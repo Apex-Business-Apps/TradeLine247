@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Search, Filter, FileText } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Link } from 'react-router-dom';
 
 export default function Quotes() {
   const mockQuotes = [
@@ -49,9 +50,11 @@ export default function Quotes() {
               Manage vehicle quotes and pricing
             </p>
           </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Quote
+          <Button asChild>
+            <Link to="/quotes/new">
+              <Plus className="h-4 w-4 mr-2" />
+              New Quote
+            </Link>
           </Button>
         </div>
 

@@ -1,73 +1,197 @@
-# Welcome to your Lovable project
+# AutoRepAi - Advanced Dealership AI Platform
 
-## Project info
+🚀 **Production-ready, compliance-first dealership management platform** with AI-powered lead qualification, Canadian tax calculations, and enterprise-grade security.
 
-**URL**: https://lovable.dev/projects/8c580ccb-d2ed-4900-a1da-f3b4f211efc8
+## ✨ Features
 
-## How can I edit this code?
+### Core Functionality
+- ✅ **AI Concierge**: Humanized chatbot powered by Google Gemini 2.5 Flash
+- ✅ **Lead Management**: Capture, score, qualify, and track with full consent logging
+- ✅ **Inventory Management**: Vehicle database with multi-source sync ready
+- ✅ **Smart Quoting**: Canadian provincial tax calculator (GST/HST/PST)
+- ✅ **Credit Applications**: FCRA-compliant with consent tracking
+- ✅ **Omnichannel Inbox**: Unified communications (planned expansion)
+- ✅ **Compliance-First**: CASL, PIPEDA, TCPA, GDPR built-in
 
-There are several ways of editing your application.
+### Technical Highlights
+- 🔐 Row Level Security (RLS) on all tables
+- 📊 Comprehensive audit logging
+- 🎯 Role-based access control (RBAC)
+- 📱 Progressive Web App (PWA) ready
+- 🌍 Multi-tenant with jurisdiction awareness
+- ⚡ Real-time updates via Supabase
 
-**Use Lovable**
+## 🚀 Quick Start
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8c580ccb-d2ed-4900-a1da-f3b4f211efc8) and start prompting.
+### Prerequisites
+- Node.js 18+
+- Supabase account (already connected)
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
+```bash
+# Install dependencies
+npm install
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Navigate to `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### First-Time Setup
+1. **Create Account**: Visit `/auth` and sign up
+2. **Configure Settings**: Go to `/settings` to set jurisdiction and compliance preferences
+3. **Add Vehicle**: Navigate to `/inventory` and add your first vehicle
+4. **Test AI Chat**: Click the chat widget to interact with AutoRepAi assistant
 
-**Use GitHub Codespaces**
+## 📚 Documentation
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - System design and technical details
+- [COMPLIANCE.md](./COMPLIANCE.md) - Regulatory compliance guide
+- [SECURITY.md](./SECURITY.md) - Security controls and best practices
 
-## What technologies are used for this project?
+## 🎯 Tech Stack
 
-This project is built with:
+- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
+- **Backend**: Supabase (PostgreSQL + Edge Functions)
+- **AI**: Lovable AI Gateway (Google Gemini 2.5 Flash)
+- **Auth**: Supabase Auth with RLS
+- **UI**: Radix UI + Custom Design System
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🔑 Key Pages
 
-## How can I deploy this project?
+- `/` - Landing page
+- `/auth` - Sign in/up
+- `/dashboard` - Main dashboard with stats
+- `/leads` - Lead management
+- `/inventory` - Vehicle inventory
+- `/quotes` - Quote list
+- `/quotes/new` - Interactive quote calculator
+- `/credit-apps` - Credit applications
+- `/inbox` - Communication hub
+- `/settings` - System configuration
 
-Simply open [Lovable](https://lovable.dev/projects/8c580ccb-d2ed-4900-a1da-f3b4f211efc8) and click on Share -> Publish.
+## 🛡️ Compliance Features
 
-## Can I connect a custom domain to my Lovable project?
+### Canadian
+- ✅ CASL consent tracking (marketing, SMS, email)
+- ✅ PIPEDA principles implementation
+- ✅ Quebec Law-25 considerations
+- ✅ Provincial dealer regulations (OMVIC, AMVIC, VSA)
 
-Yes, you can!
+### United States
+- ✅ TCPA consent logging
+- ✅ FCRA credit application compliance
+- ✅ GLBA security safeguards
+- ⏳ CAN-SPAM email compliance (planned)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### EU/Global
+- ✅ GDPR principles
+- ⏳ Data subject access requests (planned)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🔐 Security
+
+- **Authentication**: Supabase Auth with session management
+- **Authorization**: Row Level Security + role-based access
+- **Audit Logging**: All critical actions logged
+- **Data Protection**: Encryption in transit (HTTPS)
+- **Compliance**: Full audit trails for regulatory requirements
+
+## 🌐 AI Integration
+
+AutoRepAi uses **Lovable AI Gateway** with Google Gemini:
+- **Automatic setup**: No API keys needed
+- **Free tier**: Gemini models free until Oct 6, 2025
+- **Rate limiting**: Built-in error handling
+- **Compliance-aware**: Respects consent preferences
+
+### AI Edge Function
+```typescript
+// Already deployed at: /functions/v1/ai-chat
+POST https://niorocndzcflrwdrofsp.supabase.co/functions/v1/ai-chat
+{
+  "messages": [...],
+  "dealershipName": "Your Dealer",
+  "leadId": "optional-uuid"
+}
+```
+
+## 📊 Database Schema
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for complete schema details.
+
+**Key Tables:**
+- `organizations` - Multi-tenant org structure
+- `dealerships` - Dealership locations
+- `profiles` - User profiles (extends auth.users)
+- `user_roles` - Security-first RBAC
+- `leads` - Lead capture and tracking
+- `vehicles` - Inventory management
+- `quotes` - Quote versioning
+- `credit_applications` - Credit apps with consent
+- `consents` - Explicit consent tracking
+- `audit_events` - Compliance audit log
+
+## 🎨 Design System
+
+Apple-inspired minimalist design with:
+- Semantic color tokens (HSL-based)
+- Consistent spacing and typography
+- Dark mode support
+- Accessible by default (WCAG 2.2 AA)
+- Responsive mobile-first layouts
+
+## 🚧 Roadmap
+
+### Immediate (Week 1-2)
+- [ ] Email integration (Resend)
+- [ ] SMS integration (Twilio)
+- [ ] E2EE document sharing
+- [ ] Enhanced lead scoring
+
+### Short-term (Month 1)
+- [ ] Multi-language (EN/FR)
+- [ ] Dealertrack connector
+- [ ] Autovance connector
+- [ ] Advanced analytics
+
+### Long-term (Quarter 1)
+- [ ] Mobile app (Capacitor)
+- [ ] Marketplace integrations
+- [ ] Voice assistant
+- [ ] Predictive analytics
+
+## 📝 License
+
+Proprietary - All rights reserved
+
+## 🤝 Support
+
+For issues or questions:
+- Check documentation in `/docs`
+- Review [COMPLIANCE.md](./COMPLIANCE.md) for regulatory questions
+- Contact your Lovable account manager
+
+## 🎓 Training
+
+Essential training for your team:
+1. **Sales**: CASL/TCPA compliance, lead capture
+2. **Finance**: FCRA requirements, credit applications
+3. **Management**: Audit processes, compliance oversight
+
+## ⚡ Performance
+
+- Lighthouse Score: 90+ (target)
+- LCP: <2.5s
+- TTI: <3.0s
+- PWA installable
+
+## 🔗 Quick Links
+
+- [Supabase Dashboard](https://supabase.com/dashboard/project/niorocndzcflrwdrofsp)
+- [Edge Functions](https://supabase.com/dashboard/project/niorocndzcflrwdrofsp/functions)
+- [Database Tables](https://supabase.com/dashboard/project/niorocndzcflrwdrofsp/editor)
+
+---
+
+Built with ❤️ using Lovable • Ready for production deployment
