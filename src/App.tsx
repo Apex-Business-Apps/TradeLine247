@@ -14,6 +14,7 @@ import CreditApps from "./pages/CreditApps";
 import Inbox from "./pages/Inbox";
 import Settings from "./pages/Settings";
 import Compliance from "./pages/Compliance";
+import CreditApplication from "./pages/CreditApplication";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import { AIChatWidget } from "./components/Chat/AIChatWidget";
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/quotes" element={<ProtectedRoute><Quotes /></ProtectedRoute>} />
           <Route path="/quotes/new" element={<ProtectedRoute><QuoteBuilder /></ProtectedRoute>} />
           <Route path="/credit-apps" element={<ProtectedRoute><CreditApps /></ProtectedRoute>} />
+          <Route path="/credit-apps/new" element={<ProtectedRoute><CreditApplication /></ProtectedRoute>} />
           <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/compliance" element={<ProtectedRoute><Compliance /></ProtectedRoute>} />
