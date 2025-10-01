@@ -143,23 +143,38 @@ Apple-inspired minimalist design with:
 
 ## 🚧 Roadmap
 
+### ✅ Completed (v1.0)
+- [x] AI Concierge (Gemini 2.5 Flash)
+- [x] Lead Management with consent logging
+- [x] Canadian tax calculator (all provinces)
+- [x] Credit applications (FCRA/GLBA/ESIGN)
+- [x] E2EE crypto utilities (WebCrypto)
+- [x] Compliance Center UI
+- [x] DMS connector SDK (Autovance/Dealertrack stubs)
+- [x] i18n (EN/FR)
+- [x] PWA + Capacitor mobile setup
+- [x] Security docs (ASVS v5 mapping)
+
 ### Immediate (Week 1-2)
-- [ ] Email integration (Resend)
+- [ ] Email integration (Resend/SendGrid)
 - [ ] SMS integration (Twilio)
-- [ ] E2EE document sharing
-- [ ] Enhanced lead scoring
+- [ ] Complete E2EE document sharing UI
+- [ ] Enhanced lead scoring algorithm
+- [ ] Playwright E2E test suite execution
+- [ ] axe-core accessibility test passes
 
 ### Short-term (Month 1)
-- [ ] Multi-language (EN/FR)
-- [ ] Dealertrack connector
-- [ ] Autovance connector
-- [ ] Advanced analytics
+- [ ] Dealertrack API integration (live credentials)
+- [ ] Autovance API integration (live credentials)
+- [ ] Advanced analytics dashboard
+- [ ] Quote PDF generator with bilingual support
+- [ ] iOS/Android production builds
 
 ### Long-term (Quarter 1)
-- [ ] Mobile app (Capacitor)
-- [ ] Marketplace integrations
-- [ ] Voice assistant
-- [ ] Predictive analytics
+- [ ] Marketplace integrations (AutoTrader, Kijiji, CarGurus)
+- [ ] Voice assistant (call transcription)
+- [ ] Predictive analytics (ML lead scoring)
+- [ ] Real-time inventory sync
 
 ## 📝 License
 

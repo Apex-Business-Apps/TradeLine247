@@ -2,21 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/placeholder.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#3b82f6" />
+    
+    <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="AutoRepAi" />
-    <title>AutoRepAi - Dealership AI Platform</title>
-    <meta name="description" content="Advanced AI-powered dealership management platform with compliance-first design" />
-    <meta name="author" content="Lovable" />
+    <link rel="apple-touch-icon" href="/placeholder.svg" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1e293b" />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <title>AutoRepAi - Advanced Dealership AI Platform</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Production-ready, compliance-first dealership management platform with AI-powered lead qualification and Canadian tax calculations." />
+    <meta name="keywords" content="dealership, automotive, AI, CRM, CASL, PIPEDA, compliance" />
+    <meta name="author" content="AutoRepAi" />
 
+    <!-- Open Graph -->
     <meta property="og:title" content="AutoRepAi - Dealership AI Platform" />
-    <parameter name="og:description" content="Advanced AI-powered dealership management platform" />
+    <meta property="og:description" content="Advanced AI-powered dealership management platform" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
@@ -25,5 +43,16 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
+            .catch(err => console.error('[PWA] Service Worker registration failed:', err));
+        });
+      }
+    </script>
   </body>
 </html>
