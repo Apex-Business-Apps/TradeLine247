@@ -5,15 +5,13 @@
  * WCAG 2.2 AA: Ensures app remains accessible offline
  */
 
-const CACHE_NAME = 'autorepaica-v1';
-const RUNTIME_CACHE = 'autorepaica-runtime';
+const CACHE_NAME = 'autorepaica-v3-20251001';
+const RUNTIME_CACHE = 'autorepaica-runtime-v3';
 
 // Critical assets to cache on install
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
-  '/placeholder.svg'
+  '/logo.png'
 ];
 
 // Install event: precache critical assets
@@ -68,6 +66,16 @@ self.addEventListener('fetch', (event) => {
             );
           });
         })
+    );
+    return;
+  }
+
+// Navigation requests (HTML): network-first to avoid stale builds
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => response)
+        .catch(() => caches.match(request))
     );
     return;
   }

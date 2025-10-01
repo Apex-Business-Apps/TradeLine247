@@ -1,7 +1,9 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -20,9 +22,10 @@ import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import { AIChatWidget } from "./components/Chat/AIChatWidget";
 
 const queryClient = new QueryClient();
+const persister = createSyncStoragePersister({ storage: window.localStorage });
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, buster: 'v1', maxAge: 1000 * 60 * 60 * 24 }}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -44,7 +47,7 @@ const App = () => (
       </Routes>
       <AIChatWidget />
     </TooltipProvider>
-  </QueryClientProvider>
+  </PersistQueryClientProvider>
 );
 
 export default App;
