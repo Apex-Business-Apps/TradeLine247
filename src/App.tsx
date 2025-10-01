@@ -13,6 +13,7 @@ import QuoteBuilder from "./pages/QuoteBuilder";
 import CreditApps from "./pages/CreditApps";
 import Inbox from "./pages/Inbox";
 import Settings from "./pages/Settings";
+import Compliance from "./pages/Compliance";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import { AIChatWidget } from "./components/Chat/AIChatWidget";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/credit-apps" element={<ProtectedRoute><CreditApps /></ProtectedRoute>} />
           <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/compliance" element={<ProtectedRoute><Compliance /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

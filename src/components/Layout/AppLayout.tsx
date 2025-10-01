@@ -29,6 +29,7 @@ const navigation = [
   { name: 'Quotes', href: '/quotes', icon: FileText },
   { name: 'Credit Apps', href: '/credit-apps', icon: CreditCard },
   { name: 'Inbox', href: '/inbox', icon: MessageSquare },
+  { name: 'Compliance', href: '/compliance', icon: Settings },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
