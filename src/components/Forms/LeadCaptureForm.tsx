@@ -73,11 +73,16 @@ export function LeadCaptureForm({ onSuccess, vehicleId, dealershipId }: LeadCapt
       const ipResponse = await fetch('https://api.ipify.org?format=json');
       const { ip } = await ipResponse.json();
 
+      // Validate dealership_id is provided
+      if (!dealershipId) {
+        throw new Error('Dealership information is missing. Please contact support.');
+      }
+
       // Create lead
       const { data: lead, error: leadError } = await supabase
         .from('leads')
         .insert({
-          dealership_id: dealershipId || '00000000-0000-0000-0000-000000000000',
+          dealership_id: dealershipId,
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,

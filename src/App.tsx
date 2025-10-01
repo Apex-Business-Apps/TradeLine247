@@ -4,7 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -21,14 +22,43 @@ import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import { AIChatWidget } from "./components/Chat/AIChatWidget";
 
-const queryClient = new QueryClient();
-const persister = createSyncStoragePersister({ storage: window.localStorage });
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
+
+const persister = createSyncStoragePersister({ 
+  storage: window.localStorage,
+  key: 'AUTOAI_CACHE'
+});
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+}
 
 const App = () => (
-  <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, buster: 'v1', maxAge: 1000 * 60 * 60 * 24 }}>
+  <PersistQueryClientProvider 
+    client={queryClient} 
+    persistOptions={{ 
+      persister, 
+      buster: 'v2-20251001',
+      maxAge: 1000 * 60 * 60 * 24
+    }}
+  >
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
