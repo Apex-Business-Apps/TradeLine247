@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Car, Users, Zap, Shield } from 'lucide-react';
+import { Sparkles, CarFront, UsersRound, Rocket, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
@@ -20,7 +20,7 @@ const Index = () => {
               <Button asChild size="lg">
                 <Link to="/auth">
                   Get Started
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <Sparkles className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
@@ -36,7 +36,7 @@ const Index = () => {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="text-center">
             <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Users className="h-6 w-6 text-primary" />
+              <UsersRound className="h-6 w-6 text-primary" />
             </div>
             <h3 className="text-lg font-semibold mb-2">AI Lead Management</h3>
             <p className="text-muted-foreground">
@@ -46,7 +46,7 @@ const Index = () => {
 
           <div className="text-center">
             <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Car className="h-6 w-6 text-primary" />
+              <CarFront className="h-6 w-6 text-primary" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Smart Quoting</h3>
             <p className="text-muted-foreground">
@@ -56,7 +56,7 @@ const Index = () => {
 
           <div className="text-center">
             <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Zap className="h-6 w-6 text-primary" />
+              <Rocket className="h-6 w-6 text-primary" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Instant Credit Apps</h3>
             <p className="text-muted-foreground">
@@ -66,7 +66,7 @@ const Index = () => {
 
           <div className="text-center">
             <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Shield className="h-6 w-6 text-primary" />
+              <ShieldCheck className="h-6 w-6 text-primary" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Enterprise Security</h3>
             <p className="text-muted-foreground">

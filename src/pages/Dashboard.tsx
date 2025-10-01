@@ -1,12 +1,12 @@
 import { AppLayout } from '@/components/Layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Car, FileText, TrendingUp } from 'lucide-react';
+import { UsersRound, CarFront, ScrollText, TrendingUp } from 'lucide-react';
 
 export default function Dashboard() {
   const stats = [
-    { name: 'Active Leads', value: '24', icon: Users, change: '+12%' },
-    { name: 'Available Vehicles', value: '156', icon: Car, change: '+5%' },
-    { name: 'Quotes Sent', value: '18', icon: FileText, change: '+8%' },
+    { name: 'Active Leads', value: '24', icon: UsersRound, change: '+12%' },
+    { name: 'Available Vehicles', value: '156', icon: CarFront, change: '+5%' },
+    { name: 'Quotes Sent', value: '18', icon: ScrollText, change: '+8%' },
     { name: 'Conversion Rate', value: '32%', icon: TrendingUp, change: '+2%' },
   ];
 
