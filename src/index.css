@@ -2,6 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Apple-inspired minimalist design tokens */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 5%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 5%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 5%;
+    
+    /* Primary - Professional blue */
+    --primary: 215 85% 55%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary - Neutral gray */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 10%;
+    
+    /* Muted - Subtle backgrounds */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    
+    /* Accent - Highlight color */
+    --accent: 215 85% 55%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Destructive - Error states */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Success */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    
+    /* Warning */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Borders */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 215 85% 55%;
+    
+    --radius: 0.5rem;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+  
+  .dark {
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+    
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 95%;
+    
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
+    
+    --primary: 215 85% 60%;
+    --primary-foreground: 0 0% 5%;
+    
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 95%;
+    
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    
+    --accent: 215 85% 60%;
+    --accent-foreground: 0 0% 5%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 95%;
+    
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 95%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 95%;
+    
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 215 85% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
