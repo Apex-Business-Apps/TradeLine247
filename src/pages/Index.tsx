@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Sparkles, CarFront, UsersRound, Rocket, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import logo from '@/assets/logo.jpg';
 
 const Index = () => {
   return (
@@ -9,9 +10,11 @@ const Index = () => {
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
-            <h1 className="text-5xl font-bold tracking-tight sm:text-6xl mb-6">
-              AutoRepAi
-            </h1>
+            <img 
+              src={logo} 
+              alt="AutoAi Logo" 
+              className="w-32 h-32 mx-auto mb-6"
+            />
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               The world's most advanced dealership AI platform. Automate leads, quotes, 
               credit apps, and customer communication with enterprise-grade compliance.

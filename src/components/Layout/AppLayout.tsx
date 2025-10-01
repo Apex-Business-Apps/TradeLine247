@@ -17,6 +17,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import logo from '@/assets/logo.jpg';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -73,7 +74,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <SheetContent side="left" className="w-64 p-0">
               <div className="flex h-full flex-col">
                 <div className="border-b p-4">
-                  <h2 className="text-lg font-semibold">AutoRepAi</h2>
+                  <img src={logo} alt="AutoAi" className="w-16 h-16" />
                 </div>
                 <nav className="flex-1 space-y-1 p-4">
                   <NavLinks />
@@ -81,7 +82,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               </div>
             </SheetContent>
           </Sheet>
-          <h1 className="text-lg font-semibold">AutoRepAi</h1>
+          <img src={logo} alt="AutoAi" className="h-10 w-10" />
         </div>
       </div>
 
@@ -90,7 +91,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
           <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-background px-6 pb-4">
             <div className="flex h-16 shrink-0 items-center">
-              <h1 className="text-xl font-bold">AutoRepAi</h1>
+              <img src={logo} alt="AutoAi" className="h-12 w-12" />
             </div>
             <nav className="flex flex-1 flex-col">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
