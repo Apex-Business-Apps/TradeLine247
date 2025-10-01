@@ -33,7 +33,17 @@ const queryClient = new QueryClient({
 
 const persister = createSyncStoragePersister({ 
   storage: window.localStorage,
-  key: 'AUTOAI_CACHE'
+  key: 'AUTOAI_CACHE',
+  serialize: (data) => JSON.stringify(data),
+  deserialize: (data) => {
+    try {
+      return JSON.parse(data);
+    } catch (error) {
+      console.error('Failed to deserialize cache, clearing...', error);
+      window.localStorage.removeItem('AUTOAI_CACHE');
+      return undefined;
+    }
+  },
 });
 
 function ScrollToTop() {
@@ -51,8 +61,14 @@ const App = () => (
     client={queryClient} 
     persistOptions={{ 
       persister, 
-      buster: 'v2-20251001',
-      maxAge: 1000 * 60 * 60 * 24
+      buster: 'v3-20251001',
+      maxAge: 1000 * 60 * 60 * 24,
+      dehydrateOptions: {
+        shouldDehydrateQuery: () => true,
+      },
+    }}
+    onSuccess={() => {
+      console.log('React Query cache restored successfully');
     }}
   >
     <TooltipProvider>
