@@ -17,7 +17,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import logo from '@/assets/logo.jpg';
+import logo from '@/assets/logo.png';
 
 interface AppLayoutProps {
   children: ReactNode;
