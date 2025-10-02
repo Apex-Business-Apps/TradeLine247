@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { MessageSquare, X, Send, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ChatbotAvatar } from '@/components/assistant/ChatbotAvatar';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -78,10 +79,10 @@ export function AIChatWidget() {
       <Button
         onClick={() => setIsOpen(true)}
         size="lg"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50 p-0 overflow-hidden"
         aria-label="Open chat"
       >
-        <MessageSquare className="h-6 w-6" />
+        <ChatbotAvatar size={56} />
       </Button>
     );
   }
@@ -90,9 +91,9 @@ export function AIChatWidget() {
     <Card className="fixed bottom-6 right-6 w-96 h-[600px] flex flex-col shadow-2xl z-50">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold">AutoRepAi</h3>
+        <div className="flex items-center gap-3">
+          <ChatbotAvatar size={40} />
+          <h3 className="font-semibold">CarBOB</h3>
         </div>
         <Button
           variant="ghost"
