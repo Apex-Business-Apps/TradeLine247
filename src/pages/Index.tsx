@@ -43,7 +43,7 @@ const Index = () => {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button variant="outline" size="lg" asChild className="text-lg px-8 py-6 border-2 border-white text-white hover:bg-white hover:text-black">
+              <Button variant="outline" size="lg" asChild className="text-lg px-8 py-6 border-2 border-white text-primary hover:bg-white hover:text-black">
                 <Link to="/dashboard">
                   View Live Demo
                   <Rocket className="ml-2 h-5 w-5" />
