@@ -14,6 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
+      ab_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          session_id: string
+          test_id: string
+          user_id: string | null
+          variant: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          session_id: string
+          test_id: string
+          user_id?: string | null
+          variant: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          session_id?: string
+          test_id?: string
+          user_id?: string | null
+          variant?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_events_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "ab_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ab_tests: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          name: string
+          start_date: string | null
+          status: string
+          traffic_split: Json
+          updated_at: string
+          variants: Json
+          winner: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          start_date?: string | null
+          status?: string
+          traffic_split?: Json
+          updated_at?: string
+          variants: Json
+          winner?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          start_date?: string | null
+          status?: string
+          traffic_split?: Json
+          updated_at?: string
+          variants?: Json
+          winner?: string | null
+        }
+        Relationships: []
+      }
       audit_events: {
         Row: {
           action: string
@@ -715,6 +798,9 @@ export type Database = {
           locale: string | null
           organization_id: string | null
           phone: string | null
+          referral_code: string | null
+          referral_credits: number | null
+          referred_by: string | null
           timezone: string | null
           updated_at: string
         }
@@ -728,6 +814,9 @@ export type Database = {
           locale?: string | null
           organization_id?: string | null
           phone?: string | null
+          referral_code?: string | null
+          referral_credits?: number | null
+          referred_by?: string | null
           timezone?: string | null
           updated_at?: string
         }
@@ -741,6 +830,9 @@ export type Database = {
           locale?: string | null
           organization_id?: string | null
           phone?: string | null
+          referral_code?: string | null
+          referral_credits?: number | null
+          referred_by?: string | null
           timezone?: string | null
           updated_at?: string
         }
@@ -879,6 +971,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      referrals: {
+        Row: {
+          converted_at: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          referral_code: string
+          referred_email: string
+          referred_user_id: string | null
+          referrer_id: string
+          reward_granted: boolean | null
+          status: string
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          referral_code: string
+          referred_email: string
+          referred_user_id?: string | null
+          referrer_id: string
+          reward_granted?: boolean | null
+          status?: string
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          referral_code?: string
+          referred_email?: string
+          referred_user_id?: string | null
+          referrer_id?: string
+          reward_granted?: boolean | null
+          status?: string
+        }
+        Relationships: []
       }
       usage_counters: {
         Row: {
@@ -1111,6 +1242,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      widget_installs: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          dealership_id: string
+          domain: string | null
+          id: string
+          install_date: string
+          last_impression_at: string | null
+          metadata: Json | null
+          organization_id: string
+          total_clicks: number | null
+          total_impressions: number | null
+          widget_code: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          dealership_id: string
+          domain?: string | null
+          id?: string
+          install_date?: string
+          last_impression_at?: string | null
+          metadata?: Json | null
+          organization_id: string
+          total_clicks?: number | null
+          total_impressions?: number | null
+          widget_code: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          dealership_id?: string
+          domain?: string | null
+          id?: string
+          install_date?: string
+          last_impression_at?: string | null
+          metadata?: Json | null
+          organization_id?: string
+          total_clicks?: number | null
+          total_impressions?: number | null
+          widget_code?: string
+        }
+        Relationships: []
       }
     }
     Views: {

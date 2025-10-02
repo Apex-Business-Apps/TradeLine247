@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Sparkles, CarFront, UsersRound, Rocket, ShieldCheck, ArrowRight, TrendingUp, Zap, Award, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '@/assets/logo.png';
+import { ROICalculator } from '@/components/Growth/ROICalculator';
 
 const Index = () => {
   return (
@@ -155,6 +156,25 @@ const Index = () => {
               Learn more <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Card>
+        </div>
+      </div>
+
+      {/* ROI Calculator Section */}
+      <div className="bg-gradient-to-b from-white to-muted/30 py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Badge className="mb-4 text-sm px-4 py-2 bg-primary text-white border-primary">
+              <TrendingUp className="w-3 h-3 mr-2" />
+              Calculate Your ROI
+            </Badge>
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4 text-black">
+              See Your Potential <span className="text-primary">Revenue Growth</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Find out how much more revenue your dealership could generate with AutoRepAi
+            </p>
+          </div>
+          <ROICalculator />
         </div>
       </div>
 

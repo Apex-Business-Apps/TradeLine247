@@ -18,6 +18,7 @@ import Inbox from "./pages/Inbox";
 import Settings from "./pages/Settings";
 import Compliance from "./pages/Compliance";
 import CreditApplication from "./pages/CreditApplication";
+import Growth from "./pages/Growth";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import { AIChatWidget } from "./components/Chat/AIChatWidget";
@@ -88,6 +89,7 @@ const App = () => (
         <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/compliance" element={<ProtectedRoute><Compliance /></ProtectedRoute>} />
+        <Route path="/growth" element={<ProtectedRoute><Growth /></ProtectedRoute>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
