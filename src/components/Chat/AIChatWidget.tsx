@@ -79,10 +79,10 @@ export function AIChatWidget() {
       <Button
         onClick={() => setIsOpen(true)}
         size="lg"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50 p-0 overflow-hidden"
+        className="fixed bottom-6 right-6 h-40 w-40 rounded-full shadow-lg z-50 p-0 overflow-hidden"
         aria-label="Open chat"
       >
-        <ChatbotAvatar size={56} />
+        <ChatbotAvatar size={168} />
       </Button>
     );
   }
@@ -92,7 +92,7 @@ export function AIChatWidget() {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-3">
-          <ChatbotAvatar size={40} />
+          <ChatbotAvatar size={120} />
           <h3 className="font-semibold">CarBOB</h3>
         </div>
         <Button
