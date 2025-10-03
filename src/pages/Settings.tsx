@@ -130,6 +130,73 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Social Media & Communication</CardTitle>
+                <CardDescription>
+                  Connect your social media and messaging platforms
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Facebook</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Manage Facebook page and lead ads
+                      </p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">Instagram</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Connect Instagram business account
+                      </p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">X (Twitter)</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Post updates and engage with customers
+                      </p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">TikTok</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Connect TikTok business account
+                      </p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">WhatsApp</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Business messaging and customer support
+                      </p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">YouTube</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Manage video content and channel
+                      </p>
+                    </div>
+                    <Button variant="outline">Configure</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="ai" className="space-y-6 mt-6">
