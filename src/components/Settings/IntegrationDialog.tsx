@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { z } from 'zod';
 
 interface IntegrationDialogProps {
   open: boolean;
@@ -35,9 +36,26 @@ export function IntegrationDialog({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  // Input validation schema - prevents injection attacks
+  const credentialSchema = z.object({
+    value: z.string()
+      .trim()
+      .min(1, 'Field cannot be empty')
+      .max(500, 'Value too long')
+      .refine((val) => !/[<>{}]/.test(val), 'Invalid characters detected')
+  });
+
   const handleSave = async () => {
     setLoading(true);
     try {
+      // Validate all inputs against injection attacks
+      for (const [key, value] of Object.entries(formData)) {
+        const validation = credentialSchema.safeParse({ value });
+        if (!validation.success) {
+          throw new Error(`Invalid ${key}: ${validation.error.errors[0].message}`);
+        }
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
@@ -49,13 +67,27 @@ export function IntegrationDialog({
 
       if (!profile?.organization_id) throw new Error('No organization found');
 
+      // SECURITY: Store credentials securely via Edge Function (not in database config field)
+      const { data: secretData, error: secretError } = await supabase.functions.invoke('store-integration-credentials', {
+        body: {
+          provider,
+          organization_id: profile.organization_id,
+          credentials: formData,
+        },
+      });
+
+      if (secretError) throw secretError;
+
+      // Store only non-sensitive metadata in integrations table
       const { error } = await supabase
         .from('integrations')
         .insert({
           organization_id: profile.organization_id,
           provider,
           name: title,
-          config: formData,
+          config: {}, // Non-sensitive config only
+          credential_vault_key: secretData.vault_key,
+          credential_rotated_at: new Date().toISOString(),
           active: true,
         });
 
@@ -63,7 +95,7 @@ export function IntegrationDialog({
 
       toast({
         title: 'Integration saved',
-        description: `${title} has been configured successfully.`,
+        description: `${title} has been configured securely.`,
       });
 
       onOpenChange(false);
