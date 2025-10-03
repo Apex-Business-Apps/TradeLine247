@@ -2,3 +2,6 @@ project_id = "niorocndzcflrwdrofsp"
 
 [functions.ai-chat]
 verify_jwt = false
+
+[functions.social-post]
+verify_jwt = true
