@@ -36,6 +36,33 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Security headers to apply to all responses
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
+  'Cross-Origin-Embedder-Policy': 'require-corp',
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Resource-Policy': 'same-origin',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://niorocndzcflrwdrofsp.supabase.co wss://niorocndzcflrwdrofsp.supabase.co https://api.lovable.app; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+};
+
+// Helper function to add security headers to response
+function addSecurityHeaders(response) {
+  const newHeaders = new Headers(response.headers);
+  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+    newHeaders.set(key, value);
+  });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: newHeaders
+  });
+}
+
 // Fetch event: network-first for API, cache-first for assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
@@ -56,14 +83,15 @@ self.addEventListener('fetch', (event) => {
               cache.put(request, responseClone);
             });
           }
-          return response;
+          return addSecurityHeaders(response);
         })
         .catch(() => {
           return caches.match(request).then((cached) => {
-            return cached || new Response(
+            if (cached) return addSecurityHeaders(cached);
+            return addSecurityHeaders(new Response(
               JSON.stringify({ error: 'Offline', offline: true }),
               { headers: { 'Content-Type': 'application/json' } }
-            );
+            ));
           });
         })
     );
@@ -74,8 +102,8 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
-        .then((response) => response)
-        .catch(() => caches.match(request))
+        .then((response) => addSecurityHeaders(response))
+        .catch(() => caches.match(request).then(cached => cached ? addSecurityHeaders(cached) : cached))
     );
     return;
   }
@@ -83,12 +111,12 @@ self.addEventListener('fetch', (event) => {
   // Static assets: cache-first with network fallback
   event.respondWith(
     caches.match(request).then((cached) => {
-      if (cached) return cached;
+      if (cached) return addSecurityHeaders(cached);
 
       return fetch(request).then((response) => {
         // Don't cache opaque responses or errors
         if (!response || response.status !== 200 || response.type === 'opaque') {
-          return response;
+          return addSecurityHeaders(response);
         }
 
         const responseClone = response.clone();
@@ -96,7 +124,7 @@ self.addEventListener('fetch', (event) => {
           cache.put(request, responseClone);
         });
 
-        return response;
+        return addSecurityHeaders(response);
       });
     })
   );
