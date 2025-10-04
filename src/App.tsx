@@ -7,6 +7,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { Routes, Route, useLocation } from "react-router-dom";
+import { safeStorage } from "@/lib/storage/safeStorage";
 
 // Eager load critical routes
 import Index from "./pages/Index";
@@ -47,7 +48,7 @@ const queryClient = new QueryClient({
 });
 
 const persister = createSyncStoragePersister({ 
-  storage: window.localStorage,
+  storage: safeStorage,
   key: 'AUTOAI_CACHE',
   serialize: (data) => JSON.stringify(data),
   deserialize: (data) => {
@@ -55,7 +56,7 @@ const persister = createSyncStoragePersister({
       return JSON.parse(data);
     } catch (error) {
       console.error('Failed to deserialize cache, clearing...', error);
-      window.localStorage.removeItem('AUTOAI_CACHE');
+      safeStorage.removeItem('AUTOAI_CACHE');
       return undefined;
     }
   },
