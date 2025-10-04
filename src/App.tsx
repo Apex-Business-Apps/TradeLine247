@@ -21,8 +21,9 @@ import Compliance from "./pages/Compliance";
 import CreditApplication from "./pages/CreditApplication";
 import Growth from "./pages/Growth";
 import NotFound from "./pages/NotFound";
+import LeadDetail from "./pages/LeadDetail";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
-import { AIChatWidget } from "./components/Chat/AIChatWidget";
+import { EnhancedAIChatWidget } from "./components/Chat/EnhancedAIChatWidget";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,6 +84,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
+          <Route path="/leads/:id" element={<ProtectedRoute><LeadDetail /></ProtectedRoute>} />
           <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
           <Route path="/quotes" element={<ProtectedRoute><Quotes /></ProtectedRoute>} />
           <Route path="/quotes/new" element={<ProtectedRoute><QuoteBuilder /></ProtectedRoute>} />
@@ -95,7 +97,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <AIChatWidget />
+        <EnhancedAIChatWidget />
       </TooltipProvider>
     </PersistQueryClientProvider>
   </ErrorBoundary>
