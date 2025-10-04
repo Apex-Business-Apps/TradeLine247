@@ -13,6 +13,9 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 
+// Eager load critical components that are always needed
+import { EnhancedAIChatWidget } from "./components/Chat/EnhancedAIChatWidget";
+
 // Lazy load non-critical routes for better initial load performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Leads = lazy(() => import("./pages/Leads"));
@@ -27,7 +30,6 @@ const CreditApplication = lazy(() => import("./pages/CreditApplication"));
 const Growth = lazy(() => import("./pages/Growth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const LeadDetail = lazy(() => import("./pages/LeadDetail"));
-const EnhancedAIChatWidget = lazy(() => import("./components/Chat/EnhancedAIChatWidget").then(m => ({ default: m.EnhancedAIChatWidget })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
