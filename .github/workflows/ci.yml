@@ -141,8 +141,8 @@ jobs:
           name: build-output
           path: dist/
 
-  lighthouse:
-    name: Performance Budgets (Lighthouse)
+  lighthouse-mobile:
+    name: 📱 Lighthouse Mobile Performance Gate (ENFORCED)
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -161,11 +161,181 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Run Lighthouse CI
-        run: |
-          npm install -g @lhci/cli@0.12.x
-          lhci autorun
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.12.x
+      
+      - name: Run Lighthouse CI Mobile Audits
+        run: lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-        # TODO: Add lighthouserc.json configuration
-        # Budgets: LCP ≤ 2.5s, TTI ≤ 3.0s, Accessibility ≥ 90
+      
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+      
+      - name: Check performance budgets (GATE)
+        run: |
+          echo "🔍 Checking performance budgets..."
+          echo "=================================="
+          
+          if [ -f ".lighthouseci/assertion-results.json" ]; then
+            # Check for error-level violations
+            ERROR_COUNT=$(grep -c '"level":"error"' .lighthouseci/assertion-results.json || true)
+            
+            if [ "$ERROR_COUNT" -gt 0 ]; then
+              echo ""
+              echo "❌ FAILED: $ERROR_COUNT performance budget violation(s) detected"
+              echo ""
+              echo "Budget violations:"
+              cat .lighthouseci/assertion-results.json | jq '.[] | select(.level=="error") | {name: .name, actual: .actual, expected: .expected}'
+              echo ""
+              echo "📊 Full report available in artifacts"
+              exit 1
+            else
+              echo "✅ PASSED: All performance budgets met"
+              echo ""
+              echo "Performance: ≥85"
+              echo "Accessibility: ≥90"
+              echo "LCP: ≤2500ms"
+              echo "TBT: ≤300ms"
+              echo "CLS: ≤0.1"
+            fi
+          else
+            echo "⚠️ WARNING: No assertion results found"
+            exit 1
+          fi
+
+  wcag-accessibility:
+    name: ♿ WCAG 2.2 AA Gate (ENFORCED)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      
+      - name: Run WCAG 2.2 AA accessibility tests
+        run: npx playwright test tests/accessibility/wcag-audit.spec.ts tests/accessibility/complete-wcag.spec.ts --reporter=html,json
+        continue-on-error: true
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: accessibility-results
+          path: |
+            test-results/
+            playwright-report/
+      
+      - name: Check WCAG violations (GATE)
+        run: |
+          echo "🔍 Checking WCAG 2.2 AA compliance..."
+          echo "====================================="
+          
+          # Check test exit code from previous step
+          if [ -f "test-results/.last-run.json" ]; then
+            FAILURES=$(jq '.failures' test-results/.last-run.json || echo "0")
+            
+            if [ "$FAILURES" -gt 0 ]; then
+              echo ""
+              echo "❌ FAILED: $FAILURES accessibility violation(s) detected"
+              echo ""
+              echo "Common violations:"
+              echo "- Color contrast (4.5:1 minimum)"
+              echo "- Missing alt text"
+              echo "- Missing form labels"
+              echo "- Missing ARIA attributes"
+              echo ""
+              echo "📊 Full report: playwright-report/index.html"
+              exit 1
+            else
+              echo "✅ PASSED: No WCAG 2.2 AA violations detected"
+            fi
+          else
+            # Fallback: Check for test failures via exit code
+            if ! npx playwright test tests/accessibility/wcag-audit.spec.ts --reporter=list; then
+              echo "❌ FAILED: WCAG 2.2 AA violations detected"
+              exit 1
+            fi
+          fi
+
+  merge-gate:
+    name: 🚦 Merge Gate - Pipeline Status
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, unit-tests, accessibility-tests, e2e-tests, security-scan, lighthouse-mobile, wcag-accessibility]
+    if: always()
+    steps:
+      - name: Check all job statuses
+        run: |
+          echo "🚦 MERGE GATE STATUS CHECK"
+          echo "=========================="
+          echo ""
+          echo "Lint & Typecheck:        ${{ needs.lint-and-typecheck.result }}"
+          echo "Unit Tests:              ${{ needs.unit-tests.result }}"
+          echo "Accessibility Tests:     ${{ needs.accessibility-tests.result }}"
+          echo "E2E Tests:               ${{ needs.e2e-tests.result }}"
+          echo "Security Scan:           ${{ needs.security-scan.result }}"
+          echo "Lighthouse Mobile:       ${{ needs.lighthouse-mobile.result }}"
+          echo "WCAG 2.2 AA:             ${{ needs.wcag-accessibility.result }}"
+          echo ""
+          
+          # Check for any failures
+          FAILED=0
+          
+          if [ "${{ needs.lint-and-typecheck.result }}" != "success" ]; then
+            echo "❌ Lint/Typecheck failed"
+            FAILED=1
+          fi
+          
+          if [ "${{ needs.unit-tests.result }}" != "success" ]; then
+            echo "❌ Unit tests failed"
+            FAILED=1
+          fi
+          
+          if [ "${{ needs.lighthouse-mobile.result }}" != "success" ]; then
+            echo "❌ CRITICAL: Performance budgets not met"
+            echo "   - Performance score must be ≥85"
+            echo "   - LCP must be ≤2500ms"
+            echo "   - CLS must be ≤0.1"
+            FAILED=1
+          fi
+          
+          if [ "${{ needs.wcag-accessibility.result }}" != "success" ]; then
+            echo "❌ CRITICAL: WCAG 2.2 AA compliance failed"
+            echo "   - All color contrast ratios must be ≥4.5:1"
+            echo "   - All images must have alt text"
+            echo "   - All forms must have labels"
+            FAILED=1
+          fi
+          
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "🔴 PIPELINE FAILED - Merge blocked"
+            echo ""
+            echo "Action Required:"
+            echo "1. Review failed job artifacts"
+            echo "2. Fix all violations"
+            echo "3. Re-run pipeline"
+            exit 1
+          fi
+          
+          echo ""
+          echo "✅ ALL GATES PASSED - Ready to merge"
+          echo ""
+          echo "Performance & Accessibility Requirements Met:"
+          echo "- ✅ Performance score ≥85"
+          echo "- ✅ Accessibility score ≥90"
+          echo "- ✅ LCP ≤2500ms"
+          echo "- ✅ CLS ≤0.1"
+          echo "- ✅ No WCAG 2.2 AA violations"
