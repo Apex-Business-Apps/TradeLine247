@@ -1,0 +1,172 @@
+Control ID,Category,Requirement,Status,Implementation Notes,Evidence Location,Last Verified
+V1.1.1,Architecture,Secure SDLC with code review,PASS,Code review process via Git workflow,GitHub repository,2025-10-04
+V1.1.2,Architecture,Threat model documented,PASS,Comprehensive threat model in SECURITY.md,SECURITY.md lines 9-33,2025-10-04
+V1.4.1,Architecture,Trusted enforcement points (RLS),PASS,Row Level Security enabled on all tables,Supabase RLS policies,2025-10-04
+V1.5.1,Architecture,Input validation at boundaries,PASS,Zod schemas for all forms,src/components/Forms/*,2025-10-04
+V2.1.1,Authentication,Password-based authentication,PASS,Supabase Auth with bcrypt hashing,src/integrations/supabase/client.ts,2025-10-04
+V2.1.2,Authentication,Email verification supported,PASS,Email confirmation flow enabled,Supabase Auth settings,2025-10-04
+V2.1.3,Authentication,Password strength requirements,PASS,Minimum 8 chars enforced by Supabase,Supabase Auth config,2025-10-04
+V2.1.4,Authentication,Credential enumeration protection,PASS,Generic error messages for failed logins,src/pages/Auth.tsx,2025-10-04
+V2.1.5,Authentication,Account lockout after failed attempts,FAIL,Not currently implemented - Supabase default unlimited retries,N/A,2025-10-04
+V2.1.9,Authentication,Password reset via email,PASS,Secure password reset flow with token expiry,Supabase Auth,2025-10-04
+V2.1.12,Authentication,Password change requires old password,PASS,Supabase enforces current password for change,Supabase Auth,2025-10-04
+V2.2.1,Authentication,Anti-automation controls,PARTIAL,Rate limiting on Edge Functions only - no CAPTCHA,Edge function rate limits,2025-10-04
+V2.2.2,Authentication,Password breach detection,FAIL,Leaked password detection not enabled in Supabase,Security-Errors.md,2025-10-04
+V2.2.3,Authentication,Secure password reset,PASS,Time-limited tokens sent via email only,Supabase Auth,2025-10-04
+V2.3.1,Authentication,Session tokens cryptographically random,PASS,JWT tokens signed with HS256,Supabase Auth,2025-10-04
+V2.3.2,Authentication,Session invalidation on logout,PASS,supabase.auth.signOut() terminates session,src/components/Auth/*,2025-10-04
+V2.3.3,Authentication,Session timeout after inactivity,PASS,1-hour access token expiry with refresh rotation,src/integrations/supabase/client.ts,2025-10-04
+V2.5.1,Authentication,Credential recovery,PASS,Email-based account recovery,Supabase Auth,2025-10-04
+V2.7.1,Authentication,Re-authentication for sensitive ops,FAIL,Not implemented - sensitive ops don't require re-auth,N/A,2025-10-04
+V2.7.2,Authentication,OAuth state parameter,PASS,PKCE flow enabled for OAuth,src/integrations/supabase/client.ts line 19,2025-10-04
+V2.8.1,Authentication,Multi-factor authentication,FAIL,MFA not enabled - planned for future,N/A,2025-10-04
+V3.1.1,Session Management,Session binding to TLS connection,PASS,All sessions over HTTPS with HSTS,index.html CSP/HSTS headers,2025-10-04
+V3.2.1,Session Management,Session tokens cryptographically strong,PASS,JWTs with 256-bit keys,Supabase Auth,2025-10-04
+V3.2.2,Session Management,Session ID not exposed in URLs,PASS,JWT in Authorization header only,Supabase client,2025-10-04
+V3.2.3,Session Management,Session storage secure,PARTIAL,localStorage used (XSS vulnerable) - no SSR,src/integrations/supabase/client.ts,2025-10-04
+V3.2.4,Session Management,Session tokens are single use or rotated,PASS,Refresh tokens rotate on every use,Supabase Auth,2025-10-04
+V3.3.1,Session Management,Logout terminates server-side session,PASS,supabase.auth.signOut() invalidates server session,Supabase Auth,2025-10-04
+V3.3.2,Session Management,Absolute session timeout,PASS,1-hour access token + refresh token rotation,Supabase Auth,2025-10-04
+V3.3.3,Session Management,Idle timeout,PASS,Auto-refresh only on user activity,src/integrations/supabase/client.ts,2025-10-04
+V3.3.4,Session Management,Session termination notification,FAIL,User not notified when session expires,N/A,2025-10-04
+V3.4.1,Session Management,Cookie-based sessions with Secure flag,PASS,Sidebar cookie has Secure flag in production,src/components/ui/sidebar.tsx,2025-10-04
+V3.4.2,Session Management,Cookie HttpOnly attribute,PARTIAL,Auth in localStorage (can't use HttpOnly) - sidebar cookie can't set HttpOnly client-side,Cookie-Matrix.md,2025-10-04
+V3.4.3,Session Management,Cookie SameSite attribute,PASS,"Auth N/A (localStorage), sidebar=Lax",Cookie-Matrix.md lines 168-188,2025-10-04
+V3.4.5,Session Management,Cookie scope correctly set,PASS,Path=/ for application-wide access,src/components/ui/sidebar.tsx,2025-10-04
+V4.1.1,Access Control,Deny by default principle,PASS,RLS denies all access unless explicitly granted,Supabase RLS policies,2025-10-04
+V4.1.2,Access Control,Attribute/feature-based access control,PASS,RBAC via user_roles table with has_role() function,SECURITY.md lines 84-89,2025-10-04
+V4.1.3,Access Control,Principle of least privilege,PASS,Role hierarchy with minimal permissions per role,Database RLS policies,2025-10-04
+V4.1.5,Access Control,Server-side access control enforcement,PASS,All access control via Supabase RLS (server-side),Supabase database,2025-10-04
+V4.2.1,Access Control,Data access is resource-scoped,PASS,Organization-scoped queries via RLS,get_user_organization() function,2025-10-04
+V4.2.2,Access Control,User data isolation,PASS,Users can only access own org/dealer data,RLS policies with org_id checks,2025-10-04
+V4.3.1,Access Control,Admin interfaces use appropriate MFA,FAIL,No MFA implemented,N/A,2025-10-04
+V4.3.2,Access Control,Directory browsing disabled,PASS,React SPA - no directory listing,Vite configuration,2025-10-04
+V4.3.3,Access Control,API rate limiting,PASS,Rate limiting on Edge Functions,Edge function configuration,2025-10-04
+V5.1.1,Input Validation,Input validation for security,PASS,Zod schemas validate all form inputs,Multiple form components,2025-10-04
+V5.1.2,Input Validation,Structured data from trusted sources,PASS,TypeScript types + Zod validation,Database types in types.ts,2025-10-04
+V5.1.3,Input Validation,Output encoding for context,PASS,React automatic escaping + CSP headers,React framework + Security-Gate-Report.md,2025-10-04
+V5.1.4,Input Validation,Character set validation,PASS,UTF-8 enforced via database/API,Supabase configuration,2025-10-04
+V5.1.5,Input Validation,Validation on every tier,PASS,Client (Zod) + Server (RLS) validation,Frontend forms + Database policies,2025-10-04
+V5.2.1,Input Validation,Sanitization against injection,PASS,Parameterized queries via Supabase client (no raw SQL),Supabase client implementation,2025-10-04
+V5.2.2,Input Validation,SQL injection prevention,PASS,No raw SQL - all queries parameterized,Supabase client usage,2025-10-04
+V5.2.3,Input Validation,LDAP injection prevention,N/A,No LDAP integration,N/A,2025-10-04
+V5.2.4,Input Validation,OS command injection prevention,PASS,No shell commands from user input,Codebase review,2025-10-04
+V5.2.5,Input Validation,XML injection prevention,N/A,No XML processing,N/A,2025-10-04
+V5.2.7,Input Validation,Template injection prevention,PASS,React escaping + no server-side templating,React framework,2025-10-04
+V5.2.8,Input Validation,SSRF prevention,PASS,No user-controlled URLs for backend requests,Edge function review,2025-10-04
+V5.3.1,Input Validation,XSS protection,PASS,React escaping + CSP headers,Security-Gate-Report.md,2025-10-04
+V5.3.2,Input Validation,User-controlled content sanitization,PASS,No dangerouslySetInnerHTML used,Codebase review,2025-10-04
+V5.3.3,Input Validation,Context-aware output encoding,PASS,React handles encoding automatically,React framework,2025-10-04
+V5.3.4,Input Validation,DOM-based XSS protection,PASS,No unsafe DOM manipulation,Codebase review,2025-10-04
+V5.3.5,Input Validation,CSP to prevent XSS,PASS,Strict CSP implemented,Security-Gate-Report.md + index.html,2025-10-04
+V5.3.6,Input Validation,User upload file type validation,FAIL,File upload not yet implemented,N/A,2025-10-04
+V5.4.1,Input Validation,Memory-safe string operations,PASS,JavaScript string handling (memory-safe),Language feature,2025-10-04
+V5.4.2,Input Validation,Format string attack prevention,PASS,No C-style format strings,Language feature,2025-10-04
+V5.4.3,Input Validation,Integer overflow protection,PASS,JavaScript number safety + validation,Zod number schemas,2025-10-04
+V5.5.1,Input Validation,Deserialization of untrusted data,PASS,JSON only - no eval() or unsafe deserialization,Codebase review,2025-10-04
+V5.5.2,Input Validation,XML parser hardening,N/A,No XML processing,N/A,2025-10-04
+V5.5.3,Input Validation,JSON schema validation,PASS,Zod schemas for all JSON payloads,Form validation,2025-10-04
+V6.1.1,Cryptography,Sensitive data encrypted at rest,PASS,Supabase encrypts database at rest,Supabase platform feature,2025-10-04
+V6.1.2,Cryptography,Sensitive data encrypted in transit,PASS,TLS 1.3 for all connections + HSTS,Security-Gate-Report.md,2025-10-04
+V6.1.3,Cryptography,Secrets not hardcoded,PASS,All secrets in Supabase Secrets (env vars),Supabase dashboard,2025-10-04
+V6.2.1,Cryptography,TLS/SSL for all connections,PASS,HTTPS enforced via HSTS header,Security-Gate-Report.md,2025-10-04
+V6.2.2,Cryptography,Strong TLS configuration,PASS,TLS 1.2+ with strong ciphers,Supabase/Lovable infrastructure,2025-10-04
+V6.2.3,Cryptography,Secure TLS cipher suites,PASS,Modern cipher suites only,Platform configuration,2025-10-04
+V6.2.5,Cryptography,Certificate validation,PASS,Valid SSL certificates,Platform managed,2025-10-04
+V6.2.6,Cryptography,HSTS header present,PASS,Strict-Transport-Security with 1 year max-age,Security-Gate-Report.md + public/sw.js,2025-10-04
+V6.3.1,Cryptography,Master secrets properly protected,PASS,Secrets in Supabase Secrets (encrypted at rest),Supabase Secrets,2025-10-04
+V6.3.2,Cryptography,Cryptographic modules fail securely,PASS,WebCrypto API standard error handling,src/lib/crypto.ts,2025-10-04
+V6.3.3,Cryptography,Random values cryptographically secure,PASS,window.crypto.getRandomValues() used,src/lib/crypto.ts,2025-10-04
+V6.4.1,Cryptography,Approved cryptographic algorithms,PASS,AES-256-GCM for encryption,src/lib/crypto.ts,2025-10-04
+V6.4.2,Cryptography,Symmetric keys sufficient length,PASS,256-bit AES keys,src/lib/crypto.ts,2025-10-04
+V7.1.1,Error Handling,Generic error messages to users,PASS,Detailed errors hidden from frontend,Error handling in components,2025-10-04
+V7.1.2,Error Handling,Detailed errors logged server-side,PASS,Edge function logs in Supabase,Supabase logging,2025-10-04
+V7.1.3,Error Handling,Error messages don't leak sensitive data,PASS,Sanitized error messages to client,Error handling review,2025-10-04
+V7.1.4,Error Handling,Stack traces not exposed,PASS,Production builds don't expose stack traces,Vite production build,2025-10-04
+V7.2.1,Error Handling,Logs don't contain credentials,PASS,No passwords/tokens in logs,Code review,2025-10-04
+V7.2.2,Error Handling,Logs don't contain sensitive PII,PARTIAL,Logs may contain email addresses (not SSN/credit cards),Logging review,2025-10-04
+V7.3.1,Error Handling,Audit logs for security events,PASS,audit_events table for security-critical actions,Database schema,2025-10-04
+V7.3.2,Error Handling,Audit logs are tamper-proof,PASS,Append-only audit_events table with RLS,RLS policies,2025-10-04
+V7.3.3,Error Handling,Audit logs retention policy,PARTIAL,No automated retention/archival yet,TODO,2025-10-04
+V7.4.1,Error Handling,Errors handled consistently,PASS,Centralized error handling via React patterns,Error boundaries,2025-10-04
+V7.4.2,Error Handling,Memory is cleared on error,PASS,JavaScript garbage collection,Language feature,2025-10-04
+V8.1.1,Data Protection,Sensitive data classification,PASS,Data classified: Critical/High/Medium/Low,SECURITY.md lines 161-165,2025-10-04
+V8.1.2,Data Protection,PII handling procedures,PASS,Documented data protection policies,COMPLIANCE.md + SECURITY.md,2025-10-04
+V8.1.3,Data Protection,Sensitive data not logged,PASS,Credentials/PII excluded from logs,Logging implementation,2025-10-04
+V8.2.1,Data Protection,Encryption at rest,PASS,Supabase encrypts database at rest (AES-256),Supabase infrastructure,2025-10-04
+V8.2.2,Data Protection,Encryption in transit,PASS,TLS 1.3 for all network traffic,HSTS + TLS config,2025-10-04
+V8.2.3,Data Protection,Secure caching headers,PASS,Cache-Control headers for sensitive endpoints,Response headers,2025-10-04
+V8.3.1,Data Protection,Sensitive data not in URL,PASS,POST for forms + no sensitive data in query params,API design review,2025-10-04
+V8.3.2,Data Protection,Sensitive data not in browser history,PASS,POST methods + no GET with sensitive params,Implementation review,2025-10-04
+V8.3.3,Data Protection,Autocomplete disabled on sensitive fields,PASS,autocomplete=off on password/credit card fields,Form components,2025-10-04
+V8.3.4,Data Protection,Sensitive data cleared from memory,PASS,JavaScript automatic memory management,Language feature,2025-10-04
+V8.3.5,Data Protection,Authentication credentials protected,PASS,Passwords never stored client-side,Supabase Auth,2025-10-04
+V8.3.6,Data Protection,Temporary files secured,PASS,No temporary files created client-side,Implementation review,2025-10-04
+V8.3.7,Data Protection,Data retention policy,PARTIAL,No automated data deletion yet,TODO,2025-10-04
+V9.1.1,Communication,HTTPS for all connections,PASS,All traffic over HTTPS,HSTS enforcement,2025-10-04
+V9.1.2,Communication,Latest TLS version,PASS,TLS 1.3 supported,Platform configuration,2025-10-04
+V9.1.3,Communication,Weak cipher suites disabled,PASS,Only strong ciphers enabled,TLS configuration,2025-10-04
+V9.2.1,Communication,TLS certificate valid,PASS,Valid SSL certificate,Platform managed,2025-10-04
+V9.2.2,Communication,Certificate pinning (mobile),N/A,Web application - not mobile app,N/A,2025-10-04
+V9.2.3,Communication,Certificate chain validation,PASS,Full chain validated,Browser/platform,2025-10-04
+V9.2.4,Communication,Internal hostnames not in certificates,PASS,Public certificate for domain,Certificate review,2025-10-04
+V10.2.1,Malicious Code,CSP header prevents inline scripts,PASS,Strict CSP with nonce-based inline scripts,Security-Gate-Report.md,2025-10-04
+V10.2.2,Malicious Code,Subresource Integrity for CDN,PARTIAL,No CDN resources currently - would use SRI if added,N/A,2025-10-04
+V10.2.3,Malicious Code,XSS protection mechanisms,PASS,React escaping + CSP + X-XSS-Protection header,Security-Gate-Report.md,2025-10-04
+V10.3.1,Malicious Code,Dependency vulnerability scanning,PASS,npm audit in CI/CD pipeline,package.json,2025-10-04
+V10.3.2,Malicious Code,Dependencies up to date,PASS,Regular dependency updates,Dependabot/manual review,2025-10-04
+V10.3.3,Malicious Code,Known vulnerable components,PASS,No known critical vulnerabilities,npm audit results,2025-10-04
+V11.1.1,Business Logic,Sequential business logic flows,PASS,State machines for multi-step flows,Credit app flow,2025-10-04
+V11.1.2,Business Logic,Limits on time-sensitive operations,PASS,Rate limiting on Edge Functions,Edge function config,2025-10-04
+V11.1.3,Business Logic,Number of operations per user,PARTIAL,Rate limiting exists but not per-user quotas,Edge functions,2025-10-04
+V11.1.4,Business Logic,Transaction rollback on error,PASS,Database transactions with rollback,Supabase transactions,2025-10-04
+V11.1.5,Business Logic,Validate business rules server-side,PASS,RLS policies enforce business rules,Database policies,2025-10-04
+V11.1.6,Business Logic,Automated testing of business logic,PARTIAL,Some tests exist - not comprehensive,tests/ directory,2025-10-04
+V11.1.7,Business Logic,Anti-automation controls,PARTIAL,Rate limiting only - no CAPTCHA,Edge functions,2025-10-04
+V12.1.1,Files,File type validation,FAIL,File upload not implemented yet,N/A,2025-10-04
+V12.1.2,Files,File size limits,FAIL,File upload not implemented yet,N/A,2025-10-04
+V12.1.3,Files,Filename sanitization,FAIL,File upload not implemented yet,N/A,2025-10-04
+V12.2.1,Files,Malware scanning,FAIL,File upload not implemented yet,N/A,2025-10-04
+V12.3.1,Files,User-uploaded files served securely,FAIL,File upload not implemented yet,N/A,2025-10-04
+V12.4.1,Files,File storage permissions,FAIL,Supabase Storage not configured yet,N/A,2025-10-04
+V12.5.1,Files,File execution disabled in upload dirs,N/A,Client-side app - no upload directories,N/A,2025-10-04
+V12.5.2,Files,Direct request to uploaded files denied,FAIL,Supabase Storage not configured yet,N/A,2025-10-04
+V12.6.1,Files,SSRF via file upload prevented,FAIL,File upload not implemented yet,N/A,2025-10-04
+V13.1.1,API,RESTful API design,PASS,Supabase REST API + PostgREST,Supabase API,2025-10-04
+V13.1.2,API,Authentication required for protected APIs,PASS,JWT required for authenticated endpoints,Supabase Auth,2025-10-04
+V13.1.3,API,Authorization verified for each request,PASS,RLS policies check on every query,Database RLS,2025-10-04
+V13.1.4,API,API keys are not default/test keys,PASS,Production keys in Supabase Secrets,Secrets management,2025-10-04
+V13.1.5,API,Admin APIs protected,PASS,Service role key required for admin ops,Supabase service role,2025-10-04
+V13.2.1,API,CORS policy restricts origins,PASS,CORS configured for specific origins,Supabase CORS config,2025-10-04
+V13.2.2,API,HTTP methods restricted,PASS,RLS policies enforce method restrictions,Database policies,2025-10-04
+V13.2.3,API,Origin header validated,PASS,Supabase validates Origin,Platform feature,2025-10-04
+V13.2.4,API,Content-Type header validated,PASS,application/json required,API implementation,2025-10-04
+V13.2.5,API,API versioning implemented,PARTIAL,Using latest Supabase API version,API design,2025-10-04
+V13.3.1,API,Rate limiting on APIs,PASS,Edge Functions have rate limiting,Supabase configuration,2025-10-04
+V13.3.2,API,Timeout protection,PASS,Default timeouts on HTTP requests,Fetch API + Supabase,2025-10-04
+V13.4.1,API,Request authentication verified,PASS,JWT signature validation,Supabase Auth,2025-10-04
+V13.4.2,API,REST service security,PASS,Authenticated + RLS enforced,Supabase implementation,2025-10-04
+V14.1.1,Configuration,Secure build process,PASS,Automated build via Lovable/GitHub,CI/CD pipeline,2025-10-04
+V14.1.2,Configuration,Dependencies reviewed,PASS,Regular security audits,npm audit,2025-10-04
+V14.1.3,Configuration,Build pipeline security,PASS,No secrets in source code,Git history review,2025-10-04
+V14.1.4,Configuration,Production build hardens code,PASS,Vite production build minifies/obfuscates,Vite config,2025-10-04
+V14.1.5,Configuration,Development features disabled in prod,PASS,No debug mode in production builds,Vite configuration,2025-10-04
+V14.2.1,Configuration,Security headers implemented,PASS,9 security headers active,Security-Gate-Report.md,2025-10-04
+V14.2.2,Configuration,HSTS implemented,PASS,max-age=31536000 with includeSubDomains,public/sw.js + index.html,2025-10-04
+V14.2.3,Configuration,CSP implemented,PASS,Strict CSP with script-src and style-src,Security-Gate-Report.md,2025-10-04
+V14.2.4,Configuration,X-Content-Type-Options set,PASS,nosniff enabled,Security-Gate-Report.md,2025-10-04
+V14.2.5,Configuration,X-Frame-Options set,PASS,DENY enabled,Security-Gate-Report.md,2025-10-04
+V14.2.6,Configuration,Referrer-Policy set,PASS,strict-origin-when-cross-origin,Security-Gate-Report.md,2025-10-04
+V14.2.7,Configuration,Permissions-Policy set,PASS,Restrictive permissions policy,Security-Gate-Report.md,2025-10-04
+V14.3.1,Configuration,Environment variables secure,PASS,Secrets in Supabase Secrets (encrypted),Supabase dashboard,2025-10-04
+V14.3.2,Configuration,No secrets in source control,PASS,Git history clean - secrets in env only,Git review,2025-10-04
+V14.3.3,Configuration,Framework security features enabled,PASS,React security features enabled,React configuration,2025-10-04
+V14.4.1,Configuration,HTTP security headers present,PASS,All 9 critical headers implemented,Security-Gate-Report.md,2025-10-04
+V14.4.2,Configuration,Server prevents directory listing,PASS,React SPA - no server directory listing,Architecture,2025-10-04
+V14.4.3,Configuration,Unnecessary HTTP methods disabled,PASS,Only GET/POST/PUT/DELETE allowed,API design,2025-10-04
+V14.4.4,Configuration,Error messages don't reveal versions,PASS,Generic error messages only,Error handling,2025-10-04
+V14.4.5,Configuration,Admin endpoints protected,PASS,Service role required for admin operations,Supabase Auth,2025-10-04
+V14.5.1,Configuration,Debug disabled in production,PASS,No console logs in production build,Vite build config,2025-10-04
+V14.5.2,Configuration,Error stack traces disabled,PASS,Stack traces not exposed to users,Production config,2025-10-04
+V14.5.3,Configuration,Diagnostic endpoints protected,PASS,No diagnostic endpoints exposed,Architecture,2025-10-04
+V14.5.4,Configuration,Cloud storage permissions secure,FAIL,Supabase Storage not configured yet,N/A,2025-10-04

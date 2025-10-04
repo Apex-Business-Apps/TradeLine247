@@ -33,6 +33,8 @@ AutoRepAi implements defense-in-depth security controls aligned with **OWASP ASV
 
 ## OWASP ASVS v5 Control Mapping
 
+**Detailed ASVS v5 Checklist**: See [docs/security/ASVS-Checklist.csv](./docs/security/ASVS-Checklist.csv) for complete pass/fail status of all 150+ controls with implementation notes and evidence locations.
+
 ### V1: Architecture, Design and Threat Modeling
 | Control | Status | Implementation |
 |---------|--------|----------------|
