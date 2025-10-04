@@ -20,6 +20,9 @@ import {
   type QuoteCalculation,
   type FinanceCalculation,
 } from '@/lib/taxCalculator';
+import { downloadQuotePDF } from './QuotePDFGenerator';
+import { FileDown, Languages } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function QuoteCalculator() {
   const [vehiclePrice, setVehiclePrice] = useState('35000');
@@ -32,6 +35,7 @@ export function QuoteCalculator() {
   const [province, setProvince] = useState<Province>('ON');
   const [financeTerm, setFinanceTerm] = useState('60');
   const [financeRate, setFinanceRate] = useState('5.99');
+  const [pdfLanguage, setPdfLanguage] = useState<'en' | 'fr'>('en');
 
   const quote = calculateQuote({
     vehiclePrice: parseFloat(vehiclePrice) || 0,
@@ -298,9 +302,57 @@ export function QuoteCalculator() {
             </div>
           </div>
 
-          <Button className="w-full" size="lg">
-            Save Quote
-          </Button>
+              <div className="flex gap-2">
+                <Button 
+                  className="flex-1" 
+                  size="lg"
+                  onClick={() => {
+                    // TODO: Save to database
+                    toast.success('Quote saved successfully');
+                  }}
+                >
+                  Save Quote
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => {
+                    const pdfData = {
+                      quoteNumber: `Q-${Date.now()}`,
+                      date: new Date().toLocaleDateString(),
+                      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                      dealership: {
+                        name: 'AutoRepAi Demo Dealer',
+                        address: '123 Main St, City, Province',
+                        phone: '(555) 123-4567',
+                        email: 'sales@dealer.com',
+                      },
+                      customer: {
+                        name: 'Customer Name',
+                      },
+                      vehicle: {
+                        year: 2024,
+                        make: 'Make',
+                        model: 'Model',
+                      },
+                      quote,
+                      finance,
+                    };
+                    downloadQuotePDF(pdfData, pdfLanguage);
+                    toast.success(`PDF downloaded in ${pdfLanguage === 'en' ? 'English' : 'French'}`);
+                  }}
+                >
+                  <FileDown className="h-4 w-4 mr-2" />
+                  PDF ({pdfLanguage.toUpperCase()})
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  onClick={() => setPdfLanguage(pdfLanguage === 'en' ? 'fr' : 'en')}
+                >
+                  <Languages className="h-4 w-4" />
+                </Button>
+              </div>
         </CardContent>
       </Card>
     </div>

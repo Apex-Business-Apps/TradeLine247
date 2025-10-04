@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { IntegrationCard } from '@/components/Settings/IntegrationCard';
 import { IntegrationDialog } from '@/components/Settings/IntegrationDialog';
+import { ConnectorStatusCard } from '@/components/Settings/ConnectorStatusCard';
 
 type IntegrationType = 'facebook' | 'instagram' | 'x' | 'tiktok' | 'whatsapp' | 'youtube' | null;
 
@@ -22,6 +23,8 @@ export default function Settings() {
             Manage your dealership settings and preferences
           </p>
         </div>
+
+        <ConnectorStatusCard />
 
         <Tabs defaultValue="general">
           <TabsList>
