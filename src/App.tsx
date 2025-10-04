@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+
 import { ErrorBoundary } from "@/lib/observability/errorBoundary";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
@@ -75,7 +75,6 @@ const App = () => (
         console.log('React Query cache restored successfully');
       }}
     >
-      <TooltipProvider>
         <Toaster />
         <Sonner />
         <ScrollToTop />
@@ -98,7 +97,6 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <EnhancedAIChatWidget />
-      </TooltipProvider>
     </PersistQueryClientProvider>
   </ErrorBoundary>
 );
