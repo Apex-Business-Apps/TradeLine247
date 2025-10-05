@@ -145,8 +145,8 @@ i18n
       escapeValue: false
     },
     detection: {
-      order: ['navigator'],
-      caches: []
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage']
     }
   });
 

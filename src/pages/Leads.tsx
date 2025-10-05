@@ -1,4 +1,3 @@
-import { memo, useMemo } from 'react';
 import { AppLayout } from '@/components/Layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
-const Leads = memo(function Leads() {
+export default function Leads() {
   const mockLeads = [
     {
       id: '1',
@@ -30,7 +29,7 @@ const Leads = memo(function Leads() {
     },
   ];
 
-  const getStatusColor = useMemo(() => (status: string) => {
+  const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       new: 'bg-blue-500',
       contacted: 'bg-yellow-500',
@@ -40,7 +39,7 @@ const Leads = memo(function Leads() {
       lost: 'bg-red-500',
     };
     return colors[status] || 'bg-gray-500';
-  }, []);
+  };
 
   return (
     <AppLayout>
@@ -103,6 +102,4 @@ const Leads = memo(function Leads() {
       </div>
     </AppLayout>
   );
-});
-
-export default Leads;
+}

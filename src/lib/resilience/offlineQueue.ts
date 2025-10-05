@@ -4,7 +4,6 @@
  * Queues operations when connectors are unavailable and retries when back online
  */
 
-import { safeStorage } from '@/lib/storage/safeStorage';
 export interface QueuedOperation {
   id: string;
   connector: string;
@@ -152,7 +151,7 @@ export class OfflineQueue {
 
   private loadFromStorage() {
     try {
-      const stored = safeStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         this.queue = JSON.parse(stored);
         console.log(`[OfflineQueue] Loaded ${this.queue.length} operations from storage`);
@@ -164,7 +163,7 @@ export class OfflineQueue {
 
   private saveToStorage() {
     try {
-      safeStorage.setItem(STORAGE_KEY, JSON.stringify(this.queue));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.queue));
     } catch (error) {
       console.error('[OfflineQueue] Failed to save to storage:', error);
     }

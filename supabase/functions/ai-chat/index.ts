@@ -11,54 +11,12 @@ interface ChatMessage {
   content: string;
 }
 
-// Rate limiting with sliding window (20 requests per minute)
-const rateLimitWindow = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT = 20;
-const RATE_WINDOW = 60000; // 1 minute
-
-function checkRateLimit(clientId: string): boolean {
-  const now = Date.now();
-  const record = rateLimitWindow.get(clientId);
-
-  if (!record || now > record.resetAt) {
-    rateLimitWindow.set(clientId, { count: 1, resetAt: now + RATE_WINDOW });
-    return true;
-  }
-
-  if (record.count >= RATE_LIMIT) {
-    return false;
-  }
-
-  record.count++;
-  return true;
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Rate limiting based on client IP or identifier
-    const clientId = req.headers.get('x-client-info') || 
-                     req.headers.get('x-forwarded-for') || 
-                     req.headers.get('cf-connecting-ip') || 
-                     'unknown';
-    
-    if (!checkRateLimit(clientId)) {
-      console.warn(`Rate limit exceeded for client: ${clientId}`);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Too many requests. Please try again in a minute.',
-          type: 'rate_limit'
-        }),
-        { 
-          status: 429, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': '60' } 
-        }
-      );
-    }
-
     const { messages, dealershipName, leadId } = await req.json();
     console.log('AI Chat request:', { messageCount: messages?.length, dealershipName, leadId });
 

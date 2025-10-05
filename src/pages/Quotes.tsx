@@ -1,4 +1,3 @@
-import { memo, useMemo } from 'react';
 import { AppLayout } from '@/components/Layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Plus, Search, Filter, FileText } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 
-const Quotes = memo(function Quotes() {
+export default function Quotes() {
   const mockQuotes = [
     {
       id: '1',
@@ -29,7 +28,7 @@ const Quotes = memo(function Quotes() {
     },
   ];
 
-  const getStatusColor = useMemo(() => (status: string) => {
+  const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       draft: 'bg-gray-500',
       sent: 'bg-blue-500',
@@ -39,7 +38,7 @@ const Quotes = memo(function Quotes() {
       declined: 'bg-red-500',
     };
     return colors[status] || 'bg-gray-500';
-  }, []);
+  };
 
   return (
     <AppLayout>
@@ -107,6 +106,4 @@ const Quotes = memo(function Quotes() {
       </div>
     </AppLayout>
   );
-});
-
-export default Quotes;
+}
