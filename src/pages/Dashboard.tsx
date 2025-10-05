@@ -1,8 +1,9 @@
+import { memo } from 'react';
 import { AppLayout } from '@/components/Layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UsersRound, CarFront, ScrollText, TrendingUp } from 'lucide-react';
 
-export default function Dashboard() {
+const Dashboard = memo(function Dashboard() {
   const stats = [
     { name: 'Active Leads', value: '24', icon: UsersRound, change: '+12%' },
     { name: 'Available Vehicles', value: '156', icon: CarFront, change: '+5%' },
@@ -90,4 +91,6 @@ export default function Dashboard() {
       </div>
     </AppLayout>
   );
-}
+});
+
+export default Dashboard;

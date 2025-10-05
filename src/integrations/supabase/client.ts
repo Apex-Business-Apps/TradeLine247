@@ -13,9 +13,5 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-    // Cookie options for enhanced security when using server-side rendering
-    // Note: In client-only apps, auth tokens are primarily stored in localStorage
-    storageKey: 'supabase.auth.token',
-    flowType: 'pkce', // Use PKCE flow for enhanced security
   }
 });
