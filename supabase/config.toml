@@ -1,1 +1,22 @@
 project_id = "niorocndzcflrwdrofsp"
+
+[functions.ai-chat]
+verify_jwt = true
+
+[functions.capture-client-ip]
+verify_jwt = false  # Public endpoint - just returns IP
+
+[functions.store-encryption-key]
+verify_jwt = true
+
+[functions.retrieve-encryption-key]
+verify_jwt = true
+
+[functions.store-integration-credentials]
+verify_jwt = true
+
+[functions.social-post]
+verify_jwt = true
+
+[functions.unsubscribe]
+verify_jwt = false  # Public endpoint - uses token-based auth
