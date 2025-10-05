@@ -32,10 +32,22 @@ export async function encryptCreditApplication(
 ): Promise<EncryptedCreditData> {
   const encryptedData = { ...applicantData };
   const encryptedFieldNames: string[] = [];
+  const fieldEncryptionData: Record<string, { iv: string; key: string }> = {};
 
-  // Generate a single encryption key for all fields
-  const firstField = sensitiveFields.find(field => applicantData[field]);
-  if (!firstField) {
+  // Encrypt each sensitive field with its own key and IV
+  for (const field of sensitiveFields) {
+    if (applicantData[field]) {
+      const { data: encrypted, key, iv } = await encryptText(
+        String(applicantData[field])
+      );
+
+      encryptedData[field] = encrypted;
+      encryptedFieldNames.push(field);
+      fieldEncryptionData[field] = { key, iv };
+    }
+  }
+
+  if (encryptedFieldNames.length === 0) {
     return {
       applicant_data: applicantData,
       encrypted_fields: [],
@@ -43,22 +55,8 @@ export async function encryptCreditApplication(
     };
   }
 
-  // Encrypt first field to get key
-  const { data: firstEncrypted, key, iv } = await encryptText(
-    String(applicantData[firstField])
-  );
-
-  // Store key in Supabase Vault via Edge Function
-  const keyId = await storeEncryptionKey(key, iv);
-
-  // Encrypt all sensitive fields with the same key
-  for (const field of sensitiveFields) {
-    if (applicantData[field]) {
-      const { data: encrypted } = await encryptText(String(applicantData[field]));
-      encryptedData[field] = encrypted;
-      encryptedFieldNames.push(field);
-    }
-  }
+  // Store all encryption keys and IVs
+  const keyId = await storeEncryptionKey(fieldEncryptionData);
 
   return {
     applicant_data: encryptedData,
@@ -79,15 +77,19 @@ export async function decryptCreditApplication(
     return encryptedData;
   }
 
-  // Retrieve key from Supabase Vault via Edge Function
-  const { key, iv } = await retrieveEncryptionKey(keyId);
+  // Retrieve field-specific keys and IVs from storage
+  const fieldEncryptionData = await retrieveEncryptionKey(keyId);
 
   const decryptedData = { ...encryptedData };
 
   for (const field of encryptedFields) {
-    if (encryptedData[field]) {
+    if (encryptedData[field] && fieldEncryptionData[field]) {
       try {
-        const decrypted = await decryptText(encryptedData[field], key, iv);
+        const decrypted = await decryptText(
+          encryptedData[field], 
+          fieldEncryptionData[field].key, 
+          fieldEncryptionData[field].iv
+        );
         decryptedData[field] = decrypted;
       } catch (error) {
         console.error(`Failed to decrypt field ${field}:`, error);
@@ -100,12 +102,14 @@ export async function decryptCreditApplication(
 }
 
 /**
- * Store encryption key in Supabase Vault
+ * Store encryption key in custom encryption_keys table
  */
-async function storeEncryptionKey(key: string, iv: string): Promise<string> {
+async function storeEncryptionKey(
+  fieldEncryptionData: Record<string, { key: string; iv: string }>
+): Promise<string> {
   try {
     const { data, error } = await supabase.functions.invoke('store-encryption-key', {
-      body: { key, iv },
+      body: { fieldEncryptionData },
     });
 
     if (error) throw error;
@@ -117,16 +121,16 @@ async function storeEncryptionKey(key: string, iv: string): Promise<string> {
 }
 
 /**
- * Retrieve encryption key from Supabase Vault
+ * Retrieve encryption key from custom encryption_keys table
  */
-async function retrieveEncryptionKey(keyId: string): Promise<{ key: string; iv: string }> {
+async function retrieveEncryptionKey(keyId: string): Promise<Record<string, { key: string; iv: string }>> {
   try {
     const { data, error } = await supabase.functions.invoke('retrieve-encryption-key', {
       body: { keyId },
     });
 
     if (error) throw error;
-    return { key: data.key, iv: data.iv };
+    return data.fieldEncryptionData;
   } catch (error) {
     console.error('Failed to retrieve encryption key:', error);
     throw new Error('Encryption key retrieval failed');

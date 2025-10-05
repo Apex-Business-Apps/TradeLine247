@@ -37,23 +37,37 @@ serve(async (req) => {
       throw new Error('Missing keyId');
     }
 
-    // Retrieve from Supabase Vault
-    const { data: vaultData, error: vaultError } = await supabaseClient
-      .from('vault.secrets')
-      .select('secret')
-      .eq('name', keyId)
+    // Check rate limit
+    const { data: rateLimitCheck, error: rateLimitError } = await supabaseClient
+      .rpc('check_key_retrieval_rate_limit', { p_user_id: user.id });
+
+    if (rateLimitError || !rateLimitCheck) {
+      console.error('Rate limit check failed:', rateLimitError);
+      throw new Error('Rate limit exceeded. Too many key retrieval attempts.');
+    }
+
+    // Retrieve from encryption_keys table
+    const { data: keyData, error: retrieveError } = await supabaseClient
+      .from('encryption_keys')
+      .select('*')
+      .eq('id', keyId)
       .single();
 
-    if (vaultError || !vaultData) {
-      console.error('Vault retrieval error:', vaultError);
+    if (retrieveError || !keyData) {
+      console.error('Key retrieval error:', retrieveError);
+      
+      // Log failed attempt
+      await supabaseClient.from('key_retrieval_attempts').insert({
+        user_id: user.id,
+        key_id: keyId,
+        success: false,
+      });
+      
       throw new Error('Encryption key not found');
     }
 
-    const secretData = JSON.parse(vaultData.secret);
-
-    // Verify the key belongs to the requesting user
-    if (secretData.user_id !== user.id) {
-      // Check if user has admin role for accessing other users' keys
+    // Verify authorization
+    if (keyData.user_id !== user.id) {
       const { data: roles } = await supabaseClient
         .from('user_roles')
         .select('role')
@@ -64,6 +78,22 @@ serve(async (req) => {
         throw new Error('Unauthorized: Cannot access other users encryption keys');
       }
     }
+
+    // Update access tracking
+    await supabaseClient
+      .from('encryption_keys')
+      .update({
+        access_count: (keyData.access_count || 0) + 1,
+        last_accessed_at: new Date().toISOString(),
+      })
+      .eq('id', keyId);
+
+    // Log successful attempt
+    await supabaseClient.from('key_retrieval_attempts').insert({
+      user_id: user.id,
+      key_id: keyId,
+      success: true,
+    });
 
     // Log audit event
     await supabaseClient.from('audit_events').insert({
@@ -78,10 +108,11 @@ serve(async (req) => {
       },
     });
 
+    console.log(`✅ Encryption keys retrieved: ${keyId} (access count: ${(keyData.access_count || 0) + 1})`);
+
     return new Response(
       JSON.stringify({ 
-        key: secretData.key, 
-        iv: secretData.iv 
+        fieldEncryptionData: JSON.parse(keyData.key_encrypted)
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -90,8 +121,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error retrieving encryption key:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,

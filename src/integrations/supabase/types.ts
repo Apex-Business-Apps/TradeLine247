@@ -529,6 +529,48 @@ export type Database = {
           },
         ]
       }
+      encryption_keys: {
+        Row: {
+          access_count: number | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          iv: string
+          key_encrypted: string
+          last_accessed_at: string | null
+          metadata: Json | null
+          purpose: string
+          rotated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_count?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          iv: string
+          key_encrypted: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          purpose: string
+          rotated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_count?: number | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          iv?: string
+          key_encrypted?: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          purpose?: string
+          rotated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       integrations: {
         Row: {
           active: boolean | null
@@ -629,6 +671,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      key_retrieval_attempts: {
+        Row: {
+          attempted_at: string
+          id: string
+          ip_address: string | null
+          key_id: string
+          success: boolean
+          user_id: string
+        }
+        Insert: {
+          attempted_at?: string
+          id?: string
+          ip_address?: string | null
+          key_id: string
+          success: boolean
+          user_id: string
+        }
+        Update: {
+          attempted_at?: string
+          id?: string
+          ip_address?: string | null
+          key_id?: string
+          success?: boolean
+          user_id?: string
+        }
+        Relationships: []
       }
       leads: {
         Row: {
@@ -1293,6 +1362,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_key_retrieval_rate_limit: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
       get_user_organization: {
         Args: { _user_id: string }
         Returns: string

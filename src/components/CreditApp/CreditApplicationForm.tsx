@@ -126,7 +126,6 @@ export function CreditApplicationForm({ leadId, dealershipId, onComplete }: Cred
         status: 'submitted' as const,
         soft_pull: consentForm.getValues().softPull,
         consent_timestamp: new Date().toISOString(),
-        consent_ip: '', // TODO: Get client IP
         encrypted_fields,
         encryption_key_id,
       };
@@ -139,6 +138,15 @@ export function CreditApplicationForm({ leadId, dealershipId, onComplete }: Cred
 
       if (appError) throw appError;
 
+      // Capture client IP for compliance
+      let clientIp = 'unknown';
+      try {
+        const { data: ipData } = await supabase.functions.invoke('capture-client-ip');
+        clientIp = ipData?.ip || 'unknown';
+      } catch (ipError) {
+        console.error('Failed to capture client IP:', ipError);
+      }
+
       // Record consent proofs
       const consents = [
         {
@@ -148,6 +156,8 @@ export function CreditApplicationForm({ leadId, dealershipId, onComplete }: Cred
           jurisdiction: 'us' as const,
           purpose: 'FCRA credit inquiry authorization',
           granted_at: new Date().toISOString(),
+          consent_ip: clientIp,
+          user_agent: navigator.userAgent,
           metadata: {
             fcra_consent: true,
             soft_pull: consentForm.getValues().softPull,

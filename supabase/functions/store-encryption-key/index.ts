@@ -31,26 +31,32 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { key, iv } = await req.json();
+    const { fieldEncryptionData } = await req.json();
 
-    if (!key || !iv) {
-      throw new Error('Missing key or iv');
+    if (!fieldEncryptionData) {
+      throw new Error('Missing fieldEncryptionData');
     }
 
-    // Generate unique key ID
-    const keyId = `key_${user.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Store in Supabase Vault
-    const { error: vaultError } = await supabaseClient
-      .from('vault.secrets')
+    // Store in custom encryption_keys table
+    // fieldEncryptionData contains: { fieldName: { key, iv }, ... }
+    const { data: keyData, error: insertError } = await supabaseClient
+      .from('encryption_keys')
       .insert({
-        name: keyId,
-        secret: JSON.stringify({ key, iv, user_id: user.id }),
-        description: 'Credit application encryption key',
-      });
+        user_id: user.id,
+        key_encrypted: JSON.stringify(fieldEncryptionData), // Store all field keys/IVs as JSON
+        iv: '', // Not used in this approach
+        purpose: 'credit_application_encryption',
+        metadata: {
+          created_by: user.email,
+          field_count: Object.keys(fieldEncryptionData).length,
+          timestamp: new Date().toISOString(),
+        },
+      })
+      .select()
+      .single();
 
-    if (vaultError) {
-      console.error('Vault storage error:', vaultError);
+    if (insertError) {
+      console.error('Key storage error:', insertError);
       throw new Error('Failed to store encryption key');
     }
 
@@ -59,16 +65,19 @@ serve(async (req) => {
       user_id: user.id,
       action: 'CREATE',
       resource_type: 'encryption_key',
-      resource_id: keyId,
+      resource_id: keyData.id,
       event_type: 'key_creation',
       metadata: {
         purpose: 'credit_application_encryption',
+        field_count: Object.keys(fieldEncryptionData).length,
         timestamp: new Date().toISOString(),
       },
     });
 
+    console.log(`✅ Encryption keys stored: ${keyData.id} (${Object.keys(fieldEncryptionData).length} fields)`);
+
     return new Response(
-      JSON.stringify({ keyId }),
+      JSON.stringify({ keyId: keyData.id }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -76,8 +85,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error storing encryption key:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
