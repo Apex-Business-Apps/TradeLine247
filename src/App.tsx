@@ -7,15 +7,11 @@ import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { safeStorage } from "@/lib/storage/safeStorage";
 
 // Eager load critical routes
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
-
-// Eager load critical components that are always needed
-import { EnhancedAIChatWidget } from "./components/Chat/EnhancedAIChatWidget";
 
 // Lazy load non-critical routes for better initial load performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -31,6 +27,7 @@ const CreditApplication = lazy(() => import("./pages/CreditApplication"));
 const Growth = lazy(() => import("./pages/Growth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const LeadDetail = lazy(() => import("./pages/LeadDetail"));
+const EnhancedAIChatWidget = lazy(() => import("./components/Chat/EnhancedAIChatWidget").then(m => ({ default: m.EnhancedAIChatWidget })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,7 +45,7 @@ const queryClient = new QueryClient({
 });
 
 const persister = createSyncStoragePersister({ 
-  storage: safeStorage,
+  storage: window.localStorage,
   key: 'AUTOAI_CACHE',
   serialize: (data) => JSON.stringify(data),
   deserialize: (data) => {
@@ -56,7 +53,7 @@ const persister = createSyncStoragePersister({
       return JSON.parse(data);
     } catch (error) {
       console.error('Failed to deserialize cache, clearing...', error);
-      safeStorage.removeItem('AUTOAI_CACHE');
+      window.localStorage.removeItem('AUTOAI_CACHE');
       return undefined;
     }
   },
