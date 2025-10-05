@@ -1,0 +1,343 @@
+Phase 4: Embed Gate - Build Blocker Configuration
+========================================
+
+## Purpose
+
+The Embed Gate is a CI test that FAILS builds reintroducing anti-framing headers or breaking CSP frame-ancestors configuration.
+
+## Test Location
+
+**File:** `tests/security/embed-gate.spec.ts`  
+**CI Job:** `embed-gate` in `.github/workflows/ci.yml`
+
+## Gate Rules
+
+### Rule 1: X-Frame-Options MUST Be Absent
+```typescript
+test('CRITICAL: Root document must NOT have X-Frame-Options header', async ({ page }) => {
+  const response = await page.goto('/');
+  const headers = response!.headers();
+  
+  // FAIL build if X-Frame-Options is present
+  expect(headers['x-frame-options']).toBeUndefined();
+});
+```
+
+**Why:**
+- `X-Frame-Options` is obsolete (superseded by CSP)
+- Overrides CSP `frame-ancestors` in some browsers
+- Prevents embedding in Lovable preview
+
+**Fix if Failing:**
+- Remove from `public/sw.js` SECURITY_HEADERS object
+- Remove from `index.html` meta tags
+- Remove from any proxy/CDN configuration
+
+---
+
+### Rule 2: CSP frame-ancestors MUST Include Allow-List
+```typescript
+test('CRITICAL: CSP must include correct frame-ancestors allow-list', async ({ page }) => {
+  const response = await page.goto('/');
+  const headers = response!.headers();
+  const csp = headers['content-security-policy'];
+  
+  expect(csp).toContain('frame-ancestors');
+  expect(csp).toContain("'self'");
+  expect(csp).toContain('https://*.lovable.dev');
+  expect(csp).toContain('https://*.lovableproject.com');
+  expect(csp).toContain('https://*.lovable.app');
+  expect(csp).not.toContain("frame-ancestors 'none'");
+});
+```
+
+**Why:**
+- `frame-ancestors` is the modern standard for clickjacking protection
+- Scoped allow-list permits Lovable preview embedding
+- Blocks unauthorized iframe embedding
+
+**Fix if Failing:**
+- Update `public/sw.js` line 48 CSP directive
+- Update `index.html` line 28 fallback CSP
+- Verify domains exactly match Lovable infrastructure
+
+---
+
+### Rule 3: Security Baseline Headers Present
+```typescript
+test('Security baseline: Required security headers present', async ({ page }) => {
+  const response = await page.goto('/');
+  const headers = response!.headers();
+  
+  expect(headers['content-security-policy']).toBeDefined();
+  expect(headers['x-content-type-options']).toBe('nosniff');
+  expect(headers['referrer-policy']).toBeDefined();
+  expect(headers['permissions-policy']).toBeDefined();
+});
+```
+
+**Why:**
+- Maintains security posture while allowing embedding
+- Ensures defense-in-depth strategy
+- Prevents MIME-sniffing and other attacks
+
+**Fix if Failing:**
+- Verify all headers in `public/sw.js` SECURITY_HEADERS
+- Check SW is registered and active
+- Ensure SW fetch handler applies headers to all responses
+
+---
+
+### Rule 4: Service Worker Cache Version Updated
+```typescript
+test('Service Worker: Verify updated cache version', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  
+  const swCacheName = await page.evaluate(async () => {
+    const cacheNames = await caches.keys();
+    return cacheNames.find(name => name.includes('embed-fix')) || 'none';
+  });
+  
+  expect(swCacheName).toContain('embed-fix');
+});
+```
+
+**Why:**
+- Service Worker caches responses with headers
+- Old SW cache serves stale (broken) headers
+- Cache version bump forces client-side SW update
+
+**Fix if Failing:**
+- Update `public/sw.js` line 8: `CACHE_NAME = 'autorepaica-v4-YYYYMMDD-embed-fix'`
+- Ensure cache name includes a unique identifier
+- Deploy and verify SW registers with new cache name
+
+---
+
+## CI Integration
+
+### Workflow Configuration
+
+```yaml
+embed-gate:
+  name: Embed Gate (Anti-Framing Header Check)
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Playwright
+      run: npx playwright install --with-deps chromium
+    
+    - name: Build app
+      run: npm run build
+    
+    - name: Run embed gate tests
+      run: npx playwright test tests/security/embed-gate.spec.ts
+    
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: embed-gate-failures
+        path: playwright-report/
+```
+
+### Merge Gate Dependency
+
+```yaml
+merge-gate:
+  name: Merge Gate
+  needs: [lint-and-typecheck, unit-tests, e2e-tests, embed-gate, ...]
+  runs-on: ubuntu-latest
+  steps:
+    - name: Check all gates passed
+      run: |
+        if [ "${{ needs.embed-gate.result }}" != "success" ]; then
+          echo "❌ Embed gate failed - build blocked"
+          exit 1
+        fi
+```
+
+**Effect:** Pull requests CANNOT merge if embed gate fails.
+
+---
+
+## Local Testing
+
+### Quick Check
+```bash
+# Run embed gate locally before pushing
+npm run build
+npx playwright test tests/security/embed-gate.spec.ts
+```
+
+### Debug Mode
+```bash
+# Run with headed browser to see what's happening
+npx playwright test tests/security/embed-gate.spec.ts --headed --debug
+```
+
+### Manual Verification
+```bash
+# 1. Start dev server
+npm run dev
+
+# 2. Open DevTools > Network
+# 3. Navigate to http://localhost:8080
+# 4. Click root document (first HTML response)
+# 5. Click Headers tab
+# 6. Verify:
+#    - NO x-frame-options header
+#    - CSP contains frame-ancestors with Lovable domains
+```
+
+---
+
+## Failure Scenarios & Fixes
+
+### Scenario 1: X-Frame-Options Present
+**Symptom:**
+```
+Error: expect(received).toBeUndefined()
+Expected: undefined
+Received: "DENY"
+```
+
+**Cause:** Header inadvertently re-added to SW or HTML
+
+**Fix:**
+1. Search codebase for `X-Frame-Options`
+2. Remove all occurrences
+3. Bump SW cache version
+4. Retest
+
+---
+
+### Scenario 2: frame-ancestors Missing Lovable Domains
+**Symptom:**
+```
+Error: expect(received).toContain(expected)
+Expected substring: "https://*.lovable.dev"
+Received: "frame-ancestors 'self'"
+```
+
+**Cause:** CSP directive incomplete or wrong
+
+**Fix:**
+1. Update `public/sw.js` line 48
+2. Ensure all domains present:
+   - `'self'`
+   - `https://*.lovable.dev`
+   - `https://*.lovableproject.com`
+   - `https://*.lovable.app`
+3. Update `index.html` line 28 (fallback)
+4. Retest
+
+---
+
+### Scenario 3: SW Cache Not Updated
+**Symptom:**
+```
+Error: expect(received).toContain(expected)
+Expected substring: "embed-fix"
+Received: "autorepaica-v4-20251005"
+```
+
+**Cause:** Cache version not bumped after header changes
+
+**Fix:**
+1. Update `public/sw.js` line 8:
+   ```javascript
+   const CACHE_NAME = 'autorepaica-v4-20251005-embed-fix-v2';
+   ```
+2. Ensure unique identifier in cache name
+3. Redeploy
+4. Hard refresh in browser (Ctrl+Shift+R)
+5. Retest
+
+---
+
+## Monitoring & Alerts
+
+### Production Header Monitoring
+
+**Tool:** Uptime monitoring with header checks (e.g., UptimeRobot, Pingdom)
+
+**Checks:**
+- [ ] `X-Frame-Options` header NOT present
+- [ ] `Content-Security-Policy` header present
+- [ ] CSP contains `frame-ancestors` with Lovable domains
+
+**Alert Conditions:**
+- ⚠️ Warning: If X-Frame-Options appears
+- 🚨 Critical: If CSP frame-ancestors missing or wrong
+
+**Response:**
+1. Roll back to last known good build
+2. Investigate root cause (CDN override? Proxy injection?)
+3. Apply fix
+4. Redeploy
+5. Verify in production
+
+---
+
+## Historical Context
+
+### Why This Gate Exists
+
+**Problem (Oct 2024):**
+- Service Worker applied `X-Frame-Options: DENY`
+- Lovable preview iframe blank
+- Users couldn't see their app during development
+
+**Root Cause:**
+- Overly restrictive security defaults
+- SW cache persistence prevented quick fixes
+- No automated regression prevention
+
+**Solution:**
+- Remove X-Frame-Options entirely
+- Use CSP frame-ancestors with Lovable allow-list
+- Add automated test to block reintroduction
+- Document in multiple places
+
+**Current Status (Jan 2025):**
+- ✅ Headers fixed in codebase
+- ✅ Automated gate in CI
+- ✅ Documentation complete
+- ✅ Manual verification procedures established
+
+---
+
+## References
+
+**Code:**
+- Test: `tests/security/embed-gate.spec.ts`
+- SW: `public/sw.js` lines 39-49
+- HTML: `index.html` lines 22-28
+- CI: `.github/workflows/ci.yml` lines 211-248
+
+**Documentation:**
+- `docs/EMBED_FIX_REPORT.md` - Initial fix report
+- `docs/B1-Embed-Gate.txt` - Gate rules (this file)
+- `docs/B2-Security-Headers-Snapshot.md` - Header analysis
+- `docs/B3-SW-Release-Checklist.md` - Deployment procedures
+
+**External:**
+- [MDN: Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+- [MDN: frame-ancestors](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors)
+- [W3C CSP Spec](https://www.w3.org/TR/CSP3/)
+
+---
+
+**Last Updated:** 2025-01-05  
+**Maintained By:** DevOps Team  
+**Review Schedule:** Before each major release
