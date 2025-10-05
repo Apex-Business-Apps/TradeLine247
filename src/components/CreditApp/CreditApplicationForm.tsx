@@ -17,6 +17,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, CheckCircle2, FileText, Shield, UserCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { encryptCreditApplication } from '@/lib/security/creditEncryption';
 
 const applicantSchema = z.object({
   firstName: z.string().min(1, 'First name required').max(50),
@@ -96,14 +97,24 @@ export function CreditApplicationForm({ leadId, dealershipId, onComplete }: Cred
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
+      // Prepare applicant data
+      const rawApplicantData = {
+        ...applicantData,
+        ...applicantForm.getValues(),
+      };
+
+      // Encrypt sensitive fields
+      const { 
+        applicant_data: encryptedApplicantData, 
+        encrypted_fields, 
+        encryption_key_id 
+      } = await encryptCreditApplication(rawApplicantData);
+
       const applicationData = {
         lead_id: leadId,
         dealership_id: dealershipId,
         submitted_by: user?.id,
-        applicant_data: {
-          ...applicantData,
-          ...applicantForm.getValues(),
-        },
+        applicant_data: encryptedApplicantData,
         co_applicant_data: coApplicant ? {} : null,
         employment_data: {
           status: applicantForm.getValues().employmentStatus,
@@ -116,6 +127,8 @@ export function CreditApplicationForm({ leadId, dealershipId, onComplete }: Cred
         soft_pull: consentForm.getValues().softPull,
         consent_timestamp: new Date().toISOString(),
         consent_ip: '', // TODO: Get client IP
+        encrypted_fields,
+        encryption_key_id,
       };
 
       const { data: application, error: appError } = await supabase
