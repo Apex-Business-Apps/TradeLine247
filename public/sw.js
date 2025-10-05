@@ -5,8 +5,8 @@
  * WCAG 2.2 AA: Ensures app remains accessible offline
  */
 
-const CACHE_NAME = 'autorepaica-v3-20251001';
-const RUNTIME_CACHE = 'autorepaica-runtime-v3';
+const CACHE_NAME = 'autorepaica-v4-20251005-embed-fix';
+const RUNTIME_CACHE = 'autorepaica-runtime-v4';
 
 // Critical assets to cache on install
 const PRECACHE_ASSETS = [
@@ -37,17 +37,15 @@ self.addEventListener('activate', (event) => {
 });
 
 // Security headers to apply to all responses
+// NOTE: X-Frame-Options removed - CSP frame-ancestors provides superior control
+// frame-ancestors allows embedding in Lovable preview while blocking other origins
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
-  'Cross-Origin-Embedder-Policy': 'require-corp',
-  'Cross-Origin-Opener-Policy': 'same-origin',
-  'Cross-Origin-Resource-Policy': 'same-origin',
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://niorocndzcflrwdrofsp.supabase.co wss://niorocndzcflrwdrofsp.supabase.co https://api.lovable.app; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://niorocndzcflrwdrofsp.supabase.co wss://niorocndzcflrwdrofsp.supabase.co https://api.lovable.app; frame-ancestors 'self' https://*.lovable.dev https://*.lovableproject.com https://*.lovable.app; base-uri 'self'; form-action 'self';"
 };
 
 // Helper function to add security headers to response

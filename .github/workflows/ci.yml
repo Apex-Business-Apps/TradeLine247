@@ -270,10 +270,70 @@ jobs:
             fi
           fi
 
+  embed-gate:
+    name: 🎯 Embed Gate - Anti-Framing Check (ENFORCED)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      
+      - name: Run embed gate tests
+        run: npx playwright test tests/security/embed-gate.spec.ts --reporter=html,json
+        continue-on-error: true
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: embed-gate-results
+          path: |
+            test-results/
+            playwright-report/
+      
+      - name: Check embed gate violations (GATE)
+        run: |
+          echo "🎯 Checking embed gate compliance..."
+          echo "===================================="
+          
+          if ! npx playwright test tests/security/embed-gate.spec.ts --reporter=list; then
+            echo ""
+            echo "❌ FAILED: Embed gate violations detected"
+            echo ""
+            echo "Common issues:"
+            echo "- X-Frame-Options header present (blocks framing)"
+            echo "- CSP frame-ancestors set to 'none' (blocks framing)"
+            echo "- Missing Lovable domains in frame-ancestors allow-list"
+            echo ""
+            echo "📊 Full report: playwright-report/index.html"
+            exit 1
+          else
+            echo "✅ PASSED: Embed gate compliant"
+            echo ""
+            echo "- No X-Frame-Options blocking framing"
+            echo "- CSP frame-ancestors correctly configured"
+            echo "- Service Worker updated with embed-fix cache"
+          fi
+
   merge-gate:
     name: 🚦 Merge Gate - Pipeline Status
     runs-on: ubuntu-latest
-    needs: [lint-and-typecheck, unit-tests, accessibility-tests, e2e-tests, security-scan, lighthouse-mobile, wcag-accessibility]
+    needs: [lint-and-typecheck, unit-tests, accessibility-tests, e2e-tests, security-scan, lighthouse-mobile, wcag-accessibility, embed-gate]
     if: always()
     steps:
       - name: Check all job statuses
@@ -288,6 +348,7 @@ jobs:
           echo "Security Scan:           ${{ needs.security-scan.result }}"
           echo "Lighthouse Mobile:       ${{ needs.lighthouse-mobile.result }}"
           echo "WCAG 2.2 AA:             ${{ needs.wcag-accessibility.result }}"
+          echo "Embed Gate:              ${{ needs.embed-gate.result }}"
           echo ""
           
           # Check for any failures
@@ -319,6 +380,14 @@ jobs:
             FAILED=1
           fi
           
+          if [ "${{ needs.embed-gate.result }}" != "success" ]; then
+            echo "❌ CRITICAL: Embed gate failed"
+            echo "   - X-Frame-Options must not be present"
+            echo "   - CSP frame-ancestors must allow Lovable domains"
+            echo "   - Service Worker must not block framing"
+            FAILED=1
+          fi
+          
           if [ "$FAILED" -eq 1 ]; then
             echo ""
             echo "🔴 PIPELINE FAILED - Merge blocked"
@@ -339,3 +408,4 @@ jobs:
           echo "- ✅ LCP ≤2500ms"
           echo "- ✅ CLS ≤0.1"
           echo "- ✅ No WCAG 2.2 AA violations"
+          echo "- ✅ Embed gate compliant (preview works)"
