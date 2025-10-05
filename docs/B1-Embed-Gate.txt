@@ -1,0 +1,315 @@
+# B1 — Embed Gate (Build Blocker)
+
+**Purpose:** Fail any build that reintroduces anti-framing headers or misconfigures CSP frame-ancestors.
+
+**Location:** `tests/security/embed-gate.spec.ts`  
+**CI Integration:** `.github/workflows/ci.yml` (embed-gate job)  
+**Trigger:** Runs on every push/PR to main/develop branches
+
+---
+
+## Gate Rules (All Must Pass)
+
+### Rule 1: X-Frame-Options MUST Be Absent
+**Test:** `CRITICAL: Root document must NOT have X-Frame-Options header`  
+**Why:** X-Frame-Options is obsolete and overrides CSP frame-ancestors in older browsers. Any value (DENY, SAMEORIGIN, ALLOW-FROM) blocks embedding.  
+**Failure Impact:** Preview will blank out in Lovable iframe.
+
+**Pass Example:**
+```
+Response Headers:
+  content-security-policy: frame-ancestors 'self' https://*.lovable.dev ...
+  x-content-type-options: nosniff
+  strict-transport-security: max-age=31536000
+  [X-Frame-Options: ABSENT ✓]
+```
+
+**Fail Example:**
+```
+Response Headers:
+  x-frame-options: SAMEORIGIN
+  ❌ BUILD BLOCKED: X-Frame-Options present - will break Preview embedding
+```
+
+---
+
+### Rule 2: CSP frame-ancestors MUST Include Allow-List
+**Test:** `CRITICAL: CSP must include correct frame-ancestors allow-list`  
+**Why:** frame-ancestors controls who can embed the app. Must include prod + Lovable preview domains.  
+**Failure Impact:** Preview iframe will be blocked by CSP.
+
+**Required Allow-List:**
+- `'self'` (same-origin embeds)
+- `https://*.lovable.dev` (Lovable preview domains)
+- `https://*.lovableproject.com` (Lovable legacy domains)
+- `https://*.lovable.app` (Lovable production domains)
+
+**Pass Example:**
+```
+Content-Security-Policy:
+  default-src 'self';
+  frame-ancestors 'self' https://*.lovable.dev https://*.lovableproject.com https://*.lovable.app;
+  ...
+  ✓ All required origins present
+```
+
+**Fail Examples:**
+
+*Missing frame-ancestors:*
+```
+Content-Security-Policy: default-src 'self'; script-src 'self'
+❌ BUILD BLOCKED: frame-ancestors directive missing
+```
+
+*Set to 'none':*
+```
+Content-Security-Policy: frame-ancestors 'none'
+❌ BUILD BLOCKED: frame-ancestors blocks all embedding
+```
+
+*Incomplete allow-list:*
+```
+Content-Security-Policy: frame-ancestors 'self'
+❌ BUILD BLOCKED: Missing Lovable preview domains
+```
+
+---
+
+### Rule 3: Security Baseline Headers Present
+**Test:** `Security baseline: Required security headers present`  
+**Why:** Ensure we don't sacrifice security while enabling embedding.
+
+**Required Headers:**
+- `Content-Security-Policy` (with frame-ancestors)
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy` (strict-origin-when-cross-origin)
+- `Permissions-Policy` (disable unused features)
+
+**Pass Example:**
+```
+✓ content-security-policy: present
+✓ x-content-type-options: nosniff
+✓ referrer-policy: strict-origin-when-cross-origin
+✓ permissions-policy: geolocation=(), microphone=(), camera=()
+```
+
+---
+
+### Rule 4: Service Worker Cache Version Updated
+**Test:** `Service Worker: Verify updated cache version`  
+**Why:** Ensures SW updates are deployed and stale caches are purged.
+
+**Pass Example:**
+```
+Service Worker Cache Names:
+  - autorepai-v4-20251005-embed-fix
+  ✓ Contains 'embed-fix' marker
+```
+
+**Fail Example:**
+```
+Service Worker Cache Names:
+  - autorepai-v3-stable
+  ❌ BUILD BLOCKED: Stale cache version (missing embed-fix marker)
+```
+
+---
+
+## CI Integration Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Developer pushes code to main/develop                       │
+└─────────────────┬───────────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│ GitHub Actions CI Workflow (.github/workflows/ci.yml)       │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Lint & Typecheck                                         │
+│ 2. Unit Tests                                               │
+│ 3. Build                                                    │
+│ 4. E2E Tests                                                │
+│ 5. ► EMBED GATE (tests/security/embed-gate.spec.ts) ◄      │
+│ 6. Security Scan                                            │
+│ 7. Lighthouse Performance                                   │
+│ 8. WCAG Accessibility                                       │
+│ 9. Merge Gate (checks all above)                           │
+└─────────────────┬───────────────────────────────────────────┘
+                  │
+        ┌─────────┴─────────┐
+        │                   │
+        ▼                   ▼
+  ✓ All Pass          ✗ Embed Gate Fails
+  Merge Allowed       ┌──────────────────────────────┐
+                      │ ❌ MERGE BLOCKED              │
+                      │ Error: X-Frame-Options found │
+                      │ or frame-ancestors missing   │
+                      │                              │
+                      │ Action Required:             │
+                      │ 1. Review SW headers         │
+                      │ 2. Fix configuration         │
+                      │ 3. Re-run CI                 │
+                      └──────────────────────────────┘
+```
+
+---
+
+## Local Testing
+
+**Before pushing code:**
+```bash
+# Run embed gate tests locally
+npm run test:e2e tests/security/embed-gate.spec.ts
+
+# Expected output:
+# ✓ CRITICAL: Root document must NOT have X-Frame-Options header
+# ✓ CRITICAL: CSP must include correct frame-ancestors allow-list
+# ✓ Security baseline: Required security headers present
+# ✓ Service Worker: Verify updated cache version
+#
+# 4 passed (5s)
+```
+
+**If tests fail locally:**
+1. Check `public/sw.js` → `SECURITY_HEADERS` object
+2. Verify X-Frame-Options is NOT in headers
+3. Verify frame-ancestors includes all required domains
+4. Ensure cache version includes current marker
+5. Re-run tests
+
+---
+
+## Test Execution Transcript (Example)
+
+**Date:** 2025-10-05  
+**Build:** v4-20251005-embed-fix  
+**CI Run:** https://github.com/user/autorepai/actions/runs/12345
+
+```
+Running 4 tests using 1 worker
+
+[embed-gate] › tests/security/embed-gate.spec.ts:11:3 › Embed Gate - Anti-Framing Header Check › CRITICAL: Root document must NOT have X-Frame-Options header
+  ✅ X-Frame-Options not present (embed allowed)
+
+[embed-gate] › tests/security/embed-gate.spec.ts:23:3 › Embed Gate - Anti-Framing Header Check › CRITICAL: CSP must include correct frame-ancestors allow-list
+  ✅ CSP frame-ancestors correctly configured
+     Allow-list: self + Lovable domains
+
+[embed-gate] › tests/security/embed-gate.spec.ts:46:3 › Embed Gate - Anti-Framing Header Check › Security baseline: Required security headers present
+  ✅ Security baseline headers present
+
+[embed-gate] › tests/security/embed-gate.spec.ts:61:3 › Embed Gate - Anti-Framing Header Check › Service Worker: Verify updated cache version
+  ✅ Service Worker updated with embed-fix cache version
+
+  4 passed (2.3s)
+
+✅ EMBED GATE: PASSED
+   Build is safe to merge
+```
+
+---
+
+## Failure Scenarios & Remediation
+
+### Scenario 1: X-Frame-Options Reintroduced
+
+**Failure Log:**
+```
+[embed-gate] › CRITICAL: Root document must NOT have X-Frame-Options header
+  Error: expect(received).toBeUndefined()
+  Received: "SAMEORIGIN"
+```
+
+**Root Cause:** Someone added X-Frame-Options back to:
+- Service Worker (`public/sw.js`)
+- HTML meta tag (`index.html`)
+- Server/CDN config
+
+**Fix:**
+1. Check git diff for changes to `public/sw.js` and `index.html`
+2. Remove X-Frame-Options from all locations
+3. Re-run tests
+
+---
+
+### Scenario 2: frame-ancestors Missing Lovable Domains
+
+**Failure Log:**
+```
+[embed-gate] › CRITICAL: CSP must include correct frame-ancestors allow-list
+  Error: expect(received).toContain(expected)
+  Expected: "https://*.lovable.dev"
+  Received: "frame-ancestors 'self'"
+```
+
+**Root Cause:** CSP frame-ancestors was modified and Lovable domains were removed.
+
+**Fix:**
+1. Open `public/sw.js`
+2. Update `SECURITY_HEADERS['Content-Security-Policy']`
+3. Ensure frame-ancestors includes:
+   ```javascript
+   frame-ancestors 'self' https://*.lovable.dev https://*.lovableproject.com https://*.lovable.app
+   ```
+4. Re-run tests
+
+---
+
+### Scenario 3: Stale Cache Version
+
+**Failure Log:**
+```
+[embed-gate] › Service Worker: Verify updated cache version
+  Error: expect(received).toContain(expected)
+  Expected substring: "embed-fix"
+  Received: "autorepai-v3-stable"
+```
+
+**Root Cause:** Service Worker cache name wasn't updated after header changes.
+
+**Fix:**
+1. Open `public/sw.js`
+2. Update `CACHE_NAME` to include current version marker:
+   ```javascript
+   const CACHE_NAME = 'autorepai-v5-[your-feature-marker]';
+   ```
+3. Clear browser cache
+4. Re-run tests
+
+---
+
+## Maintenance
+
+**When to update this gate:**
+- Adding new preview/prod domains to allow-list
+- Changing cache versioning strategy
+- Updating security header requirements
+
+**How to update:**
+1. Modify test logic in `tests/security/embed-gate.spec.ts`
+2. Update this documentation (`docs/B1-Embed-Gate.txt`)
+3. Add changes to release notes
+4. Communicate to team via changelog
+
+---
+
+## Success Criteria
+
+✅ **Gate is Working if:**
+- CI blocks PRs that fail embed tests
+- Local tests catch header misconfigurations
+- Team is aware of gate requirements
+- Documentation is up-to-date
+
+❌ **Gate Needs Fixing if:**
+- False positives block valid builds
+- False negatives allow broken configs through
+- Tests are flaky or timeout frequently
+- Team bypasses gate due to friction
+
+---
+
+**Last Updated:** 2025-10-05  
+**Owner:** DevOps + Security Team  
+**Review Frequency:** Quarterly or when security requirements change
