@@ -1,1 +1,10 @@
 project_id = "niorocndzcflrwdrofsp"
+
+[functions.ai-chat]
+verify_jwt = true
+
+[functions.social-post]
+verify_jwt = true
+
+[functions.store-integration-credentials]
+verify_jwt = true
