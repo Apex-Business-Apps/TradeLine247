@@ -1,8 +1,10 @@
 /**
- * Embed Gate Test - Phase 4 Regression Prevention
+ * Embed Gate Test - Regression Prevention
  * 
  * Ensures the app can be embedded in Lovable preview iframes
  * Blocks builds that reintroduce X-Frame-Options or break frame-ancestors
+ * 
+ * CRITICAL: This test MUST pass for deployment
  */
 
 import { test, expect } from '@playwright/test';
