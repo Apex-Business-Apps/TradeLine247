@@ -78,7 +78,7 @@ export async function encryptFile(file: File): Promise<{
   return {
     data: arrayBufferToBase64(encrypted),
     key: arrayBufferToBase64(exportedKey),
-    iv: arrayBufferToBase64(iv),
+    iv: arrayBufferToBase64(iv.buffer),
     filename: file.name,
     mimeType: file.type,
   };
@@ -150,7 +150,7 @@ export async function encryptText(text: string): Promise<{
   return {
     data: arrayBufferToBase64(encrypted),
     key: arrayBufferToBase64(exportedKey),
-    iv: arrayBufferToBase64(iv),
+    iv: arrayBufferToBase64(iv.buffer),
   };
 }
 

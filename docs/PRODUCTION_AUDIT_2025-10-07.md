@@ -297,7 +297,7 @@ lhci autorun --config=lighthouserc.json
 - [ ] Run full test suite: `npm run test`
 - [ ] Run Lighthouse audit: `lhci autorun`
 - [ ] Verify CI pipeline passes on GitHub
-- [ ] Manual: Enable leaked password protection (Supabase Dashboard)
+- [x] ✅ Manual: Leaked password protection ENABLED (confirmed by user)
 
 ### Should Complete (P1):
 - [ ] Address Finding #1 (credit app exposure) OR document acceptance

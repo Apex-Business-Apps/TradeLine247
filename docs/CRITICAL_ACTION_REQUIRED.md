@@ -140,7 +140,7 @@ Once scripts are added:
 1. ✅ Verify `npm run test` executes
 2. ✅ Push to GitHub
 3. ✅ Confirm CI pipeline passes
-4. ✅ Manual: Enable leaked password protection in Supabase
+4. ✅ **DONE:** Leaked password protection already enabled
 
 ### Before Deploying (Same Day)
 5. Run Lighthouse audit: `npm run build && lhci autorun`
