@@ -5,11 +5,13 @@
  * WCAG 2.2 AA: Ensures app remains accessible offline
  */
 
-const CACHE_NAME = 'autorepaica-v4-20251005-embed-fix';
-const RUNTIME_CACHE = 'autorepaica-runtime-v4';
+const CACHE_NAME = 'autorepaica-v5-20251007-spa-navigation-r9';
+const RUNTIME_CACHE = 'autorepaica-runtime-v5';
 
-// Critical assets to cache on install
+// Critical assets to cache on install - APP SHELL + FIRST PAINT
 const PRECACHE_ASSETS = [
+  '/',
+  '/index.html',
   '/manifest.json',
   '/logo.png'
 ];
@@ -96,12 +98,34 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-// Navigation requests (HTML): network-first to avoid stale builds
+// Navigation requests (HTML): ALWAYS serve cached app shell for SPA routing
+  // This ensures deep links work offline and when server lacks fallback config
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
-        .then((response) => addSecurityHeaders(response))
-        .catch(() => caches.match(request).then(cached => cached ? addSecurityHeaders(cached) : cached))
+      caches.match('/index.html')
+        .then((cachedShell) => {
+          if (cachedShell) {
+            // App shell found - serve it immediately for client-side routing
+            return addSecurityHeaders(cachedShell);
+          }
+          // No cached shell - try network as fallback (initial load)
+          return fetch(request)
+            .then((response) => {
+              if (response.ok) {
+                const clone = response.clone();
+                caches.open(CACHE_NAME).then(cache => cache.put('/index.html', clone));
+                return addSecurityHeaders(response);
+              }
+              return addSecurityHeaders(response);
+            })
+            .catch(() => {
+              // Network failed and no cache - return offline page
+              return addSecurityHeaders(new Response(
+                '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offline</title></head><body><h1>App Unavailable</h1><p>Please check your connection.</p></body></html>',
+                { headers: { 'Content-Type': 'text/html' } }
+              ));
+            });
+        })
     );
     return;
   }
