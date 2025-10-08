@@ -6,6 +6,47 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Encrypt token using AES-GCM
+async function encryptToken(token: string): Promise<{ encrypted: string; iv: string }> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(token);
+  
+  // Generate encryption key from environment secret
+  const secret = Deno.env.get('ENCRYPTION_SECRET') || 'default-secret-change-in-production';
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    'PBKDF2',
+    false,
+    ['deriveBits', 'deriveKey']
+  );
+  
+  const key = await crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: encoder.encode('oauth-token-salt'),
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt']
+  );
+  
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    data
+  );
+  
+  return {
+    encrypted: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+    iv: btoa(String.fromCharCode(...iv)),
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -97,17 +138,38 @@ serve(async (req) => {
 
     if (!user) throw new Error('Unauthorized');
 
-    // Store tokens
+    // Get user's organization
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('organization_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile?.organization_id) {
+      throw new Error('User organization not found');
+    }
+
+    // Encrypt tokens before storage
+    const encryptedAccess = await encryptToken(tokenData.access_token);
+    const encryptedRefresh = tokenData.refresh_token 
+      ? await encryptToken(tokenData.refresh_token)
+      : null;
+
+    // Store encrypted tokens
     await supabaseClient.from('oauth_tokens').upsert({
-      user_id: user.id,
+      organization_id: profile.organization_id,
       provider,
-      access_token: tokenData.access_token,
-      refresh_token: tokenData.refresh_token,
+      access_token: encryptedAccess.encrypted,
+      refresh_token: encryptedRefresh?.encrypted || null,
       expires_at: tokenData.expires_in 
         ? new Date(Date.now() + tokenData.expires_in * 1000).toISOString()
         : null,
       scope: tokenData.scope,
-    }, { onConflict: 'user_id,provider' });
+      user_info: {
+        encrypted_iv: encryptedAccess.iv,
+        refresh_iv: encryptedRefresh?.iv,
+      },
+    }, { onConflict: 'organization_id,provider' });
 
     return new Response(
       JSON.stringify({ success: true, provider }),
