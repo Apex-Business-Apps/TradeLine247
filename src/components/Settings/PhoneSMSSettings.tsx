@@ -107,10 +107,19 @@ export default function PhoneSMSSettings() {
           </div>
 
           <div className="space-y-2">
+            <Label>Twilio Number</Label>
+            <Input
+              readOnly
+              value="+15878128881"
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label>Webhook URL</Label>
             <Input
               readOnly
-              value={`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/twilio-voice`}
+              value="https://niorocndzcflrwdrofsp.supabase.co/functions/v1/twilio-voice"
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
@@ -140,7 +149,7 @@ export default function PhoneSMSSettings() {
             <Label>SMS Webhook URL</Label>
             <Input
               readOnly
-              value={`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/twilio-sms`}
+              value="https://niorocndzcflrwdrofsp.supabase.co/functions/v1/twilio-sms"
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
