@@ -5,8 +5,48 @@
  * WCAG 2.2 AA: Ensures app remains accessible offline
  */
 
-const CACHE_NAME = 'autorepaica-v5-20251007-spa-navigation-r9';
-const RUNTIME_CACHE = 'autorepaica-runtime-v5';
+const CACHE_NAME = 'autorepaica-v6-20251008-canonical-headers';
+const RUNTIME_CACHE = 'autorepaica-runtime-v6';
+
+// Environment-aware security headers
+// Production: frame-ancestors only self + canonical
+// Preview: frame-ancestors includes Lovable domains
+const IS_PRODUCTION = self.location.hostname === 'www.autorepai.ca' || 
+                      self.location.hostname === 'autorepai.ca';
+const CANONICAL = 'https://www.autorepai.ca';
+
+function buildFrameAncestors() {
+  const base = ["'self'", CANONICAL];
+  
+  if (IS_PRODUCTION) {
+    return base.join(' '); // Production: strict allowlist
+  }
+  
+  // Preview: include Lovable domains
+  return [
+    ...base,
+    'https://lovable.app',
+    'https://lovable.dev',
+    'https://*.lovable.app',
+    'https://*.lovable.dev',
+    'https://*.lovableproject.com'
+  ].join(' ');
+}
+
+function buildCSP() {
+  return [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://va.vercel-scripts.com",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://niorocndzcflrwdrofsp.supabase.co wss://niorocndzcflrwdrofsp.supabase.co https://va.vercel-scripts.com",
+    `frame-ancestors ${buildFrameAncestors()}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'"
+  ].join('; ');
+}
 
 // Critical assets to cache on install - APP SHELL + FIRST PAINT
 const PRECACHE_ASSETS = [
@@ -39,15 +79,15 @@ self.addEventListener('activate', (event) => {
 });
 
 // Security headers to apply to all responses
-// NOTE: X-Frame-Options removed - CSP frame-ancestors provides superior control
-// frame-ancestors allows embedding in Lovable preview while blocking other origins
+// DO NOT include X-Frame-Options - CSP frame-ancestors supersedes it per MDN guidance
+// Environment-aware: Production restricts to canonical only, Preview allows Lovable domains
 const SECURITY_HEADERS = {
+  'Content-Security-Policy': buildCSP(),
   'X-Content-Type-Options': 'nosniff',
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://niorocndzcflrwdrofsp.supabase.co wss://niorocndzcflrwdrofsp.supabase.co https://api.lovable.app; frame-ancestors 'self' https://*.lovable.dev https://*.lovableproject.com https://*.lovable.app; base-uri 'self'; form-action 'self';"
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
 };
 
 // Helper function to add security headers to response

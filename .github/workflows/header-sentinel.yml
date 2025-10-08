@@ -1,0 +1,141 @@
+name: Security Header Sentinel
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+  schedule:
+    # Run every 30 minutes to catch regressions quickly
+    - cron: "*/30 * * * *"
+
+jobs:
+  verify-production-headers:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        path: ["/", "/404", "/auth", "/dashboard"]
+    
+    steps:
+      - name: Check security headers
+        run: |
+          set -euo pipefail
+          
+          url="https://www.autorepai.ca${{ matrix.path }}"
+          echo "=========================================="
+          echo "Testing: $url"
+          echo "=========================================="
+          
+          # Fetch headers
+          headers=$(curl -sI "$url" 2>&1 || echo "CURL_FAILED")
+          
+          if [[ "$headers" == "CURL_FAILED" ]]; then
+            echo "❌ FAIL: Could not reach $url"
+            exit 1
+          fi
+          
+          echo "$headers"
+          echo ""
+          
+          # CRITICAL: X-Frame-Options must NOT be present
+          if echo "$headers" | grep -iq '^X-Frame-Options:'; then
+            echo "❌ CRITICAL: X-Frame-Options header detected"
+            echo "   This will block embedding in Lovable preview"
+            echo "   CSP frame-ancestors should be used instead"
+            exit 1
+          fi
+          echo "✅ X-Frame-Options absent (correct)"
+          
+          # CRITICAL: Content-Security-Policy must exist
+          if ! echo "$headers" | grep -iq '^Content-Security-Policy:'; then
+            echo "❌ CRITICAL: Content-Security-Policy header missing"
+            exit 1
+          fi
+          echo "✅ Content-Security-Policy present"
+          
+          # CRITICAL: CSP must contain frame-ancestors
+          csp_line=$(echo "$headers" | grep -i '^Content-Security-Policy:' | head -1)
+          if ! echo "$csp_line" | grep -iq 'frame-ancestors'; then
+            echo "❌ CRITICAL: CSP missing frame-ancestors directive"
+            exit 1
+          fi
+          echo "✅ CSP contains frame-ancestors"
+          
+          # Verify frame-ancestors includes 'self'
+          if ! echo "$csp_line" | grep -iq "frame-ancestors.*'self'"; then
+            echo "❌ CRITICAL: frame-ancestors missing 'self'"
+            exit 1
+          fi
+          echo "✅ frame-ancestors includes 'self'"
+          
+          # Verify frame-ancestors includes canonical
+          if ! echo "$csp_line" | grep -iq "frame-ancestors.*autorepai.ca"; then
+            echo "⚠️  WARNING: frame-ancestors missing canonical domain"
+          else
+            echo "✅ frame-ancestors includes canonical domain"
+          fi
+          
+          # Check other security headers (warnings only)
+          for header in "X-Content-Type-Options" "Referrer-Policy" "Strict-Transport-Security"; do
+            if echo "$headers" | grep -iq "^${header}:"; then
+              echo "✅ $header present"
+            else
+              echo "⚠️  WARNING: $header missing"
+            fi
+          done
+          
+          echo ""
+          echo "✅ All critical checks passed for ${{ matrix.path }}"
+
+  verify-embed-gate-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run embed gate tests
+        run: npx playwright test tests/security/embed-gate.spec.ts
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: embed-gate-test-results
+          path: test-results/
+          retention-days: 7
+
+  notify-on-failure:
+    needs: [verify-production-headers, verify-embed-gate-tests]
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+      - name: Report failure
+        run: |
+          echo "=========================================="
+          echo "❌ SECURITY HEADER SENTINEL FAILED"
+          echo "=========================================="
+          echo ""
+          echo "Action required: Header regression detected"
+          echo ""
+          echo "Common causes:"
+          echo "  1. X-Frame-Options reintroduced (hosting config change)"
+          echo "  2. CSP frame-ancestors removed/corrupted"
+          echo "  3. Service Worker cache not updated"
+          echo ""
+          echo "Fix locations:"
+          echo "  - vite.config.ts (buildFrameAncestors function)"
+          echo "  - public/sw.js (SECURITY_HEADERS constant)"
+          echo "  - Hosting platform headers config"
+          echo ""
+          echo "Run locally: ./scripts/verify-headers.sh"
+          echo ""
+          exit 1
