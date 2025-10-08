@@ -25,6 +25,22 @@ export default defineConfig(({ mode }) => ({
       ].join('; '),
     },
   },
+  preview: {
+    headers: {
+      'X-Frame-Options': undefined as any,
+      'Content-Security-Policy': [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https:",
+        "font-src 'self' data:",
+        "connect-src 'self' https://niorocndzcflrwdrofsp.supabase.co wss://niorocndzcflrwdrofsp.supabase.co https://api.lovable.app",
+        "frame-ancestors 'self' https://lovable.app https://lovable.dev https://*.lovable.app https://*.lovable.dev https://*.lovableproject.com",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ].join('; '),
+    },
+  },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {
