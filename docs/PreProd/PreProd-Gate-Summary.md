@@ -1,67 +1,30 @@
 # Pre-Production Gate Summary - AutoRepAi
 
-**Date:** October 5, 2025  
+**Date:** October 8, 2025  
 **Timezone:** America/Edmonton (MDT/MST)  
-**Decision Time:** 2025-10-05 17:00 MDT  
+**Decision Time:** 2025-10-08  
 **Status:** ⏳ PENDING VERIFICATION
 
 ---
 
 ## Executive Summary
 
-This document provides the comprehensive gate summary for AutoRepAi's pre-production readiness. All three phases must achieve GREEN status before production deployment is authorized.
+This document provides the comprehensive gate summary for AutoRepAi's pre-production readiness. All phases must achieve GREEN status before production deployment is authorized.
 
 ### Gate Overview
 
 | Phase | Component | Status | Evidence | Blocker |
 |-------|-----------|--------|----------|---------|
-| **Phase 1** | Password Protection | ⏳ PENDING | [Phase1-Supabase-Password-Protection.md](./Phase1-Supabase-Password-Protection.md) | Manual config required |
-| **Phase 2** | E2E Testing | ⏳ PENDING | [Phase2-Test-Report.md](./Phase2-Test-Report.md) | Test execution required |
-| **Phase 3** | Monitoring & Alerts | ⏳ PENDING | [Phase3-Monitoring-Setup.md](./Phase3-Monitoring-Setup.md) | Monitor deployment required |
+| **Phase 1** | E2E Testing | ⏳ PENDING | [Phase1-Test-Report.md](./Phase1-Test-Report.md) | Test execution required |
+| **Phase 2** | Password Protection | ⏳ PENDING | [Phase2-Supabase-Password-Protection.md](./Phase2-Supabase-Password-Protection.md) | Manual config required |
+| **Phase 3** | RLS Audit | ✅ **PASS** | [Phase3-RLS-Audit.md](./Phase3-RLS-Audit.md) | COMPLETED |
+| **Phase 4** | Security Headers | ⏳ PENDING | [Phase4-Headers-Verification.md](./Phase4-Headers-Verification.md) | Manual verification required |
+| **Phase 5** | DNS & SSL | ⏳ PENDING | [Phase5-DNS-SSL.md](./Phase5-DNS-SSL.md) | Manual config required |
+| **Phase 6** | Monitoring & Alerts | ⏳ PENDING | [Phase6-Monitoring.md](./Phase6-Monitoring.md) | Monitor deployment required |
 
 ---
 
-## Phase 1: Supabase Auth Security 🔐
-
-### Objective
-Enable and verify Leaked Password Protection with strict password policies to prevent compromised credentials from being used.
-
-### Requirements
-- [x] Documentation created
-- [ ] Min password length ≥12 characters configured
-- [ ] Mixed character requirements (uppercase, lowercase, numbers, symbols)
-- [ ] Leaked Password Protection enabled in Supabase Dashboard
-- [ ] Test user created with known breached password (e.g., `password123456`)
-- [ ] Rejection proof documented with screenshot
-- [ ] Success with strong password documented
-
-### Evidence Location
-📄 **Primary Document:** [Phase1-Supabase-Password-Protection.md](./Phase1-Supabase-Password-Protection.md)
-
-### Verification Checklist
-```
-[ ] Screenshot: Supabase Dashboard → Auth → Policies showing:
-    - Minimum password length: 12
-    - Password strength: Enabled
-    - Leaked Password Protection: Enabled
-    
-[ ] Screenshot: Failed signup attempt with breached password showing:
-    - Error message: "Password has appeared in data breaches"
-    - HTTP 422 or similar rejection
-    
-[ ] Screenshot: Successful signup with strong password:
-    - Password: min 12 chars, mixed case, numbers, symbols
-    - User successfully created in auth.users
-```
-
-### Gate Status: ⏳ PENDING
-**Blocker:** Manual configuration in Supabase Dashboard required  
-**Owner:** DevOps/Security Team  
-**ETA:** Before production cutover
-
----
-
-## Phase 2: End-to-End Testing 🧪
+## Phase 1: End-to-End Testing 🧪
 
 ### Objective
 Validate all critical user flows, security headers, RLS policies, and Edge Functions in staging environment.
@@ -84,12 +47,12 @@ Validate all critical user flows, security headers, RLS policies, and Edge Funct
 - [ ] Performance budgets met (page load <3s, TTI <5s)
 
 ### Evidence Location
-📄 **Primary Document:** [Phase2-Test-Report.md](./Phase2-Test-Report.md)  
+📄 **Primary Document:** [Phase1-Test-Report.md](./Phase1-Test-Report.md)  
 📦 **Artifacts:** `artifacts/e2e/html-report/index.html`
 
 ### Test Execution Command
 ```bash
-E2E_BASE_URL="https://your-staging-url.lovable.app" npx playwright test --reporter=html
+E2E_BASE_URL="https://www.autorepai.ca" npx playwright test --reporter=html,list,junit,json
 ```
 
 ### Verification Checklist
@@ -107,13 +70,113 @@ E2E_BASE_URL="https://your-staging-url.lovable.app" npx playwright test --report
 ```
 
 ### Gate Status: ⏳ PENDING
-**Blocker:** E2E test execution required with staging URL  
+**Blocker:** E2E test execution required against production URL  
 **Owner:** QA/DevOps Team  
 **ETA:** Before production cutover
 
 ---
 
-## Phase 3: Monitoring & Alerting 📊
+## Phase 2: Supabase Auth Security 🔐
+
+### Objective
+Enable and verify Leaked Password Protection with strict password policies to prevent compromised credentials from being used.
+
+### Requirements
+- [x] Documentation created
+- [ ] Min password length ≥12 characters configured
+- [ ] Mixed character requirements (uppercase, lowercase, numbers, symbols)
+- [ ] Leaked Password Protection enabled in Supabase Dashboard
+- [ ] Test user created with known breached password (e.g., `password123456`)
+- [ ] Rejection proof documented with screenshot
+- [ ] Success with strong password documented
+
+### Evidence Location
+📄 **Primary Document:** [Phase2-Supabase-Password-Protection.md](./Phase2-Supabase-Password-Protection.md)
+
+### Gate Status: ⏳ PENDING
+**Blocker:** Manual configuration in Supabase Dashboard required  
+**Owner:** DevOps/Security Team  
+**ETA:** Before production cutover
+
+---
+
+## Phase 3: RLS Policy Audit 🛡️
+
+### Objective
+Audit all Row-Level Security policies to ensure no anonymous access to sensitive data and no overly permissive policies.
+
+### Requirements
+- [x] Documentation created
+- [x] All tables audited for RLS policies
+- [x] No `USING (true)` policies on sensitive tables (except service role)
+- [x] Duplicate policies removed
+- [x] Security definer functions verified
+- [x] Verification queries executed
+
+### Evidence Location
+📄 **Primary Document:** [Phase3-RLS-Audit.md](./Phase3-RLS-Audit.md)
+
+### Gate Status: ✅ **PASS**
+**Completed:** 2025-10-08 12:00 MDT  
+**Migration Applied:** Removed duplicate `usage_counters` read policy  
+**Verification:** All policies correct and secure
+
+---
+
+## Phase 4: Security Headers Verification 🔒
+
+### Objective
+Verify production security header posture ensures no X-Frame-Options header and correct CSP frame-ancestors directive.
+
+### Requirements
+- [x] Documentation created
+- [ ] Root path (/) headers verified
+- [ ] 404 route headers verified
+- [ ] No X-Frame-Options present on any route
+- [ ] CSP frame-ancestors includes Lovable domains
+- [ ] SSL/TLS certificate valid
+
+### Evidence Location
+📄 **Primary Document:** [Phase4-Headers-Verification.md](./Phase4-Headers-Verification.md)
+
+### Test Commands
+```bash
+curl -sI https://www.autorepai.ca/ | egrep -i "content-security-policy|x-frame-options|^HTTP/"
+curl -sI https://www.autorepai.ca/404 | egrep -i "content-security-policy|x-frame-options|^HTTP/"
+```
+
+### Gate Status: ⏳ PENDING
+**Blocker:** Manual curl verification required  
+**Owner:** DevOps/Security Team  
+**ETA:** Before production cutover
+
+---
+
+## Phase 5: DNS & SSL Configuration 🌐
+
+### Objective
+Configure DNS at Webnames to route traffic to Lovable hosting with apex redirect and verify SSL certificate validity.
+
+### Requirements
+- [x] Documentation created
+- [ ] www.autorepai.ca CNAME → Lovable hostname
+- [ ] autorepai.ca apex → 301 redirect to https://www.autorepai.ca
+- [ ] A/AAAA records for www removed
+- [ ] DNS propagation verified (nslookup)
+- [ ] Apex redirect verified (curl)
+- [ ] SSL certificate valid for both domains
+
+### Evidence Location
+📄 **Primary Document:** [Phase5-DNS-SSL.md](./Phase5-DNS-SSL.md)
+
+### Gate Status: ⏳ PENDING
+**Blocker:** Manual DNS configuration at Webnames required  
+**Owner:** DevOps Team  
+**ETA:** Before production cutover
+
+---
+
+## Phase 6: Monitoring & Alerting 📊
 
 ### Objective
 Deploy comprehensive monitoring for uptime, security headers, error rates, and Supabase infrastructure metrics with automated alerting.
@@ -140,9 +203,7 @@ Deploy comprehensive monitoring for uptime, security headers, error rates, and S
   - [ ] Automated checks via GitHub Actions or cron
 
 ### Evidence Location
-📄 **Primary Documents:**
-- [Phase3-Monitoring-Setup.md](./Phase3-Monitoring-Setup.md)
-- [Phase3-Alert-Policies.md](./Phase3-Alert-Policies.md)
+📄 **Primary Document:** [Phase6-Monitoring.md](./Phase6-Monitoring.md)
 
 ### Monitoring Providers
 - **Uptime:** UptimeRobot / Checkly / StatusCake
@@ -217,21 +278,27 @@ Deploy comprehensive monitoring for uptime, security headers, error rates, and S
 
 ### Blockers Summary
 
-1. **CRITICAL:** Phase 1 requires manual Supabase Dashboard configuration + test user verification
-2. **CRITICAL:** Phase 2 requires staging URL + full E2E test execution
-3. **CRITICAL:** Phase 3 requires external monitoring services setup + alert testing
+1. **Phase 1 (E2E Testing):** Requires execution of Playwright test suite against production URL
+2. **Phase 2 (Password Protection):** Requires manual Supabase Dashboard configuration + test user verification
+3. **Phase 3 (RLS Audit):** ✅ **COMPLETED** - No blockers
+4. **Phase 4 (Security Headers):** Requires manual curl verification of production headers
+5. **Phase 5 (DNS & SSL):** Requires manual DNS configuration at Webnames registrar
+6. **Phase 6 (Monitoring):** Requires external monitoring services setup + alert testing
 
 ---
 
 ## Decision Record
 
 **Decision:** ⏳ NO-GO (PENDING)  
-**Reason:** All three phases require manual completion and evidence upload  
+**Reason:** 5 of 6 phases require manual completion and evidence upload  
 **Next Steps:**
-1. Complete Phase 1 configuration and update [Phase1-Supabase-Password-Protection.md](./Phase1-Supabase-Password-Protection.md)
-2. Run Phase 2 E2E tests and update [Phase2-Test-Report.md](./Phase2-Test-Report.md)
-3. Deploy Phase 3 monitors and update [Phase3-Monitoring-Setup.md](./Phase3-Monitoring-Setup.md) + [Phase3-Alert-Policies.md](./Phase3-Alert-Policies.md)
-4. Return to this document and update status to GO ✅
+1. Run Phase 1 E2E tests and update [Phase1-Test-Report.md](./Phase1-Test-Report.md)
+2. Complete Phase 2 Supabase configuration and update [Phase2-Supabase-Password-Protection.md](./Phase2-Supabase-Password-Protection.md)
+3. ✅ Phase 3 RLS Audit: COMPLETED
+4. Run Phase 4 header verification and update [Phase4-Headers-Verification.md](./Phase4-Headers-Verification.md)
+5. Configure Phase 5 DNS/SSL and update [Phase5-DNS-SSL.md](./Phase5-DNS-SSL.md)
+6. Deploy Phase 6 monitors and update [Phase6-Monitoring.md](./Phase6-Monitoring.md)
+7. Return to this document and update status to GO ✅
 
 ---
 
@@ -320,13 +387,14 @@ Status: ⏳ PENDING
 ## References
 
 ### Internal Documentation
-- [Phase 1: Supabase Password Protection](./Phase1-Supabase-Password-Protection.md)
-- [Phase 2: E2E Test Report](./Phase2-Test-Report.md)
-- [Phase 3: Monitoring Setup](./Phase3-Monitoring-Setup.md)
-- [Phase 3: Alert Policies](./Phase3-Alert-Policies.md)
+- [Phase 1: E2E Test Report](./Phase1-Test-Report.md)
+- [Phase 2: Supabase Password Protection](./Phase2-Supabase-Password-Protection.md)
+- [Phase 3: RLS Audit](./Phase3-RLS-Audit.md) ✅ **PASS**
+- [Phase 4: Security Headers Verification](./Phase4-Headers-Verification.md)
+- [Phase 5: DNS & SSL Configuration](./Phase5-DNS-SSL.md)
+- [Phase 6: Monitoring Setup](./Phase6-Monitoring.md)
 - [Production Deployment Checklist](../PRODUCTION_DEPLOYMENT_CHECKLIST.md)
 - [Production Readiness Report](../../PRODUCTION_READINESS_REPORT.md)
-- [Phase 6 Release Gate](../P6-Release-Gate.md)
 - [Rollback Playbook](../P5-Rollback-Playbook.md)
 
 ### External Resources
@@ -337,7 +405,22 @@ Status: ⏳ PENDING
 
 ---
 
-**Report Generated:** 2025-10-05 17:00 MDT  
-**Report Version:** 1.0  
+**Report Generated:** 2025-10-08  
+**Report Version:** 2.0  
 **Document Owner:** DevOps & Security Team  
-**Next Review:** After all phases achieve GREEN status
+**Next Review:** After all phases achieve GREEN status  
+
+---
+
+## Phase Status Summary
+
+| Phase | Status | Completion Date | Next Action |
+|-------|--------|-----------------|-------------|
+| Phase 1: E2E Testing | ⏳ PENDING | - | Execute Playwright tests against production |
+| Phase 2: Password Protection | ⏳ PENDING | - | Configure Supabase + test breached password rejection |
+| Phase 3: RLS Audit | ✅ **PASS** | 2025-10-08 12:00 MDT | None - COMPLETED |
+| Phase 4: Security Headers | ⏳ PENDING | - | Run curl verification commands |
+| Phase 5: DNS & SSL | ⏳ PENDING | - | Configure Webnames DNS records |
+| Phase 6: Monitoring | ⏳ PENDING | - | Deploy uptime monitors + error tracking |
+
+**Overall Gate Status:** 🔴 **NO-GO** (1 of 6 phases complete)

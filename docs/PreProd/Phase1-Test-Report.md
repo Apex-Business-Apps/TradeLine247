@@ -1,14 +1,14 @@
 # Phase 1: End-to-End Test Report
 
 **Status:** 🔴 **BLOCKED - MANUAL EXECUTION REQUIRED**  
-**Date:** 2025-10-07  
+**Date:** 2025-10-08  
 **Location:** America/Edmonton
 
 ---
 
 ## 🎯 Objective
 
-Execute full E2E test suite headless against production staging URL, validate:
+Execute full E2E test suite headless against production URL, validate:
 - All HTTP responses return 2xx/3xx status codes
 - Zero `console.error` messages across all flows
 - Critical user journeys complete successfully
@@ -18,9 +18,25 @@ Execute full E2E test suite headless against production staging URL, validate:
 
 ## ⚙️ Test Execution
 
-### Command
+### Prerequisites
+
+**Check Dependencies:**
 ```bash
-E2E_BASE_URL=https://www.autorepai.ca npm run test:e2e
+npm list @playwright/test vitest @axe-core/playwright
+```
+
+**Install if missing:**
+```bash
+npm install -D @playwright/test vitest @axe-core/playwright
+npx playwright install --with-deps
+```
+
+### Command
+
+**⚠️ IMPORTANT:** Package.json is missing test scripts. Run Playwright directly:
+
+```bash
+E2E_BASE_URL="https://www.autorepai.ca" npx playwright test --reporter=html,list,junit,json
 ```
 
 ### Configuration
