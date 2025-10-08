@@ -154,6 +154,63 @@ export type Database = {
           },
         ]
       }
+      call_logs: {
+        Row: {
+          created_at: string
+          direction: string
+          duration_seconds: number | null
+          from_number: string
+          id: string
+          lead_id: string | null
+          metadata: Json | null
+          phone_number_id: string | null
+          recording_url: string | null
+          status: string
+          to_number: string
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          duration_seconds?: number | null
+          from_number: string
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          phone_number_id?: string | null
+          recording_url?: string | null
+          status: string
+          to_number: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          duration_seconds?: number | null
+          from_number?: string
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          phone_number_id?: string | null
+          recording_url?: string | null
+          status?: string
+          to_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "call_logs_phone_number_id_fkey"
+            columns: ["phone_number_id"]
+            isOneToOne: false
+            referencedRelation: "phone_numbers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consents: {
         Row: {
           channel: string | null
@@ -781,6 +838,56 @@ export type Database = {
           },
         ]
       }
+      oauth_tokens: {
+        Row: {
+          access_token: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          organization_id: string
+          provider: string
+          refresh_token: string | null
+          scope: string | null
+          token_type: string | null
+          updated_at: string
+          user_info: Json | null
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          organization_id: string
+          provider: string
+          refresh_token?: string | null
+          scope?: string | null
+          token_type?: string | null
+          updated_at?: string
+          user_info?: Json | null
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          organization_id?: string
+          provider?: string
+          refresh_token?: string | null
+          scope?: string | null
+          token_type?: string | null
+          updated_at?: string
+          user_info?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_tokens_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string
@@ -813,6 +920,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      phone_numbers: {
+        Row: {
+          active: boolean | null
+          capabilities: Json | null
+          created_at: string
+          forwarding_number: string | null
+          id: string
+          organization_id: string
+          phone_number: string
+          provider: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          capabilities?: Json | null
+          created_at?: string
+          forwarding_number?: string | null
+          id?: string
+          organization_id: string
+          phone_number: string
+          provider?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          capabilities?: Json | null
+          created_at?: string
+          forwarding_number?: string | null
+          id?: string
+          organization_id?: string
+          phone_number?: string
+          provider?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phone_numbers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pricing_tiers: {
         Row: {
@@ -1079,6 +1230,60 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      sms_messages: {
+        Row: {
+          body: string
+          created_at: string
+          direction: string
+          from_number: string
+          id: string
+          lead_id: string | null
+          metadata: Json | null
+          phone_number_id: string | null
+          status: string
+          to_number: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          direction: string
+          from_number: string
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          phone_number_id?: string | null
+          status: string
+          to_number: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          direction?: string
+          from_number?: string
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          phone_number_id?: string | null
+          status?: string
+          to_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_messages_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_messages_phone_number_id_fkey"
+            columns: ["phone_number_id"]
+            isOneToOne: false
+            referencedRelation: "phone_numbers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       spatial_ref_sys: {
         Row: {
