@@ -3245,6 +3245,35 @@ export type Database = {
         }
         Returns: string
       }
+      vehicles_search: {
+        Args: {
+          p_engine?: string[]
+          p_lat?: number
+          p_limit?: number
+          p_lng?: number
+          p_offset?: number
+          p_province?: string
+          p_q?: string
+          p_radius_km?: number
+          p_seats_max?: number
+          p_seats_min?: number
+          p_sort?: string
+        }
+        Returns: {
+          distance_km: number
+          engine: string
+          id: string
+          latitude: number
+          longitude: number
+          make: string
+          mileage: number
+          model: string
+          price: number
+          province: string
+          seats: number
+          year: number
+        }[]
+      }
     }
     Enums: {
       consent_status: "granted" | "denied" | "withdrawn" | "expired"
