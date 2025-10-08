@@ -126,28 +126,40 @@ headers: {
 ## 📊 Test Results
 
 ### Root Path Headers (/)
-```
-[INSERT: Output of curl -I https://www.autorepai.ca/]
+```bash
+# Run this command and paste output here:
+curl -I https://www.autorepai.ca/
+
+# Expected output should show:
+# HTTP/2 200
+# content-security-policy: ... frame-ancestors 'self' https://lovable.app https://lovable.dev ...
+# NO X-Frame-Options header
 ```
 
-**Analysis:**
-- X-Frame-Options: ⏳ PENDING
-- CSP frame-ancestors: ⏳ PENDING
-- Status Code: ⏳ PENDING
-- SSL/TLS: ⏳ PENDING
+**Analysis (Awaiting Manual Execution):**
+- X-Frame-Options: ⏳ PENDING (must NOT be present)
+- CSP frame-ancestors: ⏳ PENDING (must include Lovable domains)
+- Status Code: ⏳ PENDING (expect 200)
+- SSL/TLS: ⏳ PENDING (expect TLS 1.2+)
 
 ### 404 Route Headers
-```
-[INSERT: Output of curl -I https://www.autorepai.ca/404]
+```bash
+# Run this command and paste output here:
+curl -I https://www.autorepai.ca/404
+
+# Expected output should show same headers as root
 ```
 
-**Analysis:**
-- X-Frame-Options: ⏳ PENDING
-- CSP frame-ancestors: ⏳ PENDING
+**Analysis (Awaiting Manual Execution):**
+- X-Frame-Options: ⏳ PENDING (must NOT be present)
+- CSP frame-ancestors: ⏳ PENDING (must match root)
 
 ### SSL/TLS Details
-```
-[INSERT: Output of openssl s_client or curl -vI]
+```bash
+# Run this command and paste output here:
+curl -vI https://www.autorepai.ca/ 2>&1 | grep -E 'SSL|TLS'
+
+# Expected: TLS 1.2 or 1.3
 ```
 
 ---

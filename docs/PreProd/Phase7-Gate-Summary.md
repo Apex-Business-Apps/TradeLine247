@@ -19,12 +19,12 @@ This document compiles the results of all pre-production gates (Phases 1-6) and 
 
 | Phase | Gate Name | Status | Blocking Issues | Evidence |
 |-------|-----------|--------|-----------------|----------|
-| **Phase 1** | E2E Test Suite | 🔴 BLOCKED | Manual execution required | [Phase1-Test-Report.md](Phase1-Test-Report.md) |
-| **Phase 2** | Supabase Password Protection | 🔴 BLOCKED | Manual Supabase config required | [Phase1-Supabase-Password-Protection.md](Phase1-Supabase-Password-Protection.md) |
-| **Phase 3** | RLS Policy Audit | 🟡 YELLOW | 1 duplicate policy | [Phase3-RLS-Audit.md](Phase3-RLS-Audit.md) |
-| **Phase 4** | Security Headers | ⏳ PENDING | Manual curl verification | [Phase4-Headers-Verification.md](Phase4-Headers-Verification.md) |
-| **Phase 5** | DNS & SSL | 🔴 BLOCKED | Manual DNS config at Webnames | [Phase5-DNS-SSL.md](Phase5-DNS-SSL.md) |
-| **Phase 6** | Monitoring & Alerts | 🔴 BLOCKED | Manual monitor deployment | [Phase6-Monitoring.md](Phase6-Monitoring.md) |
+| **Phase 1** | E2E Test Suite | 🔴 BLOCKED | Manual execution required: `E2E_BASE_URL=https://www.autorepai.ca npm run test:e2e` | [Phase1-Test-Report.md](Phase1-Test-Report.md) |
+| **Phase 2** | Supabase Password Protection | 🔴 BLOCKED | Manual Supabase Dashboard config + test evidence required | [Phase1-Supabase-Password-Protection.md](Phase1-Supabase-Password-Protection.md) |
+| **Phase 3** | RLS Policy Audit | 🟢 PASS | ✅ Duplicate policy removed via migration (2025-10-07) | [Phase3-RLS-Audit.md](Phase3-RLS-Audit.md) |
+| **Phase 4** | Security Headers | ⏳ PENDING | Manual curl verification required (see commands in doc) | [Phase4-Headers-Verification.md](Phase4-Headers-Verification.md) |
+| **Phase 5** | DNS & SSL | 🔴 BLOCKED | Manual DNS config at Webnames + propagation wait (1-48h) | [Phase5-DNS-SSL.md](Phase5-DNS-SSL.md) |
+| **Phase 6** | Monitoring & Alerts | 🔴 BLOCKED | Manual monitor deployment (BetterUptime/Checkly/Sentry) | [Phase6-Monitoring.md](Phase6-Monitoring.md) |
 
 ---
 
@@ -160,26 +160,29 @@ This document compiles the results of all pre-production gates (Phases 1-6) and 
 ---
 
 ### Phase 3: RLS Policy Audit
-**Status:** 🟡 **YELLOW**
+**Status:** 🟢 **PASS**
 
-**Reason:**
-- 1 duplicate policy found (`usage_counters`)
-- All critical security policies validated
+**Migration Applied:** 2025-10-07 12:00 MDT
+
+**Fix Applied:**
+```sql
+DROP POLICY IF EXISTS "Users can view their org usage" ON public.usage_counters;
+```
 
 **Findings:**
 - ✅ All tables have RLS enabled
 - ✅ All PII tables block anonymous access
 - ✅ Security definer functions properly configured
-- 🟡 `usage_counters` has duplicate SELECT policy
+- ✅ Duplicate `usage_counters` SELECT policy removed
 
-**Recommended Fix:**
-```sql
-DROP POLICY IF EXISTS "Users can view their org usage counters" ON public.usage_counters;
-```
+**Final State:**
+- `usage_counters` now has exactly 2 policies:
+  1. `Service role can manage usage counters` (ALL, service_role)
+  2. `Users can view their org usage counters` (SELECT, authenticated, org-scoped)
 
-**Risk Level:** LOW (duplicate policy doesn't expose data, just redundant)
+**Risk Level:** NONE (issue resolved)
 
-**Decision:** Can proceed to GO if business accepts this minor issue, or fix now (5-minute task)
+**Decision:** ✅ PASS - Phase 3 complete
 
 ---
 
