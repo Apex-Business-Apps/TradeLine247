@@ -9,6 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { IntegrationCard } from '@/components/Settings/IntegrationCard';
 import { IntegrationDialog } from '@/components/Settings/IntegrationDialog';
 import { ConnectorStatusCard } from '@/components/Settings/ConnectorStatusCard';
+import PhoneSMSSettings from '@/components/Settings/PhoneSMSSettings';
+import OAuthIntegrations from '@/components/Settings/OAuthIntegrations';
 
 type IntegrationType = 'facebook' | 'instagram' | 'x' | 'tiktok' | 'whatsapp' | 'youtube' | null;
 
@@ -31,6 +33,8 @@ export default function Settings() {
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="compliance">Compliance</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="oauth">OAuth Apps</TabsTrigger>
+            <TabsTrigger value="telephony">Phone & SMS</TabsTrigger>
             <TabsTrigger value="ai">AI Assistant</TabsTrigger>
           </TabsList>
 
@@ -180,6 +184,24 @@ export default function Settings() {
                 />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="oauth" className="space-y-6 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>OAuth Integrations</CardTitle>
+                <CardDescription>
+                  One-click connections to third-party services
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <OAuthIntegrations />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="telephony" className="space-y-6 mt-6">
+            <PhoneSMSSettings />
           </TabsContent>
 
           <TabsContent value="ai" className="space-y-6 mt-6">
