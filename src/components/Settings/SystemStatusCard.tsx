@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2, XCircle, Clock, RefreshCw, Phone, Link2, Search, BarChart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { checkEntitlement } from '@/lib/entitlement';
 
 interface ServiceStatus {
   name: string;
@@ -77,13 +78,33 @@ export function SystemStatusCard() {
       newStatuses.push({ name: 'Vehicle Search', status: 'not_connected', lastChecked: new Date(), icon: Search });
     }
 
-    // Analytics - Check if enabled (placeholder)
-    newStatuses.push({
-      name: 'Analytics',
-      status: 'not_connected', // Will be updated when entitlement is implemented
-      lastChecked: new Date(),
-      icon: BarChart,
-    });
+    // Check Analytics entitlement
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('organization_id')
+          .eq('id', user.id)
+          .single();
+
+        if (profile?.organization_id) {
+          const hasAnalytics = await checkEntitlement(profile.organization_id, 'analytics');
+          newStatuses.push({
+            name: 'Analytics',
+            status: hasAnalytics ? 'connected' : 'not_connected',
+            lastChecked: new Date(),
+            icon: BarChart,
+          });
+        } else {
+          newStatuses.push({ name: 'Analytics', status: 'not_connected', lastChecked: new Date(), icon: BarChart });
+        }
+      } else {
+        newStatuses.push({ name: 'Analytics', status: 'not_connected', lastChecked: new Date(), icon: BarChart });
+      }
+    } catch {
+      newStatuses.push({ name: 'Analytics', status: 'not_connected', lastChecked: new Date(), icon: BarChart });
+    }
 
     setStatuses(newStatuses);
     setLoading(false);
