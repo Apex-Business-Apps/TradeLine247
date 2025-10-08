@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { IntegrationCard } from '@/components/Settings/IntegrationCard';
 import { IntegrationDialog } from '@/components/Settings/IntegrationDialog';
 import { ConnectorStatusCard } from '@/components/Settings/ConnectorStatusCard';
+import { SystemStatusCard } from '@/components/Settings/SystemStatusCard';
 import PhoneSMSSettings from '@/components/Settings/PhoneSMSSettings';
 import OAuthIntegrations from '@/components/Settings/OAuthIntegrations';
 
@@ -26,6 +27,8 @@ export default function Settings() {
           </p>
         </div>
 
+        <SystemStatusCard />
+        
         <ConnectorStatusCard />
 
         <Tabs defaultValue="general">
