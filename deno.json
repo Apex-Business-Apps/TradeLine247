@@ -1,0 +1,25 @@
+{
+  "importMap": "import_map.json",
+  "lock": false,
+  "nodeModulesDir": "none",
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": false,
+    "lib": ["dom", "deno.ns", "deno.window"]
+  },
+  "fmt": { 
+    "useTabs": false, 
+    "lineWidth": 100 
+  },
+  "lint": { 
+    "rules": { 
+      "tags": ["recommended"] 
+    } 
+  },
+  "tasks": {
+    "clean": "rm -rf .deno_cache deno.lock vendor",
+    "cache": "deno cache -q --reload supabase/functions/*/index.ts",
+    "check": "deno check supabase/functions/*/index.ts",
+    "info": "deno info --import-map=import_map.json supabase/functions/ai-chat/index.ts"
+  }
+}

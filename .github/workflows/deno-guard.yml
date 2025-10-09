@@ -1,0 +1,57 @@
+name: deno-dependency-guard
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'supabase/functions/**'
+      - 'import_map.json'
+      - 'deno.json'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'supabase/functions/**'
+      - 'import_map.json'
+      - 'deno.json'
+  workflow_dispatch:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      
+      - name: Cache Deno dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/deno
+            ~/.deno
+          key: deno-${{ hashFiles('import_map.json', 'deno.json') }}
+          restore-keys: |
+            deno-
+      
+      - name: Run dependency guard
+        run: bash scripts/guard-deno-graph.sh
+      
+      - name: Report status
+        if: success()
+        run: |
+          echo "✅ Deno dependency guard passed"
+          echo "All edge functions use consistent dependency versions"
+      
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "❌ Deno dependency guard failed"
+          echo "Version conflicts detected in edge functions"
+          echo "Review the logs above for details"
+          exit 1

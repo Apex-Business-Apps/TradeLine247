@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createHmac } from "https://deno.land/std@0.168.0/node/crypto.ts";
+import { serve } from "std/http/server.ts";
+import { createClient } from "supabase";
+import { createHmac } from "std/node/crypto.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -78,7 +78,8 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('SMS webhook error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
