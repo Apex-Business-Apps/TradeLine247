@@ -65,30 +65,36 @@ const ciphertext = await crypto.subtle.encrypt(
 
 ---
 
-## Implementation Details
+## Implementation Required
 
-### New Secure Function
-**File:** `supabase/functions/store-integration-credentials-secure/index.ts`
+### Backend Team Action Required
+**The P0 vulnerability has been identified but requires backend team expertise to implement the fix.**
 
-**Features:**
-1. **AES-256-GCM Encryption:**
+**Why Backend Team Required:**
+- Supabase Vault API integration requires service role access
+- Encryption key management needs proper architecture design
+- Migration of existing credentials needs careful planning
+- Testing and validation requires production-level credentials
+
+**Recommended Implementation:**
+1. **Use AES-256-GCM Encryption:**
    - 256-bit key length (strongest AES variant)
    - Galois/Counter Mode (provides confidentiality + authenticity)
    - 12-byte random IV (prevents pattern detection)
    - 16-byte authentication tag (prevents tampering)
 
-2. **Key Management:**
+2. **Key Management Strategy:**
    - Keys generated per organization + provider combination
-   - Stored in Supabase Vault (separate from encrypted data)
+   - Stored in Supabase Vault using proper API (not direct table access)
    - Key IDs use UUIDs to prevent enumeration
    - Audit trail for all key operations
 
 3. **Separation of Concerns:**
-   - Encryption keys: `vault.secrets` table
+   - Encryption keys: Supabase Vault (via API)
    - Encrypted credentials: `integrations.credentials_encrypted` column
    - Attacker needs both database AND vault access to decrypt
 
-4. **Compliance:**
+4. **Compliance Requirements:**
    - Meets PCI DSS encryption requirements
    - Complies with GDPR Article 32 (encryption of personal data)
    - Satisfies SOC 2 controls for credential protection
@@ -244,21 +250,37 @@ If issues arise post-deployment:
 
 ## Deployment Authorization
 
-**Status:** 🟡 READY FOR STAGING DEPLOYMENT  
+**Status:** 🔴 **REQUIRES BACKEND TEAM IMPLEMENTATION**  
 
-**Required Actions:**
-- [ ] Deploy `store-integration-credentials-secure` function
-- [ ] Test in staging environment
-- [ ] Create decryption companion function
-- [ ] Update application code
-- [ ] Migrate existing credentials
-- [ ] Delete old insecure function
+**Why This Blocks Deployment:**
+The vulnerability has been identified and documented, but proper implementation requires:
+- Supabase Vault API expertise (not simple table operations)
+- Production-grade encryption key management
+- Credential migration strategy
+- Full security testing with real OAuth tokens
+
+**Required Actions for Backend Team:**
+- [ ] Implement AES-256-GCM encryption using Supabase Vault API
+- [ ] Create encryption function using proper vault.create_secret() method
+- [ ] Create companion decryption function
+- [ ] Design key rotation policy
+- [ ] Migrate existing base64-encoded credentials
+- [ ] Test with real OAuth providers (Google, HubSpot, Microsoft)
+- [ ] Update application code to use new secure functions
+- [ ] Run penetration testing
+- [ ] Delete old insecure function after migration
 - [ ] Security team final approval
 
-**Go-Live Blocker Removed:** Once deployed and tested, this P0 issue is resolved.
+**Temporary Mitigation (Until Fix Deployed):**
+- Document that OAuth integrations contain a P0 vulnerability
+- Restrict access to `integrations` table (already has RLS)
+- Monitor database access logs for unusual queries
+- Expedite backend team implementation
+
+**Go-Live Blocker:** This P0 issue MUST be resolved before production deployment.
 
 ---
 
-*Fix Created: 2025-10-09*  
-*Function: supabase/functions/store-integration-credentials-secure/index.ts*  
+*Fix Documented: 2025-10-09*  
+*Implementation Required: Backend Team with Supabase Vault Expertise*  
 *Contact: security@autorepai.ca*
