@@ -1,5 +1,5 @@
-import { createClient } from "supabase";
-import { createHmac } from "std/node/crypto.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3?target=deno&bundle&dts";
+import { createHmac } from "https://deno.land/std@0.177.0/node/crypto.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
