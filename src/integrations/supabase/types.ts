@@ -888,6 +888,45 @@ export type Database = {
           },
         ]
       }
+      offline_queue: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          last_error: string | null
+          operation: string
+          retry_count: number
+          status: string
+          table_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data: Json
+          id?: string
+          last_error?: string | null
+          operation: string
+          retry_count?: number
+          status?: string
+          table_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          last_error?: string | null
+          operation?: string
+          retry_count?: number
+          status?: string
+          table_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           created_at: string
@@ -1306,6 +1345,39 @@ export type Database = {
           proj4text?: string | null
           srid?: number
           srtext?: string | null
+        }
+        Relationships: []
+      }
+      sync_state: {
+        Row: {
+          created_at: string
+          id: string
+          last_sync_at: string
+          metadata: Json | null
+          sync_token: string | null
+          table_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_sync_at?: string
+          metadata?: Json | null
+          sync_token?: string | null
+          table_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_sync_at?: string
+          metadata?: Json | null
+          sync_token?: string | null
+          table_name?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

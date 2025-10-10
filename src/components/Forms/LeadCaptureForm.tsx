@@ -169,11 +169,11 @@ export function LeadCaptureForm({ onSuccess, vehicleId, dealershipId }: LeadCapt
 
       form.reset();
       onSuccess?.();
-    } catch (error: any) {
-      console.error('Lead capture error:', error);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit. Please try again.';
       toast({
         title: 'Error',
-        description: error.message || 'Failed to submit. Please try again.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

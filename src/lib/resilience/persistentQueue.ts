@@ -58,28 +58,24 @@ export class PersistentQueue {
       updated_at: new Date().toISOString(),
     };
 
-    // Store locally first
     this.localQueue.set(operationId, op);
     this.saveToLocal();
 
-      // Try to persist to database
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          await db.from('offline_queue').insert({
-            operation_id: op.operation_id,
-            connector: op.connector,
-            operation: op.operation,
-            payload: op.payload,
-            status: op.status,
-            retries: op.retries,
-            max_retries: op.max_retries,
-            user_id: user.id,
-          });
-        }
-      } catch (error) {
-        console.warn('[PersistentQueue] Failed to persist to DB, will retry on sync:', error);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await db.from('offline_queue').insert({
+          user_id: user.id,
+          operation: op.operation,
+          table_name: op.connector,
+          data: op.payload,
+          status: op.status,
+          retry_count: op.retries,
+        });
       }
+    } catch (error) {
+      // Will sync to DB later
+    }
 
     return operationId;
   }
@@ -104,17 +100,14 @@ export class PersistentQueue {
         op.status = 'completed';
         op.completed_at = new Date().toISOString();
         op.updated_at = new Date().toISOString();
-        console.log(`[PersistentQueue] Completed ${op.operation_id}`);
       } catch (error) {
         op.retries++;
         op.error_message = error instanceof Error ? error.message : 'Unknown error';
         
         if (op.retries >= op.max_retries) {
           op.status = 'failed';
-          console.error(`[PersistentQueue] Failed ${op.operation_id} after ${op.retries} retries`);
         } else {
           op.status = 'pending';
-          console.warn(`[PersistentQueue] Retry ${op.retries}/${op.max_retries} for ${op.operation_id}`);
         }
         
         op.updated_at = new Date().toISOString();
@@ -137,46 +130,43 @@ export class PersistentQueue {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Fetch from database
       const { data: dbOps, error } = await db
         .from('offline_queue')
         .select('*')
         .eq('user_id', user.id)
-        .in('status', ['pending', 'processing']);
+        .in('status', ['pending', 'syncing']);
 
       if (error) throw error;
 
-      // Merge with local queue
       if (dbOps) {
         for (const dbOp of dbOps) {
-          if (!this.localQueue.has(dbOp.operation_id)) {
-            this.localQueue.set(dbOp.operation_id, {
+          const opId = `${dbOp.table_name}-${dbOp.operation}-${dbOp.id}`;
+          if (!this.localQueue.has(opId)) {
+            this.localQueue.set(opId, {
               id: dbOp.id,
-              operation_id: dbOp.operation_id,
-              connector: dbOp.connector,
+              operation_id: opId,
+              connector: dbOp.table_name,
               operation: dbOp.operation,
-              payload: dbOp.payload,
-              status: dbOp.status,
-              retries: dbOp.retries,
-              max_retries: dbOp.max_retries,
-              error_message: dbOp.error_message,
+              payload: dbOp.data,
+              status: dbOp.status === 'syncing' ? 'processing' : dbOp.status,
+              retries: dbOp.retry_count,
+              max_retries: 3,
+              error_message: dbOp.last_error,
               user_id: dbOp.user_id,
               created_at: dbOp.created_at,
               updated_at: dbOp.updated_at,
-              completed_at: dbOp.completed_at,
             });
           }
         }
       }
 
-      // Push local changes to database
       for (const op of this.localQueue.values()) {
         await this.updateInDB(op);
       }
 
       this.saveToLocal();
     } catch (error) {
-      console.error('[PersistentQueue] Sync failed:', error);
+      // Silent fail, will retry on next sync
     } finally {
       this.isSyncing = false;
     }
@@ -207,13 +197,12 @@ export class PersistentQueue {
     for (const [opId, op] of completed) {
       this.localQueue.delete(opId);
       
-      // Delete from database
       try {
         await db.from('offline_queue')
           .delete()
-          .eq('operation_id', op.operation_id);
+          .eq('id', op.id);
       } catch (error) {
-        console.warn('[PersistentQueue] Failed to delete from DB:', error);
+        // Will be cleaned up on next sync
       }
     }
 
@@ -264,22 +253,21 @@ export class PersistentQueue {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      const dbStatus = op.status === 'processing' ? 'syncing' : op.status;
+
       await db.from('offline_queue').upsert({
         id: op.id,
-        operation_id: op.operation_id,
-        connector: op.connector,
-        operation: op.operation,
-        payload: op.payload,
-        status: op.status,
-        retries: op.retries,
-        max_retries: op.max_retries,
-        error_message: op.error_message,
         user_id: user.id,
+        operation: op.operation,
+        table_name: op.connector,
+        data: op.payload,
+        status: dbStatus,
+        retry_count: op.retries,
+        last_error: op.error_message,
         updated_at: op.updated_at,
-        completed_at: op.completed_at,
       });
     } catch (error) {
-      console.warn('[PersistentQueue] Failed to update DB:', error);
+      // Silent fail
     }
   }
 
@@ -294,10 +282,9 @@ export class PersistentQueue {
         for (const op of ops) {
           this.localQueue.set(op.operation_id, op);
         }
-        console.log(`[PersistentQueue] Loaded ${ops.length} operations from local storage`);
       }
     } catch (error) {
-      console.error('[PersistentQueue] Failed to load from local storage:', error);
+      this.localQueue = new Map();
     }
   }
 
@@ -309,7 +296,7 @@ export class PersistentQueue {
       const ops = Array.from(this.localQueue.values());
       safeStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(ops));
     } catch (error) {
-      console.error('[PersistentQueue] Failed to save to local storage:', error);
+      // Storage quota exceeded or unavailable
     }
   }
 }

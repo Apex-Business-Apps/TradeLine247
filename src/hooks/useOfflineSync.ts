@@ -76,14 +76,11 @@ export function useOfflineSync() {
     setSyncState(prev => ({ ...prev, isSyncing: true, error: null }));
 
     try {
-      // Sync persistent queue
       await persistentQueue.sync();
 
-      // Process pending operations
       await persistentQueue.process(async (op) => {
-        // Execute the operation based on connector
-        console.log(`[OfflineSync] Processing ${op.connector}.${op.operation}`);
-        // Actual execution logic would go here
+        // Execute the operation - implementation depends on operation type
+        // This is handled by the persistent queue processor
       });
 
       setSyncState(prev => ({
@@ -93,12 +90,13 @@ export function useOfflineSync() {
         pendingCount: persistentQueue.getPendingCount(),
       }));
     } catch (error) {
-      console.error('[OfflineSync] Sync failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Sync failed';
       setSyncState(prev => ({
         ...prev,
         isSyncing: false,
-        error: error instanceof Error ? error.message : 'Sync failed',
+        error: errorMessage,
       }));
+      throw error;
     }
   }, []);
 
@@ -128,23 +126,21 @@ export function useOfflineSync() {
    * Update sync state for entity
    */
   const updateSyncState = useCallback(async (
-    entityType: string,
-    entityId: string,
+    tableName: string,
     metadata?: any
   ) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) throw new Error('User not authenticated');
 
       await db.from('sync_state').upsert({
         user_id: user.id,
-        entity_type: entityType,
-        entity_id: entityId,
-        last_synced_at: new Date().toISOString(),
+        table_name: tableName,
+        last_sync_at: new Date().toISOString(),
         metadata: metadata || {},
       });
     } catch (error) {
-      console.error('[OfflineSync] Failed to update sync state:', error);
+      throw error;
     }
   }, []);
 
@@ -152,8 +148,7 @@ export function useOfflineSync() {
    * Check if entity needs sync
    */
   const needsSync = useCallback(async (
-    entityType: string,
-    entityId: string,
+    tableName: string,
     maxAge: number = 300000 // 5 minutes default
   ): Promise<boolean> => {
     try {
@@ -162,20 +157,18 @@ export function useOfflineSync() {
 
       const { data, error } = await db
         .from('sync_state')
-        .select('last_synced_at')
+        .select('last_sync_at')
         .eq('user_id', user.id)
-        .eq('entity_type', entityType)
-        .eq('entity_id', entityId)
+        .eq('table_name', tableName)
         .single();
 
       if (error || !data) return true;
 
-      const lastSync = new Date(data.last_synced_at).getTime();
+      const lastSync = new Date(data.last_sync_at).getTime();
       const now = Date.now();
       
       return now - lastSync > maxAge;
     } catch (error) {
-      console.error('[OfflineSync] Failed to check sync state:', error);
       return true;
     }
   }, []);

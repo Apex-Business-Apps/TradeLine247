@@ -138,13 +138,12 @@ export function CreditApplicationForm({ leadId, dealershipId, onComplete }: Cred
 
       if (appError) throw appError;
 
-      // Capture client IP for compliance
       let clientIp = 'unknown';
       try {
         const { data: ipData } = await supabase.functions.invoke('capture-client-ip');
         clientIp = ipData?.ip || 'unknown';
       } catch (ipError) {
-        console.error('Failed to capture client IP:', ipError);
+        // IP capture failed, continue with unknown
       }
 
       // Record consent proofs
@@ -196,8 +195,8 @@ export function CreditApplicationForm({ leadId, dealershipId, onComplete }: Cred
       toast.success('Credit application submitted successfully');
       onComplete?.(application.id);
     } catch (error) {
-      console.error('Credit application submission error:', error);
-      toast.error('Failed to submit credit application');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit credit application';
+      toast.error(errorMessage);
     } finally {
       setSubmitting(false);
     }

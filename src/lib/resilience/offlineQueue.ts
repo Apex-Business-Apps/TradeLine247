@@ -49,8 +49,6 @@ export class OfflineQueue {
     this.queue.push(queuedOp);
     this.saveToStorage();
     
-    console.log(`[OfflineQueue] Enqueued ${connector}.${operation} (${id})`);
-    
     return id;
   }
 
@@ -65,8 +63,6 @@ export class OfflineQueue {
     this.processing = true;
 
     const pendingOps = this.queue.filter(op => op.status === 'pending');
-    
-    console.log(`[OfflineQueue] Processing ${pendingOps.length} operations`);
 
     for (const op of pendingOps) {
       try {
@@ -76,19 +72,14 @@ export class OfflineQueue {
         await executor(op);
 
         op.status = 'completed';
-        console.log(`[OfflineQueue] Completed ${op.connector}.${op.operation} (${op.id})`);
       } catch (error) {
         op.retries++;
         
         if (op.retries >= op.maxRetries) {
           op.status = 'failed';
           op.error = error instanceof Error ? error.message : 'Unknown error';
-          console.error(`[OfflineQueue] Failed ${op.connector}.${op.operation} after ${op.retries} retries`);
         } else {
           op.status = 'pending';
-          console.warn(`[OfflineQueue] Retry ${op.retries}/${op.maxRetries} for ${op.connector}.${op.operation}`);
-          
-          // Wait before next retry
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * op.retries));
         }
       }
@@ -155,10 +146,9 @@ export class OfflineQueue {
       const stored = safeStorage.getItem(STORAGE_KEY);
       if (stored) {
         this.queue = JSON.parse(stored);
-        console.log(`[OfflineQueue] Loaded ${this.queue.length} operations from storage`);
       }
     } catch (error) {
-      console.error('[OfflineQueue] Failed to load from storage:', error);
+      this.queue = [];
     }
   }
 
@@ -166,7 +156,7 @@ export class OfflineQueue {
     try {
       safeStorage.setItem(STORAGE_KEY, JSON.stringify(this.queue));
     } catch (error) {
-      console.error('[OfflineQueue] Failed to save to storage:', error);
+      // Silent fail - storage quota exceeded or unavailable
     }
   }
 }
