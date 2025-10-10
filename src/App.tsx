@@ -15,7 +15,7 @@ import Auth from "./pages/Auth";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 
 // Eager load critical components that are always needed
-import { EnhancedAIChatWidget } from "./components/Chat/EnhancedAIChatWidget";
+import { AIChatWidget } from "./components/Chat/AIChatWidget";
 
 // Lazy load non-critical routes for better initial load performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -116,7 +116,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <EnhancedAIChatWidget />
+          <AIChatWidget />
         </Suspense>
     </PersistQueryClientProvider>
   </ErrorBoundary>
