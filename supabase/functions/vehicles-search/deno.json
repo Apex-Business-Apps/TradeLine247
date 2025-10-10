@@ -1,0 +1,9 @@
+{
+  "importMap": "./import_map.json",
+  "lock": "./deno.lock",
+  "nodeModulesDir": false,
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["dom", "deno.ns", "deno.window"]
+  }
+}
