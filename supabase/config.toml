@@ -6,17 +6,32 @@ verify_jwt = true
 [functions.capture-client-ip]
 verify_jwt = false  # Public endpoint - just returns IP
 
-[functions.store-encryption-key]
-verify_jwt = true
+[functions.oauth-callback]
+verify_jwt = false  # OAuth flow - validates via state parameter
 
 [functions.retrieve-encryption-key]
 verify_jwt = true
 
-[functions.store-integration-credentials]
+[functions.send-sms]
 verify_jwt = true
 
 [functions.social-post]
 verify_jwt = true
 
+[functions.store-encryption-key]
+verify_jwt = true
+
+[functions.store-integration-credentials]
+verify_jwt = true
+
+[functions.twilio-sms]
+verify_jwt = false  # Webhook - validates via Twilio signature
+
+[functions.twilio-voice]
+verify_jwt = false  # Webhook - validates via Twilio signature
+
 [functions.unsubscribe]
 verify_jwt = false  # Public endpoint - uses token-based auth
+
+[functions.vehicles-search]
+verify_jwt = true
