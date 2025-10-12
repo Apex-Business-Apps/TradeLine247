@@ -5,10 +5,12 @@ import { Sparkles, CarFront, UsersRound, Rocket, ShieldCheck, ArrowRight, Trendi
 import { Link } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 import { ROICalculator } from '@/components/Growth/ROICalculator';
+import { Header } from '@/components/Layout/Header';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       {/* Bold Hero Section with Red Accent */}
       <div className="relative overflow-hidden bg-black text-white">
         {/* Red accent stripe */}
