@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import logo from '@/assets/logo.png';
+import { Logo, LogoText } from '@/components/ui/logo';
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
@@ -99,7 +99,10 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <img src={logo} alt="AutoAi" className="w-24 h-24 mx-auto mb-4" />
+          <div className="flex justify-center items-center gap-2 mb-4">
+            <Logo size="lg" />
+            <LogoText className="text-2xl" />
+          </div>
           <CardDescription>
             Sign in to access your dealership platform
           </CardDescription>

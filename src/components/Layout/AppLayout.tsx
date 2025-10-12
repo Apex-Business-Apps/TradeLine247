@@ -18,7 +18,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import logo from '@/assets/logo.png';
+import { Logo, LogoText } from '@/components/ui/logo';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -75,8 +75,9 @@ export function AppLayout({ children }: AppLayoutProps) {
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-0">
               <div className="flex h-full flex-col">
-                <div className="border-b p-4">
-                  <img src={logo} alt="AutoAi" className="w-16 h-16" />
+                <div className="border-b p-4 flex items-center gap-2">
+                  <Logo size="lg" />
+                  <LogoText className="text-lg" />
                 </div>
                 <nav className="flex-1 space-y-1 p-4">
                   <NavLinks />
@@ -84,7 +85,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               </div>
             </SheetContent>
           </Sheet>
-          <img src={logo} alt="AutoAi" className="h-10 w-10" />
+          <Logo size="md" />
         </div>
       </div>
 
@@ -92,8 +93,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         {/* Desktop sidebar */}
         <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
           <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-background px-6 pb-4">
-            <div className="flex h-16 shrink-0 items-center">
-              <img src={logo} alt="AutoAi" className="h-12 w-12" />
+            <div className="flex h-16 shrink-0 items-center gap-2">
+              <Logo size="lg" />
+              <LogoText className="text-lg" />
             </div>
             <nav className="flex flex-1 flex-col">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">

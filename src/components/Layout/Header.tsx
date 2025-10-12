@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Logo, LogoText } from '@/components/ui/logo';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -58,10 +59,11 @@ export function Header() {
         <div className="flex lg:flex-1">
           <Link 
             to="/" 
-            className="-m-1.5 p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
+            className="-m-1.5 p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md flex items-center gap-2"
             aria-label="AutoRepAi Home"
           >
-            <span className="text-xl font-bold text-primary">AutoRepAi</span>
+            <Logo size="lg" className="hover:scale-105 transition-transform" />
+            <LogoText className="text-xl hidden sm:inline" />
           </Link>
         </div>
 
@@ -125,11 +127,12 @@ export function Header() {
             <div className="flex items-center justify-between">
               <Link 
                 to="/" 
-                className="-m-1.5 p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
+                className="-m-1.5 p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label="AutoRepAi Home"
               >
-                <span className="text-lg font-bold text-primary">AutoRepAi</span>
+                <Logo size="md" />
+                <LogoText className="text-lg" />
               </Link>
               <Button
                 variant="ghost"

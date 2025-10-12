@@ -3,9 +3,9 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, CarFront, UsersRound, Rocket, ShieldCheck, ArrowRight, TrendingUp, Zap, Award, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import logo from '@/assets/logo.png';
 import { ROICalculator } from '@/components/Growth/ROICalculator';
 import { Header } from '@/components/Layout/Header';
+import { Logo } from '@/components/ui/logo';
 
 const Index = () => {
   return (
@@ -23,11 +23,7 @@ const Index = () => {
               AI-Powered Dealership Platform
             </Badge>
             
-            <img 
-              src={logo} 
-              alt="AutoAi Logo" 
-              className="w-40 h-40 mx-auto mb-8 animate-scale-in hover-scale"
-            />
+            <Logo className="w-40 h-40 mx-auto mb-8 animate-scale-in hover-scale" />
             
             <h1 className="text-5xl sm:text-7xl font-bold tracking-tight mb-6 text-white">
               Close More Deals.<br />
