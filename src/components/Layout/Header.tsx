@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import logo from '@/assets/logo.png';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -62,11 +61,7 @@ export function Header() {
             className="-m-1.5 p-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
             aria-label="AutoRepAi Home"
           >
-            <img 
-              src={logo} 
-              alt="AutoRepAi" 
-              className="h-12 w-12 hover:scale-105 transition-transform"
-            />
+            <span className="text-xl font-bold text-primary">AutoRepAi</span>
           </Link>
         </div>
 
@@ -134,7 +129,7 @@ export function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label="AutoRepAi Home"
               >
-                <img src={logo} alt="AutoRepAi" className="h-10 w-10" />
+                <span className="text-lg font-bold text-primary">AutoRepAi</span>
               </Link>
               <Button
                 variant="ghost"
