@@ -19,14 +19,13 @@ export function Logo({ className = '', size }: LogoProps) {
   const sizeClass = size && !className.includes('h-') ? sizeMap[size] : '';
   const combinedClassName = `${sizeClass} ${className}`.trim();
   
-  // Fallback to styled div if image doesn't load
   return (
-    <div 
-      className={`${combinedClassName} rounded-full bg-primary flex items-center justify-center font-bold text-white`}
-      aria-label="AutoRepAi Logo"
-    >
-      <span className="text-2xl">A</span>
-    </div>
+    <img 
+      src="/logo.png" 
+      alt="AutoRepAi Logo" 
+      className={combinedClassName}
+      loading="eager"
+    />
   );
 }
 
