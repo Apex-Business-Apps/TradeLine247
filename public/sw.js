@@ -52,8 +52,7 @@ function buildCSP() {
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/logo.png'
+  '/manifest.json'
 ];
 
 // Install event: precache critical assets
