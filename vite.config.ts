@@ -49,8 +49,7 @@ function buildCSP(): string {
 }
 
 const securityHeaders = {
-  // DO NOT set X-Frame-Options - CSP frame-ancestors supersedes it
-  'X-Frame-Options': undefined as any,
+  // X-Frame-Options intentionally omitted - CSP frame-ancestors supersedes it
   'Content-Security-Policy': buildCSP(),
   'X-Content-Type-Options': 'nosniff',
   'X-XSS-Protection': '1; mode=block',
