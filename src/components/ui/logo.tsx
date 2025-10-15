@@ -1,7 +1,8 @@
 /**
  * Centralized Logo Component
- * Uses public folder for consistent asset loading across all environments
+ * CANONICAL: Always uses src/assets/logo.png
  */
+import logoImage from '@/assets/logo.png';
 
 interface LogoProps {
   className?: string;
@@ -21,8 +22,8 @@ export function Logo({ className = '', size }: LogoProps) {
   
   return (
     <img 
-      src="/logo.png" 
-      alt="AutoRepAi Logo" 
+      src={logoImage} 
+      alt="AutoAi Logo" 
       className={combinedClassName}
       loading="eager"
     />
