@@ -2,6 +2,23 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+// IMPORTANT: do not import 'fs', 'path', or other Node libs in code that runs in the browser.
+// This config remains Node-only, but we neutralize 'process.env' for browser bundles to avoid crashes.
+
+export default defineConfig({
+  plugins: [react()],
+  define: {
+    // Prevent libs from exploding when they check process.env in Deno/browser
+    "process.env": {},
+  },
+  build: {
+    target: "es2020",
+    sourcemap: false,
+  },
+});
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
