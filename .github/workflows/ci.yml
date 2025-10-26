@@ -108,15 +108,51 @@ jobs:
         run: pod install
 
       - name: Build iOS workspace
-        working-directory: ios/App
+        shell: bash
+        env:
+          # Safe, explicit values (simulator build; no signing)
+          CONFIGURATION: Release
+          SCHEME: App
+          WORKSPACE: ios/App/App.xcworkspace
+          DESTINATION: 'platform=iOS Simulator,name=iPhone 15,OS=latest'
         run: |
-          PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
-          MARKETING_VERSION=1.0.0 \
-          CURRENT_PROJECT_VERSION=1 \
+          set -euo pipefail
+
+          echo "🔎 Xcode version:"
+          xcodebuild -version
+
+          echo "🔎 List schemes:"
+          xcodebuild -list -workspace "$WORKSPACE" || true
+
+          echo "🔎 Show build settings (first pass):"
+          xcodebuild -showBuildSettings -workspace "$WORKSPACE" -scheme "$SCHEME" | sed -n '1,120p' || true
+
+          # Clean first, then build for SIMULATOR. No signing. Explicit overrides remove common 65s.
+          set -o pipefail
           xcodebuild \
-            -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -destination "$DESTINATION" \
             -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
-            clean build
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_IDENTITY="" \
+            PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
+            MARKETING_VERSION=${MARKETING_VERSION:-1.0.0} \
+            CURRENT_PROJECT_VERSION=${BUILD_NUMBER:-1} \
+            ONLY_ACTIVE_ARCH=NO \
+            | tee xcodebuild.log
+
+      - name: Upload xcodebuild log (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: xcodebuild.log
+
+      - name: Tail xcodebuild log on failure
+        if: failure()
+        run: |
+          echo "----- LAST 300 LINES -----"
+          tail -n 300 xcodebuild.log || true
