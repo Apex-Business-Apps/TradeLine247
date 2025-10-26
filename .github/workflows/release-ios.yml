@@ -1,0 +1,80 @@
+name: release/ios
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']     # tag to ship (e.g., v0.2.0)
+
+jobs:
+  archive-upload:
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # (Optional) bump/version patching if you need it – keep or remove
+      - name: Ensure bundle id/version/build in Info.plist
+        shell: bash
+        env:
+          PLIST: ios/App/App/Info.plist
+          BUNDLE_ID: com.apex.tradeline
+          APP_NAME: "TradeLine 24/7"
+          MARKETING_VERSION: ${{ github.ref_name }}  # 'v1.2.3' -> strip 'v' below
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          ver="${MARKETING_VERSION#v}"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string $BUNDLE_ID" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $APP_NAME" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string $APP_NAME" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleName $APP_NAME" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleName string $APP_NAME" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $ver" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $ver" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$PLIST"
+
+      - name: Xcode archive (📦 device build)
+        run: |
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGN_STYLE=Automatic \
+            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
+            PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
+            -archivePath build/App.xcarchive \
+            archive | xcpretty && exit ${PIPESTATUS[0]}
+        # iphoneos + generic/platform=iOS makes a device archive acceptable to App Store Connect. :contentReference[oaicite:2]{index=2}
+
+      - name: Export IPA
+        run: |
+          cat > ExportOptions.plist <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store</string>
+            <key>uploadSymbols</key><true/>
+            <key>compileBitcode</key><false/>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportPath build/export \
+            -exportOptionsPlist ExportOptions.plist
+
+      - name: Upload to App Store Connect (Transporter)
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}  # full .p8 contents
+        run: |
+          echo "$ASC_PRIVATE_KEY" > api_key.p8
+          xcrun iTMSTransporter -m upload \
+            -assetFile build/export/*.ipa \
+            -apiKey "$ASC_KEY_ID" -apiIssuer "$ASC_ISSUER_ID" \
+            -authenticationKeyPath api_key.p8 -allowProvisioningUpdates
+        # Transporter is Apple's official CLI uploader used by Xcode under the hood. :contentReference[oaicite:3]{index=3}
+
+      - name: Keep IPA as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: build/export/*.ipa
