@@ -1,4 +1,5 @@
-declare global { var process: any | undefined; var Buffer: any | undefined; }
-;(globalThis as any).process = (globalThis as any).process ?? { env: {} };
-(function exposeBuffer(){ if(!(globalThis as any).Buffer){ try{ import('buffer').then((m:any)=>{ if(m?.Buffer && !(globalThis as any).Buffer){ (globalThis as any).Buffer = m.Buffer; } }).catch(()=>{});}catch{}} })();
+// Minimal shim for libs that read process.env in the browser.
+// No global type augmentation = no conflicts with @types/node.
+const g = globalThis as any;
+g.process ??= { env: {} as Record<string, string | undefined> };
 export {};
