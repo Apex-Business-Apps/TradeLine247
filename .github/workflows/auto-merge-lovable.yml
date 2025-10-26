@@ -11,21 +11,18 @@ permissions:
 jobs:
   auto:
     name: enable auto-merge when checks pass
-    # Run only for Lovable-authored or Lovable-tagged PRs
     if: >
       github.event.pull_request.user.login == 'lovable[bot]' ||
       contains(github.event.pull_request.title, 'Lovable') ||
       contains(join(github.event.pull_request.labels.*.name, ','), 'lovable')
     runs-on: ubuntu-latest
     steps:
-      # 1) Checkout so gh doesn't complain about missing .git
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      # 2) Enable auto-merge (squash) for this PR using repo-scoped calls
-      - name: Enable auto-merge (squash) if checks pass
+      - name: Enable auto-merge (squash) if checks pass (tolerant)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -33,9 +30,25 @@ jobs:
         run: |
           set -euo pipefail
           echo "PR #$PR on $REPO"
-          # mark ready (no-op if already ready)
+          # Mark ready (no-op if already ready)
           gh pr ready "$PR" --repo "$REPO" || true
-          # arm auto-merge (squash). This just sets the flag; merge happens
-          # automatically when all required checks pass.
-          gh pr merge "$PR" --auto --squash --repo "$REPO"
-          echo "Auto-merge armed for PR #$PR."
+
+          # Try to arm auto-merge. Don't fail the job if repo has auto-merge disabled.
+          set +e
+          OUT="$(gh pr merge "$PR" --auto --squash --repo "$REPO" 2>&1)"
+          CODE=$?
+          set -e
+
+          if [ $CODE -ne 0 ]; then
+            echo "$OUT"
+            if echo "$OUT" | grep -q "enablePullRequestAutoMerge"; then
+              echo "🔕 Auto-merge disabled at repo level. Not failing job."
+              gh pr comment "$PR" --repo "$REPO" --body \
+                "Auto-merge couldn’t be enabled because repository auto-merge is off. To allow Lovable PRs to merge automatically once checks pass, enable: **Settings → General → Pull Requests → Allow auto-merge**. This job now succeeds without arming auto-merge."
+              exit 0
+            fi
+            # Any other error should surface as a failure
+            exit $CODE
+          fi
+
+          echo "✅ Auto-merge armed for PR #$PR (squash)."

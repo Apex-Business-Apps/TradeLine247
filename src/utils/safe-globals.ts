@@ -1,4 +1,5 @@
-declare global { var process: any | undefined; var Buffer: any | undefined; }
+// Browser/Deno guard: provide a minimal process.env only.
+// IMPORTANT: No 'buffer' import here (Vite 5 does not auto-polyfill Node core).
+declare global { var process: any | undefined; }
 ;(globalThis as any).process = (globalThis as any).process ?? { env: {} };
-(function exposeBuffer(){ if(!(globalThis as any).Buffer){ try{ import('buffer').then((m:any)=>{ if(m?.Buffer && !(globalThis as any).Buffer){ (globalThis as any).Buffer = m.Buffer; } }).catch(()=>{});}catch{}} })();
 export {};

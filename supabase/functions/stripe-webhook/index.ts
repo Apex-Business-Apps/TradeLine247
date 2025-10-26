@@ -229,15 +229,28 @@ async function processEventBackground(eventId: string, eventType: string): Promi
     console.error(`Error processing event ${eventId}:`, error);
 
     // Mark as failed and increment retry count
-    await supabase
+    const { data: retryRow, error: retryReadErr } = await supabase
       .from("billing_events")
-      .update({ 
+      .select("retry_count")
+      .eq("event_id", eventId)
+      .single();
+
+    if (retryReadErr) throw retryReadErr;
+
+    const newRetryCount = (retryRow?.retry_count ?? 0) + 1;
+
+    // TODO: replace with RPC increment_retry_count(event_id)
+    const { error: retryWriteErr } = await supabase
+      .from("billing_events")
+      .update({
         processing_status: "failed",
         error_message: error.message,
         last_processed_at: new Date().toISOString(),
-        retry_count: supabase.raw("retry_count + 1")
+        retry_count: newRetryCount
       })
       .eq("event_id", eventId);
+
+    if (retryWriteErr) throw retryWriteErr;
   }
 }
 
