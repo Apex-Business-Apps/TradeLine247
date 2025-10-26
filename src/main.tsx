@@ -6,8 +6,7 @@ console.log('🚀 TradeLine 24/7 - Starting main.tsx...');
 // Guard 'process' for Deno/browser importers
 ;(globalThis as any).process = (globalThis as any).process ?? { env: {} };
 
-// Guard before anything else runs
-import './utils/safe-globals';
+import "./utils/safe-globals";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
