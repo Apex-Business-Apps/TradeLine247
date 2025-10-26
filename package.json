@@ -27,7 +27,7 @@
     "ios:open": "npx cap open ios",
 
     "// npm lifecycle hooks": "────────────────────────────────────",
-    "prebuild": "npm run verify:app && npm run verify:icons",
+    "postbuild": "npm run verify:app && npm run verify:icons",
     "capacitor:sync:before": "npm run build"
   },
   "dependencies": {
