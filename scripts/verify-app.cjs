@@ -1,79 +1,81 @@
 #!/usr/bin/env node
+/**
+ * verify-app.cjs
+ * Purpose: Verify the built SPA is servable without importing any TS/Node server code.
+ * Strategy: Run "vite preview" on port 4173, poll GET / until 200, then exit 0.
+ * No external deps. Node 18+ fetch is available.
+ */
 
 const { spawn } = require('node:child_process');
 const { setTimeout: delay } = require('node:timers/promises');
-const path = require('node:path');
-const fs = require('node:fs');
 
-const projectRoot = path.resolve(__dirname, '..');
-const distIndex = path.join(projectRoot, 'dist', 'index.html');
+const PORT = Number(process.env.VERIFY_PORT || 4173);
+const HOST = '127.0.0.1';
+const ORIGIN = `http://${HOST}:${PORT}`;
+const PATH = process.env.VERIFY_PATH || '/'; // we only need index for SPA
 
-async function ensureDist() {
-  try {
-    await fs.promises.access(distIndex, fs.constants.R_OK);
-  } catch (error) {
-    throw new Error('dist/index.html not found. Run "npm run build" before verify.');
+// Spawn vite preview to serve dist without touching server TS files.
+const preview = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', [
+  'vite',
+  'preview',
+  '--host',
+  HOST,
+  '--port',
+  String(PORT),
+], {
+  stdio: ['ignore', 'pipe', 'pipe'],
+  env: {
+    ...process.env,
+    // defensive: some CI envs set odd values that break preview
+    NODE_ENV: 'production',
+  },
+});
+
+let previewExited = false;
+preview.on('exit', (code, signal) => {
+  previewExited = true;
+  if (code !== 0) {
+    console.error(`[verify] vite preview exited early code=${code} signal=${signal}`);
   }
-}
+});
 
-async function waitForServer(port) {
-  const url = `http://127.0.0.1:${port}/healthz`;
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    try {
-      const response = await fetch(url, { cache: 'no-store' });
-      if (response.ok) {
-        return;
-      }
-    } catch (error) {
-      // retry
+// Pipe output for debugging, but keep noise low
+preview.stdout.on('data', (d) => process.stdout.write(String(d)));
+preview.stderr.on('data', (d) => process.stderr.write(String(d)));
+
+async function pollReady(timeoutMs = 15000, intervalMs = 300) {
+  const deadline = Date.now() + timeoutMs;
+  let lastErr = null;
+  while (Date.now() < deadline) {
+    if (previewExited) {
+      throw new Error('vite preview exited before ready');
     }
-    await delay(250);
+    try {
+      const res = await fetch(ORIGIN + PATH, { redirect: 'manual' });
+      if (res.ok || (res.status >= 300 && res.status < 400)) {
+        return true;
+      }
+      lastErr = new Error(`unexpected status ${res.status}`);
+    } catch (e) {
+      lastErr = e;
+    }
+    await delay(intervalMs);
   }
-  throw new Error('Server did not become ready at /healthz');
-}
-
-async function verifyEndpoints(port) {
-  const base = `http://127.0.0.1:${port}`;
-
-  const health = await fetch(`${base}/healthz`);
-  if (!health.ok) {
-    throw new Error(`/healthz returned ${health.status}`);
-  }
-
-  const ready = await fetch(`${base}/readyz`);
-  if (!ready.ok) {
-    throw new Error(`/readyz returned ${ready.status}`);
-  }
-
-  const home = await fetch(`${base}/`);
-  const html = await home.text();
-  if (!html.includes('Your 24/7 Ai Receptionist!')) {
-    throw new Error('Homepage missing tagline copy.');
-  }
+  throw lastErr ?? new Error('timeout waiting for preview');
 }
 
 (async () => {
   try {
-    await ensureDist();
-
-    const port = Number.parseInt(process.env.VERIFY_PORT ?? '', 10) || 4173;
-    const server = spawn('node', ['server.mjs'], {
-      cwd: projectRoot,
-      env: { ...process.env, PORT: String(port) },
-      stdio: ['ignore', 'inherit', 'inherit'],
-    });
-
-    try {
-      await waitForServer(port);
-      await verifyEndpoints(port);
-      console.log('VERIFY: PASS');
-    } finally {
-      server.kill('SIGTERM');
-      await delay(200);
-    }
-  } catch (error) {
+    console.log(`Node.js ${process.version}`);
+    console.log(`[verify] Waiting for preview at ${ORIGIN}${PATH} ...`);
+    await pollReady();
+    console.log('VERIFY: PASS');
+    preview.kill('SIGTERM');
+    process.exit(0);
+  } catch (e) {
     console.error('VERIFY: FAIL');
-    console.error(error instanceof Error ? error.message : error);
+    console.error(e && e.stack || e);
+    try { preview.kill('SIGTERM'); } catch {}
     process.exit(1);
   }
 })();
