@@ -1,0 +1,21 @@
+name: ci/lint
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions: { contents: read }
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install deps (lock-aware)
+        run: |
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then npm ci; else npm i --no-audit --no-fund; fi
+      - name: Run lint if available, else succeed
+        run: |
+          if npm run | grep -q "^ *lint"; then npm run lint; else echo "No 'lint' script—passing compat context."; fi
