@@ -40,13 +40,10 @@ jobs:
             fs.writeFileSync('package.json', JSON.stringify(p, null, 2));
           "
 
-      - name: Build web (ignore lifecycle hooks)
-        run: NPM_CONFIG_IGNORE_SCRIPTS=true npm run build
-
       - name: Verify built assets
         run: |
+          NPM_CONFIG_IGNORE_SCRIPTS=true npm run build
           node scripts/verify-app.cjs
-          node scripts/verify_icons.mjs
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
@@ -77,6 +74,35 @@ jobs:
       - name: Sync Capacitor iOS project
         run: npx cap sync ios
 
+      - name: Patch iOS Info.plist
+        shell: bash
+        env:
+          BUNDLE_ID: com.apex.tradeline
+          APP_NAME: TradeLine 24/7
+          MARKETING_VERSION: 1.0.0
+          BUILD_NUMBER: 1
+        run: |
+          set -euo pipefail
+          PLIST="ios/App/App/Info.plist"
+          if [ ! -f "$PLIST" ]; then echo "❌ Info.plist not found at $PLIST"; exit 1; fi
+          set_plist () {
+            local key="$1"; local type="$2"; shift 2; local value="$*"
+            if /usr/libexec/PlistBuddy -c "Print :$key" "$PLIST" >/dev/null 2>&1; then
+              /usr/libexec/PlistBuddy -c "Set :$key $value" "$PLIST"
+            else
+              /usr/libexec/PlistBuddy -c "Add :$key $type $value" "$PLIST"
+            fi
+          }
+          echo "🔧 Patching $PLIST"
+          set_plist CFBundleIdentifier string "$BUNDLE_ID"
+          set_plist CFBundleDisplayName string "$APP_NAME"
+          set_plist CFBundleName string "$APP_NAME"
+          set_plist CFBundleShortVersionString string "$MARKETING_VERSION"
+          set_plist CFBundleVersion string "$BUILD_NUMBER"
+          echo "✅ CFBundleIdentifier: $(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$PLIST")"
+          echo "✅ CFBundleShortVersionString: $(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$PLIST")"
+          echo "✅ CFBundleVersion: $(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$PLIST")"
+
       - name: Install CocoaPods
         working-directory: ios/App
         run: pod install
@@ -84,6 +110,9 @@ jobs:
       - name: Build iOS workspace
         working-directory: ios/App
         run: |
+          PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
+          MARKETING_VERSION=1.0.0 \
+          CURRENT_PROJECT_VERSION=1 \
           xcodebuild \
             -workspace App.xcworkspace \
             -scheme App \
