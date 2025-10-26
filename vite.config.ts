@@ -9,16 +9,23 @@ export default defineConfig(async ({ mode }) => {
 
   try {
     const { fileURLToPath } = await import("node:url");
-    srcAlias = fileURLToPath(srcUrl);
+    try {
+      srcAlias = fileURLToPath(srcUrl);
+    } catch {
+      // Node can throw ERR_INVALID_FILE_URL_PATH when the URL contains encodings it does not expect (observed on
+      // macOS runners when the checkout lives in a randomized /private path). Fall back to a manual decode so
+      // the build proceeds instead of exploding inside `npx cap sync`.
+      srcAlias = decodeURIComponent(srcUrl.pathname);
+    }
   } catch {
     // Deno (used by Lovable) doesn't expose Node's url helpers; fall back to the decoded pathname.
     srcAlias = decodeURIComponent(srcUrl.pathname);
+  }
 
-    // When running on Windows via Node the decoded pathname can look like /C:/path — trim the leading slash
-    // so Vite receives a native path. Deno does not expose process.platform, so guard our inspection.
-    if (/^\/[A-Za-z]:/.test(srcAlias)) {
-      srcAlias = srcAlias.slice(1);
-    }
+  // When running on Windows via Node the decoded pathname can look like /C:/path — trim the leading slash
+  // so Vite receives a native path. Deno does not expose process.platform, so guard our inspection.
+  if (/^\/[A-Za-z]:/.test(srcAlias)) {
+    srcAlias = srcAlias.slice(1);
   }
 
   const plugins = [react()];
@@ -43,7 +50,7 @@ export default defineConfig(async ({ mode }) => {
         'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
-        'Content-Security-Policy': "default-src 'self'; img-src 'self' https: data:; media-src 'self' https:; connect-src 'self' https://hysvqdwmhxnblxfqnszn.supabase.co wss://hysvqdwmhxnblxfqnszn.supabase.co https://api.tradeline247ai.com wss://api.tradeline247ai.com; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:;"
+        'Content-Security-Policy': "default-src 'self'; img-src 'self' https: data:; media-src 'self' https:; connect-src 'self' https://hysvqdwmhxnblxfqnszn.supabase.co wss://hysvqdwmhxnblxfqnszn.supabase.co https://api.tradeline247ai.com wss://api.tradeline247ai.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:;"
       }
     },
     plugins,
