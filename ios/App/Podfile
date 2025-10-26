@@ -2,7 +2,12 @@ require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
 platform :ios, '15.0'
 use_frameworks! :linkage => :static
-project File.expand_path('App.xcodeproj', __dir__) # allow pod install from CI roots
+
+project_path = File.expand_path('App.xcodeproj', __dir__)
+unless File.exist?(project_path)
+  raise "Unable to locate App.xcodeproj at #{project_path}. Run 'npx cap sync ios' before installing pods."
+end
+project project_path # allow pod install from CI roots
 
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
