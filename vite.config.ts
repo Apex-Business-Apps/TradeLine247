@@ -5,14 +5,20 @@ import react from "@vitejs/plugin-react-swc";
 // This config remains Node-only, but we neutralize 'process.env' for browser bundles to avoid crashes.
 export default defineConfig(async ({ mode }) => {
   const srcUrl = new URL("./src", import.meta.url);
-  let srcAlias = decodeURIComponent(srcUrl.pathname);
+  let srcAlias: string;
 
   try {
     const { fileURLToPath } = await import("node:url");
     srcAlias = fileURLToPath(srcUrl);
   } catch {
-    // Deno (used by Lovable) doesn't expose Node's url helpers; fall back to the POSIX-style path.
+    // Deno (used by Lovable) doesn't expose Node's url helpers; fall back to the decoded pathname.
     srcAlias = decodeURIComponent(srcUrl.pathname);
+
+    // When running on Windows via Node the decoded pathname can look like /C:/path — trim the leading slash
+    // so Vite receives a native path. Deno does not expose process.platform, so guard our inspection.
+    if (/^\/[A-Za-z]:/.test(srcAlias)) {
+      srcAlias = srcAlias.slice(1);
+    }
   }
 
   const plugins = [react()];
