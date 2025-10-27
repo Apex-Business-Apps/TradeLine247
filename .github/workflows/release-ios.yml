@@ -1,41 +1,20 @@
 name: release/ios
+
 on:
   workflow_dispatch:
   push:
-    tags: ['v*']     # tag to ship (e.g., v0.2.0)
+    tags:
+      - 'v*'      # e.g. v0.2.0
 
 jobs:
   archive-upload:
     runs-on: macos-14
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
 
-      # (Optional) bump/version patching if you need it – keep or remove
-      - name: Ensure bundle id/version/build in Info.plist
-        shell: bash
-        env:
-          PLIST: ios/App/App/Info.plist
-          BUNDLE_ID: com.apex.tradeline
-          APP_NAME: "TradeLine 24/7"
-          MARKETING_VERSION: ${{ github.ref_name }}  # 'v1.2.3' -> strip 'v' below
-          BUILD_NUMBER: ${{ github.run_number }}
-        run: |
-          set -euo pipefail
-          ver="${MARKETING_VERSION#v}"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string $BUNDLE_ID" "$PLIST"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $APP_NAME" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string $APP_NAME" "$PLIST"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleName $APP_NAME" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleName string $APP_NAME" "$PLIST"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $ver" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $ver" "$PLIST"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$PLIST"
-
- jobs:
-  archive-upload:
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v4
-
-      # 0) Node – build web assets for Capacitor
+      # Node – build web assets for Capacitor
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -47,27 +26,42 @@ jobs:
           npm ci
           npm run build
 
-      # 1) Sync Capacitor to iOS (copies web build + updates pods)
+      # Sync native project + pods
       - name: Sync Capacitor iOS
         run: |
           set -euo pipefail
           npx cap sync ios
 
-      # 2) Ensure CocoaPods are installed for the workspace (idempotent)
       - name: Install CocoaPods
         run: |
           set -euo pipefail
           cd ios/App
           pod install --repo-update
 
-      # (your Info.plist step stays here)
+      # Keep Info.plist in sync (safe/idempotent)
+      - name: Ensure bundle id/version/build in Info.plist
+        shell: bash
+        env:
+          PLIST: ios/App/App/Info.plist
+          BUNDLE_ID: com.apex.tradeline
+          APP_NAME: "TradeLine 24/7"
+          MARKETING_VERSION: ${{ github.ref_name }}   # 'v1.2.3' => strip 'v' below
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          ver="${MARKETING_VERSION#v}"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string $BUNDLE_ID" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $APP_NAME" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string $APP_NAME" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleName $APP_NAME" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleName string $APP_NAME" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $ver" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $ver" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$PLIST"
 
-      # 3) Archive – allow auto provisioning & keep a raw log
+      # Device archive (not simulator) + keep raw log
       - name: Xcode archive (📦 device build)
+        shell: bash
         run: |
           set -euo pipefail
           mkdir -p build
-          # keep raw log so we can inspect real failures (xcpretty truncates)
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
             -scheme App \
@@ -75,38 +69,17 @@ jobs:
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             CODE_SIGN_STYLE=Automatic \
-            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
+            DEVELOPMENT_TEAM='${{ secrets.APPLE_TEAM_ID }}' \
             PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
             -allowProvisioningUpdates \
             -archivePath build/App.xcarchive \
             archive 2>&1 | tee build/archive.log | xcpretty
           test ${PIPESTATUS[0]} -eq 0
-      - name: Upload build log (if needed)
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: xcode-archive-log
-          path: build/archive.log
-
-      # (Export IPA, Transporter upload, keep artifact) – unchanged
-
-      - name: Xcode archive (📦 device build)
-        run: |
-          xcodebuild \
-            -workspace ios/App/App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGN_STYLE=Automatic \
-            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
-            PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
-            -archivePath build/App.xcarchive \
-            archive | xcpretty && exit ${PIPESTATUS[0]}
-        # iphoneos + generic/platform=iOS makes a device archive acceptable to App Store Connect. :contentReference[oaicite:2]{index=2}
 
       - name: Export IPA
+        shell: bash
         run: |
+          set -euo pipefail
           cat > ExportOptions.plist <<'PLIST'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -122,20 +95,26 @@ jobs:
             -exportOptionsPlist ExportOptions.plist
 
       - name: Upload to App Store Connect (Transporter)
+        shell: bash
         env:
           ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}  # full .p8 contents
+          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}   # full .p8 text
         run: |
+          set -euo pipefail
           echo "$ASC_PRIVATE_KEY" > api_key.p8
           xcrun iTMSTransporter -m upload \
             -assetFile build/export/*.ipa \
-            -apiKey "$ASC_KEY_ID" -apiIssuer "$ASC_ISSUER_ID" \
-            -authenticationKeyPath api_key.p8 -allowProvisioningUpdates
-        # Transporter is Apple's official CLI uploader used by Xcode under the hood. :contentReference[oaicite:3]{index=3}
+            -apiKey "$ASC_KEY_ID" \
+            -apiIssuer "$ASC_ISSUER_ID" \
+            -authenticationKeyPath api_key.p8 \
+            -allowProvisioningUpdates
 
-      - name: Keep IPA as artifact
+      - name: Upload artifacts (IPA + logs)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa
-          path: build/export/*.ipa
+          name: ios-ipa-and-logs
+          path: |
+            build/export/*.ipa
+            build/archive.log
