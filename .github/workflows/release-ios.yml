@@ -29,6 +29,67 @@ jobs:
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $ver" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $ver" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$PLIST"
 
+ jobs:
+  archive-upload:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      # 0) Node – build web assets for Capacitor
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps & build web
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run build
+
+      # 1) Sync Capacitor to iOS (copies web build + updates pods)
+      - name: Sync Capacitor iOS
+        run: |
+          set -euo pipefail
+          npx cap sync ios
+
+      # 2) Ensure CocoaPods are installed for the workspace (idempotent)
+      - name: Install CocoaPods
+        run: |
+          set -euo pipefail
+          cd ios/App
+          pod install --repo-update
+
+      # (your Info.plist step stays here)
+
+      # 3) Archive – allow auto provisioning & keep a raw log
+      - name: Xcode archive (📦 device build)
+        run: |
+          set -euo pipefail
+          mkdir -p build
+          # keep raw log so we can inspect real failures (xcpretty truncates)
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGN_STYLE=Automatic \
+            DEVELOPMENT_TEAM=${{ secrets.APPLE_TEAM_ID }} \
+            PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
+            -allowProvisioningUpdates \
+            -archivePath build/App.xcarchive \
+            archive 2>&1 | tee build/archive.log | xcpretty
+          test ${PIPESTATUS[0]} -eq 0
+      - name: Upload build log (if needed)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: xcode-archive-log
+          path: build/archive.log
+
+      # (Export IPA, Transporter upload, keep artifact) – unchanged
+
       - name: Xcode archive (📦 device build)
         run: |
           xcodebuild \
