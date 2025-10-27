@@ -4,64 +4,106 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*'      # e.g. v0.2.0
+      - 'v*'              # e.g., v0.2.1
 
 jobs:
   archive-upload:
     runs-on: macos-14
     timeout-minutes: 60
+    env:
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
 
     steps:
       - uses: actions/checkout@v4
 
-      # Node – build web assets for Capacitor
+      # Node — build web assets for Capacitor (idempotent)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install deps & build web
+        shell: bash
         run: |
           set -euo pipefail
           npm ci
           npm run build
 
-      # Sync native project + pods
+      # Sync Capacitor (copies web build + updates native project)
       - name: Sync Capacitor iOS
+        shell: bash
         run: |
           set -euo pipefail
           npx cap sync ios
 
+      # Ensure CocoaPods are installed (safe if already installed)
       - name: Install CocoaPods
+        shell: bash
         run: |
           set -euo pipefail
           cd ios/App
           pod install --repo-update
 
-      # Keep Info.plist in sync (safe/idempotent)
+      # Prepare App Store Connect API key file (used by xcodebuild + Transporter)
+      - name: Write ASC API key
+        shell: bash
+        env:
+          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}   # full .p8 text
+        run: |
+          set -euo pipefail
+          echo "$ASC_PRIVATE_KEY" > api_key.p8
+
+      # Keep Info.plist in sync — robust versioning for manual or tag runs
       - name: Ensure bundle id/version/build in Info.plist
         shell: bash
         env:
           PLIST: ios/App/App/Info.plist
           BUNDLE_ID: com.apex.tradeline
           APP_NAME: "TradeLine 24/7"
-          MARKETING_VERSION: ${{ github.ref_name }}   # 'v1.2.3' => strip 'v' below
-          BUILD_NUMBER: ${{ github.run_number }}
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          GITHUB_REF_TYPE: ${{ github.ref_type }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
-          ver="${MARKETING_VERSION#v}"
+          # Marketing version:
+          # - On tag 'v1.2.3' -> '1.2.3'
+          # - Otherwise -> '1.0.<run>'
+          ver="1.0.${GITHUB_RUN_NUMBER}"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" =~ ^v?[0-9]+(\.[0-9]+){0,2}$ ]]; then
+            ver="${GITHUB_REF_NAME#v}"
+          fi
+          build="${GITHUB_RUN_NUMBER}"
+
           /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string $BUNDLE_ID" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $APP_NAME" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string $APP_NAME" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleName $APP_NAME" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleName string $APP_NAME" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $ver" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $ver" "$PLIST"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $build" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $build" "$PLIST"
 
-      # Device archive (not simulator) + keep raw log
-      - name: Xcode archive (📦 device build)
+          # Save a snapshot for debugging
+          /usr/libexec/PlistBuddy -c "Print" "$PLIST" > build_Info.plist.txt
+
+      # Deflake + capture full Xcode error (no swallowed messages)
+      - name: Clean Xcode DerivedData
         shell: bash
         run: |
           set -euo pipefail
+          rm -rf ~/Library/Developer/Xcode/DerivedData/* || true
+
+      - name: Xcode archive (📦 device build, real logs)
+        shell: bash
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          set -euo pipefail
           mkdir -p build
+          # Run without xcpretty first so we keep exact error output
+          set +e
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
             -scheme App \
@@ -69,12 +111,19 @@ jobs:
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             CODE_SIGN_STYLE=Automatic \
-            DEVELOPMENT_TEAM='${{ secrets.APPLE_TEAM_ID }}' \
+            DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
             PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
             -allowProvisioningUpdates \
+            -authenticationKeyPath api_key.p8 \
+            -authenticationKeyID "${ASC_KEY_ID}" \
+            -authenticationKeyIssuerID "${ASC_ISSUER_ID}" \
             -archivePath build/App.xcarchive \
-            archive 2>&1 | tee build/archive.log | xcpretty
-          test ${PIPESTATUS[0]} -eq 0
+            clean archive 2>&1 | tee build/archive.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "xcodebuild exit status: $status"
+          tail -n 150 build/archive.log || true
+          exit $status
 
       - name: Export IPA
         shell: bash
@@ -93,16 +142,15 @@ jobs:
             -archivePath build/App.xcarchive \
             -exportPath build/export \
             -exportOptionsPlist ExportOptions.plist
+          ls -lah build/export || true
 
       - name: Upload to App Store Connect (Transporter)
         shell: bash
         env:
           ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}   # full .p8 text
         run: |
           set -euo pipefail
-          echo "$ASC_PRIVATE_KEY" > api_key.p8
           xcrun iTMSTransporter -m upload \
             -assetFile build/export/*.ipa \
             -apiKey "$ASC_KEY_ID" \
@@ -110,11 +158,15 @@ jobs:
             -authenticationKeyPath api_key.p8 \
             -allowProvisioningUpdates
 
-      - name: Upload artifacts (IPA + logs)
+      - name: Upload artifacts (IPA + logs + Info.plist snapshot)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa-and-logs
           path: |
-            build/export/*.ipa
+            build/export/**/*.ipa
             build/archive.log
+            ExportOptions.plist
+            build_Info.plist.txt
+            build/App.xcarchive
+
