@@ -4,126 +4,157 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*'              # e.g., v0.2.1
+      - 'v*' # e.g. v0.2.1
 
 jobs:
   archive-upload:
     runs-on: macos-14
     timeout-minutes: 60
+
     env:
-      LANG: en_US.UTF-8
-      LC_ALL: en_US.UTF-8
+      BUNDLE_ID: com.apex.tradeline
+      SCHEME: App
+      WORKSPACE: ios/App/App.xcworkspace
+      CONFIG: Release
+      ARCHIVE_PATH: build/App.xcarchive
+      EXPORT_PATH: build/export
+      APP_NAME: "TradeLine 24/7"
 
     steps:
       - uses: actions/checkout@v4
 
-      # Node — build web assets for Capacitor (idempotent)
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install deps & build web
-        shell: bash
         run: |
           set -euo pipefail
           npm ci
           npm run build
+          npm run verify:app || true
+          npm run verify:icons || true
 
-      # Sync Capacitor (copies web build + updates native project)
       - name: Sync Capacitor iOS
-        shell: bash
         run: |
           set -euo pipefail
           npx cap sync ios
 
-      # Ensure CocoaPods are installed (safe if already installed)
       - name: Install CocoaPods
-        shell: bash
         run: |
           set -euo pipefail
           cd ios/App
           pod install --repo-update
 
-      # Prepare App Store Connect API key file (used by xcodebuild + Transporter)
-      - name: Write ASC API key
-        shell: bash
-        env:
-          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}   # full .p8 text
-        run: |
-          set -euo pipefail
-          echo "$ASC_PRIVATE_KEY" > api_key.p8
-
-      # Keep Info.plist in sync — robust versioning for manual or tag runs
-      - name: Ensure bundle id/version/build in Info.plist
+      - name: Ensure Info.plist version/build + sanity checks
         shell: bash
         env:
           PLIST: ios/App/App/Info.plist
-          BUNDLE_ID: com.apex.tradeline
-          APP_NAME: "TradeLine 24/7"
-          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          GITHUB_REF_TYPE: ${{ github.ref_type }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          MARKETING_VERSION: ${{ github.ref_name }}
+          BUILD_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
-          # Marketing version:
-          # - On tag 'v1.2.3' -> '1.2.3'
-          # - Otherwise -> '1.0.<run>'
-          ver="1.0.${GITHUB_RUN_NUMBER}"
-          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" =~ ^v?[0-9]+(\.[0-9]+){0,2}$ ]]; then
-            ver="${GITHUB_REF_NAME#v}"
-          fi
-          build="${GITHUB_RUN_NUMBER}"
-
+          test -d "$(dirname "$WORKSPACE")" || { echo "::error::Workspace not found at $WORKSPACE"; exit 65; }
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$PLIST" >/dev/null 2>&1 || true
+          ver="${MARKETING_VERSION#v}"
           /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string $BUNDLE_ID" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $APP_NAME" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string $APP_NAME" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleName $APP_NAME" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleName string $APP_NAME" "$PLIST"
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $ver" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $ver" "$PLIST"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $build" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $build" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST" || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$PLIST"
+          BID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$PLIST")
+          echo "Bundle ID in Info.plist: $BID"
+          test "$BID" = "$BUNDLE_ID" || { echo "::error::CFBundleIdentifier mismatch ($BID != $BUNDLE_ID)"; exit 65; }
 
-          # Save a snapshot for debugging
-          /usr/libexec/PlistBuddy -c "Print" "$PLIST" > build_Info.plist.txt
-
-      # Deflake + capture full Xcode error (no swallowed messages)
-      - name: Clean Xcode DerivedData
-        shell: bash
+      - name: Verify scheme is shared
         run: |
           set -euo pipefail
-          rm -rf ~/Library/Developer/Xcode/DerivedData/* || true
+          SCHEMES=$(xcodebuild -list -json -workspace "$WORKSPACE")
+          echo "$SCHEMES" | grep -q "\"$SCHEME\"" || { echo "::error::Scheme '$SCHEME' not found (ensure it is SHARED and committed)"; exit 65; }
 
-      - name: Xcode archive (📦 device build, real logs)
+      # === CODE SIGNING: install cert & profile into a temp keychain ===
+      - name: Install signing cert & profile
+        shell: bash
+        env:
+          P12_B64: ${{ secrets.IOS_CERT_P12 }}
+          P12_PWD: ${{ secrets.IOS_CERT_PASSWORD }}
+          PROFILE_B64: ${{ secrets.IOS_PROFILE }}
+        run: |
+          set -euo pipefail
+          mkdir -p build signing
+          echo "$P12_B64"     | base64 --decode > signing/dist.p12
+          echo "$PROFILE_B64" | base64 --decode > signing/profile.mobileprovision
+
+          KEYCHAIN="build/signing.keychain-db"
+          KEYCHAIN_PWD="$(openssl rand -hex 16)"
+
+          cleanup() {
+            security delete-keychain "$KEYCHAIN" >/dev/null 2>&1 || true
+            rm -rf signing
+          }
+          trap cleanup EXIT
+
+          security create-keychain -p "$KEYCHAIN_PWD" "$KEYCHAIN"
+          security set-keychain-settings -lut 7200 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PWD" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          security default-keychain -s "$KEYCHAIN"
+
+          security import signing/dist.p12 -k "$KEYCHAIN" -P "$P12_PWD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PWD" "$KEYCHAIN"
+
+          CERT_ID=$(security find-identity -v -p codesigning "$KEYCHAIN" | awk -F'"' '/Apple Distribution/ {print $2; exit}')
+          if [ -z "$CERT_ID" ]; then
+            echo "::error::No Apple Distribution identity found in temp keychain"; exit 65;
+          fi
+          echo "Using signing identity: $CERT_ID"
+
+          UUID=$(/usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin <<<"$(security cms -D -i signing/profile.mobileprovision)")
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp signing/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+          echo "Installed profile UUID: $UUID"
+
+          {
+            echo "CERT_ID=$CERT_ID"
+            echo "PROFILE_UUID=$UUID"
+            echo "KEYCHAIN=$KEYCHAIN"
+            echo "KEYCHAIN_PWD=$KEYCHAIN_PWD"
+          } >> $GITHUB_ENV
+
+      - name: Xcode archive (manual signing)
         shell: bash
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
           set -euo pipefail
           mkdir -p build
-          # Run without xcpretty first so we keep exact error output
-          set +e
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
-            -scheme App \
-            -configuration Release \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIG" \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
-            CODE_SIGN_STYLE=Automatic \
-            DEVELOPMENT_TEAM="${APPLE_TEAM_ID}" \
-            PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath api_key.p8 \
-            -authenticationKeyID "${ASC_KEY_ID}" \
-            -authenticationKeyIssuerID "${ASC_ISSUER_ID}" \
-            -archivePath build/App.xcarchive \
-            clean archive 2>&1 | tee build/archive.log
-          status=${PIPESTATUS[0]}
-          set -e
-          echo "xcodebuild exit status: $status"
-          tail -n 150 build/archive.log || true
-          exit $status
+            -archivePath "$ARCHIVE_PATH" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
+            CODE_SIGN_IDENTITY="$CERT_ID" \
+            archive | tee build/archive.log
+          test ${PIPESTATUS[0]} -eq 0
+
+      - name: Prove embedded profile + entitlements
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_PATH=$(find "$ARCHIVE_PATH/Products/Applications" -name "*.app" | head -n1)
+          EMBED_PLIST="$APP_PATH/embedded.mobileprovision"
+          # Extract and show critical fields
+          security cms -D -i "$EMBED_PLIST" > build/embedded.plist
+          echo "Embedded Profile UUID: $(/usr/libexec/PlistBuddy -c 'Print UUID' build/embedded.plist)"
+          echo "TeamIdentifier: $(/usr/libexec/PlistBuddy -c 'Print TeamIdentifier:0' build/embedded.plist)"
+          echo "AppIDName: $(/usr/libexec/PlistBuddy -c 'Print Name' build/embedded.plist)"
+          echo "Entitlements summary:"
+          codesign -d --entitlements :- "$APP_PATH" 2>/dev/null | plutil -convert json -o - - | jq '{application_identifier,com.apple.developer.team-identifier}' | tee build/entitlements.json
 
       - name: Export IPA
         shell: bash
@@ -135,38 +166,45 @@ jobs:
           <plist version="1.0"><dict>
             <key>method</key><string>app-store</string>
             <key>uploadSymbols</key><true/>
-            <key>compileBitcode</key><false/>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key><dict>
+              <key>com.apex.tradeline</key><string>TL247_mobpro_tradeline_01</string>
+            </dict>
           </dict></plist>
           PLIST
           xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportPath build/export \
-            -exportOptionsPlist ExportOptions.plist
-          ls -lah build/export || true
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$EXPORT_PATH" \
+            -exportOptionsPlist ExportOptions.plist | tee build/export.log
+          IPA=$(ls "$EXPORT_PATH"/*.ipa | head -n1)
+          echo "IPA_PATH=$IPA" >> $GITHUB_ENV
+          echo "Exported: $IPA"
 
       - name: Upload to App Store Connect (Transporter)
         shell: bash
         env:
           ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
         run: |
           set -euo pipefail
+          umask 077
+          echo "$ASC_PRIVATE_KEY" > api_key.p8
           xcrun iTMSTransporter -m upload \
-            -assetFile build/export/*.ipa \
+            -assetFile "$IPA_PATH" \
             -apiKey "$ASC_KEY_ID" \
             -apiIssuer "$ASC_ISSUER_ID" \
-            -authenticationKeyPath api_key.p8 \
-            -allowProvisioningUpdates
+            -authenticationKeyPath api_key.p8
+          rm -f api_key.p8
 
-      - name: Upload artifacts (IPA + logs + Info.plist snapshot)
+      - name: Upload artifacts (IPA + logs)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa-and-logs
           path: |
-            build/export/**/*.ipa
+            ${{ env.IPA_PATH }}
             build/archive.log
-            ExportOptions.plist
-            build_Info.plist.txt
-            build/App.xcarchive
-
+            build/export.log
+            build/embedded.plist
+            build/entitlements.json
