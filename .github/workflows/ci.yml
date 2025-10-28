@@ -1,114 +1,59 @@
-name: ci
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-  push:
-    branches: [main]
+name: CI
 
-permissions:
-  contents: read
-  statuses: write
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: build
+  ci/lint:
+    name: ci/lint
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: https://example.supabase.co
+      VITE_SUPABASE_ANON_KEY: public-anon-key
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
           cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
 
-      - name: Install deps
-        run: npm ci
-
-      - name: Build
-        run: npm run -s build
-
-      - name: Report status context (ci/build)
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const state = "${{ job.status }}" === "success" ? "success" : "failure";
-            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha,
-              state,
-              context: "ci/build",
-              description: state === "success" ? "Build passed" : "Build failed"
-            });
-
-  lint:
-    name: lint
+  ci/build:
+    name: ci/build
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: https://example.supabase.co
+      VITE_SUPABASE_ANON_KEY: public-anon-key
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
           cache: 'npm'
+      - run: npm ci
+      - run: npm run verify:env:public
+      - run: npm run typecheck
+      - run: npm run build
 
-      - name: Install deps
-        run: npm ci
-
-      - name: Lint
-        run: npm run -s lint || (echo "lint errors" && exit 1)
-
-      - name: Report status context (ci/lint)
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const state = "${{ job.status }}" === "success" ? "success" : "failure";
-            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha,
-              state,
-              context: "ci/lint",
-              description: state === "success" ? "Lint passed" : "Lint failed"
-            });
-
-  test:
-    name: test
+  ci/test:
+    name: ci/test
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: https://example.supabase.co
+      VITE_SUPABASE_ANON_KEY: public-anon-key
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
           cache: 'npm'
-
-      - name: Install deps
-        run: npm ci
-
-      - name: Test
-        run: npm test -- --ci --reporters=default --passWithNoTests
-
-      - name: Report status context (ci/test)
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const state = "${{ job.status }}" === "success" ? "success" : "failure";
-            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha,
-              state,
-              context: "ci/test",
-              description: state === "success" ? "Tests passed" : "Tests failed"
-            });
+      - run: npm ci
+      - run: npm run test:ci

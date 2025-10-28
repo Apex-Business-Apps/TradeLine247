@@ -1,4 +1,3 @@
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
@@ -15,8 +14,6 @@ const Demo = () => {
         keywords="AI receptionist demo, TradeLine 24/7 demo, customer service automation demo, AI phone system demo"
         canonical="https://www.tradeline247ai.com/demo"
       />
-      
-      <Header />
       
       <main className="flex-1">
         {/* Hero Section */}

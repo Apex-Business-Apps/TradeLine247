@@ -34,7 +34,7 @@ export const HeroSection = () => {
             className="h-55 md:h-[20.625rem] lg:h-[24.75rem] w-auto mx-auto drop-shadow-2xl hover-scale transition-all duration-500"
             decoding="async"
             loading="eager"
-            fetchPriority="high"
+            fetchpriority="high"
             style={{filter: 'var(--premium-glow)'}}
           />
         </div>

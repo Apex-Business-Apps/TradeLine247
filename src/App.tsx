@@ -24,6 +24,7 @@ import "@/utils/keyboardNavigation"; // Initialize keyboard navigation utilities
 
 import StartupSplash from "@/components/StartupSplash";
 import LayoutCanon from "@/components/LayoutCanon";
+import AppLayout from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import DesignTokens from "./pages/DesignTokens";
 import ClientDashboard from "./pages/ClientDashboard";
@@ -114,46 +115,48 @@ const AppWithMonitoring = () => {
         <Route path="/healthz" element={<Healthz />} />
         <Route path="/readyz" element={<Readyz />} />
 
-        {/* Primary app routes */}
-        <Route path="/" element={<main id="main"><Index /></main>} />
-        <Route path="/auth" element={<main id="main"><Auth /></main>} />
-        <Route path="/thank-you" element={<main id="main"><ThankYou /></main>} />
-        <Route path="/signup" element={<Navigate to="/auth" replace />} />
-        <Route path="/features" element={<main id="main"><Features /></main>} />
-        <Route path="/pricing" element={<main id="main"><Pricing /></main>} />
-        <Route path="/faq" element={<main id="main"><FAQ /></main>} />
-        <Route path="/contact" element={<main id="main"><Contact /></main>} />
-        <Route path="/demo" element={<main id="main"><Demo /></main>} />
-        {/* 🔥 Removed broken /security route that referenced a non-existent component */}
-        <Route path="/compare" element={<main id="main"><Compare /></main>} />
-        <Route path="/privacy" element={<main id="main"><Privacy /></main>} />
-        <Route path="/terms" element={<main id="main"><Terms /></main>} />
-        <Route path="/design-tokens" element={<main id="main"><DesignTokens /></main>} />
-        <Route path="/dashboard" element={<main id="main"><ClientDashboard /></main>} />
-        <Route path="/dashboard/integrations/crm" element={<main id="main"><CRMIntegration /></main>} />
-        <Route path="/dashboard/integrations/email" element={<main id="main"><EmailIntegration /></main>} />
-        <Route path="/dashboard/integrations/phone" element={<main id="main"><PhoneIntegration /></main>} />
-        <Route path="/dashboard/integrations/messaging" element={<main id="main"><MessagingIntegration /></main>} />
-        <Route path="/dashboard/integrations/mobile" element={<main id="main"><MobileIntegration /></main>} />
-        <Route path="/dashboard/integrations/automation" element={<main id="main"><AutomationIntegration /></main>} />
-        <Route path="/call-center" element={<main id="main"><CallCenter /></main>} />
-        <Route path="/calls" element={<main id="main"><CallLogs /></main>} />
-        <Route path="/phone-apps" element={<main id="main"><PhoneApps /></main>} />
-        <Route path="/sms-delivery" element={<main id="main"><SMSDeliveryDashboard /></main>} />
-        <Route path="/admin/kb" element={<main id="main"><AdminKB /></main>} />
-        <Route path="/admin/campaigns" element={<main id="main"><CampaignManager /></main>} />
-        <Route path="/ops/crypto/init" element={<main id="main"><CryptoInit /></main>} />
-        <Route path="/ops/activation" element={<main id="main"><Activation /></main>} />
-        <Route path="/ops/voice" element={<main id="main"><VoiceSettings /></main>} />
-        <Route path="/ops/twilio/wire" element={<main id="main"><TwilioWire /></main>} />
-        <Route path="/ops/staging-test" element={<main id="main"><StagingTest /></main>} />
-        <Route path="/ops/voice-health" element={<main id="main"><VoiceHealth /></main>} />
-        <Route path="/ops/messaging-health" element={<main id="main"><MessagingHealth /></main>} />
-        <Route path="/ops/numbers/onboard" element={<main id="main"><ClientNumberOnboarding /></main>} />
-        <Route path="/ops/twilio-evidence" element={<main id="main"><TwilioEvidence /></main>} />
+        <Route element={<AppLayout />}>
+          {/* Primary app routes */}
+          <Route path="/" element={<main id="main"><Index /></main>} />
+          <Route path="/auth" element={<main id="main"><Auth /></main>} />
+          <Route path="/thank-you" element={<main id="main"><ThankYou /></main>} />
+          <Route path="/signup" element={<Navigate to="/auth" replace />} />
+          <Route path="/features" element={<main id="main"><Features /></main>} />
+          <Route path="/pricing" element={<main id="main"><Pricing /></main>} />
+          <Route path="/faq" element={<main id="main"><FAQ /></main>} />
+          <Route path="/contact" element={<main id="main"><Contact /></main>} />
+          <Route path="/demo" element={<main id="main"><Demo /></main>} />
+          {/* 🔥 Removed broken /security route that referenced a non-existent component */}
+          <Route path="/compare" element={<main id="main"><Compare /></main>} />
+          <Route path="/privacy" element={<main id="main"><Privacy /></main>} />
+          <Route path="/terms" element={<main id="main"><Terms /></main>} />
+          <Route path="/design-tokens" element={<main id="main"><DesignTokens /></main>} />
+          <Route path="/dashboard" element={<main id="main"><ClientDashboard /></main>} />
+          <Route path="/dashboard/integrations/crm" element={<main id="main"><CRMIntegration /></main>} />
+          <Route path="/dashboard/integrations/email" element={<main id="main"><EmailIntegration /></main>} />
+          <Route path="/dashboard/integrations/phone" element={<main id="main"><PhoneIntegration /></main>} />
+          <Route path="/dashboard/integrations/messaging" element={<main id="main"><MessagingIntegration /></main>} />
+          <Route path="/dashboard/integrations/mobile" element={<main id="main"><MobileIntegration /></main>} />
+          <Route path="/dashboard/integrations/automation" element={<main id="main"><AutomationIntegration /></main>} />
+          <Route path="/call-center" element={<main id="main"><CallCenter /></main>} />
+          <Route path="/calls" element={<main id="main"><CallLogs /></main>} />
+          <Route path="/phone-apps" element={<main id="main"><PhoneApps /></main>} />
+          <Route path="/sms-delivery" element={<main id="main"><SMSDeliveryDashboard /></main>} />
+          <Route path="/admin/kb" element={<main id="main"><AdminKB /></main>} />
+          <Route path="/admin/campaigns" element={<main id="main"><CampaignManager /></main>} />
+          <Route path="/ops/crypto/init" element={<main id="main"><CryptoInit /></main>} />
+          <Route path="/ops/activation" element={<main id="main"><Activation /></main>} />
+          <Route path="/ops/voice" element={<main id="main"><VoiceSettings /></main>} />
+          <Route path="/ops/twilio/wire" element={<main id="main"><TwilioWire /></main>} />
+          <Route path="/ops/staging-test" element={<main id="main"><StagingTest /></main>} />
+          <Route path="/ops/voice-health" element={<main id="main"><VoiceHealth /></main>} />
+          <Route path="/ops/messaging-health" element={<main id="main"><MessagingHealth /></main>} />
+          <Route path="/ops/numbers/onboard" element={<main id="main"><ClientNumberOnboarding /></main>} />
+          <Route path="/ops/twilio-evidence" element={<main id="main"><TwilioEvidence /></main>} />
 
-        {/* Catch-all must be last */}
-        <Route path="*" element={<main id="main"><NotFound /></main>} />
+          {/* Catch-all must be last */}
+          <Route path="*" element={<main id="main"><NotFound /></main>} />
+        </Route>
       </Routes>
     </>
   );

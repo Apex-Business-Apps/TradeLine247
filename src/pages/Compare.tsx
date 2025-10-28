@@ -1,4 +1,3 @@
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,8 +63,6 @@ const Compare = () => {
         keywords="AI receptionist comparison, Smith.ai vs TradeLine, Ruby receptionist comparison, CallRail comparison, answering service comparison"
         canonical="https://www.tradeline247ai.com/compare"
       />
-      
-      <Header />
       
       <main className="flex-1">
         {/* Hero Section */}

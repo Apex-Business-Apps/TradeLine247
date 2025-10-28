@@ -49,6 +49,7 @@ export const Header: React.FC = () => {
     isAdmin
   } = useAuth();
   const navigate = useNavigate();
+  const mobileMenuId = 'mobile-menu';
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -125,7 +126,14 @@ export const Header: React.FC = () => {
           <LanguageSwitcher data-lovable-lock="permanent" />
           
           {/* Enhanced Mobile Menu Button */}
-          <button className="md:hidden p-2 rounded-md hover:bg-accent transition-all duration-300 hover-scale" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle mobile menu">
+          <button
+            type="button"
+            className="md:hidden z-50 p-2 rounded-md hover:bg-accent transition-all duration-300 hover-scale"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+            aria-controls={mobileMenuId}
+            aria-expanded={isMobileMenuOpen}
+          >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
@@ -149,20 +157,40 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Enhanced Mobile Navigation with Slide Animation */}
-      {isMobileMenuOpen && <div className="md:hidden border-t bg-background/95 backdrop-blur animate-slide-in-right">
-          <nav className="container py-4 space-y-2">
-            {navigationItems.map((item, index) => <Link key={item.name} to={item.href} className="block px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover-scale animate-fade-in" onClick={() => setIsMobileMenuOpen(false)} style={{
-          animationDelay: `${index * 100}ms`
-        }}>
+      <nav
+        id={mobileMenuId}
+        aria-label="Mobile"
+        aria-hidden={!isMobileMenuOpen}
+        className={cn(
+          "md:hidden border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden",
+          isMobileMenuOpen ? "animate-slide-in-right max-h-screen opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+        )}
+      >
+        <div className="container py-4 space-y-2">
+          {navigationItems.map((item, index) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              className="block px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover-scale animate-fade-in"
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              {item.name}
+            </Link>
+          ))}
+          {isAdmin() &&
+            adminNavigationItems.map((item, index) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className="block px-4 py-2 text-sm font-medium rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover-scale animate-fade-in"
+                onClick={() => setIsMobileMenuOpen(false)}
+                style={{ animationDelay: `${(navigationItems.length + index) * 100}ms` }}
+              >
                 {item.name}
-              </Link>)}
-            {/* Admin-only mobile navigation items */}
-            {isAdmin() && adminNavigationItems.map((item, index) => <Link key={item.name} to={item.href} className="block px-4 py-2 text-sm font-medium rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover-scale animate-fade-in" onClick={() => setIsMobileMenuOpen(false)} style={{
-          animationDelay: `${(navigationItems.length + index) * 100}ms`
-        }}>
-                {item.name}
-              </Link>)}
-          </nav>
-        </div>}
+              </Link>
+            ))}
+        </div>
+      </nav>
     </header>;
 };

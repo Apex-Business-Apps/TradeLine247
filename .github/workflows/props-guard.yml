@@ -1,0 +1,21 @@
+name: Guard fetchpriority attribute casing
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  fetchpriority-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure fetchpriority attribute is lowercase
+        run: |
+          if git grep -n "fetchPriority=" -- src; then
+            echo "Found forbidden fetchPriority attribute usage."
+            exit 1
+          else
+            echo "No camelCase fetchPriority attributes detected."
+          fi

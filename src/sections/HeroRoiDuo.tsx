@@ -52,7 +52,7 @@ export default function HeroRoiDuo() {
                 filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))'
               }}
               loading="eager"
-              fetchPriority="high"
+              fetchpriority="high"
               data-lovable-lock="permanent"
             />
           </div>

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -181,8 +180,6 @@ const Contact = () => {
       />
       <LocalBusinessSchema />
       
-      <Header />
-      
       <main className="flex-1">
         {/* Hero Section */}
         <section className="py-20 bg-gradient-to-br from-background to-secondary/20">
@@ -200,9 +197,11 @@ const Contact = () => {
         <section className="py-20">
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-              {contactMethods.map((method, index) => (
-                <Card 
-                  key={index} 
+              {contactMethods.map((method, index) => {
+                const isDirectLink = method.action.startsWith('tel:') || method.action.startsWith('mailto:');
+                return (
+                <Card
+                  key={index}
                   className="text-center hover:shadow-lg transition-shadow cursor-pointer group"
                   onClick={() => handleContactAction(method.action)}
                 >
@@ -214,12 +213,25 @@ const Contact = () => {
                     <CardDescription>{method.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-primary font-medium">
-                      {method.contact}
-                    </div>
+                    {isDirectLink ? (
+                      <a
+                        href={method.action}
+                        className="text-primary font-medium block"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                        }}
+                      >
+                        {method.contact}
+                      </a>
+                    ) : (
+                      <div className="text-primary font-medium">
+                        {method.contact}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
-              ))}
+                );
+              })}
             </div>
 
             {/* Contact Form */}

@@ -30,7 +30,7 @@ export default defineConfig(async ({ mode }) => {
 
   const plugins = [react()];
 
-  if (mode === "development") {
+  if (mode !== "production" && process.env.LOVABLE === "1") {
     try {
       const { componentTagger } = await import("lovable-tagger");
       plugins.push(componentTagger());
@@ -53,7 +53,7 @@ export default defineConfig(async ({ mode }) => {
         'Content-Security-Policy': "default-src 'self'; img-src 'self' https: data:; media-src 'self' https:; connect-src 'self' https://hysvqdwmhxnblxfqnszn.supabase.co wss://hysvqdwmhxnblxfqnszn.supabase.co https://api.tradeline247ai.com wss://api.tradeline247ai.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:;"
       }
     },
-    plugins,
+    plugins: plugins.filter(Boolean),
     resolve: {
       alias: {
         "@": srcAlias,

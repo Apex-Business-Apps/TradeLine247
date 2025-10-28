@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,8 +24,7 @@ const ThankYou = () => {
       />
       
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        
+
         <main className="flex-1 container py-16 px-4">
           <div className="max-w-2xl mx-auto">
             <Card className="border-primary/20 shadow-xl">

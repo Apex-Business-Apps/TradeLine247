@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { Session, User } from '@supabase/supabase-js';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { usePasswordSecurity } from '@/hooks/usePasswordSecurity';
 
@@ -213,8 +212,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      
+
       <main className="flex-1 container py-8 px-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">

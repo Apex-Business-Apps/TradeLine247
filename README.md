@@ -72,3 +72,18 @@ To connect a domain, navigate to Project > Settings > Domains and click Connect 
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
 
+## Environment configuration
+
+Certain public environment variables must be present before running builds or tests:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+Use the provided preflight script to verify they are set without printing their values:
+
+```sh
+VITE_SUPABASE_URL=... VITE_SUPABASE_ANON_KEY=... npm run verify:env:public
+```
+
+The CI workflow runs this script automatically; ensure the variables are available in your environment to avoid failures.
+
