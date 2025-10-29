@@ -57,9 +57,10 @@ const leadSchema = z.object({
     .toLowerCase(),
   company: z.string()
     .trim()
-    .min(1, "Company name is required")
     .max(200, "Company name must be less than 200 characters")
-    .regex(/^[a-zA-Z0-9\s\-&.,()]+$/, "Company name contains invalid characters"),
+    .regex(/^[a-zA-Z0-9\s\-&.,()]+$/, "Company name contains invalid characters")
+    .optional()
+    .transform((value) => (value && value.length > 0 ? value : "")),
   notes: z.string()
     .trim()
     .max(2000, "Notes must be less than 2000 characters")
@@ -70,7 +71,7 @@ const leadSchema = z.object({
 interface LeadSubmissionRequest {
   name: string;
   email: string;
-  company: string;
+  company?: string;
   notes?: string;
 }
 

@@ -3,6 +3,8 @@
  * Prevents XSS, SQL injection, and other injection attacks
  */
 
+import { normalizeToE164 } from "./e164.ts";
+
 export interface SanitizationOptions {
   maxLength?: number;
   allowedChars?: RegExp;
@@ -66,6 +68,34 @@ export function sanitizeName(name: string, maxLength: number = 100): string {
   });
 }
 
+export function sanitizePhone(input: string, defaultCountryCode: string = '1'): string | null {
+  if (!input || typeof input !== 'string') {
+    return null;
+  }
+
+  const normalizedInput = sanitizeText(input, {
+    maxLength: 32,
+    allowedChars: /^[0-9+()\-\s.]+$/,
+    removeHtml: true,
+    removeSql: true,
+    removeScripts: true,
+  });
+
+  if (!normalizedInput) {
+    return null;
+  }
+
+  try {
+    return normalizeToE164(normalizedInput, defaultCountryCode);
+  } catch (error) {
+    console.warn('[sanitizePhone] Failed to normalize phone number', {
+      input,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
 export function detectSuspiciousContent(text: string): boolean {
   const patterns = [/script/gi, /<[^>]*>/gi, /javascript:/gi, /on\w+=/gi, /(union|select|drop|delete)/gi];
   return patterns.some(p => p.test(text));
@@ -77,4 +107,6 @@ export async function generateRequestHash(data: any): Promise<string> {
   const hash = await crypto.subtle.digest('SHA-256', buffer);
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
+
+export type { SanitizationOptions };
 

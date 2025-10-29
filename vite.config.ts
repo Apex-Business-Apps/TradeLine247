@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 
 // IMPORTANT: do not import 'fs', 'path', or other Node libs in code that runs in the browser.
 // This config remains Node-only, but we neutralize 'process.env' for browser bundles to avoid crashes.
@@ -43,6 +43,7 @@ export default defineConfig(async ({ mode }) => {
   }
 
   return {
+    base: "/",
     server: {
       host: "::",
       port: 8080,

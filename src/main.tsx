@@ -44,6 +44,12 @@ try {
   console.log('🚀 Mounting React...');
   
   createRoot(rootElement).render(<App />);
+
+  queueMicrotask(() => {
+    if (!rootElement.isConnected) {
+      console.error("🚨 React root not attached after mount. Check hydration/mount sequence.");
+    }
+  });
   
   console.log('✅ React mounted successfully');
   

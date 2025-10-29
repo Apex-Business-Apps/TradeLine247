@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-signature',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 interface AnalyticsEvent {
@@ -16,13 +17,22 @@ interface AnalyticsEvent {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Allow': 'POST', 'Content-Type': 'application/json' },
+    });
+  }
+
+  const writeKey = Deno.env.get('ANALYTICS_WRITE_KEY');
+  if (!writeKey) {
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
-    if (req.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405, headers: corsHeaders });
-    }
 
     // Verify HMAC signature
     const signature = req.headers.get('x-signature');
@@ -54,7 +64,7 @@ serve(async (req) => {
 
     // Verify HMAC signature if provided
     if (signature) {
-      const secret = Deno.env.get('ANALYTICS_SECRET') || 'default-analytics-secret';
+      const secret = Deno.env.get('ANALYTICS_SECRET') || writeKey || 'default-analytics-secret';
       const encoder = new TextEncoder();
       
       const key = await crypto.subtle.importKey(
