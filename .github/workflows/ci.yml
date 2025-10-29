@@ -21,29 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+        with: { node-version: '20', cache: 'npm' }
       - run: npm ci --no-audit --fund=false
       - run: npm run -s build
       - name: Verify dist
-        run: |
-          test -f dist/index.html || { echo "Missing dist/index.html"; exit 2; }
-      - name: Report status (ci/build)
-        if: always()
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const state = (['success','skipped'].includes('${{ job.status }}'.toLowerCase())) ? 'success' : 'failure';
-            const sha = context.payload.pull_request?.head?.sha || context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha,
-              state,
-              context: 'ci/build',
-              description: state==='success'?'Build passed':'Build failed'
-            });
+        run: "test -f dist/index.html || (echo 'Missing dist/index.html' && exit 2)"
 
   ci/lint:
     name: ci/lint
@@ -52,23 +34,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+        with: { node-version: '20', cache: 'npm' }
       - run: npm ci --no-audit --fund=false
       - run: npm run -s lint --if-present || true
-      - name: Report status (ci/lint)
-        if: always()
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const state = (['success','skipped'].includes('${{ job.status }}'.toLowerCase())) ? 'success' : 'failure';
-            const sha = context.payload.pull_request?.head?.sha || context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner, repo: context.repo.repo, sha,
-              state, context: 'ci/lint',
-              description: state==='success'?'Lint passed':'Lint failed'
-            });
 
   ci/test:
     name: ci/test
@@ -77,20 +45,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+        with: { node-version: '20', cache: 'npm' }
       - run: npm ci --no-audit --fund=false
       - run: npm test --if-present || true
-      - name: Report status (ci/test)
-        if: always()
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const state = (['success','skipped'].includes('${{ job.status }}'.toLowerCase())) ? 'success' : 'failure';
-            const sha = context.payload.pull_request?.head?.sha || context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner, repo: context.repo.repo, sha,
-              state, context: 'ci/test',
-              description: state==='success'?'Tests passed':'Tests failed'
-            });
