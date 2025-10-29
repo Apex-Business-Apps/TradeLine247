@@ -13,6 +13,7 @@ jobs:
     env:
       NODE_VERSION: '20'
       WORKSPACE_PATH: App.xcworkspace
+      PROJECT_PATH: App.xcodeproj
       SCHEME: App
       CONFIGURATION: Debug
     steps:
@@ -21,12 +22,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - name: Install npm dependencies
         run: npm ci
 
+      - name: Build web assets
+        run: npm run build
+
       - name: Sync Capacitor iOS project
         run: npx cap sync ios
+
+      - name: Ensure Xcode project exists
+        working-directory: ios/App
+        run: |
+          set -euo pipefail
+          if [ ! -d "$PROJECT_PATH" ]; then
+            echo "Expected to find $PROJECT_PATH after capacitor sync." >&2
+            exit 1
+          fi
+          if [ ! -f "$PROJECT_PATH/project.pbxproj" ]; then
+            echo "Missing project.pbxproj inside $PROJECT_PATH" >&2
+            exit 1
+          fi
 
       - name: Install CocoaPods
         working-directory: ios/App

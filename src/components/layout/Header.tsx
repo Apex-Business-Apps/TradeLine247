@@ -139,7 +139,7 @@ export const Header: React.FC = () => {
               console.log('Burger menu clicked, current state:', isMobileMenuOpen);
               setIsMobileMenuOpen(!isMobileMenuOpen);
             }}
-            aria-label="Toggle navigation menu"
+            aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
             aria-controls={mobileMenuId}
             type="button"
