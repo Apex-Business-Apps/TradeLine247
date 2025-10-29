@@ -1,5 +1,8 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
+app_ios_dir = File.expand_path(__dir__)
+Dir.chdir(app_ios_dir) unless Dir.pwd == app_ios_dir
+
 platform :ios, '15.0'
 use_frameworks! :linkage => :static
 

@@ -1,0 +1,47 @@
+name: ios/build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-14
+    timeout-minutes: 45
+    env:
+      NODE_VERSION: '20'
+      WORKSPACE_PATH: App.xcworkspace
+      SCHEME: App
+      CONFIGURATION: Debug
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Sync Capacitor iOS project
+        run: npx cap sync ios
+
+      - name: Install CocoaPods
+        working-directory: ios/App
+        run: |
+          set -euo pipefail
+          pod install --repo-update
+
+      - name: Build iOS workspace
+        working-directory: ios/App
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace "$WORKSPACE_PATH" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            build

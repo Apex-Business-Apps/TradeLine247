@@ -41,9 +41,9 @@ jobs:
           npx cap sync ios
 
       - name: Install CocoaPods
+        working-directory: ios/App
         run: |
           set -euo pipefail
-          cd ios/App
           pod install --repo-update
 
       - name: Ensure Info.plist version/build + sanity checks
