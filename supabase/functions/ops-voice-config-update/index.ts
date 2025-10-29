@@ -1,40 +1,40 @@
-import { createClient } from 'npm:@supabase/supabase-js@2'
+// Authenticated update of org voice settings. Non-critical audit logging.
+// Requires standard JWT auth via supabase-js when invoked from the app (token forwarded automatically).
+import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
-Deno.serve(async (req) => {
-  const origin = req.headers.get('origin') ?? '*'
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: {
-      'Access-Control-Allow-Origin': origin,
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'authorization, content-type',
-    }})
+serve(async (req) => {
+  try {
+    const auth = req.headers.get('authorization') ?? ''
+    if (!auth?.toLowerCase().startsWith('bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+    }
+
+    const { SUPABASE_URL, SUPABASE_ANON_KEY } = Deno.env.toObject()
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, { global: { headers: { Authorization: auth } } })
+
+    const payload = await req.json().catch(() => ({}))
+    // Accept minimal shape; extend to your schema
+    const { org_id, config } = payload || {}
+    if (!org_id || typeof config !== 'object') {
+      return new Response(JSON.stringify({ error: 'Invalid payload' }), { status: 400 })
+    }
+
+    // Upsert/update settings (adjust table/columns as needed)
+    const { error } = await supabase.from('voice_settings').upsert({ org_id, config }, { onConflict: 'org_id' })
+    if (error) throw error
+
+    // Non-blocking audit (best effort)
+    try {
+      await supabase.from('audit_logs').insert({
+        org_id,
+        action: 'ops-voice-config-update',
+        meta: { ok: true },
+      })
+    } catch (_) {}
+
+    return new Response(JSON.stringify({ ok: true }), { status: 200 })
+  } catch (e) {
+    return new Response(JSON.stringify({ error: String(e?.message || e) }), { status: 500 })
   }
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
-      status: 405,
-      headers: { 'Allow': 'POST', 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin }
-    })
-  }
-
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    { global: { headers: {
-        Authorization: req.headers.get('Authorization') ?? '',
-      } } }
-  )
-  // If privileged writes are required for a table, create a second client with service role:
-  // const admin = createClient(Deno.env.get('SUPABASE_URL')??'', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')??'')
-
-  const body = await req.json().catch(() => ({}))
-  // TODO: validate body minimally; upsert config scoped by auth.uid()
-  // Example:
-  // const { data: user } = await supabase.auth.getUser()
-  // if (!user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin }})
-  // const { error } = await supabase.from('voice_settings').upsert({ user_id: user.user.id, ...body }).select().single()
-
-  return new Response(JSON.stringify({ ok: true }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin }
-  })
 })
