@@ -124,17 +124,31 @@ export const Header: React.FC = () => {
         {/* Enhanced CTA Button & Mobile Menu */}
         <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="permanent">
           <LanguageSwitcher data-lovable-lock="permanent" />
-          
-          {/* Enhanced Mobile Menu Button */}
+
+          {/* Burger Menu Button - ALWAYS VISIBLE - Critical Navigation Control */}
           <button
-            type="button"
-            className="md:hidden z-50 p-2 rounded-md hover:bg-accent transition-all duration-300 hover-scale"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle mobile menu"
-            aria-controls={mobileMenuId}
+            id="burger-menu-button"
+            data-testid="burger-menu-button"
+            className="flex items-center justify-center p-2 rounded-md border-2 border-primary/20 bg-background hover:bg-accent hover:border-primary/40 transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
+            style={{
+              display: 'flex !important',
+              visibility: 'visible !important',
+              opacity: '1 !important',
+            }}
+            onClick={() => {
+              console.log('Burger menu clicked, current state:', isMobileMenuOpen);
+              setIsMobileMenuOpen(!isMobileMenuOpen);
+            }}
+            aria-label="Toggle navigation menu"
             aria-expanded={isMobileMenuOpen}
+            aria-controls={mobileMenuId}
+            type="button"
           >
-            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {isMobileMenuOpen ? (
+              <X size={24} className="text-primary" strokeWidth={2.5} />
+            ) : (
+              <Menu size={24} className="text-primary" strokeWidth={2.5} />
+            )}
           </button>
 
           {user ? <div className="flex items-center gap-2">
