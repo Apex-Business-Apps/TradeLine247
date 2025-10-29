@@ -1,0 +1,63 @@
+name: status-bridge
+on:
+  workflow_run:
+    workflows: ["CI"]         # must match the workflow *name* in ci.yml
+    types: [completed]        # fire after CI finishes
+
+permissions:
+  contents: read
+  checks: read
+  statuses: write
+
+jobs:
+  bridge:
+    # Only bridge for PR-origin runs; skip pushes to main
+    if: ${{ github.event.workflow_run.event == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Map CI job conclusions to required contexts and write commit statuses
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const run   = context.payload.workflow_run;
+            const sha   = run.head_sha;
+
+            // Helper: list jobs for this run attempt
+            const jobs = await github.paginate(
+              github.rest.actions.listJobsForWorkflowRunAttempt,
+              {
+                owner, repo,
+                run_id: run.id,
+                attempt_number: run.run_attempt || 1,
+                per_page: 100
+              }
+            );
+
+            const toState = (conclusion) => {
+              if (conclusion === 'success') return 'success';
+              // treat skipped/cancelled as success to avoid perma-wait when stages are intentionally skipped
+              if (['skipped','cancelled'].includes(conclusion || '')) return 'success';
+              return 'failure';
+            };
+
+            // Map any job whose name contains these tokens → required contexts
+            const targets = [
+              { context: 'ci/build', match: /(^|\/)\s*ci\/build\b/i },
+              { context: 'ci/lint',  match: /(^|\/)\s*ci\/lint\b/i  },
+              { context: 'ci/test',  match: /(^|\/)\s*ci\/test\b/i  },
+            ];
+
+            for (const t of targets) {
+              // Find the corresponding job from CI
+              const j = jobs.find(job => t.match.test(job.name));
+              if (!j) continue;
+
+              const state = toState(j.conclusion);
+              await github.rest.repos.createCommitStatus({
+                owner, repo, sha,
+                state,
+                context: t.context,
+                description: `${t.context} => ${j.conclusion || 'unknown'}`,
+              });
+            }
