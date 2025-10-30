@@ -44,7 +44,15 @@ jobs:
         working-directory: ios/App
         run: |
           set -euo pipefail
+          if [ ! -f Podfile ]; then
+            echo "Podfile missing from $(pwd)" >&2
+            exit 65
+          fi
           pod install --repo-update
+          if [ ! -d App.xcworkspace ]; then
+            echo "Expected CocoaPods to generate App.xcworkspace" >&2
+            exit 65
+          fi
 
       - name: Ensure Info.plist version/build + sanity checks
         shell: bash

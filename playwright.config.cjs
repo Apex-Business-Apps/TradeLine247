@@ -1,6 +1,10 @@
 // playwright.config.cjs — CommonJS so GitHub Actions Babel doesn’t choke on `import`
 const { defineConfig, devices } = require('@playwright/test');
 
+// Default to bypassing CSP for inline fixtures used in e2e tests. Allow
+// opting out by exporting PLAYWRIGHT_BYPASS_CSP=false when debugging.
+const bypassCSP = process.env.PLAYWRIGHT_BYPASS_CSP !== 'false';
+
 module.exports = defineConfig({
   testDir: 'tests',
   fullyParallel: true,
@@ -12,7 +16,7 @@ module.exports = defineConfig({
     baseURL: process.env.BASE_URL || 'http://localhost:5000',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
-    bypassCSP: true, // bypass CSP so inline fixtures used in tests stop breaking Codemagic builds
+    bypassCSP,
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

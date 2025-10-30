@@ -45,12 +45,24 @@ jobs:
             echo "Missing project.pbxproj inside $PROJECT_PATH" >&2
             exit 1
           fi
+          if [ ! -f "Podfile" ]; then
+            echo "Podfile missing from $(pwd)" >&2
+            exit 1
+          fi
 
       - name: Install CocoaPods
         working-directory: ios/App
         run: |
           set -euo pipefail
+          if [ ! -f "Podfile" ]; then
+            echo "Podfile missing from $(pwd)" >&2
+            exit 1
+          fi
           pod install --repo-update
+          if [ ! -d "$WORKSPACE_PATH" ]; then
+            echo "Expected CocoaPods to generate $WORKSPACE_PATH" >&2
+            exit 1
+          fi
 
       - name: Build iOS workspace
         working-directory: ios/App
