@@ -25,18 +25,10 @@ jobs:
       - name: Install Lighthouse CI
         run: npm i -g @lhci/cli@0.13.0
 
-      - name: Run Lighthouse CI (prod URL)
+      - name: Run Lighthouse CI (prod URL or LHCI_URL)
         env:
           LHCI_URL: ${{ vars.LHCI_URL }}
-        run: |
-          URL="${LHCI_URL:-https://tradeline247ai.com/}"
-          echo "Testing URL: $URL"
-          lhci autorun \
-            --collect.url="$URL" \
-            --collect.numberOfRuns=1 \
-            --assert.preset=lighthouse:recommended \
-            --budget.path=.lighthousebudgets.json \
-            --upload.target=temporary-public-storage
+        run: lhci autorun --config=.lighthouserc.cjs
 
       - name: Upload LHCI reports
         if: always()
