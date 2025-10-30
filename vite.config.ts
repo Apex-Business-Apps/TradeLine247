@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, type PluginOption } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 
@@ -11,7 +11,13 @@ export default defineConfig(async ({ command }) => {
 
   if (shouldEnableTagger) {
     const { componentTagger } = await import("lovable-tagger");
-    plugins.push(componentTagger());
+    const maybePlugins = componentTagger() as PluginOption | PluginOption[] | undefined;
+
+    if (Array.isArray(maybePlugins)) {
+      plugins.push(...maybePlugins);
+    } else if (maybePlugins) {
+      plugins.push(maybePlugins);
+    }
   }
 
   return {
