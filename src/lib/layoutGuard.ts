@@ -1,3 +1,11 @@
+// Temporary NOOP to ensure guards never blank public routes.
+// Keep function signature so existing imports don’t break.
+export function allowPublicRoutes(pathname: string): boolean {
+  // Allow all marketing routes to render unconditionally.
+  // Tighten later with an explicit allowlist if you want.
+  return true;
+}
+
 // LOVABLE-GUARD: runtime self-heal; hero code untouched.
 export function enforceHeroRoiDuo() {
   const a = document.getElementById("start-trial-hero");
@@ -48,19 +56,17 @@ export function lockHeroElementsPermanently() {
     document.getElementById("roi-calculator"),
     document.getElementById("hero-roi-duo"),
     document.querySelector(".hero-roi__container")
-  ].filter(Boolean);
+  ].filter(Boolean) as HTMLElement[];
 
-  elements.forEach(el => {
-    if (el) {
-      el.setAttribute("data-lovable-lock", "permanent");
-      el.setAttribute("data-layout-lock", "true");
-      // Freeze the element's style modifications
-      Object.defineProperty(el, 'style', {
-        configurable: false,
-        enumerable: true,
-        get: () => el.getAttribute('style'),
-        set: () => console.warn('Hero element style modification blocked by layout guardian')
-      });
-    }
+  elements.forEach((el) => {
+    el.setAttribute("data-lovable-lock", "permanent");
+    el.setAttribute("data-layout-lock", "true");
+    // Freeze the element's style modifications
+    Object.defineProperty(el, "style", {
+      configurable: false,
+      enumerable: true,
+      get: () => el.getAttribute("style"),
+      set: () => console.warn("Hero element style modification blocked by layout guardian"),
+    });
   });
 }
