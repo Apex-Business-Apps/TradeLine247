@@ -20,7 +20,7 @@ jobs:
     steps:
       # 1) Checkout so gh doesn't complain about missing .git
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
