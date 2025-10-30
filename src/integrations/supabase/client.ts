@@ -20,10 +20,11 @@ function readEnv(name: string): string | undefined {
 const LS_URL  = typeof localStorage !== 'undefined' ? localStorage.getItem('SUPABASE_URL') : null;
 const LS_ANON = typeof localStorage !== 'undefined' ? localStorage.getItem('SUPABASE_ANON_KEY') : null;
 
-// Public project URL (safe to embed); DO NOT embed anon key here.
+// Public project URL and anon key (safe to embed client-side)
 const FALLBACK_URL = 'https://hysvqdwmhxnblxfqnszn.supabase.co';
+const FALLBACK_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo';
 
-// Prefer Vite envs, then localStorage, then (preview only) public URL
+// Prefer Vite envs, then localStorage, then (preview only) fallback values
 const SUPABASE_URL =
   readEnv('VITE_SUPABASE_URL') ||
   (LS_URL || undefined) ||
@@ -31,7 +32,8 @@ const SUPABASE_URL =
 
 const SUPABASE_ANON_KEY =
   readEnv('VITE_SUPABASE_ANON_KEY') ||
-  (LS_ANON || undefined);
+  (LS_ANON || undefined) ||
+  (isPreviewHost ? FALLBACK_ANON_KEY : undefined);
 
 // A soft "disabled" result
 const DISABLED = Object.freeze({ data: null, error: new Error('[Supabase disabled] Missing URL or ANON key for this environment.') });
