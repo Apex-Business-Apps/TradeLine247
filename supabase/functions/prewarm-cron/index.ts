@@ -13,11 +13,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 // Default endpoints to pre-warm
-const DEFAULT_ENDPOINTS = [
-  "/functions/v1/healthz",
-  "/functions/v1/dashboard-summary",
-  "/functions/v1/secure-analytics"
-];
+const DEFAULT_ENDPOINTS = ["/functions/v1/healthz"];
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -34,7 +30,13 @@ serve(async (req) => {
       const configResponse = await fetch(`${SUPABASE_URL}/storage/v1/object/public/config/prewarm.json`);
       if (configResponse.ok) {
         const config = await configResponse.json();
-        endpoints = config.endpoints || DEFAULT_ENDPOINTS;
+        if (Array.isArray(config.endpoints)) {
+          const sanitized = config.endpoints
+            .filter((endpoint: unknown) => typeof endpoint === "string" && endpoint.startsWith("/"));
+          if (sanitized.length > 0) {
+            endpoints = sanitized;
+          }
+        }
       }
     } catch (e) {
       console.log("Using default endpoints (config not found)");

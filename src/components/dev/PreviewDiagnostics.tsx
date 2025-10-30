@@ -11,6 +11,16 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CheckCircle, AlertCircle, XCircle, ChevronDown, RefreshCw } from 'lucide-react';
 
+const LOVABLE_PREVIEW_DOMAINS = ['lovableproject.com', 'lovable.app', 'lovable.dev', 'gptengineer.app'];
+
+function isLovablePreviewHost(hostname: string): boolean {
+  const normalized = hostname.toLowerCase();
+  return (
+    normalized.includes('.lovable.') ||
+    LOVABLE_PREVIEW_DOMAINS.some(domain => normalized === domain || normalized.endsWith(`.${domain}`))
+  );
+}
+
 export function PreviewDiagnostics() {
   const [healthCheck, setHealthCheck] = useState<HealthCheckResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -19,10 +29,7 @@ export function PreviewDiagnostics() {
   useEffect(() => {
     // Auto-run on mount in preview/dev
     const hostname = window.location.hostname;
-    const isPreview = hostname.includes('lovableproject.com') || 
-                      hostname.includes('https://tradeline247aicom.lovable.app/') || 
-                      hostname.includes('lovable.dev') ||
-                      import.meta.env.DEV;
+    const isPreview = isLovablePreviewHost(hostname) || import.meta.env.DEV;
     
     if (isPreview) {
       runCheck();
@@ -45,7 +52,7 @@ export function PreviewDiagnostics() {
   };
 
   // Don't show in production
-  if (!import.meta.env.DEV && !window.location.hostname.includes('lovable')) {
+  if (!import.meta.env.DEV && !isLovablePreviewHost(window.location.hostname)) {
     return null;
   }
 
