@@ -83,34 +83,49 @@ serve(async (req) => {
     // Fetch user profile (redact sensitive fields)
     const { data: profile } = await supabaseClient
       .from('profiles')
-      .select('id, full_name, created_at, updated_at')
+      .select('id, full_name, created_at, updated_at, phone_e164')
       .eq('id', targetUserId)
       .single();
-    
+
     exportData.personal_information.profile = profile;
 
     // Fetch appointments (sanitized)
-    const { data: appointments } = await supabaseClient
-      .from('appointments')
-      .select('id, start_at, end_at, status, source, note, created_at')
-      .eq('e164', profile?.phone_e164 || '');
-    
+    let appointments: any[] | null = null;
+    if (profile?.phone_e164) {
+      const appointmentsResponse = await supabaseClient
+        .from('appointments')
+        .select('id, start_at, end_at, status, source, note, created_at')
+        .eq('e164', profile.phone_e164);
+
+      appointments = appointmentsResponse.data || [];
+    }
+
     exportData.activity_data.appointments = appointments || [];
 
     // Fetch call logs
-    const { data: calls } = await supabaseClient
-      .from('call_logs')
-      .select('id, call_sid, from_e164, to_e164, status, duration_sec, created_at, summary')
-      .or(`from_e164.eq.${profile?.phone_e164},to_e164.eq.${profile?.phone_e164}`);
-    
+    let calls: any[] | null = null;
+    if (profile?.phone_e164) {
+      const callsResponse = await supabaseClient
+        .from('call_logs')
+        .select('id, call_sid, from_e164, to_e164, status, duration_sec, created_at, summary')
+        .or(`from_e164.eq.${profile.phone_e164},to_e164.eq.${profile.phone_e164}`);
+
+      calls = callsResponse.data || [];
+    }
+
     exportData.activity_data.call_logs = calls || [];
 
     // Fetch consent logs
-    const { data: consents } = await supabaseClient
-      .from('consent_logs')
-      .select('*')
-      .eq('e164', profile?.phone_e164 || '');
-    
+    let consents: any[] | null = null;
+    if (profile?.phone_e164) {
+      const consentsResponse = await supabaseClient
+        .from('consent_logs')
+        .select('*')
+        .eq('e164', profile.phone_e164);
+
+      consents = consentsResponse.data || [];
+    }
+
     exportData.consent_records.consent_logs = consents || [];
 
     // Fetch support tickets
@@ -188,10 +203,11 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
-    console.error('DSAR export error:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : JSON.stringify(error);
+    console.error('Function error:', message);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', message: error.message }),
+      JSON.stringify({ error: message }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

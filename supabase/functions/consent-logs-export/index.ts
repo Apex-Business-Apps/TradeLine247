@@ -117,10 +117,11 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
-    console.error('Consent logs export error:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : JSON.stringify(error);
+    console.error('Function error:', message);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', message: error.message }),
+      JSON.stringify({ error: message }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

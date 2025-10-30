@@ -42,16 +42,24 @@ function removeArabicDiacritics(text: string): string {
  * Convert Traditional Chinese to Simplified (simplified mapping)
  * Note: This is a basic implementation; production should use proper library
  */
+export const TRAD_TO_SIMP: Record<string, string> = {
+  '繁': '繁',
+  '體': '体',
+  '電': '电',
+  '話': '话',
+  '網': '网',
+  '際': '际',
+  '銀': '银',
+  '行': '行',
+  '國': '国',
+  '語': '语',
+  '學': '学',
+  // Add more mappings as needed
+};
+
 function traditionalToSimplified(text: string): string {
   // Basic mappings for common characters
-  const mapping: Record<string, string> = {
-    '繁': '繁', '體': '体', '電': '电', '話': '话', 
-    '網': '网', '際': '际', '銀': '银', '行': '行',
-    '國': '国', '際': '际', '語': '语', '學': '学',
-    // Add more mappings as needed
-  };
-  
-  return text.split('').map(char => mapping[char] || char).join('');
+  return text.split('').map(char => TRAD_TO_SIMP[char] || char).join('');
 }
 
 /**

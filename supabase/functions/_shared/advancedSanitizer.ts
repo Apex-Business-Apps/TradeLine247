@@ -118,4 +118,3 @@ export async function generateRequestHash(data: any): Promise<string> {
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export type { SanitizationOptions };

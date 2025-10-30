@@ -138,7 +138,7 @@ serve(async (req) => {
         `
       });
 
-      console.log('Notification email sent:', notifyEmail.id);
+      console.log('Notification email sent:', notifyEmail);
 
       // Send auto-reply to customer
       const autoReply = await resend.emails.send({
@@ -154,7 +154,7 @@ serve(async (req) => {
         `
       });
 
-      console.log('Auto-reply sent:', autoReply.id);
+      console.log('Auto-reply sent:', autoReply);
     } catch (emailError) {
       console.error('Email error:', emailError);
       // Don't fail the request if email fails - message is saved
