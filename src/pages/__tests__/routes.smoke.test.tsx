@@ -74,8 +74,8 @@ describe('Router Smoke Tests', () => {
     // Check that pricing page renders
     expect(container.textContent).toMatch(/pricing/i);
 
-    // Check for CTA text (Start free trial)
-    expect(container.textContent).toMatch(/start free trial/i);
+    // Check for actual CTA text from restored Pricing page (Zero-Monthly or Predictable)
+    expect(container.textContent).toMatch(/Zero-Monthly|Predictable/i);
   });
 
   it('should render Auth page with sign in form', () => {
@@ -98,9 +98,12 @@ describe('Router Smoke Tests', () => {
   it('should render Pricing with correct structure', () => {
     const { container } = render(<Pricing />);
 
-    // Verify pricing page has proper structure
-    const section = container.querySelector('section');
-    expect(section).toBeTruthy();
-    expect(section?.className).toContain('container');
+    // Verify pricing page has proper structure (div wrapper with sections inside)
+    const mainWrapper = container.querySelector('div.min-h-screen');
+    expect(mainWrapper).toBeTruthy();
+
+    // Check for pricing plan cards
+    expect(container.textContent).toMatch(/Zero-Monthly Plan/i);
+    expect(container.textContent).toMatch(/Predictable Plan/i);
   });
 });
