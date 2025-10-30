@@ -9,8 +9,12 @@ module.exports = {
         chromeFlags: "--no-sandbox",
       },
     },
-    // Assertions are disabled in stabilization; produce reports without failing CI
-    assert: { assertions: {} },
+    // Provide a minimal assertion so LHCI does not exit early while keeping it non-blocking
+    assert: {
+      assertions: {
+        "categories:performance": ["warn", { minScore: 0 }],
+      },
+    },
     upload: { target: "temporary-public-storage" },
   },
 };
