@@ -1,25 +1,12 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
 app_ios_dir = File.expand_path(__dir__)
-unless Dir.pwd == app_ios_dir
-  warn "[Podfile] Switching to iOS app directory: #{app_ios_dir}"
-  Dir.chdir(app_ios_dir)
-end
+Dir.chdir(app_ios_dir) unless Dir.pwd == app_ios_dir
 
 platform :ios, '15.0'
 use_frameworks! linkage: :static
 
-project_relative_path = 'App.xcodeproj'
-project_path = File.join(app_ios_dir, project_relative_path)
-
-unless File.exist?(project_path)
-  abort <<~MSG
-    Unable to locate #{project_relative_path} at #{project_path}.
-    Run 'npx cap sync ios' to generate the Xcode project before installing pods.
-  MSG
-end
-
-project project_relative_path
+project 'App.xcodeproj'
 
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'

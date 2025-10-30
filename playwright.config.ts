@@ -5,10 +5,6 @@ const baseURL =
   process.env.BASE_URL ||
   'http://localhost:4173';
 
-// Default to bypassing CSP so inline fixtures work during CI builds. Allow
-// tests to opt-out by setting PLAYWRIGHT_BYPASS_CSP=false.
-const bypassCSP = process.env.PLAYWRIGHT_BYPASS_CSP !== 'false';
-
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -20,7 +16,7 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    bypassCSP,
+    bypassCSP: true,
   },
   projects: [
     {

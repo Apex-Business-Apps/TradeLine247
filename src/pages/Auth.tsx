@@ -60,10 +60,6 @@ const Auth = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  if (!isSupabaseEnabled) {
-    return null;
-  }
-
   const validatePassword = (password: string): { isValid: boolean; strength: string; message?: string } => {
     if (password.length < 8) {
       return { isValid: false, strength: 'Too short', message: 'Password must be at least 8 characters long' };
