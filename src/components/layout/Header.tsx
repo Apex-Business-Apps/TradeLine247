@@ -129,12 +129,7 @@ export const Header: React.FC = () => {
           <button
             id="burger-menu-button"
             data-testid="burger-menu-button"
-            className="flex items-center justify-center p-2 rounded-md border-2 border-primary/20 bg-background hover:bg-accent hover:border-primary/40 transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
-            style={{
-              display: 'flex !important',
-              visibility: 'visible !important',
-              opacity: '1 !important',
-            }}
+            className="!flex items-center justify-center p-2 rounded-md border-2 border-primary/20 bg-background hover:bg-accent hover:border-primary/40 transition-all duration-300 hover-scale min-w-[44px] min-h-[44px] !visible !opacity-100"
             onClick={() => {
               console.log('Burger menu clicked, current state:', isMobileMenuOpen);
               setIsMobileMenuOpen(!isMobileMenuOpen);

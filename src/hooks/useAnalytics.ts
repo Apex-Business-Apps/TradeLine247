@@ -27,7 +27,7 @@ export const useAnalytics = () => {
       const pageUrl = event.page_url || window.location.href;
 
       // Use secure analytics function that has proper permissions
-      const { error, status } = await supabase.functions.invoke('secure-analytics', {
+      const { data, error } = await supabase.functions.invoke('secure-analytics', {
         body: {
           event_type: event.event_type,
           event_data: event.event_data || {},
@@ -36,13 +36,12 @@ export const useAnalytics = () => {
         }
       });
 
-      if (!error && status === 204 && !analyticsGatedWarningLogged) {
-        analyticsGatedWarningLogged = true;
-        console.warn('analytics gated in preview');
-      }
-
       if (error) {
-        console.error('Analytics tracking error:', error);
+        // Analytics may be gated in preview environments
+        if (!analyticsGatedWarningLogged) {
+          analyticsGatedWarningLogged = true;
+          console.warn('Analytics tracking disabled or gated:', error.message);
+        }
       }
     } catch (error) {
       console.error('Analytics tracking failed:', error);
