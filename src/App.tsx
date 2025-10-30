@@ -11,6 +11,7 @@ import Compare from "./pages/Compare";
 import Security from "./pages/Security";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
+import ClientDashboard from "./pages/ClientDashboard";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="security" element={<Security />} />
             <Route path="contact" element={<Contact />} />
             <Route path="auth" element={<Auth />} />
+            <Route path="dashboard" element={<ClientDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
