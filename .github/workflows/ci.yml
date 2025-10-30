@@ -35,7 +35,7 @@ jobs:
           test -f dist/index.html || (echo "dist/index.html missing" && exit 2)
       - name: Report status (ci/build)
         if: always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const state = "${{ job.status }}" === "success" ? "success" : "failure";
@@ -61,7 +61,7 @@ jobs:
       - run: npm run -s lint --if-present
       - name: Report status (ci/lint)
         if: always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const state = "${{ job.status }}" === "success" ? "success" : "failure";
@@ -87,7 +87,7 @@ jobs:
       - run: npm test --if-present -- --ci
       - name: Report status (ci/test)
         if: always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const state = "${{ job.status }}" === "success" ? "success" : "failure";
