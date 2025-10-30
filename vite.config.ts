@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import path from "node:path";
 
 export default defineConfig(async ({ command }) => {
-  const plugins = [react()];
+  const plugins: PluginOption[] = [react()];
 
   const taggerEnv = process.env.LOVABLE_COMPONENT_TAGGER?.toLowerCase();
   const shouldEnableTagger =
@@ -11,7 +11,7 @@ export default defineConfig(async ({ command }) => {
 
   if (shouldEnableTagger) {
     const { componentTagger } = await import("lovable-tagger");
-    const maybePlugins = componentTagger() as PluginOption | PluginOption[] | undefined;
+    const maybePlugins = componentTagger();
 
     if (Array.isArray(maybePlugins)) {
       plugins.push(...maybePlugins);
