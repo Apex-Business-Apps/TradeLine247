@@ -24,7 +24,12 @@ export const useSupportTickets = () => {
     
     try {
       // Get current session to determine if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      // If there's a JWT error, proceed without user_id (anonymous ticket)
+      if (sessionError?.message?.includes('malformed') || sessionError?.message?.includes('invalid')) {
+        console.warn('[SupportTicket] Detected malformed token, creating anonymous ticket');
+      }
       
       const ticketData: any = {
         email,
@@ -34,7 +39,7 @@ export const useSupportTickets = () => {
       };
 
       // Only add user_id if authenticated (enforced by RLS)
-      if (session?.user) {
+      if (session?.user && !sessionError) {
         ticketData.user_id = session.user.id;
       }
 

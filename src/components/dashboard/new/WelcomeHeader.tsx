@@ -11,19 +11,31 @@ export const WelcomeHeader: React.FC = () => {
   
   useEffect(() => {
     async function fetchUserName() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', user.id)
-          .single();
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
         
-        if (profile?.full_name) {
-          setUserName(profile.full_name);
-        } else {
-          setUserName(user.email?.split('@')[0] || 'there');
+        // If there's a JWT error, clear the corrupted session silently
+        if (error?.message?.includes('malformed') || error?.message?.includes('invalid')) {
+          console.warn('[WelcomeHeader] Detected malformed token, ignoring:', error.message);
+          return;
         }
+        
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', user.id)
+            .single();
+          
+          if (profile?.full_name) {
+            setUserName(profile.full_name);
+          } else {
+            setUserName(user.email?.split('@')[0] || 'there');
+          }
+        }
+      } catch (err) {
+        console.error('[WelcomeHeader] Error fetching user:', err);
+        setUserName('there');
       }
     }
     fetchUserName();
