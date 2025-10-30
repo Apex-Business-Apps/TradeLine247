@@ -7,6 +7,9 @@ import Index from "./pages/Index";
 import Pricing from "./pages/Pricing";
 import FAQ from "./pages/FAQ";
 import Features from "./pages/Features";
+import Compare from "./pages/Compare";
+import Security from "./pages/Security";
+import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -21,6 +24,9 @@ export default function App() {
             <Route path="pricing" element={<Pricing />} />
             <Route path="faq" element={<FAQ />} />
             <Route path="features" element={<Features />} />
+            <Route path="compare" element={<Compare />} />
+            <Route path="security" element={<Security />} />
+            <Route path="contact" element={<Contact />} />
             <Route path="auth" element={<Auth />} />
             <Route path="*" element={<NotFound />} />
           </Route>

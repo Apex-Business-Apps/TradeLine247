@@ -2,6 +2,25 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
+// Initialize error observability for production
+if (import.meta.env.PROD) {
+  import('./utils/errorObservability').then(({ initErrorObservability }) => {
+    initErrorObservability();
+  });
+}
+
+// Unregister any existing service workers to prevent stale cache issues
+// Will re-enable PWA with proper update strategy after stabilization
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      registration.unregister().then(() => {
+        console.info('[SW] Service worker unregistered - preventing stale cache during stabilization');
+      });
+    }
+  });
+}
+
 const root = document.getElementById('root');
 if (!root) { document.body.innerHTML = '<pre>Missing #root</pre>'; throw new Error('Missing #root'); }
 

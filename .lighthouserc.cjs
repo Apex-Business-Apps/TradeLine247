@@ -2,19 +2,48 @@
 module.exports = {
   ci: {
     collect: {
-      url: [process.env.LHCI_URL || "https://tradeline247ai.com/"],
+      url: [process.env.LHCI_URL || "https://www.tradeline247ai.com/"],
       numberOfRuns: 1,
       settings: {
-        budgetsPath: ".lighthousebudgets.json",
-        chromeFlags: "--no-sandbox",
+        chromeFlags: "--no-sandbox --headless",
+        onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
       },
     },
-    // Provide a minimal assertion so LHCI does not exit early while keeping it non-blocking
     assert: {
       assertions: {
-        "categories:performance": ["warn", { minScore: 0 }],
+        // Performance: warn at 60%, fail below
+        "categories:performance": ["warn", { "minScore": 0.60 }],
+
+        // Accessibility: MUST be 90%+ (enterprise requirement)
+        "categories:accessibility": ["error", { "minScore": 0.90 }],
+
+        // SEO: warn at 85%
+        "categories:seo": ["warn", { "minScore": 0.85 }],
+
+        // Best Practices: warn at 80%
+        "categories:best-practices": ["warn", { "minScore": 0.80 }],
+
+        // Critical accessibility issues (errors)
+        "button-name": "error",
+        "color-contrast": "error",
+        "label": "error",
+        "link-name": "error",
+
+        // Performance hints (warnings)
+        "unused-javascript": "warn",
+        "unused-css-rules": "warn",
+        "offscreen-images": "warn",
+        "render-blocking-resources": "warn",
+
+        // Best practices (warnings)
+        "valid-source-maps": "warn",
+        "no-document-write": "warn",
+        "uses-responsive-images": "warn",
       },
     },
-    upload: { target: "temporary-public-storage" },
+    upload: {
+      target: "temporary-public-storage",
+      reportFilenamePattern: "lhci-%%PATHNAME%%-%%DATETIME%%.json"
+    },
   },
 };
