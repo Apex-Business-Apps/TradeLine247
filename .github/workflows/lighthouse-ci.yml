@@ -1,0 +1,46 @@
+name: ci/lighthouse
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  lighthouse:
+    name: ci/lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Lighthouse CI
+        run: npm i -g @lhci/cli@0.13.0
+
+      - name: Run Lighthouse CI (prod URL)
+        env:
+          LHCI_URL: ${{ vars.LHCI_URL }}
+        run: |
+          URL="${LHCI_URL:-https://tradeline247ai.com/}"
+          echo "Testing URL: $URL"
+          lhci autorun \
+            --collect.url="$URL" \
+            --collect.numberOfRuns=1 \
+            --assert.preset=lighthouse:recommended \
+            --budget.path=.lighthousebudgets.json \
+            --upload.target=temporary-public-storage
+
+      - name: Upload LHCI reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/*
