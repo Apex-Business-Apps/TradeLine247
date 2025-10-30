@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
-import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(async ({ command }) => {
   const plugins = [react()];

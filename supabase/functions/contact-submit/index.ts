@@ -118,6 +118,10 @@ serve(async (req) => {
       throw new Error('Failed to save contact message');
     }
 
+    if (!contactRecord || typeof contactRecord.id !== 'string') {
+      throw new Error('Contact message saved without identifier');
+    }
+
     console.log(`Contact message saved: ${contactRecord.id}`);
 
     // Send notification email via Resend

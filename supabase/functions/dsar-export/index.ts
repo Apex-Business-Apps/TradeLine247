@@ -37,14 +37,16 @@ serve(async (req) => {
     const requestId = crypto.randomUUID();
 
     // Validate: admin can export any user, users can export themselves
-    const isAdmin = await supabaseClient.rpc('has_role', { 
-      p_user: user.id, 
-      p_role: 'admin' 
+    const { data: isAdmin, error: roleError } = await supabaseClient.rpc<boolean>('has_role', {
+      p_user: user.id,
+      p_role: 'admin'
     });
+
+    if (roleError) throw roleError;
 
     const targetUserId = subject_user_id || user.id;
 
-    if (!isAdmin.data && targetUserId !== user.id) {
+    if (!isAdmin && targetUserId !== user.id) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -68,7 +70,23 @@ serve(async (req) => {
     if (dsarError) throw dsarError;
 
     // Gather all user data from relevant tables
-    const exportData: any = {
+    interface ExportSection {
+      [key: string]: unknown;
+    }
+
+    interface ExportData {
+      request_id: string;
+      generated_at: string;
+      timezone: string;
+      user_id: string;
+      personal_information: ExportSection;
+      activity_data: ExportSection;
+      consent_records: ExportSection;
+      support_tickets: ExportSection;
+      communications: ExportSection;
+    }
+
+    const exportData: ExportData = {
       request_id: requestId,
       generated_at: new Date().toISOString(),
       timezone: 'America/Edmonton',
@@ -162,7 +180,22 @@ serve(async (req) => {
       return redacted;
     };
 
-    const redactedExport = redactSecrets(exportData);
+    const redactedExport = redactSecrets(exportData) as ExportData;
+
+    const countRecords = (value: unknown): number => {
+      if (Array.isArray(value)) {
+        return value.length;
+      }
+
+      if (value && typeof value === 'object') {
+        return Object.values(value as Record<string, unknown>).reduce(
+          (sum, nested) => sum + countRecords(nested),
+          0
+        );
+      }
+
+      return Number(Boolean(value));
+    };
 
     // Generate timestamped artifact filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -178,9 +211,9 @@ serve(async (req) => {
         status: 'completed',
         completed_at: new Date().toISOString(),
         evidence_artifact_url: artifactName,
-        metadata: { 
+        metadata: {
           request_id: requestId,
-          total_records: Object.values(redactedExport).flat().length,
+          total_records: countRecords(redactedExport),
           artifact_size_bytes: artifactData.length
         }
       })

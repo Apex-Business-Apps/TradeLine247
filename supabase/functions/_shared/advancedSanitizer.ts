@@ -5,15 +5,15 @@
 
 import { normalizeToE164 } from "./e164.ts";
 
-export interface SanitizationOptions {
+export type SanitizationOptions = {
   maxLength?: number;
   allowedChars?: RegExp;
   removeHtml?: boolean;
   removeSql?: boolean;
   removeScripts?: boolean;
-}
+};
 
-const DEFAULT_OPTIONS: SanitizationOptions = {
+const DEFAULT_OPTIONS: Required<Pick<SanitizationOptions, "maxLength" | "removeHtml" | "removeSql" | "removeScripts">> = {
   maxLength: 1000,
   removeHtml: true,
   removeSql: true,
