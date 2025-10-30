@@ -12,7 +12,7 @@ use_frameworks! linkage: :static
 project_relative_path = 'App.xcodeproj'
 project_path = File.join(app_ios_dir, project_relative_path)
 
-unless File.directory?(project_path)
+unless File.exist?(project_path)
   abort <<~MSG
     Unable to locate #{project_relative_path} at #{project_path}.
     Run 'npx cap sync ios' to generate the Xcode project before installing pods.

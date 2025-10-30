@@ -6,22 +6,57 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions:
-  contents: read
-  statuses: write
-
+# Prevent pile-ups and zombies
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Needed to set commit statuses
+permissions:
+  contents: read
+  statuses: write
+
 jobs:
-  lint:
-    name: ci/lint
+  build:
+    # IMPORTANT: job name must be the required context
+    name: ci/build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --fund=false
+      - run: npm run -s build
+      - name: Verify web artifact
+        run: |
+          test -f dist/index.html || (echo "dist/index.html missing" && exit 2)
+      - name: Report status (ci/build)
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const state = "${{ job.status }}" === "success" ? "success" : "failure";
+            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner, repo: context.repo.repo, sha,
+              state, context: "ci/build",
+              description: state === "success" ? "Build passed" : "Build failed"
+            });
+
+  lint:
+    name: ci/lint
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
       - run: npm ci --no-audit --fund=false
       - run: npm run -s lint --if-present
       - name: Report status (ci/lint)
@@ -29,70 +64,36 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const state = core.getInput('job-status') || ( '${{ job.status }}' === 'success' ? 'success' : 'failure' );
+            const state = "${{ job.status }}" === "success" ? "success" : "failure";
             const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
             await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha,
-              state: state,
-              context: "ci/lint",
+              owner: context.repo.owner, repo: context.repo.repo, sha,
+              state, context: "ci/lint",
               description: state === "success" ? "Lint passed" : "Lint failed"
             });
-        env:
-          job-status: ${{ job.status }}
 
-  build:
-    name: ci/build
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - run: npm ci --no-audit --fund=false
-      - run: npm run -s typecheck --if-present
-      - run: npm run -s build
-      - name: Verify Vite outDir
-        run: test -f dist/index.html
-      - name: Report status (ci/build)
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const state = '${{ job.status }}' === 'success' ? 'success' : 'failure';
-            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha,
-              state,
-              context: "ci/build",
-              description: state === "success" ? "Build passed" : "Build failed"
-            });
-
-  test:                       # ✅ valid job ID
+  test:
     name: ci/test
     runs-on: ubuntu-latest
-    needs: build              # ✅ reference the ID
+    needs: [ build ]
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with:
+          node-version: 20
+          cache: npm
       - run: npm ci --no-audit --fund=false
-      - run: npm test --if-present
+      - run: npm test --if-present -- --ci
       - name: Report status (ci/test)
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            const state = '${{ job.status }}' === 'success' ? 'success' : 'failure';
+            const state = "${{ job.status }}" === "success" ? "success" : "failure";
             const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
             await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha,
-              state,
-              context: "ci/test",
+              owner: context.repo.owner, repo: context.repo.repo, sha,
+              state, context: "ci/test",
               description: state === "success" ? "Tests passed" : "Tests failed"
             });

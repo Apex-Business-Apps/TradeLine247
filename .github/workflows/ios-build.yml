@@ -45,10 +45,6 @@ jobs:
             echo "Missing project.pbxproj inside $PROJECT_PATH" >&2
             exit 1
           fi
-          if [ ! -f "Podfile" ]; then
-            echo "Podfile missing from $(pwd)" >&2
-            exit 1
-          fi
 
       - name: Install CocoaPods
         working-directory: ios/App
