@@ -16,12 +16,19 @@ const LS_URL  = typeof localStorage !== 'undefined' ? localStorage.getItem('SUPA
 const LS_ANON = typeof localStorage !== 'undefined' ? localStorage.getItem('SUPABASE_ANON_KEY') : null;
 
 // Public project URL and anon key (safe to embed client-side)
+// Support both URL and PROJECT_ID (derive URL from project ID if needed)
+const projectId = readEnv('VITE_SUPABASE_PROJECT_ID');
+const derivedUrl = projectId ? `https://${projectId}.supabase.co` : undefined;
+
 const SUPABASE_URL =
   readEnv('VITE_SUPABASE_URL') ||
+  derivedUrl ||
   (LS_URL || undefined);
 
+// Support PUBLISHABLE_KEY as alias for ANON_KEY
 const SUPABASE_ANON_KEY =
   readEnv('VITE_SUPABASE_ANON_KEY') ||
+  readEnv('VITE_SUPABASE_PUBLISHABLE_KEY') ||
   (LS_ANON || undefined);
 
 // A soft "disabled" result
