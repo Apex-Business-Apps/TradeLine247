@@ -1,7 +1,7 @@
 // DRIFT-04: Campaign batch sending via Resend (CASL-compliant)
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Resend } from "npm:resend@4.0.0";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
 import { sanitizeText, sanitizeEmail } from "../_shared/advancedSanitizer.ts";
 
