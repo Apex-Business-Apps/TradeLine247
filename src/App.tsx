@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Toaster, Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 import { useSessionSecurity } from "@/hooks/useSessionSecurity";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -59,6 +60,9 @@ import PhoneApps from "./pages/PhoneApps";
 import ClientNumberOnboarding from "./pages/ops/ClientNumberOnboarding";
 import TwilioEvidence from "./pages/ops/TwilioEvidence";
 import MessagingHealth from "./pages/ops/MessagingHealth";
+import Security from "./pages/Security";
+import SecurityMonitoring from "./pages/SecurityMonitoring";
+import Documentation from "./pages/Documentation";
 
 const queryClient = new QueryClient();
 
@@ -125,7 +129,9 @@ const AppWithMonitoring = () => {
           <Route path="/faq" element={<main id="main"><FAQ /></main>} />
           <Route path="/contact" element={<main id="main"><Contact /></main>} />
           <Route path="/demo" element={<main id="main"><Demo /></main>} />
-          {/* 🔥 Removed broken /security route that referenced a non-existent component */}
+          <Route path="/security" element={<main id="main"><Security /></main>} />
+          <Route path="/security/monitoring" element={<main id="main"><SecurityMonitoring /></main>} />
+          <Route path="/documentation" element={<main id="main"><Documentation /></main>} />
           <Route path="/compare" element={<main id="main"><Compare /></main>} />
           <Route path="/privacy" element={<main id="main"><Privacy /></main>} />
           <Route path="/terms" element={<main id="main"><Terms /></main>} />
