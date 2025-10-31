@@ -81,7 +81,7 @@ All colors MUST be HSL.
     /* Brand Orange Colors from Logo - Maximum Saturation + 45% Vibrancy + 5% Hue */
     --brand-orange-primary: 21 100% 67%;
     --brand-orange-light: 29 100% 95%;
-    --brand-orange-dark: 15 100% 46%;
+    --brand-orange-dark: 15 100% 35%;
     
     /* Green Colors for Login/Success Actions */
     --brand-green-primary: 142 76% 36%;
@@ -123,7 +123,7 @@ All colors MUST be HSL.
     --secondary-foreground: var(--brand-orange-dark);
 
     --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 215.4 16.3% 35%;
 
     --accent: var(--brand-orange-light);
     --accent-foreground: var(--brand-orange-dark);
