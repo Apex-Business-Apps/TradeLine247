@@ -2,10 +2,10 @@
 module.exports = {
   ci: {
     collect: {
-      url: [process.env.LHCI_URL || "https://www.tradeline247ai.com/"],
+      url: [process.env.LHCI_URL || "http://localhost:8080"],
       numberOfRuns: 1,
       settings: {
-        chromeFlags: "--no-sandbox --headless",
+        chromeFlags: "--no-sandbox --headless --disable-dev-shm-usage",
         onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
       },
     },
