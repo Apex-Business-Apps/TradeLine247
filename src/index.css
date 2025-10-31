@@ -289,6 +289,37 @@ body.session-warning::before {
   animation: pulse 2s infinite;
 }
 
+/* LIGHTHOUSE FIX: Global contrast override for WCAG AA compliance */
+@layer utilities {
+  /* Force darker text colors in light mode for WCAG AA 4.5:1 contrast */
+  .text-slate-400 {
+    @apply text-slate-700;
+  }
+
+  .text-slate-500 {
+    @apply text-slate-700;
+  }
+
+  .text-gray-400 {
+    @apply text-gray-700;
+  }
+
+  .text-gray-500 {
+    @apply text-gray-700;
+  }
+
+  /* Preserve lighter colors in dark mode for readability */
+  .dark .text-slate-400,
+  .dark .text-slate-500 {
+    @apply text-slate-300;
+  }
+
+  .dark .text-gray-400,
+  .dark .text-gray-500 {
+    @apply text-gray-300;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
