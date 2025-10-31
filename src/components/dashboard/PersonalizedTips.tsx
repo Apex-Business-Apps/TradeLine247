@@ -150,7 +150,7 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
               <div className="flex-1 space-y-2">
                 <div>
                   <h4 className="font-medium text-sm">{tip.title}</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                     {tip.description}
                   </p>
                 </div>

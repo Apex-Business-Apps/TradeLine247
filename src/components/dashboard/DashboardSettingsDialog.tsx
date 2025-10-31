@@ -55,7 +55,7 @@ export const DashboardSettingsDialog: React.FC<DashboardSettingsDialogProps> = (
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Dashboard Settings</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-slate-700 dark:text-slate-300">
             Customize your dashboard experience
           </DialogDescription>
         </DialogHeader>
@@ -65,7 +65,7 @@ export const DashboardSettingsDialog: React.FC<DashboardSettingsDialogProps> = (
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Layout</CardTitle>
-              <CardDescription>Choose your preferred dashboard layout</CardDescription>
+              <CardDescription className="text-slate-600 dark:text-slate-400">Choose your preferred dashboard layout</CardDescription>
             </CardHeader>
             <CardContent>
               <RadioGroup
@@ -100,7 +100,7 @@ export const DashboardSettingsDialog: React.FC<DashboardSettingsDialogProps> = (
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Dashboard Sections</CardTitle>
-              <CardDescription>Toggle visibility of dashboard components</CardDescription>
+              <CardDescription className="text-slate-600 dark:text-slate-400">Toggle visibility of dashboard components</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -155,7 +155,7 @@ export const DashboardSettingsDialog: React.FC<DashboardSettingsDialogProps> = (
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Notifications</CardTitle>
-              <CardDescription>Manage notification preferences</CardDescription>
+              <CardDescription className="text-slate-600 dark:text-slate-400">Manage notification preferences</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -215,7 +215,7 @@ export const DashboardSettingsDialog: React.FC<DashboardSettingsDialogProps> = (
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Display</CardTitle>
-              <CardDescription>Adjust visual preferences</CardDescription>
+              <CardDescription className="text-slate-600 dark:text-slate-400">Adjust visual preferences</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">

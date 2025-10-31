@@ -45,7 +45,7 @@ export const HeroSection = () => {
         </h1>
         
         {/* Value Proposition with Delayed Animation */}
-        <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
+        <p className="text-lg md:text-xl text-slate-700 dark:text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
           We pick up when you can't, so customers aren't kept waiting.
         </p>
         
@@ -69,14 +69,14 @@ export const HeroSection = () => {
               <Link to="/features">See how it works</Link>
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground animate-pulse">
+          <p className="text-sm text-slate-600 dark:text-slate-400 animate-pulse">
             No credit card required • 10-minute setup
           </p>
         </div>
 
         {/* Trust Indicators */}
         <div className="mt-16 animate-fade-in [animation-delay:800ms]">
-          <p className="text-sm text-muted-foreground mb-4">Trusted by 1000+ businesses</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Trusted by 1000+ businesses</p>
           <div className="flex justify-center items-center gap-8 opacity-60">
             <div className="h-8 w-16 bg-muted-foreground/20 rounded"></div>
             <div className="h-8 w-20 bg-muted-foreground/20 rounded"></div>
