@@ -215,6 +215,7 @@ export default function CryptoInit() {
                           size="sm"
                           variant="ghost"
                           onClick={() => copyToClipboard(JSON.stringify(result, null, 2))}
+                          aria-label="Copy result to clipboard"
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -301,6 +302,7 @@ export default function CryptoInit() {
                         size="sm"
                         variant="ghost"
                         onClick={() => copyToClipboard(JSON.stringify(gate1Result, null, 2))}
+                        aria-label="Copy gate-1 result to clipboard"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>

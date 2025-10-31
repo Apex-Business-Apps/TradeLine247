@@ -89,6 +89,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             variant="ghost"
             size="lg"
             onClick={togglePlay}
+            aria-label={isPlaying ? "Pause video" : "Play video"}
             className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all duration-300 hover-scale"
           >
             {isPlaying ? (
@@ -106,6 +107,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               variant="ghost"
               size="sm"
               onClick={togglePlay}
+              aria-label={isPlaying ? "Pause video" : "Play video"}
               className="text-white hover:bg-white/20"
             >
               {isPlaying ? (
@@ -114,11 +116,12 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <Play className="w-4 h-4" />
               )}
             </Button>
-            
+
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleMute}
+              aria-label={isMuted ? "Unmute video" : "Mute video"}
               className="text-white hover:bg-white/20"
             >
               {isMuted ? (
@@ -133,6 +136,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             variant="ghost"
             size="sm"
             onClick={toggleFullscreen}
+            aria-label="Toggle fullscreen"
             className="text-white hover:bg-white/20"
           >
             <Maximize className="w-4 h-4" />

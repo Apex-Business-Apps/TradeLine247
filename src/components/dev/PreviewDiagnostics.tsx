@@ -94,18 +94,20 @@ export function PreviewDiagnostics() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Preview Diagnostics</CardTitle>
             <div className="flex items-center gap-2">
-              <Button 
-                onClick={runCheck} 
+              <Button
+                onClick={runCheck}
                 disabled={loading}
                 size="sm"
                 variant="ghost"
+                aria-label="Refresh diagnostics"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               </Button>
-              <Button 
+              <Button
                 onClick={() => setVisible(false)}
                 size="sm"
                 variant="ghost"
+                aria-label="Close diagnostics panel"
               >
                 ✕
               </Button>

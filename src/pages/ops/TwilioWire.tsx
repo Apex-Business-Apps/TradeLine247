@@ -180,6 +180,7 @@ export default function TwilioWire() {
                 variant="ghost"
                 size="sm"
                 onClick={() => copyToClipboard(url)}
+                aria-label="Copy webhook URL to clipboard"
               >
                 <Copy className="w-4 h-4" />
               </Button>
