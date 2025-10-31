@@ -58,6 +58,17 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --no-audit --fund=false
+
+      # Merged from props-guard.yml: Check fetchpriority attribute casing
+      - name: Check fetchpriority attribute casing
+        run: |
+          if git grep -n "fetchPriority=" -- src; then
+            echo "❌ Found camelCase fetchPriority (use lowercase fetchpriority in HTML)"
+            exit 1
+          else
+            echo "✅ No fetchPriority casing issues detected"
+          fi
+
       - run: npm run -s lint --if-present
       - name: Report status (ci/lint)
         if: always()
