@@ -85,7 +85,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
             </div>
             <div className="space-y-2 text-center">
               <DialogTitle className="text-2xl font-bold">Welcome to TradeLine247!</DialogTitle>
-              <DialogDescription className="text-base">
+              <DialogDescription className="text-base text-slate-700 dark:text-slate-300">
                 Your AI receptionist is ready to help you capture every opportunity.
                 Let's personalize your experience in just a few steps.
               </DialogDescription>
@@ -98,7 +98,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
           <div className="space-y-6">
             <div className="space-y-2 text-center">
               <DialogTitle className="text-xl font-bold">What should we call you?</DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-slate-700 dark:text-slate-300">
                 We'll use this to personalize your dashboard greeting.
               </DialogDescription>
             </div>
@@ -113,7 +113,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
                 autoFocus
               />
             </div>
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm text-slate-600 dark:text-slate-400">
               Don't worry, you can change this anytime in settings.
             </div>
           </div>
@@ -127,7 +127,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
                 <Layout className="h-10 w-10 text-blue-500" />
               </div>
               <DialogTitle className="text-xl font-bold">Choose Your Layout</DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-slate-700 dark:text-slate-300">
                 How would you like your dashboard to look?
               </DialogDescription>
             </div>
@@ -141,7 +141,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
                   <RadioGroupItem value="compact" id="compact" />
                   <div className="flex-1">
                     <div className="font-medium">Compact</div>
-                    <div className="text-sm text-muted-foreground">More info in less space</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">More info in less space</div>
                   </div>
                 </Label>
 
@@ -153,7 +153,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
                   <RadioGroupItem value="comfortable" id="comfortable" />
                   <div className="flex-1">
                     <div className="font-medium">Comfortable (Recommended)</div>
-                    <div className="text-sm text-muted-foreground">Balanced spacing and readability</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Balanced spacing and readability</div>
                   </div>
                 </Label>
 
@@ -165,7 +165,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
                   <RadioGroupItem value="spacious" id="spacious" />
                   <div className="flex-1">
                     <div className="font-medium">Spacious</div>
-                    <div className="text-sm text-muted-foreground">Maximum breathing room</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Maximum breathing room</div>
                   </div>
                 </Label>
               </div>
@@ -181,7 +181,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
                 <Palette className="h-10 w-10 text-blue-500" />
               </div>
               <DialogTitle className="text-xl font-bold">Pick Your Theme</DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-slate-700 dark:text-slate-300">
                 Choose the appearance that works best for you.
               </DialogDescription>
             </div>
@@ -195,7 +195,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
                   <RadioGroupItem value="light" id="light" />
                   <div className="flex-1">
                     <div className="font-medium">Light</div>
-                    <div className="text-sm text-muted-foreground">Bright and clean</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Bright and clean</div>
                   </div>
                 </Label>
 
@@ -207,7 +207,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
                   <RadioGroupItem value="dark" id="dark" />
                   <div className="flex-1">
                     <div className="font-medium">Dark</div>
-                    <div className="text-sm text-muted-foreground">Easy on the eyes</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Easy on the eyes</div>
                   </div>
                 </Label>
 
@@ -219,7 +219,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
                   <RadioGroupItem value="system" id="system" />
                   <div className="flex-1">
                     <div className="font-medium">System (Recommended)</div>
-                    <div className="text-sm text-muted-foreground">Matches your device settings</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Matches your device settings</div>
                   </div>
                 </Label>
               </div>

@@ -90,7 +90,7 @@ export const WelcomeHeader: React.FC = () => {
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
               {getGreeting()}, {displayName || 'there'}
             </h1>
-            <p className="text-muted-foreground text-sm sm:text-base">
+            <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
               Your AI receptionist is working hard for you today
             </p>
           </div>
@@ -148,7 +148,7 @@ export const WelcomeHeader: React.FC = () => {
         {/* Status indicator */}
         <div className="flex items-center gap-2 text-sm">
           <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-          <span className="text-muted-foreground">AI receptionist is active</span>
+          <span className="text-slate-600 dark:text-slate-400">AI receptionist is active</span>
         </div>
       </header>
 
