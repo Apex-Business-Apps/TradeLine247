@@ -62,19 +62,19 @@ const complianceStandards = [
   {
     name: "SOC 2 Type II",
     status: "In Progress",
-    description: "Annual third-party security audits covering security, availability, and confidentiality.",
+    description: "Independent SOC 2 Type II attestation (AICPA Trust Services Criteria). Availability, security, confidentiality in scope.",
     icon: FileCheck
   },
   {
     name: "GDPR Compliant",
-    status: "Certified",
-    description: "Full compliance with EU General Data Protection Regulation. Data subject rights honored.",
+    status: "Aligned",
+    description: "Controls aligned to GDPR requirements; data subject rights honored (access, erasure, portability).",
     icon: Globe
   },
   {
     name: "PIPEDA Ready",
-    status: "Certified",
-    description: "Canadian privacy law compliance. Built for Canadian businesses with Canadian data sovereignty.",
+    status: "Aligned",
+    description: "Canadian privacy law alignment based on PIPEDA's Fair Information Principles.",
     icon: Shield
   },
   {
@@ -142,7 +142,7 @@ const Security = () => {
               </Badge>
               <Badge variant="outline" className="text-sm px-4 py-2">
                 <Globe className="w-4 h-4 mr-2" />
-                GDPR Compliant
+                GDPR Aligned
               </Badge>
               <Badge variant="outline" className="text-sm px-4 py-2">
                 <Shield className="w-4 h-4 mr-2" />
@@ -150,7 +150,7 @@ const Security = () => {
               </Badge>
               <Badge variant="outline" className="text-sm px-4 py-2">
                 <FileCheck className="w-4 h-4 mr-2" />
-                PIPEDA Certified
+                PIPEDA Aligned
               </Badge>
             </div>
           </div>
@@ -193,9 +193,9 @@ const Security = () => {
         <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
           <div className="container">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Compliance & Certifications</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Compliance & Standards</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Certified and audited against the highest industry standards.
+                Aligned with recognized standards. Independent assessments where applicable.
               </p>
             </div>
 
@@ -211,7 +211,7 @@ const Security = () => {
                         <div>
                           <CardTitle className="text-lg">{standard.name}</CardTitle>
                           <Badge
-                            variant={standard.status === "Certified" || standard.status === "Enforced" ? "default" : "secondary"}
+                            variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
                             className="mt-1 text-xs"
                           >
                             {standard.status}
