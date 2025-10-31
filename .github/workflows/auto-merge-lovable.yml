@@ -41,7 +41,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
         run: |
           set -euo pipefail
           echo "🔍 Validating PR #$PR..."
@@ -80,7 +80,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
         run: |
           set -euo pipefail
           echo "🤖 Processing PR #$PR on $REPO"
@@ -140,7 +140,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
         run: |
           gh pr comment "$PR" --repo "$REPO" --body "✅ Auto-merge enabled. This PR will merge automatically when all required checks pass.
 
@@ -156,7 +156,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
         run: |
           gh pr comment "$PR" --repo "$REPO" --body "⚠️  Auto-merge could not be enabled for this PR.
 
