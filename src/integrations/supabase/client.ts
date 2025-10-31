@@ -4,6 +4,7 @@
 //   for any call (no unhandled rejections), and a flag isSupabaseEnabled=false.
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { SUPABASE_CONFIG } from '@/config/supabase';
 
 // Helpers -----------------------------------------------------
 function readEnv(name: string): string | undefined {
@@ -23,13 +24,15 @@ const derivedUrl = projectId ? `https://${projectId}.supabase.co` : undefined;
 const SUPABASE_URL =
   readEnv('VITE_SUPABASE_URL') ||
   derivedUrl ||
-  (LS_URL || undefined);
+  (LS_URL || undefined) ||
+  SUPABASE_CONFIG.url; // ✅ Fallback to embedded config
 
 // Support PUBLISHABLE_KEY as alias for ANON_KEY
 const SUPABASE_ANON_KEY =
   readEnv('VITE_SUPABASE_ANON_KEY') ||
   readEnv('VITE_SUPABASE_PUBLISHABLE_KEY') ||
-  (LS_ANON || undefined);
+  (LS_ANON || undefined) ||
+  SUPABASE_CONFIG.anonKey; // ✅ Fallback to embedded config
 
 // A soft "disabled" result
 const DISABLED = Object.freeze({ data: null, error: new Error('[Supabase disabled] Missing URL or ANON key for this environment.') });
