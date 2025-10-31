@@ -3,6 +3,10 @@ import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
 
+// Strict mode: set STRICT_ICONS=true to fail build on missing/invalid icons
+// Default (non-strict): logs warnings but allows build to continue
+const STRICT = process.env.STRICT_ICONS === 'true';
+
 const mustExist = [
   "public/assets/brand/icon_master.svg",                         // master
   "public/assets/brand/App_Icons/icon-192.png",
@@ -19,7 +23,11 @@ const mustExist = [
 
 let miss = 0;
 for (const f of mustExist) {
-  if (!fs.existsSync(f)) { console.error("MISSING:", f); miss = 1; }
+  if (!fs.existsSync(f)) {
+    const prefix = STRICT ? "ERROR" : "WARNING";
+    console.log(`${prefix}: MISSING: ${f}`);
+    miss = 1;
+  }
 }
 
 // quick PNG dim check (requires ImageMagick identify; skip if absent)
@@ -38,12 +46,21 @@ for (const [p, want] of Object.entries(dimChecks)) {
   if (!fs.existsSync(p)) continue;
   const got = size(p);
   if (got !== "unknown" && got !== want) {
-    console.error(`BAD_SIZE: ${p} -> ${got} (want ${want})`); miss = 1;
+    const prefix = STRICT ? "ERROR" : "WARNING";
+    console.log(`${prefix}: BAD_SIZE: ${p} -> ${got} (want ${want})`);
+    miss = 1;
   }
 }
 
 if (miss) {
-  console.error("❌ Icon verification failed.");
-  process.exit(1);
+  if (STRICT) {
+    console.error("❌ Icon verification failed. Build cannot continue in strict mode.");
+    console.error("   To allow web builds without mobile icons, run without STRICT_ICONS=true");
+    process.exit(1);
+  } else {
+    console.log("⚠️  Icon verification warnings detected (non-strict mode).");
+    console.log("   These are required for iOS/mobile builds. Set STRICT_ICONS=true to enforce.");
+    process.exit(0);  // Allow build to continue
+  }
 }
 console.log("✅ Icon set verified.");
