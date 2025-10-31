@@ -9,6 +9,14 @@ if (import.meta.env.PROD) {
   });
 }
 
+// ENHANCED: Initialize Lovable GitHub connection health monitoring
+// This helps diagnose and prevent GitHub reconnection issues
+if (import.meta.env.DEV || /lovable/.test(location.hostname)) {
+  import('./lib/lovableGitHubMonitor').then(({ initializeGitHubHealthMonitor }) => {
+    initializeGitHubHealthMonitor();
+  });
+}
+
 // Unregister any existing service workers to prevent stale cache issues
 // Will re-enable PWA with proper update strategy after stabilization
 if ('serviceWorker' in navigator) {
