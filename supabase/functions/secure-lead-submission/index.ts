@@ -3,16 +3,8 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { sanitizeText, sanitizeEmail, sanitizeName, detectSuspiciousContent, generateRequestHash } from '../_shared/advancedSanitizer.ts';
 import { createRequestContext, logWithContext, createResponseHeaders } from '../_shared/requestId.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-  'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
-  'X-XSS-Protection': '1; mode=block',
-  'Referrer-Policy': 'strict-origin-when-cross-origin'
-};
+import { preflight, corsHeaders } from '../_shared/cors.ts';
+import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
 
 // Server-side validation schema
 interface LeadSubmission {
@@ -130,10 +122,8 @@ async function checkRateLimit(supabase: any, clientIP: string): Promise<{ allowe
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const pf = preflight(req);
+  if (pf) return pf;
 
   const requestCtx = createRequestContext(req);
   logWithContext(requestCtx, 'info', 'Secure lead submission request received');
@@ -145,7 +135,7 @@ serve(async (req) => {
         JSON.stringify({ error: 'Method not allowed' }), 
         { 
           status: 405, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
         }
       );
     }
@@ -180,7 +170,7 @@ serve(async (req) => {
         }),
         { 
           status: 429, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
         }
       );
     }
@@ -206,7 +196,7 @@ serve(async (req) => {
         JSON.stringify(idempotencyCheck.response_data),
         { 
           status: 200, 
-          headers: { ...corsHeaders, ...createResponseHeaders(requestCtx), 'Content-Type': 'application/json' }
+          headers: mergeHeaders(corsHeaders, secureHeaders, createResponseHeaders(requestCtx), { 'Content-Type': 'application/json' })
         }
       );
     }
@@ -235,7 +225,7 @@ serve(async (req) => {
         }),
         { 
           status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
         }
       );
     }
@@ -281,7 +271,7 @@ serve(async (req) => {
         JSON.stringify({ error: 'Failed to process submission' }),
         { 
           status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
         }
       );
     }
