@@ -1,8 +1,8 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
 app_dir = File.expand_path(__dir__)
-if Dir.pwd != app_dir
-  puts "[pods] Switching to #{app_dir} (was #{Dir.pwd})" if ENV['CI']
+unless Dir.pwd == app_dir
+  puts "[pods] Switching to #{app_dir} (was #{Dir.pwd})"
   Dir.chdir(app_dir)
 end
 

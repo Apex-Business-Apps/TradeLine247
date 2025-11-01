@@ -5,11 +5,6 @@ const baseURL =
   process.env.BASE_URL ||
   'http://localhost:4173';
 
-// Always bypass CSP in CI/automation so inline scripts/styles used in
-// pre-rendered shells do not break the test harness. Engineers can override by
-// setting PLAYWRIGHT_BYPASS_CSP=false locally when debugging a real CSP issue.
-const bypassCSP = process.env.PLAYWRIGHT_BYPASS_CSP === 'false' ? false : true;
-
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -21,7 +16,7 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    bypassCSP,
+    bypassCSP: true,
   },
   projects: [
     {

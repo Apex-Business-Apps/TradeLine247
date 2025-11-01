@@ -1,5 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { corsHeaders, handleCors } from "../_shared/cors.ts";
+import { twilioFormPOST } from "../_shared/twilio.ts";
 
 const TWILIO_SID = Deno.env.get("TWILIO_ACCOUNT_SID")!;
 const TWILIO_AUTH = Deno.env.get("TWILIO_AUTH_TOKEN")!;
@@ -9,16 +11,10 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SRV = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const auth = "Basic " + btoa(`${TWILIO_SID}:${TWILIO_AUTH}`);
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
 export default async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+  const preflight = handleCors(req);
+  if (preflight) return preflight;
+
   try {
     const { org_id, old_number_e164 } = await req.json();
     if (!org_id || !old_number_e164) {
@@ -46,7 +42,10 @@ export default async (req: Request) => {
     });
     if (!up.ok) {
       const fail = await up.json().catch(() => ({}));
-      return new Response(JSON.stringify({ error: fail }), { status: up.status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: fail }), {
+        status: up.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
     const [row] = await up.json();
 
@@ -56,20 +55,29 @@ export default async (req: Request) => {
       Url: `${FUNCTIONS_BASE}/forwarding-verifier-call`,
       Method: "POST",
       Timeout: "15",
+      StatusCallback: `${FUNCTIONS_BASE}/voice-status`,
+      StatusCallbackMethod: "POST",
     });
-    const call = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Calls.json`, {
-      method: "POST",
-      headers: { Authorization: auth, "Content-Type": "application/x-www-form-urlencoded" },
-      body: form,
-    });
-    const payload = await call.json();
-    if (!call.ok) {
+    const res = await twilioFormPOST(
+      `/Accounts/${TWILIO_SID}/Calls.json`,
+      form,
+      4,
+      {
+        auth: { accountSid: TWILIO_SID, authToken: TWILIO_AUTH },
+        headers: { "Idempotency-Key": row.id },
+      },
+    );
+    const payload = await res.json();
+    if (!res.ok) {
       await fetch(`${SUPABASE_URL}/rest/v1/forwarding_checks?id=eq.${row.id}`, {
         method: "PATCH",
         headers: { apikey: ANON, Authorization: `Bearer ${SRV}`, "Content-Type": "application/json" },
         body: JSON.stringify({ status: "failed", notes: `twilio call error: ${payload?.message ?? "unknown"}` }),
       });
-      return new Response(JSON.stringify({ error: payload }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: payload }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     return new Response(
@@ -77,6 +85,9 @@ export default async (req: Request) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: String(e) }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 };
