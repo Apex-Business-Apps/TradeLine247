@@ -65,3 +65,4 @@ describe('Supabase Client', () => {
     expect(content).toMatch(keyPattern);
   });
 });
+
