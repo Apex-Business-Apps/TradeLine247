@@ -22,14 +22,6 @@ verify_jwt = true  # Requires authentication
 [functions.ops-campaigns-send]
 verify_jwt = true  # Requires authentication
 
-[functions.sms-inbound]
-verify_jwt = false  # Twilio webhook
-
-[functions.sms-inbound-fallback]
-verify_jwt = false  # Twilio webhook fallback
-
-[functions.sms-status]
-verify_jwt = false  # Twilio webhook
 
 [functions.lookup-number]
 verify_jwt = true  # Requires authentication
@@ -151,7 +143,7 @@ verify_jwt = true  # Admin-only segment operations
 [functions.ops-send-warm50]
 verify_jwt = true  # Admin-only warm contact sending
 
-# PROMPT A & D: Canonical SMS webhooks
+# Canonical SMS webhooks
 [functions.webcomms-sms-reply]
 verify_jwt = false  # Twilio webhook - canonical SMS reply path
 
@@ -204,18 +196,6 @@ verify_jwt = false  # Service-to-service call
 [functions.ops-test-call]
 verify_jwt = false  # Public test call page
 
-# PROMPT DF-1 & DF-2: Legacy webhook aliases (permanent)
-[functions.twilio-voice]
-verify_jwt = false  # Alias to /voice-answer
-
-[functions.twilio-status]
-verify_jwt = false  # Alias to /voice-status
-
-[functions.twilio-sms]
-verify_jwt = false  # Alias to /webcomms-sms-reply
-
-[functions.twilio-sms-status]
-verify_jwt = false  # Alias to /webcomms-sms-status
 
 # BILLING: Stripe webhook processing with idempotency
 [functions.stripe-webhook]
