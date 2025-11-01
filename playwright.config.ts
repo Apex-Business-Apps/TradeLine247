@@ -4,6 +4,7 @@ const baseURL =
   process.env.E2E_BASE_URL ||
   process.env.BASE_URL ||
   'http://localhost:4173';
+const bypassCSP = process.env.PLAYWRIGHT_BYPASS_CSP !== 'false';
 
 export default defineConfig({
   testDir: './tests',
@@ -16,7 +17,7 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    bypassCSP: true,
+    bypassCSP,
   },
   projects: [
     {
