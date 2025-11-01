@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 45
     env:
       NODE_VERSION: '20'
+      IOS_APP_DIR: ios/App
       WORKSPACE_PATH: App.xcworkspace
       PROJECT_PATH: App.xcodeproj
       SCHEME: App
@@ -34,7 +35,7 @@ jobs:
         run: npx cap sync ios
 
       - name: Ensure Xcode project exists
-        working-directory: ios/App
+        working-directory: ${{ env.IOS_APP_DIR }}
         run: |
           set -euo pipefail
           if [ ! -d "$PROJECT_PATH" ]; then
@@ -47,7 +48,7 @@ jobs:
           fi
 
       - name: Install CocoaPods
-        working-directory: ios/App
+        working-directory: ${{ env.IOS_APP_DIR }}
         run: |
           set -euo pipefail
           if [ ! -f "Podfile" ]; then
@@ -61,7 +62,7 @@ jobs:
           fi
 
       - name: Build iOS workspace
-        working-directory: ios/App
+        working-directory: ${{ env.IOS_APP_DIR }}
         run: |
           set -euo pipefail
           xcodebuild \
