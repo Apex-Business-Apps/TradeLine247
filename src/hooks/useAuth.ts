@@ -27,13 +27,26 @@ export const useAuth = () => {
         // Fetch user role when user logs in
         if (session?.user) {
           setTimeout(async () => {
-            fetchUserRole(session.user!.id);
-            const result = await ensureMembership(session.user!);
-            if (result.error) {
+            try {
+              // Safe access: session.user is guaranteed to exist in this scope
+              const currentUser = session.user;
+              if (!currentUser) return;
+
+              fetchUserRole(currentUser.id);
+              const result = await ensureMembership(currentUser);
+              if (result.error) {
+                toast({
+                  variant: "destructive",
+                  title: "Trial Setup Failed",
+                  description: result.error,
+                });
+              }
+            } catch (err) {
+              console.error('[Auth] Setup error:', err);
               toast({
                 variant: "destructive",
-                title: "Trial Setup Failed",
-                description: result.error,
+                title: "Setup Failed",
+                description: "Failed to initialize user session",
               });
             }
           }, 0);
@@ -111,8 +124,9 @@ export const useAuth = () => {
   };
 
   const signUp = async (email: string, password: string, displayName?: string) => {
-    const redirectUrl = `https://tradeline247ai.com/auth/callback`;
-    
+    // Use environment variable or fallback to current origin + path
+    const redirectUrl = import.meta.env.VITE_AUTH_REDIRECT_URL || `${window.location.origin}/auth/callback`;
+
     if (!isSupabaseEnabled) {
       return { error: new Error('Supabase is disabled') };
     }

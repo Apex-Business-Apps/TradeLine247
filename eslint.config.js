@@ -86,16 +86,16 @@ export default tseslint.config(
       
       // 🚫 Core guard: never render more hooks than previous render
       "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "off",
-      
+      "react-hooks/exhaustive-deps": "warn", // Re-enabled: warn on missing dependencies
+
       // Helpful strictness to catch sneaky conditionals
       "no-cond-assign": "error",
       "no-unreachable": "error",
       "no-constant-condition": ["error", { checkLoops: true }],
       "no-return-assign": "error",
-      
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+
+      "@typescript-eslint/no-unused-vars": "warn", // Re-enabled: warn on unused vars
+      "@typescript-eslint/no-explicit-any": "warn", // Re-enabled: warn on any types
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
