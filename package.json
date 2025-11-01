@@ -37,7 +37,7 @@
     "@capacitor/android": "^7.4.3",
     "@capacitor/cli": "^7.4.3",
     "@capacitor/core": "^7.4.3",
-    "@capacitor/ios": "^7.4.3",
+    "@capacitor/ios": "^7.4.4",
     "@hookform/resolvers": "^3.10.0",
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.55.1",
