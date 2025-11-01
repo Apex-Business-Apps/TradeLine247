@@ -4,6 +4,7 @@ const baseURL =
   process.env.E2E_BASE_URL ||
   process.env.BASE_URL ||
   'http://localhost:4173';
+const bypassCSP = process.env.PLAYWRIGHT_BYPASS_CSP !== 'false';
 
 // Allow CSP bypassing by default so inline scripts/styles used in the app shell
 // don't break headless runs. Teams can opt out by explicitly setting the
@@ -21,7 +22,7 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    bypassCSP: shouldBypassCSP,
+    bypassCSP,
   },
   projects: [
     {

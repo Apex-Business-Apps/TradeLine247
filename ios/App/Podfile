@@ -6,7 +6,8 @@ Dir.chdir(app_ios_dir) unless Dir.pwd == app_ios_dir
 platform :ios, '15.0'
 use_frameworks! linkage: :static
 
-project File.join(__dir__, 'App.xcodeproj')
+project File.join(app_ios_dir, 'App.xcodeproj')
+workspace File.join(app_ios_dir, 'App.xcworkspace')
 
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'

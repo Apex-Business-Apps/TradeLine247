@@ -19,6 +19,7 @@ jobs:
       ARCHIVE_PATH: build/App.xcarchive
       EXPORT_PATH: build/export
       APP_NAME: "TradeLine 24/7"
+      IOS_APP_DIR: ios/App
 
     steps:
       - uses: actions/checkout@v4
@@ -41,14 +42,29 @@ jobs:
           npx cap sync ios
 
       - name: Install CocoaPods
-        working-directory: ios/App
+        shell: bash
         run: |
           set -euo pipefail
+          cd "$IOS_APP_DIR"
+
           if [ ! -f Podfile ]; then
             echo "Podfile missing from $(pwd)" >&2
             exit 65
           fi
+
+          if [ ! -d App.xcodeproj ]; then
+            echo "Expected to find App.xcodeproj after capacitor sync." >&2
+            ls
+            exit 65
+          fi
+
+          if [ ! -f App.xcodeproj/project.pbxproj ]; then
+            echo "Missing project.pbxproj inside App.xcodeproj" >&2
+            exit 65
+          fi
+
           pod install --repo-update
+
           if [ ! -d App.xcworkspace ]; then
             echo "Expected CocoaPods to generate App.xcworkspace" >&2
             exit 65

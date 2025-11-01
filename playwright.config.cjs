@@ -1,7 +1,7 @@
 // playwright.config.cjs — CommonJS so GitHub Actions Babel doesn’t choke on `import`
 const { defineConfig, devices } = require('@playwright/test');
 
-const shouldBypassCSP = process.env.PLAYWRIGHT_BYPASS_CSP !== 'false';
+const bypassCSP = process.env.PLAYWRIGHT_BYPASS_CSP !== 'false';
 
 module.exports = defineConfig({
   testDir: 'tests',
@@ -14,7 +14,7 @@ module.exports = defineConfig({
     baseURL: process.env.BASE_URL || 'http://localhost:5000',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
-    bypassCSP: shouldBypassCSP,
+    bypassCSP,
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
