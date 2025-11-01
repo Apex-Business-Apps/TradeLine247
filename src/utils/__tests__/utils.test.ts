@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
 describe('cn (class name utility)', () => {
   it('should merge class names correctly', () => {
