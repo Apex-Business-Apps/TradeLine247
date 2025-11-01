@@ -2,12 +2,20 @@
 // Requires standard JWT auth via supabase-js when invoked from the app (token forwarded automatically).
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { preflight, corsHeaders } from '../_shared/cors.ts';
+import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
 
 serve(async (req) => {
+  const pf = preflight(req);
+  if (pf) return pf;
+
   try {
     const auth = req.headers.get('authorization') ?? ''
     if (!auth?.toLowerCase().startsWith('bearer ')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+      )
     }
 
     const { SUPABASE_URL, SUPABASE_ANON_KEY } = Deno.env.toObject()
@@ -17,7 +25,10 @@ serve(async (req) => {
     // Accept minimal shape; extend to your schema
     const { org_id, config } = payload || {}
     if (!org_id || typeof config !== 'object') {
-      return new Response(JSON.stringify({ error: 'Invalid payload' }), { status: 400 })
+      return new Response(
+        JSON.stringify({ error: 'Invalid payload' }),
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+      )
     }
 
     // Upsert/update settings (adjust table/columns as needed)
@@ -33,8 +44,14 @@ serve(async (req) => {
       })
     } catch (_) {}
 
-    return new Response(JSON.stringify({ ok: true }), { status: 200 })
+    return new Response(
+      JSON.stringify({ ok: true }),
+      { status: 200, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+    )
   } catch (e) {
-    return new Response(JSON.stringify({ error: String(e?.message || e) }), { status: 500 })
+    return new Response(
+      JSON.stringify({ error: String(e?.message || e) }),
+      { status: 500, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+    )
   }
 })
