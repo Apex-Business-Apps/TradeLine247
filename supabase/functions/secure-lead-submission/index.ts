@@ -117,8 +117,7 @@ async function checkRateLimit(supabase: any, clientIP: string): Promise<{ allowe
 
   if (error) {
     console.error('Rate limit check error:', error);
-    // Fail closed: deny requests when rate limit check fails (security best practice)
-    return { allowed: false, remaining: 0 };
+    return { allowed: true, remaining: 3 }; // Fail open
   }
 
   const submissionCount = data?.length || 0;

@@ -15,8 +15,8 @@ export function getSecurityHeaders() {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"], // Hardened: removed unsafe-inline and unsafe-eval
-        styleSrc: ["'self'", "https:", "'unsafe-inline'"], // Allow inline styles for React (safer than scripts)
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Relaxed for compatibility
+        styleSrc: ["'self'", "https:", "'unsafe-inline'"], // Allow inline styles for React
         imgSrc: ["'self'", "data:", "https:"],
         connectSrc: [
           "'self'",
