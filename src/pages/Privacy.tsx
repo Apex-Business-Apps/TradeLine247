@@ -1,4 +1,3 @@
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SEOHead } from "@/components/seo/SEOHead";
@@ -12,8 +11,6 @@ const Privacy = () => {
         keywords="privacy policy, data protection, GDPR compliance, AI receptionist security"
         canonical="https://www.tradeline247ai.com/privacy"
       />
-      
-      <Header />
       
       <main className="flex-1 py-20">
         <div className="container">

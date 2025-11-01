@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Phone, UserPlus, PhoneCall, Link as LinkIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { InviteStaffDialog } from './InviteStaffDialog';
 
 export const QuickActionsCard: React.FC = () => {
   const navigate = useNavigate();
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   const actions = [
     {
@@ -23,10 +25,7 @@ export const QuickActionsCard: React.FC = () => {
     {
       label: 'Invite Staff',
       icon: UserPlus,
-      onClick: () => {
-        // TODO: Open invite modal
-        console.log('Invite staff modal');
-      },
+      onClick: () => setInviteDialogOpen(true),
       variant: 'outline' as const
     },
     {
@@ -38,27 +37,34 @@ export const QuickActionsCard: React.FC = () => {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Quick Actions</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {actions.map((action) => {
-          const Icon = action.icon;
-          return (
-            <Button
-              key={action.label}
-              variant={action.variant}
-              onClick={action.onClick}
-              className="w-full justify-start gap-2"
-            >
-              <Icon className="h-4 w-4" />
-              {action.label}
-            </Button>
-          );
-        })}
-      </CardContent>
-    </Card>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {actions.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Button
+                key={action.label}
+                variant={action.variant}
+                onClick={action.onClick}
+                className="w-full justify-start gap-2"
+              >
+                <Icon className="h-4 w-4" />
+                {action.label}
+              </Button>
+            );
+          })}
+        </CardContent>
+      </Card>
+      
+      <InviteStaffDialog 
+        open={inviteDialogOpen} 
+        onOpenChange={setInviteDialogOpen} 
+      />
+    </>
   );
 };
 

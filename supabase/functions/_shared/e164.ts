@@ -152,7 +152,7 @@ export function normalizeBatch(phones: string[], defaultCountryCode: string = '1
     } catch (error) {
       invalid.push({
         input: phone,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   }

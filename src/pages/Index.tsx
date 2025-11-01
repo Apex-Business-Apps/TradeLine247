@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
 import { TrustBadgesSlim } from "@/components/sections/TrustBadgesSlim";
@@ -95,10 +94,6 @@ const Index = () => {
           }}
         />
         <OrganizationSchema />
-        
-        <div className="bg-background/30 backdrop-blur-[2px]" style={{ willChange: 'transform' }}>
-          <Header />
-        </div>
         
         <main className="flex-1" style={{ minHeight: '60vh' }}>
           <div className="bg-background/20 backdrop-blur-[2px]" style={{ willChange: 'transform' }}>

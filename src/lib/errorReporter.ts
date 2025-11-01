@@ -101,8 +101,13 @@ class ErrorReporter {
   }
 
   private getEnvironment(): string {
-    const hostname = window.location.hostname;
-    if (hostname.includes('lovableproject.com') || hostname.includes('https://tradeline247aicom.lovable.app/')) {
+    const hostname = window.location.hostname.toLowerCase();
+    const previewDomains = ['lovableproject.com', 'lovable.app', 'lovable.dev', 'gptengineer.app'];
+    const isPreviewHost =
+      hostname.includes('.lovable.') ||
+      previewDomains.some(domain => hostname === domain || hostname.endsWith(`.${domain}`));
+
+    if (isPreviewHost) {
       return 'preview';
     }
     if (hostname === 'localhost' || hostname === '127.0.0.1') {

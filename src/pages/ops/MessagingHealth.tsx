@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 interface A2PStatus {
@@ -84,7 +83,6 @@ const MessagingHealth = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-1 container py-8">
           <div className="flex items-center justify-center h-64">
             <p className="text-muted-foreground">Loading messaging health data...</p>
@@ -97,7 +95,6 @@ const MessagingHealth = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 container py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Messaging Health</h1>

@@ -90,25 +90,35 @@ export default function VoiceSettings() {
   };
 
   const saveConfig = async (updates: any) => {
+    if (saving) return;
+    const previous = config;
+    const nextConfig = { ...config, ...updates };
+
     setSaving(true);
+    setConfig(nextConfig);
+
     try {
-      const { error } = await supabase.functions.invoke('ops-voice-config-update', {
-        body: { ...config, ...updates }
+      const { data, error } = await supabase.functions.invoke('ops-voice-config-update', {
+        body: nextConfig,
       });
 
       if (error) throw error;
 
-      setConfig({ ...config, ...updates });
-      
+      if (!data?.ok) {
+        console.warn('Voice config update responded without ok flag', data);
+      }
+
       toast({
         title: "Settings Saved",
-        description: "Voice configuration updated successfully"
+        description: "Voice configuration updated successfully",
       });
     } catch (error: any) {
+      console.error('Failed to save voice configuration', error);
+      setConfig(previous);
       toast({
         title: "Save Failed",
-        description: error.message,
-        variant: "destructive"
+        description: error?.message ?? 'Unable to save changes right now.',
+        variant: "destructive",
       });
     } finally {
       setSaving(false);
@@ -165,7 +175,7 @@ export default function VoiceSettings() {
   }
 
   return (
-    <div className="container max-w-6xl py-8 space-y-6">
+    <div className="container max-w-6xl py-8 space-y-6" aria-busy={saving}>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Voice Settings</h1>

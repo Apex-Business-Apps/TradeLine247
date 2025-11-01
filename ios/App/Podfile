@@ -1,8 +1,15 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
+app_dir = File.expand_path(__dir__)
+unless Dir.pwd == app_dir
+  puts "[pods] Switching to #{app_dir} (was #{Dir.pwd})"
+  Dir.chdir(app_dir)
+end
+
 platform :ios, '15.0'
-use_frameworks! :linkage => :static
-project File.expand_path('App.xcodeproj', __dir__) # allow pod install from CI roots
+use_frameworks! linkage: :static
+
+project File.expand_path('App.xcodeproj', __dir__)
 
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'

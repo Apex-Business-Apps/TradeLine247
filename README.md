@@ -72,3 +72,34 @@ To connect a domain, navigate to Project > Settings > Domains and click Connect 
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
 
+## Environment configuration
+
+Certain public environment variables must be present before running builds or tests:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+Use the provided preflight script to verify they are set without printing their values:
+
+```sh
+VITE_SUPABASE_URL=... VITE_SUPABASE_ANON_KEY=... npm run verify:env:public
+```
+
+The CI workflow runs this script automatically; ensure the variables are available in your environment to avoid failures.
+
+
+## Forwarding Wizard (no new vendors)
+
+- **Rogers/Fido (mobile):** Activate `*21*<TradeLineNumber>#`, Deactivate `##21#`. [Rogers support]
+- **TELUS/Koodo (mobile):** Activate `*21*<TradeLineNumber>#` to forward all calls. [TELUS support]
+- **Bell Mobility:** Phone Settings → Call Forwarding → Always forward → set TradeLineNumber. [Bell support]
+- **Landlines (Bell/Rogers/etc.):** Dial `*72`, then TradeLineNumber. If busy/no answer, repeat once. Disable with `*73`. [Bell/Rogers home phone support]
+
+### Auto-verification
+Click **Place test call & verify**. The system calls the old number; if forwarding is active, our inbound webhook marks the check **verified**. Check Twilio **Monitor → Logs → Error Logs** for any webhook 4xx/5xx.
+
+### Outbound Caller ID
+Use **Verify caller ID**. Twilio will call the legacy number and prompt for a 6-digit code displayed in-app.
+
+### Hosted SMS (optional, off by default)
+If SMS continuity is required before porting, enable **Hosted SMS** for the legacy number (US/CA; Developer Preview).

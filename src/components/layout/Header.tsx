@@ -49,6 +49,7 @@ export const Header: React.FC = () => {
     isAdmin
   } = useAuth();
   const navigate = useNavigate();
+  const mobileMenuId = 'mobile-menu';
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -123,10 +124,26 @@ export const Header: React.FC = () => {
         {/* Enhanced CTA Button & Mobile Menu */}
         <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="permanent">
           <LanguageSwitcher data-lovable-lock="permanent" />
-          
-          {/* Enhanced Mobile Menu Button */}
-          <button className="md:hidden p-2 rounded-md hover:bg-accent transition-all duration-300 hover-scale" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle mobile menu">
-            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+
+          {/* Burger Menu Button - ALWAYS VISIBLE - Critical Navigation Control */}
+          <button
+            id="burger-menu-button"
+            data-testid="burger-menu-button"
+            className="!flex items-center justify-center p-2 rounded-md border-2 border-primary/20 bg-background hover:bg-accent hover:border-primary/40 transition-all duration-300 hover-scale min-w-[44px] min-h-[44px] !visible !opacity-100"
+            onClick={() => {
+              console.log('Burger menu clicked, current state:', isMobileMenuOpen);
+              setIsMobileMenuOpen(!isMobileMenuOpen);
+            }}
+            aria-label="Toggle mobile menu"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls={mobileMenuId}
+            type="button"
+          >
+            {isMobileMenuOpen ? (
+              <X size={24} className="text-primary" strokeWidth={2.5} />
+            ) : (
+              <Menu size={24} className="text-primary" strokeWidth={2.5} />
+            )}
           </button>
 
           {user ? <div className="flex items-center gap-2">
@@ -149,20 +166,40 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Enhanced Mobile Navigation with Slide Animation */}
-      {isMobileMenuOpen && <div className="md:hidden border-t bg-background/95 backdrop-blur animate-slide-in-right">
-          <nav className="container py-4 space-y-2">
-            {navigationItems.map((item, index) => <Link key={item.name} to={item.href} className="block px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover-scale animate-fade-in" onClick={() => setIsMobileMenuOpen(false)} style={{
-          animationDelay: `${index * 100}ms`
-        }}>
+      <nav
+        id={mobileMenuId}
+        aria-label="Mobile"
+        aria-hidden={!isMobileMenuOpen}
+        className={cn(
+          "md:hidden border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden",
+          isMobileMenuOpen ? "animate-slide-in-right max-h-screen opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+        )}
+      >
+        <div className="container py-4 space-y-2">
+          {navigationItems.map((item, index) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              className="block px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover-scale animate-fade-in"
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              {item.name}
+            </Link>
+          ))}
+          {isAdmin() &&
+            adminNavigationItems.map((item, index) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className="block px-4 py-2 text-sm font-medium rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover-scale animate-fade-in"
+                onClick={() => setIsMobileMenuOpen(false)}
+                style={{ animationDelay: `${(navigationItems.length + index) * 100}ms` }}
+              >
                 {item.name}
-              </Link>)}
-            {/* Admin-only mobile navigation items */}
-            {isAdmin() && adminNavigationItems.map((item, index) => <Link key={item.name} to={item.href} className="block px-4 py-2 text-sm font-medium rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover-scale animate-fade-in" onClick={() => setIsMobileMenuOpen(false)} style={{
-          animationDelay: `${(navigationItems.length + index) * 100}ms`
-        }}>
-                {item.name}
-              </Link>)}
-          </nav>
-        </div>}
+              </Link>
+            ))}
+        </div>
+      </nav>
     </header>;
 };
