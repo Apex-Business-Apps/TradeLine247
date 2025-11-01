@@ -4,6 +4,7 @@
 //   for any call (no unhandled rejections), and a flag isSupabaseEnabled=false.
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from './types';
 import { SUPABASE_CONFIG } from '@/config/supabase';
 
 // Helpers -----------------------------------------------------
@@ -55,17 +56,21 @@ function disabledProxy(path: string[] = []): any {
   });
 }
 
-const supabaseDisabled = disabledProxy() as unknown as SupabaseClient;
+const supabaseDisabled = disabledProxy() as unknown as SupabaseClient<Database>;
 
 export const isSupabaseEnabled = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
-export const supabase: SupabaseClient = isSupabaseEnabled
-  ? createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
-      auth: { persistSession: true, autoRefreshToken: true },
+export const supabase: SupabaseClient<Database> = isSupabaseEnabled
+  ? createClient<Database>(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
+      auth: {
+        storage: localStorage,
+        persistSession: true,
+        autoRefreshToken: true,
+      },
     })
-  : (supabaseDisabled as SupabaseClient);
+  : (supabaseDisabled as SupabaseClient<Database>);
 
 // Optional console note so devs know why features are no-op
-if (!isSupabaseEnabled) {
+if (!isSupabaseEnabled && typeof console !== 'undefined') {
   console.warn('[Supabase] Disabled in this environment.', {
     host: typeof location !== 'undefined' ? location.hostname : 'n/a',
     urlPresent: !!SUPABASE_URL,

@@ -7,11 +7,8 @@ import {
   sanitizePhone,
   validateSecurity
 } from "../_shared/advancedSanitizer.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { preflight, corsHeaders } from "../_shared/cors.ts";
+import { secureHeaders, mergeHeaders } from "../_shared/secure_headers.ts";
 
 // Simple in-memory rate limiter (production would use Redis)
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -36,10 +33,8 @@ function checkRateLimit(identifier: string): { allowed: boolean; remaining: numb
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const supabaseClient = createClient(
@@ -63,7 +58,7 @@ serve(async (req) => {
         }),
         { 
           status: 429, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
         }
       );
     }
@@ -76,7 +71,7 @@ serve(async (req) => {
     if (!name || !email || !message) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -102,7 +97,7 @@ serve(async (req) => {
       console.error('Input validation failed:', sanitizeError.message);
       return new Response(
         JSON.stringify({ error: 'Invalid input detected. Please check your information and try again.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -172,7 +167,7 @@ serve(async (req) => {
       }),
       { 
         status: 202, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
       }
     );
 
@@ -185,7 +180,7 @@ serve(async (req) => {
       }),
       { 
         status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
       }
     );
   }

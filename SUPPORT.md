@@ -4,16 +4,22 @@
 
 ### Contact Methods
 
+- **AI Concierge (24/7):** In-app chat at the bottom right corner. See the [AI Concierge FAQ](./docs/AI_CONCIERGE_FAQ.md) for usage tips and supported scenarios.
 - **Email:** info@tradeline247ai.com
 - **Phone:** +1-587-742-8885
-- **Chat:** Available in-app (bottom right corner)
 
 ### Response Times
 
-- **Critical (service down):** 2 hours
+- **Critical (service down):** 2 hours (AI concierge will page the on-call team automatically.)
 - **High (major feature broken):** 8 hours
 - **Normal (questions, minor issues):** 24 hours
 - **Low (feature requests, enhancements):** 48 hours
+
+### AI Concierge Coverage
+
+- **Supported Languages:** English, French, Spanish, and Tagalog. The concierge auto-detects locale from the conversation and will request clarification if the intent is unclear.
+- **Transcript Delivery:** Full chat transcripts are emailed to the account owner and CC'd to support@tradeline247ai.com within five minutes of session close. Marketing receives a weekly digest generated from the same transcript feed.
+- **Human Escalation:** Conversations flagged as critical or unresolved after three concierge replies are transferred to Tier 1 support. Customers can also type `agent` at any point to request an immediate handoff.
 
 ## Operator Support (Internal)
 

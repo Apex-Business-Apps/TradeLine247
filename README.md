@@ -87,3 +87,35 @@ VITE_SUPABASE_URL=... VITE_SUPABASE_ANON_KEY=... npm run verify:env:public
 
 The CI workflow runs this script automatically; ensure the variables are available in your environment to avoid failures.
 
+
+## Forwarding Wizard (no new vendors)
+
+- **Rogers/Fido (mobile):** Activate `*21*<TradeLineNumber>#`, Deactivate `##21#`. [Rogers support]
+- **TELUS/Koodo (mobile):** Activate `*21*<TradeLineNumber>#` to forward all calls. [TELUS support]
+- **Bell Mobility:** Phone Settings → Call Forwarding → Always forward → set TradeLineNumber. [Bell support]
+- **Landlines (Bell/Rogers/etc.):** Dial `*72`, then TradeLineNumber. If busy/no answer, repeat once. Disable with `*73`. [Bell/Rogers home phone support]
+
+### Auto-verification
+Click **Place test call & verify**. The system calls the old number; if forwarding is active, our inbound webhook marks the check **verified**. Check Twilio **Monitor → Logs → Error Logs** for any webhook 4xx/5xx.
+
+### Outbound Caller ID
+Use **Verify caller ID**. Twilio will call the legacy number and prompt for a 6-digit code displayed in-app.
+
+### Hosted SMS (optional, off by default)
+If SMS continuity is required before porting, enable **Hosted SMS** for the legacy number (US/CA; Developer Preview).
+
+## What we improved (in plain English)
+
+- **Calls connect more smoothly.** We added "traffic control" so our system won't overwhelm the phone network during busy moments. If the network asks us to slow down, we pause and retry automatically.
+- **Your data travels safely.** All phone-system webhooks talk to us over secure HTTPS, and we send a strict "always use HTTPS" instruction to browsers.
+- **No more confusing browser errors.** We taught our APIs how to answer browser pre-checks (CORS), so buttons that call our backend just work.
+- **We see problems as they happen.** Twilio's error feed now pings us, so we can investigate quickly instead of guessing later.
+
+### What this means for you
+- Fewer surprises, faster fixes, and a smoother setup for new numbers.
+- Nothing new for you to learn—this is all behind the scenes.
+
+### How we measure success
+- High success rate on calls and setup steps.
+- Faster recovery when the network gets busy.
+- Clear, human-readable logs when something needs attention.

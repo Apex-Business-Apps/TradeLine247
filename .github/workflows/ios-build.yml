@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 45
     env:
       NODE_VERSION: '20'
+      IOS_APP_DIR: ios/App
       WORKSPACE_PATH: App.xcworkspace
       PROJECT_PATH: App.xcodeproj
       SCHEME: App
@@ -33,35 +34,40 @@ jobs:
       - name: Sync Capacitor iOS project
         run: npx cap sync ios
 
-      - name: Ensure Xcode project exists
-        working-directory: ios/App
+      - name: Install CocoaPods
+        shell: bash
+        working-directory: ${{ env.IOS_APP_DIR }}
         run: |
           set -euo pipefail
-          if [ ! -d "$PROJECT_PATH" ]; then
-            echo "Expected to find $PROJECT_PATH after capacitor sync." >&2
+
+          echo "Installing pods from $(pwd)"
+
+          if [ ! -f Podfile ]; then
+            echo "Podfile missing from $(pwd)" >&2
             exit 1
           fi
+
+          if [ ! -d "$PROJECT_PATH" ]; then
+            echo "Expected to find $PROJECT_PATH after capacitor sync." >&2
+            ls
+            exit 1
+          fi
+
           if [ ! -f "$PROJECT_PATH/project.pbxproj" ]; then
             echo "Missing project.pbxproj inside $PROJECT_PATH" >&2
             exit 1
           fi
 
-      - name: Install CocoaPods
-        working-directory: ios/App
-        run: |
-          set -euo pipefail
-          if [ ! -f "Podfile" ]; then
-            echo "Podfile missing from $(pwd)" >&2
-            exit 1
-          fi
           pod install --repo-update
+
           if [ ! -d "$WORKSPACE_PATH" ]; then
             echo "Expected CocoaPods to generate $WORKSPACE_PATH" >&2
             exit 1
           fi
 
       - name: Build iOS workspace
-        working-directory: ios/App
+        shell: bash
+        working-directory: ${{ env.IOS_APP_DIR }}
         run: |
           set -euo pipefail
           xcodebuild \
