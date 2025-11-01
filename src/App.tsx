@@ -3,6 +3,7 @@ import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import AppLayout from "./components/layout/AppLayout";
+// CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
 
 // PERFORMANCE: Route-based code splitting - lazy load all routes except Index (critical)

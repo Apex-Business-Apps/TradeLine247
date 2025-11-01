@@ -32,6 +32,15 @@ if ('serviceWorker' in navigator) {
 const root = document.getElementById('root');
 if (!root) { document.body.innerHTML = '<pre>Missing #root</pre>'; throw new Error('Missing #root'); }
 
+// CRITICAL: Hide loading fallback immediately when this script executes (non-blocking, safe)
+const loadingEl = document.getElementById('root-loading');
+if (loadingEl) {
+  // Use requestAnimationFrame to ensure DOM is ready, but execute immediately
+  requestAnimationFrame(() => {
+    if (loadingEl) loadingEl.style.display = 'none';
+  });
+}
+
 const isPreview = import.meta.env.DEV || /lovable/.test(location.hostname);
 
 function diag(title: string, err: unknown) {
@@ -47,11 +56,65 @@ function diag(title: string, err: unknown) {
 window.addEventListener('error', (e) => { if (isPreview) diag('App error', e.error ?? e.message); });
 window.addEventListener('unhandledrejection', (e) => { if (isPreview) diag('Unhandled rejection', e.reason); });
 
+// CRITICAL: Synchronous render path for immediate FCP
+// Use Promise.race with timeout to ensure React mounts quickly
 async function boot() {
   try {
-    const mod = await import('./App');               // dynamic import catches top-level throws
-    const App = (mod as any)?.default ?? (() => null);
-    ReactDOM.createRoot(root!).render(React.createElement(App));
-  } catch (e) { diag('App failed to start', e); }
+    // Create root immediately for faster initial render
+    const reactRoot = ReactDOM.createRoot(root!);
+    
+    // CRITICAL: Timeout protection - if import takes >10s, show fallback (generous timeout for CI)
+    const importPromise = import('./App');
+    const timeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('App import timeout')), 10000)
+    );
+    
+    try {
+      const mod = await Promise.race([importPromise, timeoutPromise]);
+      const App = (mod as any)?.default ?? (() => null);
+      
+      // CRITICAL: Render immediately - don't wait for anything else
+      reactRoot.render(React.createElement(App));
+      
+      // Ensure root is visible (CSS might hide it initially)
+      root!.style.opacity = '1';
+      root!.style.visibility = 'visible';
+      
+    } catch (timeoutErr) {
+      // Timeout occurred - render error fallback
+      console.error('App import timeout or failed:', timeoutErr);
+      reactRoot.render(
+        React.createElement('div', {
+          style: {
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem',
+            fontFamily: 'system-ui'
+          }
+        }, '⚠️ Application loading...')
+      );
+      root!.style.opacity = '1';
+      root!.style.visibility = 'visible';
+      
+      // Retry import in background
+      import('./App').then(mod => {
+        const App = (mod as any)?.default;
+        if (App) {
+          reactRoot.render(React.createElement(App));
+        }
+      }).catch(e => {
+        console.error('Retry failed:', e);
+      });
+    }
+  } catch (e) { 
+    diag('App failed to start', e);
+    // Ensure root is visible even on error
+    root!.style.opacity = '1';
+    root!.style.visibility = 'visible';
+  }
 }
+
+// CRITICAL: Start boot immediately - don't defer
 boot();
