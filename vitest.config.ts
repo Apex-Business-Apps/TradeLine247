@@ -16,6 +16,12 @@ export default defineConfig({
     css: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['tests/**', 'node_modules/**'],
+    // Ensure Node.js built-ins are available for fs operations in tests
+    server: {
+      deps: {
+        inline: ['@supabase/supabase-js'],
+      },
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'lcov', 'html'],

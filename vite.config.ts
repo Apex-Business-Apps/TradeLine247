@@ -77,7 +77,7 @@ export default defineConfig(async ({ command }) => {
         },
         // PERFORMANCE: Manual chunk splitting for optimal caching and parallel downloads
         output: {
-          manualChunks: (id: string) => {
+          manualChunks: (id) => {
             // Vendor chunk: React and React DOM (stable, changes infrequently)
             if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
               return 'vendor-react';
@@ -126,7 +126,7 @@ export default defineConfig(async ({ command }) => {
             }
           },
           // PERFORMANCE: Optimize asset file naming for better caching
-          assetFileNames: (assetInfo: { name?: string }) => {
+          assetFileNames: (assetInfo) => {
             const info = assetInfo.name?.split('.') || [];
             const ext = info[info.length - 1];
             if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
@@ -143,7 +143,7 @@ export default defineConfig(async ({ command }) => {
         },
       },
       // PERFORMANCE: Minification with Terser for better compression
-      minify: 'terser' as const,
+      minify: 'terser',
       terserOptions: {
         compress: {
           drop_console: false, // Keep console for debugging (set to true in production if desired)
