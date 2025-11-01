@@ -64,14 +64,91 @@ export default defineConfig(async ({ command }) => {
       },
     },
     build: {
-      sourcemap: false,
+      sourcemap: true, // Enable source maps for debugging (use 'hidden' for production)
       outDir: "dist",
-      // ENHANCED: Better error reporting during builds
+      // PERFORMANCE: Increase chunk size warning limit after optimization
+      chunkSizeWarningLimit: 600,
+      
       rollupOptions: {
         onwarn(warning: any, warn: any) {
           // Suppress certain warnings that don't affect Lovable integration
           if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
           warn(warning);
+        },
+        // PERFORMANCE: Manual chunk splitting for optimal caching and parallel downloads
+        output: {
+          manualChunks: (id) => {
+            // Vendor chunk: React and React DOM (stable, changes infrequently)
+            if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+              return 'vendor-react';
+            }
+            
+            // Vendor chunk: React Router (stable)
+            if (id.includes('node_modules/react-router')) {
+              return 'vendor-router';
+            }
+            
+            // Vendor chunk: Radix UI components (stable UI library)
+            if (id.includes('node_modules/@radix-ui')) {
+              return 'vendor-ui';
+            }
+            
+            // Vendor chunk: Form libraries (react-hook-form, zod, etc.)
+            if (id.includes('node_modules/react-hook-form') ||
+                id.includes('node_modules/@hookform') ||
+                id.includes('node_modules/zod')) {
+              return 'vendor-form';
+            }
+            
+            // Vendor chunk: Data fetching (TanStack Query, Supabase)
+            if (id.includes('node_modules/@tanstack/react-query') ||
+                id.includes('node_modules/@supabase')) {
+              return 'vendor-data';
+            }
+            
+            // Vendor chunk: Charts (recharts)
+            if (id.includes('node_modules/recharts')) {
+              return 'vendor-charts';
+            }
+            
+            // Vendor chunk: Utilities (date-fns, lucide-react, etc.)
+            if (id.includes('node_modules/date-fns') ||
+                id.includes('node_modules/lucide-react') ||
+                id.includes('node_modules/clsx') ||
+                id.includes('node_modules/tailwind-merge') ||
+                id.includes('node_modules/class-variance-authority')) {
+              return 'vendor-utils';
+            }
+            
+            // Vendor chunk: Remaining node_modules
+            if (id.includes('node_modules')) {
+              return 'vendor';
+            }
+          },
+          // PERFORMANCE: Optimize asset file naming for better caching
+          assetFileNames: (assetInfo) => {
+            const info = assetInfo.name?.split('.') || [];
+            const ext = info[info.length - 1];
+            if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
+              return `assets/images/[name]-[hash][extname]`;
+            }
+            if (/woff2?|eot|ttf|otf/i.test(ext)) {
+              return `assets/fonts/[name]-[hash][extname]`;
+            }
+            return `assets/[name]-[hash][extname]`;
+          },
+          // PERFORMANCE: Separate chunks for each route (code splitting)
+          chunkFileNames: 'assets/js/[name]-[hash].js',
+          entryFileNames: 'assets/js/[name]-[hash].js',
+        },
+      },
+      // PERFORMANCE: Minification with Terser for better compression
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: false, // Keep console for debugging (set to true in production if desired)
+          drop_debugger: true,
+          pure_funcs: ['console.debug'], // Remove only debug logs
         },
       },
     },
