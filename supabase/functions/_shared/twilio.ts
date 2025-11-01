@@ -1,10 +1,65 @@
+import { corsHeaders } from "./cors.ts";
+
 export type TwilioAuth = { accountSid: string; authToken: string };
+
 const TWILIO_API_BASE = "https://api.twilio.com/2010-04-01";
+const ENV_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID") ?? "";
+const ENV_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN") ?? "";
 
 function basic(auth: TwilioAuth) {
-  const token = btoa(`${auth.accountSid}:${auth.authToken}`);
-  return `Basic ${token}`;
+  return `Basic ${btoa(`${auth.accountSid}:${auth.authToken}`)}`;
 }
+
+function defaultAuthHeader() {
+  if (!ENV_ACCOUNT_SID || !ENV_AUTH_TOKEN) return "";
+  return basic({ accountSid: ENV_ACCOUNT_SID, authToken: ENV_AUTH_TOKEN });
+}
+
+type TwilioPostOptions = {
+  auth?: TwilioAuth;
+  authHeader?: string;
+  headers?: Record<string, string>;
+};
+
+export async function twilioFormPOST(
+  path: string,
+  form: URLSearchParams,
+  maxRetries = 4,
+  opts: TwilioPostOptions = {},
+) {
+  let wait = 300;
+  const authHeader = opts.authHeader ?? (opts.auth ? basic(opts.auth) : defaultAuthHeader());
+  if (!authHeader) {
+    throw new Error("Twilio credentials not configured");
+  }
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const res = await fetch(`${TWILIO_API_BASE}${path}`, {
+      method: "POST",
+      headers: {
+        Authorization: authHeader,
+        "Content-Type": "application/x-www-form-urlencoded",
+        ...opts.headers,
+      },
+      body: form,
+    });
+
+    if (res.status === 429 || res.status >= 500) {
+      if (attempt === maxRetries) {
+        return res;
+      }
+      await new Promise((resolve) => setTimeout(resolve, wait + Math.floor(Math.random() * 150)));
+      wait = Math.min(wait * 2, 5000);
+      continue;
+    }
+
+    return res;
+  }
+
+  throw new Error("twilioFormPOST exhausted retries");
+}
+
+export const okHeaders = { ...corsHeaders, "Content-Type": "application/json" };
 
 // Extract <ref> from SUPABASE_URL and build functions domain
 export function functionsBaseFromSupabaseUrl(supabaseUrl: string) {
@@ -15,22 +70,16 @@ export function functionsBaseFromSupabaseUrl(supabaseUrl: string) {
 }
 
 export async function ensureSubaccount(auth: TwilioAuth, friendlyName: string) {
-  // Twilio: create subaccount (idempotent by friendlyName in our layer)
-  // Strategy: list accounts and match by friendlyName; if none, create
+  const authHeader = basic(auth);
   const listUrl = `${TWILIO_API_BASE}/Accounts.json?PageSize=50`;
-  const list = await fetch(listUrl, { headers: { Authorization: basic(auth) } });
+  const list = await fetch(listUrl, { headers: { Authorization: authHeader } });
   if (!list.ok) throw new Error(`Twilio list accounts failed: ${list.status}`);
   const data = await list.json();
   const found = (data?.accounts ?? []).find((a: any) => a.friendly_name === friendlyName);
   if (found) return { sid: found.sid };
 
-  const createUrl = `${TWILIO_API_BASE}/Accounts.json`;
   const body = new URLSearchParams({ FriendlyName: friendlyName });
-  const res = await fetch(createUrl, {
-    method: "POST",
-    headers: { Authorization: basic(auth), "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
+  const res = await twilioFormPOST(`/Accounts.json`, body, 4, { auth });
   if (!res.ok) throw new Error(`Twilio create subaccount failed: ${res.status}`);
   const created = await res.json();
   return { sid: created.sid };
@@ -53,19 +102,14 @@ export async function buyNumberAndBindWebhooks(
   subSid: string,
   phoneNumber: string,
   voiceUrl: string,
-  smsUrl: string
+  smsUrl: string,
 ) {
-  const url = `${TWILIO_API_BASE}/Accounts/${subSid}/IncomingPhoneNumbers.json`;
   const body = new URLSearchParams({
     PhoneNumber: phoneNumber,
     VoiceUrl: voiceUrl,
     SmsUrl: smsUrl,
   });
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { Authorization: basic(auth), "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
+  const res = await twilioFormPOST(`/Accounts/${subSid}/IncomingPhoneNumbers.json`, body, 4, { auth });
   if (!res.ok) throw new Error(`Buy/bind number failed: ${res.status}`);
   return await res.json();
 }
