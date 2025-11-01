@@ -86,9 +86,6 @@ verify_jwt = true  # Requires authentication
 [functions.rag-ingest]
 verify_jwt = true  # Admin only
 
-[functions.ragz]
-verify_jwt = true  # Requires authentication
-
 [functions.secure-analytics]
 verify_jwt = false  # Public analytics tracking
 
@@ -165,9 +162,6 @@ verify_jwt = true  # Admin only - port order creation
 verify_jwt = true  # Admin only - Trust Hub and reputation configuration
 
 # OPS•HEALTH: Health monitoring and testing
-[functions.ops-voice-health-check]
-verify_jwt = true  # Admin only - voice health checks
-
 [functions.ops-messaging-health-check]
 verify_jwt = true  # Admin only - messaging health checks
 
@@ -204,9 +198,6 @@ verify_jwt = false  # Stripe webhook - signature verified in function
 # INFRA: Health checks and pre-warming
 [functions.healthz]
 verify_jwt = false  # Public health check endpoint
-
-[functions.prewarm-cron]
-verify_jwt = false  # Cron-triggered pre-warm job
 
 # PROMPT VOICE-FRONTDOOR: Canadian consent flow with speech-based opt-out
 [functions.voice-frontdoor]
