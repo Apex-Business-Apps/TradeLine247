@@ -72,24 +72,39 @@ serve(async (req) => {
     }
     
     console.log('Front door: CallSid=%s From=%s', callSid, from);
-    
-    // Canadian consent disclosure with speech-based opt-out
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+
+    const skipConsent = url.searchParams.get('skip_consent') === 'true';
+
+    let twiml: string;
+
+    if (skipConsent) {
+      // Skip to menu directly (for menu repeat)
+      twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Gather input="speech" 
-          action="${supabaseUrl}/functions/v1/voice-consent-speech" 
-          method="POST" 
-          timeout="2" 
-          language="en-CA"
-          hints="opt out, no recording"
-          speechTimeout="auto">
-    <Say voice="Polly.Joanna" language="en-CA">
-      This call may be recorded to improve service quality and keep accurate records. 
-      Say opt out to continue without recording.
+  <Gather action="${supabaseUrl}/functions/v1/voice-menu-handler" method="POST" numDigits="1" timeout="5">
+    <Say voice="Polly.Joanna">
+      Press 1 for Sales. Press 2 for Support. Press 9 to leave a voicemail. Press star to repeat this menu.
     </Say>
   </Gather>
-  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-route?record=true</Redirect>
+  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=menu_timeout</Redirect>
 </Response>`;
+    } else {
+      // Canadian consent disclosure + menu
+      twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna" language="en-CA">
+    Thank you for calling TradeLine 24/7.
+    This call may be recorded for quality and training purposes.
+    By staying on the line, you consent to being recorded.
+  </Say>
+  <Gather action="${supabaseUrl}/functions/v1/voice-menu-handler" method="POST" numDigits="1" timeout="5">
+    <Say voice="Polly.Joanna">
+      Press 1 for Sales. Press 2 for Support. Press 9 to leave a voicemail. Press star to repeat this menu.
+    </Say>
+  </Gather>
+  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=menu_timeout</Redirect>
+</Response>`;
+    }
 
     return new Response(twiml, {
       headers: { ...corsHeaders, 'Content-Type': 'text/xml' },
