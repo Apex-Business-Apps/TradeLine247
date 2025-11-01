@@ -68,7 +68,7 @@ export default defineConfig(async ({ command }) => {
       outDir: "dist",
       // ENHANCED: Better error reporting during builds
       rollupOptions: {
-        onwarn(warning, warn) {
+        onwarn(warning: any, warn: any) {
           // Suppress certain warnings that don't affect Lovable integration
           if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
           warn(warning);
@@ -77,7 +77,6 @@ export default defineConfig(async ({ command }) => {
     },
     // ENHANCED: Optimize dependencies for faster reloads in Lovable
     optimizeDeps: {
-      include: ['lovable-tagger'],
       exclude: [], // Can exclude large deps that don't need pre-bundling
     },
   };

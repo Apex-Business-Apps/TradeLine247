@@ -88,7 +88,10 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
     set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 
   setShowNotifications: (show) =>
-    set({ showNotifications: show, notificationCount: show ? 0 : state => state.notificationCount }),
+    set((state) => ({ 
+      showNotifications: show, 
+      notificationCount: show ? 0 : state.notificationCount 
+    })),
 
   incrementNotificationCount: () =>
     set((state) => ({ notificationCount: state.notificationCount + 1 })),
