@@ -13,7 +13,8 @@ describe('cn (class name utility)', () => {
   });
 
   it('should handle conditional classes', () => {
-    const result = cn('foo', false && 'bar', 'baz');
+    const shouldAddBar = false;
+    const result = cn('foo', shouldAddBar && 'bar', 'baz');
     expect(result).toContain('foo');
     expect(result).toContain('baz');
     expect(result).not.toContain('bar');
@@ -51,10 +52,11 @@ describe('cn (class name utility)', () => {
   });
 
   it('should merge complex class combinations', () => {
+    const shouldHide = false;
     const result = cn(
       'base-class',
       { 'conditional-class': true },
-      false && 'hidden-class',
+      shouldHide && 'hidden-class',
       ['array-class-1', 'array-class-2'],
       'final-class'
     );
