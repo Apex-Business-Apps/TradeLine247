@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,22 +13,24 @@ serve(async (req) => {
   }
 
   try {
+    const url = new URL(req.url);
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const FORWARD_TARGET_E164 = Deno.env.get('BUSINESS_TARGET_E164') || '+14319900222';
+    const FORWARD_TARGET_E164 = Deno.env.get('BUSINESS_TARGET_E164');
 
-    const formData = await req.formData();
-    const params: Record<string, string> = {};
-    
-    for (const [key, value] of formData.entries()) {
-      params[key] = value.toString();
+    if (!FORWARD_TARGET_E164) {
+      console.error('Missing BUSINESS_TARGET_E164 environment variable');
+      throw new Error('Configuration error: Missing fallback number');
     }
+
+    // SECURITY: Validate Twilio signature to prevent webhook spoofing
+    const params = await validateTwilioRequest(req, url.toString());
 
     const CallSid = params['CallSid'];
     const Digits = params['Digits'];
     const To = params['To'];
 
-    console.log('DTMF action received:', { CallSid, Digits });
+    console.log('DTMF action received (signature validated):', { CallSid, Digits });
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

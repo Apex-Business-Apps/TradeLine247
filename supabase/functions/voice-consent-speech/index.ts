@@ -45,14 +45,14 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Consent speech error:', error);
-    
-    // On error, default to recording enabled and continue
+
+    // COMPLIANCE: On error, default to NO recording (fail-safe)
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-route?record=true</Redirect>
+  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-route?record=false</Redirect>
 </Response>`;
-    
+
     return new Response(errorTwiml, {
       headers: { ...corsHeaders, 'Content-Type': 'text/xml' },
       status: 500,

@@ -34,8 +34,8 @@ serve(async (req) => {
     const { data: numRow } = await supabase.from("telephony_numbers").select("*").eq("org_id", org_id).maybeSingle();
 
     const fnBase = functionsBaseFromSupabaseUrl(SUPABASE_URL);
-    const voiceUrl = `${fnBase}/telephony-voice`;
-    const smsUrl = `${fnBase}/telephony-sms`;
+    const voiceUrl = `${fnBase}/voice-frontdoor`;
+    const smsUrl = `${fnBase}/webcomms-sms-reply`;
 
     let purchasedNumber = numRow?.e164_number as string | undefined;
     if (!purchasedNumber) {
