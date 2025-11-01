@@ -40,7 +40,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ ! -f "Podfile" ]; then
+          echo "Installing pods from $(pwd)"
+
+          if [ ! -f Podfile ]; then
             echo "Podfile missing from $(pwd)" >&2
             exit 1
           fi
