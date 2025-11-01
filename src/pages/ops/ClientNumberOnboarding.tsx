@@ -55,7 +55,12 @@ export default function ClientNumberOnboarding() {
         }
       );
 
-      if (subaccountError) throw subaccountError;
+      if (subaccountError) {
+        if (subaccountError.message?.includes('Missing Twilio credentials')) {
+          throw new Error('Twilio credentials not configured. Please add TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN to edge function secrets.');
+        }
+        throw subaccountError;
+      }
       addEvidence(`✓ Subaccount ready: ${subaccountData.subaccount_sid}`);
 
       // Step 2: Create/retrieve Messaging Service
