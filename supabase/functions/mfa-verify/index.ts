@@ -4,7 +4,7 @@
  * Backend only - no UI changes
  */
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { createRequestContext, logWithContext } from '../_shared/requestId.ts';
 
 const corsHeaders = {

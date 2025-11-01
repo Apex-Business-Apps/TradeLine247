@@ -1,6 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { sanitizeText, sanitizeEmail, sanitizeName, detectSuspiciousContent, generateRequestHash } from '../_shared/advancedSanitizer.ts';
 import { createRequestContext, logWithContext, createResponseHeaders } from '../_shared/requestId.ts';
 
