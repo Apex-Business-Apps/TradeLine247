@@ -5,30 +5,78 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useSecureFormSubmission } from '../useSecureFormSubmission';
-import { createMockSupabase } from '@/__tests__/utils/test-utils';
+function createMockSupabase() {
+  const auth = {
+    onAuthStateChange: vi.fn(),
+    getSession: vi.fn(),
+    signOut: vi.fn(),
+    signInWithPassword: vi.fn(),
+    signUp: vi.fn(),
+    getUser: vi.fn(),
+  };
+
+  const from = vi.fn(() => ({
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn(),
+    maybeSingle: vi.fn(),
+    limit: vi.fn().mockReturnThis(),
+  }));
+
+  return {
+    auth,
+    from,
+    functions: {
+      invoke: vi.fn(),
+    },
+    rpc: vi.fn(),
+  };
+}
+
+const supabaseMock = vi.hoisted(() => {
+  return createMockSupabase();
+});
 
 // Mock Supabase - must use factory function
-vi.mock('@/integrations/supabase/client', () => {
+vi.mock('../../integrations/supabase/client', () => {
   return {
-    supabase: createMockSupabase(),
+    supabase: supabaseMock,
   };
 });
 
 describe('useSecureFormSubmission', () => {
-  const { supabase } = require('@/integrations/supabase/client');
+  const supabase = supabaseMock;
+  let originalCrypto: Crypto | undefined;
 
   beforeEach(() => {
     vi.clearAllMocks();
     sessionStorage.clear();
-    
+
+    Object.assign(supabase, createMockSupabase());
+
     // Mock crypto.randomUUID
-    global.crypto = {
-      randomUUID: vi.fn(() => 'mock-uuid-123'),
-    } as any;
+    originalCrypto = globalThis.crypto;
+    Object.defineProperty(globalThis, 'crypto', {
+      configurable: true,
+      value: {
+        randomUUID: vi.fn(() => 'mock-uuid-123'),
+      },
+    });
   });
 
   afterEach(() => {
     sessionStorage.clear();
+    if (originalCrypto) {
+      Object.defineProperty(globalThis, 'crypto', {
+        configurable: true,
+        value: originalCrypto,
+      });
+    } else {
+      Reflect.deleteProperty(globalThis, 'crypto');
+    }
   });
 
   describe('initial state', () => {
@@ -88,14 +136,16 @@ describe('useSecureFormSubmission', () => {
       }));
       
       const allowed = await result.current.checkRateLimit();
-      
+
       expect(allowed).toBe(true);
       expect(supabase.rpc).toHaveBeenCalledWith('secure_rate_limit', {
         identifier: 'test-key',
         max_requests: 5,
         window_seconds: 3600,
       });
-      expect(result.current.attempts).toBe(1); // 5 - 4 = 1
+      await waitFor(() => {
+        expect(result.current.attempts).toBe(1); // 5 - 4 = 1
+      });
     });
 
     it('should deny when rate limit exceeded', async () => {
@@ -192,8 +242,10 @@ describe('useSecureFormSubmission', () => {
       
       resolvePromise!({ data: { success: true }, error: null });
       await submitPromise;
-      
-      expect(result.current.isSubmitting).toBe(false);
+
+      await waitFor(() => {
+        expect(result.current.isSubmitting).toBe(false);
+      });
     });
 
     it('should sanitize data if sanitizeData function provided', async () => {
@@ -318,7 +370,9 @@ describe('useSecureFormSubmission', () => {
       
       await result.current.checkRateLimit();
       
-      expect(result.current.getRemainingAttempts()).toBe(3);
+      await waitFor(() => {
+        expect(result.current.getRemainingAttempts()).toBe(3);
+      });
     });
 
     it('should never return negative remaining attempts', async () => {
