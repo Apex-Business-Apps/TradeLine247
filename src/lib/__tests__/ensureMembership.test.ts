@@ -4,21 +4,65 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ensureMembership } from '../ensureMembership';
-import { createMockSupabase, createMockUser } from '@/__tests__/utils/test-utils';
+function createMockSupabase() {
+  const auth = {
+    onAuthStateChange: vi.fn(),
+    getSession: vi.fn(),
+    signOut: vi.fn(),
+    signInWithPassword: vi.fn(),
+    signUp: vi.fn(),
+    getUser: vi.fn(),
+  };
+
+  const from = vi.fn(() => ({
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn(),
+    maybeSingle: vi.fn(),
+    limit: vi.fn().mockReturnThis(),
+  }));
+
+  return {
+    auth,
+    from,
+    functions: {
+      invoke: vi.fn(),
+    },
+  };
+}
+
+function createMockUser(overrides: Partial<any> = {}) {
+  return {
+    id: 'test-user-id',
+    email: 'test@example.com',
+    user_metadata: {
+      display_name: 'Test User',
+    },
+    ...overrides,
+  };
+}
+
+const supabaseMock = vi.hoisted(() => {
+  return createMockSupabase();
+});
 
 // Mock Supabase - must use factory function
-vi.mock('@/integrations/supabase/client', () => {
+vi.mock('../../integrations/supabase/client', () => {
   return {
-    supabase: createMockSupabase(),
+    supabase: supabaseMock,
   };
 });
 
 describe('ensureMembership', () => {
-  const { supabase } = require('@/integrations/supabase/client');
+  const supabase = supabaseMock;
   const mockUser = createMockUser({ id: 'user-123' });
 
   beforeEach(() => {
     vi.clearAllMocks();
+    Object.assign(supabase, createMockSupabase());
   });
 
   describe('existing membership', () => {
@@ -66,6 +110,7 @@ describe('ensureMembership', () => {
 
   describe('new membership creation', () => {
     it('should create new organization and trial when no membership exists', async () => {
+      const userWithoutCompany = createMockUser({ user_metadata: {} });
       supabase.from.mockReturnValue({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -81,7 +126,7 @@ describe('ensureMembership', () => {
         error: null,
       });
 
-      const result = await ensureMembership(mockUser);
+      const result = await ensureMembership(userWithoutCompany);
 
       expect(result.orgId).toBe('new-org-123');
       expect(result.error).toBeUndefined();

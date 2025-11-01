@@ -66,27 +66,20 @@ describe('errorObservability', () => {
 
     it('should capture unhandled promise rejections', () => {
       initErrorObservability();
-      
+
       const rejection = new Error('Unhandled rejection');
-      
-      // jsdom doesn't support PromiseRejectionEvent constructor
-      // So we dispatch a custom event that mimics it
-      const rejectionEvent = {
-        reason: rejection,
-        promise: Promise.reject(rejection),
-      };
-      
-      window.dispatchEvent(new Event('unhandledrejection') as any);
-      
-      // Manually trigger the handler logic
-      const unhandledRejectionHandler = (event: any) => {
-        expect(event.type).toBe('unhandledrejection');
-      };
-      
-      window.addEventListener('unhandledrejection', unhandledRejectionHandler);
-      window.dispatchEvent(new Event('unhandledrejection') as any);
-      
-      expect(errorSpy).toHaveBeenCalled();
+
+      const event = new Event('unhandledrejection');
+      Object.defineProperty(event, 'reason', { value: rejection });
+
+      window.dispatchEvent(event as any);
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        '[ERROR CAPTURE]',
+        expect.objectContaining({
+          message: expect.stringContaining('Unhandled Promise Rejection'),
+        })
+      );
     });
 
     it('should include environment in error logs', () => {
