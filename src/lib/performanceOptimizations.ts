@@ -45,9 +45,13 @@ export function throttle<T extends (...args: any[]) => any>(
  * Check if user prefers reduced motion
  */
 export function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-         document.documentElement.classList.contains('reduce-motion');
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+           document.documentElement.classList.contains('reduce-motion');
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -75,16 +79,22 @@ export function createOptimizedScrollHandler(
  * Check if element is in viewport (for lazy animations)
  */
 export function isInViewport(element: Element, threshold: number = 0.1): boolean {
-  const rect = element.getBoundingClientRect();
-  const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-  const windowWidth = window.innerWidth || document.documentElement.clientWidth;
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false;
   
-  return (
-    rect.top >= -rect.height * threshold &&
-    rect.left >= -rect.width * threshold &&
-    rect.bottom <= windowHeight + rect.height * threshold &&
-    rect.right <= windowWidth + rect.width * threshold
-  );
+  try {
+    const rect = element.getBoundingClientRect();
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+    const windowWidth = window.innerWidth || document.documentElement.clientWidth;
+    
+    return (
+      rect.top >= -rect.height * threshold &&
+      rect.left >= -rect.width * threshold &&
+      rect.bottom <= windowHeight + rect.height * threshold &&
+      rect.right <= windowWidth + rect.width * threshold
+    );
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -153,10 +163,16 @@ export function memoize<T extends (...args: any[]) => any>(fn: T): T {
  * Batch DOM updates
  */
 export function batchUpdates(callback: () => void): void {
-  if (typeof requestAnimationFrame !== 'undefined') {
+  if (typeof requestAnimationFrame !== 'undefined' && typeof window !== 'undefined') {
     requestAnimationFrame(callback);
   } else {
-    setTimeout(callback, 0);
+    // Fallback for test environment or SSR
+    if (typeof setTimeout !== 'undefined') {
+      setTimeout(callback, 0);
+    } else {
+      // Synchronous fallback (should not happen in normal runtime)
+      callback();
+    }
   }
 }
 

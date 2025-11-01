@@ -26,7 +26,7 @@ const sizeClasses = {
   md: 'w-6 h-6',
   lg: 'w-8 h-8',
   xl: 'w-12 h-12',
-};
+} as const;
 
 /**
  * ChatIcon component that displays the brand robot icon
