@@ -50,7 +50,7 @@ export default function ForwardingWizard() {
     let cancelled = false;
     const interval = setInterval(async () => {
       const { data, error } = await supabase
-        .from("forwarding_checks")
+        .from("forwarding_checks" as any)
         .select("status, notes")
         .eq("id", checkId)
         .maybeSingle<ForwardingCheck>();
