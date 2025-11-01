@@ -187,7 +187,11 @@ describe('AppErrorBoundary', () => {
     expect(homeButton).toBeInTheDocument();
     expect(window.location.href).toBe('/');
 
-    window.location = originalLocation;
+    // TypeScript requires proper type when reassigning
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: originalLocation
+    });
   });
 
   it('should display support email link', () => {

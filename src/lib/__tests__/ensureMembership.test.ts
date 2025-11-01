@@ -14,7 +14,7 @@ function createMockSupabase() {
     getUser: vi.fn(),
   };
 
-  const from = vi.fn(() => ({
+  const mockChain = {
     select: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
@@ -23,7 +23,9 @@ function createMockSupabase() {
     single: vi.fn(),
     maybeSingle: vi.fn(),
     limit: vi.fn().mockReturnThis(),
-  }));
+  };
+  
+  const from = vi.fn(() => mockChain);
 
   return {
     auth,
@@ -38,6 +40,9 @@ function createMockUser(overrides: Partial<any> = {}) {
   return {
     id: 'test-user-id',
     email: 'test@example.com',
+    app_metadata: {},
+    aud: 'authenticated',
+    created_at: new Date().toISOString(),
     user_metadata: {
       display_name: 'Test User',
     },
@@ -67,15 +72,20 @@ describe('ensureMembership', () => {
 
   describe('existing membership', () => {
     it('should return existing orgId if membership exists', async () => {
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: { org_id: 'existing-org-456' },
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       const result = await ensureMembership(mockUser);
 
@@ -85,15 +95,20 @@ describe('ensureMembership', () => {
     });
 
     it('should handle membership check errors gracefully', async () => {
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: null,
           error: { message: 'Database error' },
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       supabase.functions.invoke.mockResolvedValue({
         data: { ok: true, orgId: 'new-org-789' },
@@ -111,15 +126,20 @@ describe('ensureMembership', () => {
   describe('new membership creation', () => {
     it('should create new organization and trial when no membership exists', async () => {
       const userWithoutCompany = createMockUser({ user_metadata: {} });
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: null,
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       supabase.functions.invoke.mockResolvedValue({
         data: { ok: true, orgId: 'new-org-123' },
@@ -141,15 +161,20 @@ describe('ensureMembership', () => {
         user_metadata: { display_name: 'Test Company' },
       });
 
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: null,
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       supabase.functions.invoke.mockResolvedValue({
         data: { ok: true, orgId: 'new-org-123' },
@@ -164,15 +189,20 @@ describe('ensureMembership', () => {
     });
 
     it('should handle function invocation errors', async () => {
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: null,
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       supabase.functions.invoke.mockResolvedValue({
         data: null,
@@ -186,15 +216,20 @@ describe('ensureMembership', () => {
     });
 
     it('should handle function response with ok: false', async () => {
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: null,
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       supabase.functions.invoke.mockResolvedValue({
         data: { ok: false, error: 'Trial creation failed' },
@@ -208,15 +243,20 @@ describe('ensureMembership', () => {
     });
 
     it('should handle missing orgId in response', async () => {
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: null,
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       supabase.functions.invoke.mockResolvedValue({
         data: { ok: true },
@@ -265,10 +305,13 @@ describe('ensureMembership', () => {
 
   describe('idempotency', () => {
     it('should be safe to call multiple times', async () => {
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn()
           .mockResolvedValueOnce({
             data: null,
@@ -278,7 +321,9 @@ describe('ensureMembership', () => {
             data: { org_id: 'new-org-123' },
             error: null,
           }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       supabase.functions.invoke.mockResolvedValue({
         data: { ok: true, orgId: 'new-org-123' },

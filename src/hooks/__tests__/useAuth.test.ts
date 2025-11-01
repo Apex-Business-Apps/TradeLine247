@@ -6,6 +6,17 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useAuth } from '../useAuth';
 function createMockSupabase() {
+  const mockChain = {
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn(),
+    maybeSingle: vi.fn(),
+    limit: vi.fn().mockReturnThis(),
+  };
+
   const auth = {
     onAuthStateChange: vi.fn(() => ({
       data: { subscription: { unsubscribe: vi.fn() } },
@@ -17,16 +28,7 @@ function createMockSupabase() {
     getUser: vi.fn(),
   };
 
-  const from = vi.fn(() => ({
-    select: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    delete: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    single: vi.fn(),
-    maybeSingle: vi.fn(),
-    limit: vi.fn().mockReturnThis(),
-  }));
+  const from = vi.fn(() => mockChain);
 
   return {
     auth,
@@ -41,6 +43,9 @@ function createMockUser(overrides: Partial<any> = {}) {
   return {
     id: 'test-user-id',
     email: 'test@example.com',
+    app_metadata: {},
+    aud: 'authenticated',
+    created_at: new Date().toISOString(),
     user_metadata: {
       display_name: 'Test User',
     },
@@ -137,14 +142,20 @@ describe('useAuth', () => {
       });
       
       // Mock role fetch
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: { role: 'user' },
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       const { result } = renderHook(() => useAuth());
       
@@ -165,14 +176,20 @@ describe('useAuth', () => {
         error: null,
       });
       
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: { role: 'user' },
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       const { result } = renderHook(() => useAuth());
       
@@ -181,8 +198,11 @@ describe('useAuth', () => {
       });
 
       // Simulate auth state change to null (sign out)
-      const authChangeCallback = supabase.auth.onAuthStateChange.mock.calls[0][0];
-      authChangeCallback('SIGNED_OUT', null);
+      const onAuthStateChangeMock = supabase.auth.onAuthStateChange as any;
+      const authChangeCallback = onAuthStateChangeMock.mock?.calls?.[0]?.[0];
+      if (authChangeCallback) {
+        authChangeCallback('SIGNED_OUT', null);
+      }
       
       await waitFor(() => {
         expect(result.current.user).toBeNull();
@@ -233,14 +253,20 @@ describe('useAuth', () => {
         error: null,
       });
       
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: { role: 'admin' },
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       const { result } = renderHook(() => useAuth());
       
@@ -260,14 +286,20 @@ describe('useAuth', () => {
         error: null,
       });
       
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: null,
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       const { result } = renderHook(() => useAuth());
       
@@ -294,14 +326,20 @@ describe('useAuth', () => {
         error: null,
       });
       
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: { role: 'user' },
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       renderHook(() => useAuth());
       
@@ -324,14 +362,20 @@ describe('useAuth', () => {
         error: null,
       });
       
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: { role: 'user' },
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       renderHook(() => useAuth());
 
@@ -356,14 +400,20 @@ describe('useAuth', () => {
         error: null,
       });
       
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: { role: 'admin' },
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       const { result } = renderHook(() => useAuth());
       
@@ -383,14 +433,20 @@ describe('useAuth', () => {
         error: null,
       });
       
-      supabase.from.mockReturnValue({
+      const mockChain = {
         select: vi.fn().mockReturnThis(),
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        single: vi.fn(),
         maybeSingle: vi.fn().mockResolvedValue({
           data: { role: 'user' },
           error: null,
         }),
-      });
+        limit: vi.fn().mockReturnThis(),
+      };
+      supabase.from.mockReturnValue(mockChain);
 
       const { result } = renderHook(() => useAuth());
       
