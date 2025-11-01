@@ -5,6 +5,11 @@ const baseURL =
   process.env.BASE_URL ||
   'http://localhost:4173';
 
+// Allow CSP bypassing by default so inline scripts/styles used in the app shell
+// don't break headless runs. Teams can opt out by explicitly setting the
+// toggle to "false" when debugging.
+const shouldBypassCSP = process.env.PLAYWRIGHT_BYPASS_CSP !== 'false';
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -16,7 +21,7 @@ export default defineConfig({
     baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    bypassCSP: true,
+    bypassCSP: shouldBypassCSP,
   },
   projects: [
     {

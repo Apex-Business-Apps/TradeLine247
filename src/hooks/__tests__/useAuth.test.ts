@@ -5,32 +5,97 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useAuth } from '../useAuth';
-import { createMockSupabase, createMockUser, createMockSession } from '@/__tests__/utils/test-utils';
+function createMockSupabase() {
+  const auth = {
+    onAuthStateChange: vi.fn(() => ({
+      data: { subscription: { unsubscribe: vi.fn() } },
+    })),
+    getSession: vi.fn(),
+    signOut: vi.fn().mockResolvedValue({ error: null }),
+    signInWithPassword: vi.fn(),
+    signUp: vi.fn(),
+    getUser: vi.fn(),
+  };
+
+  const from = vi.fn(() => ({
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn(),
+    maybeSingle: vi.fn(),
+    limit: vi.fn().mockReturnThis(),
+  }));
+
+  return {
+    auth,
+    from,
+    functions: {
+      invoke: vi.fn(),
+    },
+  };
+}
+
+function createMockUser(overrides: Partial<any> = {}) {
+  return {
+    id: 'test-user-id',
+    email: 'test@example.com',
+    user_metadata: {
+      display_name: 'Test User',
+    },
+    ...overrides,
+  };
+}
+
+function createMockSession(user: any = createMockUser()) {
+  return {
+    user,
+    access_token: 'mock-access-token',
+    refresh_token: 'mock-refresh-token',
+    expires_at: Date.now() / 1000 + 3600,
+  };
+}
+
+const supabaseMock = vi.hoisted(() => {
+  return createMockSupabase();
+});
+const supabaseEnabledState = vi.hoisted(() => ({ value: true }));
+const ensureMembershipMock = vi.hoisted(() => vi.fn());
 
 // Mock dependencies - must use factory function
-vi.mock('@/integrations/supabase/client', () => {
+vi.mock('../../integrations/supabase/client', () => {
   return {
-    supabase: createMockSupabase(),
-    isSupabaseEnabled: true,
+    supabase: supabaseMock,
+    get isSupabaseEnabled() {
+      return supabaseEnabledState.value;
+    },
   };
 });
 
-vi.mock('@/lib/ensureMembership', () => ({
-  ensureMembership: vi.fn().mockResolvedValue({ orgId: 'org-123', error: undefined }),
+vi.mock('../../lib/ensureMembership', () => ({
+  ensureMembership: ensureMembershipMock,
 }));
 
-vi.mock('@/hooks/use-toast', () => ({
-  toast: vi.fn(),
+const toastMock = vi.hoisted(() => vi.fn());
+
+vi.mock('../use-toast', () => ({
+  toast: toastMock,
 }));
 
 describe('useAuth', () => {
-  const { supabase } = require('@/integrations/supabase/client');
-  const { ensureMembership } = require('@/lib/ensureMembership');
+  const supabase = supabaseMock;
+  const ensureMembership = ensureMembershipMock;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Default mock implementations
+    Object.assign(supabase, createMockSupabase());
+
+    ensureMembership.mockResolvedValue({ orgId: 'org-123', error: undefined });
+    supabaseEnabledState.value = true;
+
     supabase.auth.getSession.mockResolvedValue({
       data: { session: null },
       error: null,
@@ -145,11 +210,11 @@ describe('useAuth', () => {
     it('should handle invalid token errors', async () => {
       supabase.auth.getSession.mockResolvedValue({
         data: { session: null },
-        error: { message: 'Invalid JWT token' },
+        error: { message: 'invalid JWT token' },
       });
 
       const { result } = renderHook(() => useAuth());
-      
+
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
@@ -212,16 +277,9 @@ describe('useAuth', () => {
     });
 
     it('should default to "user" role when Supabase is disabled', () => {
-      // Mock isSupabaseEnabled as false
-      vi.resetModules();
-      vi.doMock('@/integrations/supabase/client', () => ({
-        supabase: createMockSupabase(),
-        isSupabaseEnabled: false,
-      }));
-
-      const { useAuth } = require('../useAuth');
+      supabaseEnabledState.value = false;
       const { result } = renderHook(() => useAuth());
-      
+
       expect(result.current.loading).toBe(false);
     });
   });
@@ -253,10 +311,9 @@ describe('useAuth', () => {
     });
 
     it('should show toast on membership error', async () => {
-      const { toast } = require('@/hooks/use-toast');
       const mockUser = createMockUser();
       const mockSession = createMockSession(mockUser);
-      
+
       ensureMembership.mockResolvedValue({
         orgId: null,
         error: 'Failed to create trial',
@@ -277,9 +334,9 @@ describe('useAuth', () => {
       });
 
       renderHook(() => useAuth());
-      
+
       await waitFor(() => {
-        expect(toast).toHaveBeenCalledWith(
+        expect(toastMock).toHaveBeenCalledWith(
           expect.objectContaining({
             variant: 'destructive',
             title: 'Trial Setup Failed',
