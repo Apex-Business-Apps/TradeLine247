@@ -42,3 +42,8 @@ android/
 # CocoaPods output (generated in CI/mac builds)
 ios/App/Pods/
 ios/App/Podfile.lock
+
+# Playwright test artifacts
+test-results/
+playwright-report/
+playwright/.cache/

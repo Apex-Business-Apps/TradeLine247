@@ -33,12 +33,14 @@ serve(async (req) => {
     }
 
     // Only admins can export consent logs
-    const isAdmin = await supabaseClient.rpc('has_role', { 
-      p_user: user.id, 
-      p_role: 'admin' 
+    const { data: isAdmin, error: roleError } = await supabaseClient.rpc<boolean>('has_role', {
+      p_user: user.id,
+      p_role: 'admin'
     });
 
-    if (!isAdmin.data) {
+    if (roleError) throw roleError;
+
+    if (!isAdmin) {
       return new Response(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -117,10 +119,11 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
-    console.error('Consent logs export error:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : JSON.stringify(error);
+    console.error('Function error:', message);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', message: error.message }),
+      JSON.stringify({ error: message }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

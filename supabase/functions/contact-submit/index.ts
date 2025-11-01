@@ -1,12 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Resend } from "npm:resend@2.0.0";
-import { 
-  sanitizeText, 
-  sanitizeEmail, 
-  sanitizePhone, 
-  validateSecurity 
-} from "../_shared/sanitizer.ts";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+import {
+  sanitizeText,
+  sanitizeEmail,
+  sanitizePhone,
+  validateSecurity
+} from "../_shared/advancedSanitizer.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -118,6 +118,10 @@ serve(async (req) => {
       throw new Error('Failed to save contact message');
     }
 
+    if (!contactRecord || typeof contactRecord.id !== 'string') {
+      throw new Error('Contact message saved without identifier');
+    }
+
     console.log(`Contact message saved: ${contactRecord.id}`);
 
     // Send notification email via Resend
@@ -138,7 +142,7 @@ serve(async (req) => {
         `
       });
 
-      console.log('Notification email sent:', notifyEmail.id);
+      console.log('Notification email sent:', notifyEmail);
 
       // Send auto-reply to customer
       const autoReply = await resend.emails.send({
@@ -154,7 +158,7 @@ serve(async (req) => {
         `
       });
 
-      console.log('Auto-reply sent:', autoReply.id);
+      console.log('Auto-reply sent:', autoReply);
     } catch (emailError) {
       console.error('Email error:', emailError);
       // Don't fail the request if email fails - message is saved

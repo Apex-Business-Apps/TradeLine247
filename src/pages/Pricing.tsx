@@ -1,4 +1,3 @@
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CheckCircle, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -114,8 +113,6 @@ const Pricing = () => {
           ]
         }}
       />
-      
-      <Header />
       
       <main className="flex-1">
         {/* Hero Section */}

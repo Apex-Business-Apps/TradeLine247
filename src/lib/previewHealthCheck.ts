@@ -18,13 +18,12 @@ export interface HealthCheckResult {
 export async function runPreviewHealthCheck(): Promise<HealthCheckResult> {
   const checks: HealthCheckResult['checks'] = [];
   const hostname = window.location.hostname;
-  
-  // Check 1: Environment detection
-  const isPreview = hostname.includes('lovableproject.com') || 
-                    hostname.includes('https://tradeline247aicom.lovable.app/') || 
-                    hostname.includes('lovable.dev') ||
-                    hostname.includes('.gptengineer.app');
-  
+  const normalizedHost = hostname.toLowerCase();
+  const previewDomains = ['lovableproject.com', 'lovable.app', 'lovable.dev', 'gptengineer.app'];
+  const isPreview =
+    normalizedHost.includes('.lovable.') ||
+    previewDomains.some(domain => normalizedHost === domain || normalizedHost.endsWith(`.${domain}`));
+
   checks.push({
     name: 'Environment Detection',
     status: isPreview ? 'pass' : 'warn',

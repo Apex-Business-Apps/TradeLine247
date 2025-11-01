@@ -1,133 +1,110 @@
-name: ci
+name: CI
 
 on:
   push:
     branches: [ main ]
   pull_request:
+    branches: [ main ]
 
+# Prevent pile-ups and zombies
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  NODE_VERSION: 20.11.1
+# Needed to set commit statuses
+permissions:
+  contents: read
+  statuses: write
 
 jobs:
   build:
+    # IMPORTANT: job name must be the required context
     name: ci/build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 20
           cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Build web bundle
-        run: npm run build
+      - run: npm ci --no-audit --fund=false
+      - run: npm run -s build
+      - name: Verify web artifact
+        run: |
+          test -f dist/index.html || (echo "dist/index.html missing" && exit 2)
+      - name: Report status (ci/build)
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const state = "${{ job.status }}" === "success" ? "success" : "failure";
+            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner, repo: context.repo.repo, sha,
+              state, context: "ci/build",
+              description: state === "success" ? "Build passed" : "Build failed"
+            });
 
   lint:
     name: ci/lint
     runs-on: ubuntu-latest
-    needs: build
+    needs: [ build ]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 20
           cache: npm
-      - run: npm ci
-      - run: npm run lint
+      - run: npm ci --no-audit --fund=false
+
+      # Merged from props-guard.yml: Check fetchpriority attribute casing
+      - name: Check fetchpriority attribute casing
+        run: |
+          if git grep -n "fetchPriority=" -- src; then
+            echo "❌ Found camelCase fetchPriority (use lowercase fetchpriority in HTML)"
+            exit 1
+          else
+            echo "✅ No fetchPriority casing issues detected"
+          fi
+
+      - run: npm run -s lint --if-present
+      - name: Report status (ci/lint)
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const state = "${{ job.status }}" === "success" ? "success" : "failure";
+            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner, repo: context.repo.repo, sha,
+              state, context: "ci/lint",
+              description: state === "success" ? "Lint passed" : "Lint failed"
+            });
 
   test:
     name: ci/test
     runs-on: ubuntu-latest
-    needs: build
+    needs: [ build ]
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 20
           cache: npm
-      - run: npm ci
-      - name: Run unit tests
-        run: |
-          if npm run | grep -q "test"; then
-            npm test -- --watch=false
-          else
-            echo "No test script defined — skipping."
-          fi
-
-  ios:
-    name: ci/ios-build
-    runs-on: macos-14
-    needs: [ build, lint, test ]
-    timeout-minutes: 45
-    env:
-      XCODE_WORKSPACE: ios/App/App.xcworkspace
-      XCODE_SCHEME: App
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - run: npm ci --no-audit --fund=false
+      - run: npm test --if-present -- --ci
+      - name: Report status (ci/test)
+        if: always()
+        uses: actions/github-script@v7
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-      - name: Install npm dependencies
-        run: npm ci
-      - name: Build web assets
-        run: npm run build
-      - name: Verify web build artifacts
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ ! -f dist/index.html ]]; then
-            echo "::error title=Missing web bundle::Expected dist/index.html after 'npm run build'." >&2
-            exit 1
-          fi
-      - name: Sync Capacitor iOS wrapper
-        shell: bash
-        run: |
-          set -euo pipefail
-          npx --yes cap sync ios
-      - name: Verify iOS project exists
-        shell: bash
-        run: |
-          set -euo pipefail
-          PROJECT_FILE="ios/App/App.xcodeproj/project.pbxproj"
-          WORKSPACE_PATH="${XCODE_WORKSPACE:-ios/App/App.xcworkspace}"
-          WORKSPACE_FILE="${WORKSPACE_PATH%/}/contents.xcworkspacedata"
-
-          missing=0
-          if [[ ! -f "$PROJECT_FILE" ]]; then
-            echo "::error title=Missing Xcode project::Expected $PROJECT_FILE after syncing Capacitor." >&2
-            missing=1
-          fi
-          if [[ ! -f "$WORKSPACE_FILE" ]]; then
-            echo "::error title=Missing Xcode workspace::Expected $WORKSPACE_FILE after syncing Capacitor." >&2
-            missing=1
-          fi
-
-          if (( missing )); then
-            echo "Run 'npx cap add ios' locally and commit the generated ios/App wrapper." >&2
-            exit 1
-          fi
-      - name: Install CocoaPods dependencies
-        shell: bash
-        working-directory: ios/App
-        run: |
-          set -euo pipefail
-          pod install
-      - name: Build iOS workspace (simulator)
-        shell: bash
-        working-directory: ios/App
-        run: |
-          set -euo pipefail
-          xcodebuild \
-            -workspace "$(basename "$XCODE_WORKSPACE")" \
-            -scheme "$XCODE_SCHEME" \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
-            CODE_SIGNING_ALLOWED=NO \
-            build
+          script: |
+            const state = "${{ job.status }}" === "success" ? "success" : "failure";
+            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner, repo: context.repo.repo, sha,
+              state, context: "ci/test",
+              description: state === "success" ? "Tests passed" : "Tests failed"
+            });

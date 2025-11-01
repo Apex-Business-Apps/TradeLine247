@@ -19,7 +19,13 @@ export default function Activation() {
     try {
       // Get current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error("Not authenticated");
+      
+      // Check for JWT errors first
+      if (userError?.message?.includes('malformed') || userError?.message?.includes('invalid')) {
+        throw new Error("Session expired or invalid. Please log in again.");
+      }
+      
+      if (!user) throw new Error("Not authenticated");
 
       // Call activation function
       const { data, error } = await supabase.functions.invoke('ops-activate-account', {

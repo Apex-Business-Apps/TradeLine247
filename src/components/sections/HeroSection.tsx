@@ -34,18 +34,18 @@ export const HeroSection = () => {
             className="h-55 md:h-[20.625rem] lg:h-[24.75rem] w-auto mx-auto drop-shadow-2xl hover-scale transition-all duration-500"
             decoding="async"
             loading="eager"
-            fetchPriority="high"
+            fetchpriority="high"
             style={{filter: 'var(--premium-glow)'}}
           />
         </div>
         
         {/* Main Headline with Staggered Animation */}
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent leading-tight animate-fade-in [animation-delay:200ms]">
-          Your 24/7 Ai Receptionist
+          Your 24/7 Ai Receptionist!
         </h1>
         
         {/* Value Proposition with Delayed Animation */}
-        <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
+        <p className="text-lg md:text-xl text-slate-700 dark:text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
           We pick up when you can't, so customers aren't kept waiting.
         </p>
         
@@ -69,14 +69,14 @@ export const HeroSection = () => {
               <Link to="/features">See how it works</Link>
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground animate-pulse">
+          <p className="text-sm text-slate-600 dark:text-slate-400 animate-pulse">
             No credit card required • 10-minute setup
           </p>
         </div>
 
         {/* Trust Indicators */}
         <div className="mt-16 animate-fade-in [animation-delay:800ms]">
-          <p className="text-sm text-muted-foreground mb-4">Trusted by 1000+ businesses</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Trusted by 1000+ businesses</p>
           <div className="flex justify-center items-center gap-8 opacity-60">
             <div className="h-8 w-16 bg-muted-foreground/20 rounded"></div>
             <div className="h-8 w-20 bg-muted-foreground/20 rounded"></div>
