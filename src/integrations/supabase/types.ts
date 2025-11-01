@@ -80,7 +80,7 @@ export type Database = {
           event_data: Json | null
           event_type: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           session_id: string | null
           severity: string | null
           user_agent: string | null
@@ -92,7 +92,7 @@ export type Database = {
           event_data?: Json | null
           event_type: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           session_id?: string | null
           severity?: string | null
           user_agent?: string | null
@@ -104,7 +104,7 @@ export type Database = {
           event_data?: Json | null
           event_type?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           session_id?: string | null
           severity?: string | null
           user_agent?: string | null
@@ -941,7 +941,7 @@ export type Database = {
           consent_id: string | null
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           metadata: Json | null
           reason: string | null
           user_agent: string | null
@@ -953,7 +953,7 @@ export type Database = {
           consent_id?: string | null
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           reason?: string | null
           user_agent?: string | null
@@ -965,7 +965,7 @@ export type Database = {
           consent_id?: string | null
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           reason?: string | null
           user_agent?: string | null
@@ -1005,7 +1005,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           message: string
           name: string
           phone: string | null
@@ -1016,7 +1016,7 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           message: string
           name: string
           phone?: string | null
@@ -1027,7 +1027,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           message?: string
           name?: string
           phone?: string | null
@@ -1231,7 +1231,7 @@ export type Database = {
           accessed_table: string
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string | null
         }
@@ -1241,7 +1241,7 @@ export type Database = {
           accessed_table: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -1251,7 +1251,7 @@ export type Database = {
           accessed_table?: string
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
         }
@@ -2083,6 +2083,7 @@ export type Database = {
       }
       org_integration_secrets: {
         Row: {
+          calendly_api_key: string | null
           created_at: string
           gcal_service: Json | null
           organization_id: string
@@ -2092,6 +2093,7 @@ export type Database = {
           zap_outgoing_url: string | null
         }
         Insert: {
+          calendly_api_key?: string | null
           created_at?: string
           gcal_service?: Json | null
           organization_id: string
@@ -2101,6 +2103,7 @@ export type Database = {
           zap_outgoing_url?: string | null
         }
         Update: {
+          calendly_api_key?: string | null
           created_at?: string
           gcal_service?: Json | null
           organization_id?: string
@@ -2553,7 +2556,7 @@ export type Database = {
           created_at: string | null
           event_data: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           resolved: boolean | null
           severity: string | null
           user_agent: string | null
@@ -2564,7 +2567,7 @@ export type Database = {
           created_at?: string | null
           event_data?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resolved?: boolean | null
           severity?: string | null
           user_agent?: string | null
@@ -2575,7 +2578,7 @@ export type Database = {
           created_at?: string | null
           event_data?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           resolved?: boolean | null
           severity?: string | null
           user_agent?: string | null
@@ -2991,6 +2994,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      team_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string | null
+          organization_id: string | null
+          role: string
+          status: string
+          token: string | null
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          invited_by?: string | null
+          organization_id?: string | null
+          role?: string
+          status?: string
+          token?: string | null
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          organization_id?: string | null
+          role?: string
+          status?: string
+          token?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       tenant_phone_mappings: {
         Row: {
@@ -4115,12 +4160,9 @@ export type Database = {
         }
         Returns: boolean
       }
-      anonymize_ip_address: {
-        Args: { ip: unknown }
-        Returns: unknown
-      }
+      anonymize_ip_address: { Args: { ip: unknown }; Returns: unknown }
       audit_consent_access: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           by_access_type: Json
           recent_accesses: Json
@@ -4128,26 +4170,26 @@ export type Database = {
           unique_users: number
         }[]
       }
-      batch_encrypt_appointments: {
-        Args:
-          | { batch_size?: number }
-          | { p_batch_size?: number; p_encryption_key?: string }
-        Returns: Json
-      }
-      binary_quantize: {
-        Args: { "": string } | { "": unknown }
-        Returns: unknown
-      }
-      can_access_customer_pii: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      batch_encrypt_appointments:
+        | {
+            Args: { p_batch_size?: number; p_encryption_key?: string }
+            Returns: Json
+          }
+        | {
+            Args: { batch_size?: number }
+            Returns: {
+              batch_duration_seconds: number
+              encrypted_count: number
+              failed_count: number
+            }[]
+          }
+      can_access_customer_pii: { Args: { _user_id: string }; Returns: boolean }
       can_view_appointment_summary: {
         Args: { org_id_param: string }
         Returns: boolean
       }
       check_encryption_health: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           encrypted_records: number
           failed_records: number
@@ -4156,10 +4198,7 @@ export type Database = {
           total_records: number
         }[]
       }
-      check_hotline_geo: {
-        Args: { p_e164: string }
-        Returns: Json
-      }
+      check_hotline_geo: { Args: { p_e164: string }; Returns: Json }
       check_hotline_rate_limit: {
         Args: { p_ani_hash: string; p_ip_hash: string }
         Returns: Json
@@ -4169,7 +4208,7 @@ export type Database = {
         Returns: Json
       }
       check_rag_health: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           chunks_without_embeddings: number
           health_status: string
@@ -4179,66 +4218,22 @@ export type Database = {
           total_sources: number
         }[]
       }
-      citext: {
-        Args: { "": boolean } | { "": string } | { "": unknown }
-        Returns: string
-      }
-      citext_hash: {
-        Args: { "": string }
-        Returns: number
-      }
-      citextin: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      citextout: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      citextrecv: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      citextsend: {
-        Args: { "": string }
-        Returns: string
-      }
-      cleanup_expired_idempotency_keys: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      cleanup_expired_sessions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_expired_tokens: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_hotline_rate_limits: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_old_ab_sessions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_old_analytics_events: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_rate_limits: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_expired_idempotency_keys: { Args: never; Returns: number }
+      cleanup_expired_sessions: { Args: never; Returns: undefined }
+      cleanup_expired_tokens: { Args: never; Returns: undefined }
+      cleanup_hotline_rate_limits: { Args: never; Returns: undefined }
+      cleanup_old_ab_sessions: { Args: never; Returns: undefined }
+      cleanup_old_analytics_events: { Args: never; Returns: undefined }
+      cleanup_rate_limits: { Args: never; Returns: undefined }
       complete_idempotency: {
         Args: { p_key: string; p_response: Json; p_status?: string }
         Returns: undefined
       }
-      decrypt_pii: {
-        Args: { ciphertext: string }
+      decrypt_org_secret: {
+        Args: { p_encrypted: string; p_org_id: string }
         Returns: string
       }
+      decrypt_pii: { Args: { ciphertext: string }; Returns: string }
       decrypt_pii_with_iv_logged: {
         Args: {
           appointment_id?: string
@@ -4247,14 +4242,8 @@ export type Database = {
         }
         Returns: string
       }
-      detect_and_alert_anomalies: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      detect_anomalous_access: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      detect_and_alert_anomalies: { Args: never; Returns: undefined }
+      detect_anomalous_access: { Args: never; Returns: undefined }
       detect_auth_anomalies: {
         Args: {
           p_event_type: string
@@ -4272,26 +4261,25 @@ export type Database = {
           first_name: string
         }[]
       }
-      encrypt_pii: {
-        Args: { plaintext: string }
+      encrypt_org_secret: {
+        Args: { p_org_id: string; p_plaintext: string }
         Returns: string
       }
+      encrypt_pii: { Args: { plaintext: string }; Returns: string }
       encrypt_pii_field: {
         Args: { iv_seed: string; plaintext_value: string }
         Returns: string
       }
       enforce_data_retention: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           executed_at: string
           policy_name: string
           rows_deleted: number
         }[]
       }
-      get_app_encryption_key: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      expire_old_team_invitations: { Args: never; Returns: undefined }
+      get_app_encryption_key: { Args: never; Returns: string }
       get_appointment_pii_secure: {
         Args: { access_reason: string; appointment_id_param: string }
         Returns: {
@@ -4365,10 +4353,7 @@ export type Database = {
           first_name: string
         }[]
       }
-      get_dashboard_data_optimized: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_dashboard_data_optimized: { Args: never; Returns: Json }
       get_failed_auth_summary: {
         Args: { time_window?: unknown }
         Returns: {
@@ -4402,10 +4387,7 @@ export type Database = {
           updated_at: string
         }[]
       }
-      get_my_security_summary: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_my_security_summary: { Args: never; Returns: Json }
       get_or_create_usage_counter: {
         Args: {
           p_occurred_at?: string
@@ -4432,7 +4414,7 @@ export type Database = {
         }[]
       }
       get_performance_insights: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avg_value: number
           max_value: number
@@ -4520,10 +4502,7 @@ export type Database = {
           unresolved_alerts: number
         }[]
       }
-      get_security_dashboard_data: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      get_security_dashboard_data: { Args: never; Returns: Json }
       get_sms_delivery_stats: {
         Args: { hours_ago?: number }
         Returns: {
@@ -4557,22 +4536,6 @@ export type Database = {
         Args: { p_test_name: string; p_variant: string }
         Returns: Json
       }
-      halfvec_avg: {
-        Args: { "": number[] }
-        Returns: unknown
-      }
-      halfvec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      halfvec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      halfvec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -4587,58 +4550,10 @@ export type Database = {
         }
         Returns: boolean
       }
-      hnsw_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnsw_sparsevec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      hnswhandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      is_autoheal_allowed: {
-        Args: { p_action_type: string }
-        Returns: boolean
-      }
-      is_hotline_allowlisted: {
-        Args: { p_e164: string }
-        Returns: boolean
-      }
-      is_opted_in: {
-        Args: { phone_e164: string }
-        Returns: boolean
-      }
-      is_org_member: {
-        Args: { p_org_id: string }
-        Returns: boolean
-      }
-      ivfflat_bit_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflat_halfvec_support: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      ivfflathandler: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      l2_norm: {
-        Args: { "": unknown } | { "": unknown }
-        Returns: number
-      }
-      l2_normalize: {
-        Args: { "": string } | { "": unknown } | { "": unknown }
-        Returns: unknown
-      }
+      is_autoheal_allowed: { Args: { p_action_type: string }; Returns: boolean }
+      is_hotline_allowlisted: { Args: { p_e164: string }; Returns: boolean }
+      is_opted_in: { Args: { phone_e164: string }; Returns: boolean }
+      is_org_member: { Args: { p_org_id: string }; Returns: boolean }
       log_ab_test_access: {
         Args: { p_access_type?: string; p_test_name: string; p_variant: string }
         Returns: undefined
@@ -4752,7 +4667,7 @@ export type Database = {
         Returns: string
       }
       monitor_upgrade_health: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           component: string
           details: string
@@ -4783,7 +4698,7 @@ export type Database = {
         }[]
       }
       rag_stats: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           chunk_count: number
           embedded_count: number
@@ -4812,18 +4727,12 @@ export type Database = {
         }
         Returns: undefined
       }
-      record_opt_out: {
-        Args: { phone_e164: string }
-        Returns: undefined
-      }
+      record_opt_out: { Args: { phone_e164: string }; Returns: undefined }
       release_guardian_lock: {
         Args: { p_lock_key: string; p_worker_id: string }
         Returns: boolean
       }
-      resolve_greeting: {
-        Args: { p_phone_e164: string }
-        Returns: string
-      }
+      resolve_greeting: { Args: { p_phone_e164: string }; Returns: string }
       safe_analytics_insert_with_circuit_breaker: {
         Args: {
           p_event_data?: Json
@@ -4835,10 +4744,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      schedule_analytics_cleanup: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      schedule_analytics_cleanup: { Args: never; Returns: undefined }
       search_embeddings: {
         Args: {
           filter_content_type?: Database["public"]["Enums"]["embedding_content_type"]
@@ -4869,66 +4775,21 @@ export type Database = {
         }
         Returns: Json
       }
-      share_org: {
-        Args: { user_a: string; user_b: string }
-        Returns: boolean
-      }
-      sparsevec_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      sparsevec_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      sparsevec_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
+      share_org: { Args: { user_a: string; user_b: string }; Returns: boolean }
       test_encryption_roundtrip: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           details: string
           passed: boolean
           test_name: string
         }[]
       }
-      validate_security_post_upgrade: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      validate_security_post_upgrade: { Args: never; Returns: Json }
       validate_session: {
         Args: { p_session_token: string; p_user_id: string }
         Returns: Json
       }
-      vector_avg: {
-        Args: { "": number[] }
-        Returns: string
-      }
-      vector_dims: {
-        Args: { "": string } | { "": unknown }
-        Returns: number
-      }
-      vector_norm: {
-        Args: { "": string }
-        Returns: number
-      }
-      vector_out: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      vector_send: {
-        Args: { "": string }
-        Returns: string
-      }
-      vector_typmod_in: {
-        Args: { "": unknown[] }
-        Returns: number
-      }
-      verify_email_service_configured: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      verify_email_service_configured: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user" | "moderator"
@@ -5078,4 +4939,3 @@ export const Constants = {
     },
   },
 } as const
-

@@ -12,6 +12,10 @@ import Security from "./pages/Security";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import ClientDashboard from "./pages/ClientDashboard";
+import CallCenter from "./pages/CallCenter";
+import CallLogs from "./pages/CallLogs";
+import Integrations from "./pages/Integrations";
+import ClientNumberOnboarding from "./pages/ops/ClientNumberOnboarding";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -30,6 +34,10 @@ export default function App() {
             <Route path="contact" element={<Contact />} />
             <Route path="auth" element={<Auth />} />
             <Route path="dashboard" element={<ClientDashboard />} />
+            <Route path="call-center" element={<CallCenter />} />
+            <Route path="call-logs" element={<CallLogs />} />
+            <Route path="integrations" element={<Integrations />} />
+            <Route path="ops/number-onboarding" element={<ClientNumberOnboarding />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
