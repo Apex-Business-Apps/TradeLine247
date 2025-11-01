@@ -1,28 +1,47 @@
 // FILE: src/App.tsx
-import React, { Suspense } from "react";
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import AppLayout from "./components/layout/AppLayout";
+// CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
-import Pricing from "./pages/Pricing";
-import FAQ from "./pages/FAQ";
-import Features from "./pages/Features";
-import Compare from "./pages/Compare";
-import Security from "./pages/Security";
-import Contact from "./pages/Contact";
-import Auth from "./pages/Auth";
-import ClientDashboard from "./pages/ClientDashboard";
-import CallCenter from "./pages/CallCenter";
-import CallLogs from "./pages/CallLogs";
-import Integrations from "./pages/Integrations";
-import ClientNumberOnboarding from "./pages/ops/ClientNumberOnboarding";
-import NotFound from "./pages/NotFound";
+
+// PERFORMANCE: Route-based code splitting - lazy load all routes except Index (critical)
+const Pricing = lazy(() => import("./pages/Pricing"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Features = lazy(() => import("./pages/Features"));
+const Compare = lazy(() => import("./pages/Compare"));
+const Security = lazy(() => import("./pages/Security"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Auth = lazy(() => import("./pages/Auth"));
+const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
+const CallCenter = lazy(() => import("./pages/CallCenter"));
+const CallLogs = lazy(() => import("./pages/CallLogs"));
+const Integrations = lazy(() => import("./pages/Integrations"));
+const ClientNumberOnboarding = lazy(() => import("./pages/ops/ClientNumberOnboarding"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Loading fallback component for better UX during lazy loading
+const LoadingFallback = () => (
+  <div
+    style={{
+      minHeight: "50vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "1.125rem",
+      color: "hsl(var(--muted-foreground))"
+    }}
+  >
+    Loading...
+  </div>
+);
 
 export default function App() {
   return (
     <BrowserRouter>
       {/* Suspense prevents a white screen if any child is lazy elsewhere */}
-      <Suspense fallback={<div style={{ minHeight: "50vh" }} />}>
+      <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route element={<AppLayout />}>
             <Route index element={<Index />} />

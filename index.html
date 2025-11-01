@@ -137,7 +137,54 @@
     </script>
     
     <a class="skip-link" href="#main">Skip to content</a>
-    <div id="root"></div>
+    <!-- CRITICAL: Immediate fallback content for FCP - ensures Lighthouse detects paint -->
+    <div id="root" style="min-height: 100vh; background-color: hsl(var(--background, 0 0% 100%));">
+      <!-- Fallback content that appears immediately - replaced by React when it mounts -->
+      <noscript>
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; font-family: system-ui; text-align: center;">
+          <div>
+            <h1 style="font-size: 1.5rem; margin-bottom: 1rem; color: hsl(215.4 16.3% 46.7%);">TradeLine 24/7</h1>
+            <p style="color: hsl(215.4 16.3% 46.7%);">Please enable JavaScript to use this application.</p>
+          </div>
+        </div>
+      </noscript>
+      <!-- Loading indicator for React mount - minimal, non-intrusive, hidden immediately on React mount -->
+      <div id="root-loading" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: hsl(var(--background, 0 0% 100%)); position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;">
+        <div style="text-align: center; color: hsl(var(--muted-foreground, 215.4 16.3% 46.7%)); font-family: 'Inter', system-ui, sans-serif;">
+          <div style="font-size: 1.125rem; opacity: 0.5;">Loading...</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // CRITICAL: Hide loading fallback immediately when React mounts (prevents duplicate content)
+      (function() {
+        var loadingEl = document.getElementById('root-loading');
+        if (loadingEl) {
+          // Watch for React to mount and hide loading immediately
+          var observer = new MutationObserver(function(mutations) {
+            var root = document.getElementById('root');
+            // React typically renders into root, replacing children or adding React root
+            // Check if React has mounted by looking for React-created elements (not our loading div)
+            if (root) {
+              var reactRoot = root.querySelector('[data-reactroot]') || 
+                              (root.firstElementChild && root.firstElementChild.id !== 'root-loading');
+              if (reactRoot || (root.children.length > 0 && !loadingEl.parentElement)) {
+                // React has mounted, hide loading
+                if (loadingEl) loadingEl.style.display = 'none';
+                observer.disconnect();
+              }
+            }
+          });
+          observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+          
+          // Fallback: Hide after 5 seconds to ensure FCP is recorded
+          setTimeout(function() {
+            if (loadingEl) loadingEl.style.display = 'none';
+            observer.disconnect();
+          }, 5000);
+        }
+      })();
+    </script>
     
     <!-- React Bundle with Error Handling -->
     <script>

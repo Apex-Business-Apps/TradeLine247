@@ -86,6 +86,7 @@
     "i18next-http-backend": "^3.0.2",
     "input-otp": "^1.4.2",
     "libphonenumber-js": "^1.12.23",
+    "lovable-tagger": "^1.1.9",
     "lucide-react": "^0.552.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
@@ -102,7 +103,6 @@
     "swr": "^2.3.6",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "lovable-tagger": "^1.1.9",
     "twilio": "^5.9.0",
     "vaul": "^1.1.2",
     "zod": "^3.25.76",
@@ -111,6 +111,10 @@
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "@tailwindcss/typography": "^0.5.16",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.16.5",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
@@ -123,16 +127,13 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
+    "jsdom": "^25.0.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
+    "terser": "^5.44.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.46.2",
     "vite": "^5.4.19",
-    "vitest": "^2.1.5",
-    "@testing-library/react": "^16.0.1",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@testing-library/jest-dom": "^6.6.3",
-    "jsdom": "^25.0.1"
+    "vitest": "^2.1.5"
   }
 }
