@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Home, AlertTriangle, Bot } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { paths } from '@/routes/paths';
 import { SEOHead } from "@/components/seo/SEOHead";
 
 const NotFound = () => {
@@ -50,7 +51,7 @@ const NotFound = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate(paths.home)}
                   className="flex items-center gap-2"
                   size="lg"
                 >
@@ -75,7 +76,7 @@ const NotFound = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => navigate('/features')}
+                    onClick={() => navigate(paths.features)}
                     className="h-10 justify-start hover:bg-primary/5"
                   >
                     Features
@@ -83,7 +84,7 @@ const NotFound = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => navigate('/pricing')}
+                    onClick={() => navigate(paths.pricing)}
                     className="h-10 justify-start hover:bg-primary/5"
                   >
                     Pricing
@@ -91,7 +92,7 @@ const NotFound = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => navigate('/faq')}
+                    onClick={() => navigate(paths.faq)}
                     className="h-10 justify-start hover:bg-primary/5"
                   >
                     FAQ
@@ -99,7 +100,7 @@ const NotFound = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => navigate('/contact')}
+                    onClick={() => navigate(paths.contact)}
                     className="h-10 justify-start hover:bg-primary/5"
                   >
                     Contact

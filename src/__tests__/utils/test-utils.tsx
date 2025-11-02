@@ -118,15 +118,29 @@ export async function waitForAsync() {
 }
 
 /**
- * Create mock user for testing
+ * Create mock user for testing with all required Supabase User properties
  */
 export function createMockUser(overrides?: Partial<any>) {
+  const now = new Date().toISOString();
   return {
     id: 'test-user-id',
     email: 'test@example.com',
+    aud: 'authenticated',
+    role: 'authenticated',
+    email_confirmed_at: now,
+    phone: '',
+    confirmed_at: now,
+    last_sign_in_at: now,
+    app_metadata: {
+      provider: 'email',
+      providers: ['email'],
+    },
     user_metadata: {
       display_name: 'Test User',
     },
+    identities: [],
+    created_at: now,
+    updated_at: now,
     ...overrides,
   };
 }

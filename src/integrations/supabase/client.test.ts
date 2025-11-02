@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 /**
  * Supabase Client Unit Tests
@@ -15,20 +18,41 @@ import { describe, it, expect } from 'vitest';
  * manual testing in different environments.
  */
 
+// Get the directory of this test file to resolve the client.ts path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const clientFilePath = join(__dirname, 'client.ts');
+
+function readClientFileContent(): string {
+  try {
+    // First try relative to test file
+    return readFileSync(clientFilePath, 'utf-8');
+  } catch {
+    try {
+      // Fallback: try from process.cwd()
+      return readFileSync(join(process.cwd(), 'src/integrations/supabase/client.ts'), 'utf-8');
+    } catch {
+      // Final fallback: try from current working directory with tradeline247aicom prefix
+      return readFileSync(
+        join(process.cwd(), 'tradeline247aicom/src/integrations/supabase/client.ts'),
+        'utf-8'
+      );
+    }
+  }
+}
+
 describe('Supabase Client', () => {
-  it('should have logic to support VITE_SUPABASE_PUBLISHABLE_KEY', async () => {
+  it('should have logic to support VITE_SUPABASE_PUBLISHABLE_KEY', () => {
     // Read the client.ts file to verify it supports PUBLISHABLE_KEY
-    const clientModule = await import('./client.ts?raw');
-    const content = typeof clientModule === 'string' ? clientModule : clientModule.default;
+    const content = readClientFileContent();
 
     expect(content).toContain('VITE_SUPABASE_PUBLISHABLE_KEY');
-    expect(content).toContain('readEnv(\'VITE_SUPABASE_PUBLISHABLE_KEY\')');
+    expect(content).toContain("readEnv('VITE_SUPABASE_PUBLISHABLE_KEY')");
   });
 
-  it('should have logic to derive URL from VITE_SUPABASE_PROJECT_ID', async () => {
+  it('should have logic to derive URL from VITE_SUPABASE_PROJECT_ID', () => {
     // Read the client.ts file to verify it supports PROJECT_ID
-    const clientModule = await import('./client.ts?raw');
-    const content = typeof clientModule === 'string' ? clientModule : clientModule.default;
+    const content = readClientFileContent();
 
     expect(content).toContain('VITE_SUPABASE_PROJECT_ID');
     expect(content).toContain('.supabase.co');
@@ -47,21 +71,20 @@ describe('Supabase Client', () => {
     expect(supabase.auth).toBeDefined();
   });
 
-  it('should have proper env var priority: URL > PROJECT_ID', async () => {
-    const clientModule = await import('./client.ts?raw');
-    const content = typeof clientModule === 'string' ? clientModule : clientModule.default;
+  it('should have proper env var priority: URL > PROJECT_ID', () => {
+    const content = readClientFileContent();
 
     // Verify that VITE_SUPABASE_URL is checked first, then derivedUrl
-    const urlPattern = /SUPABASE_URL\s*=[\s\S]*?readEnv\('VITE_SUPABASE_URL'\)[\s\S]*?derivedUrl/;
+    const urlPattern = /SUPABASE_URL\s*=[\s\S]*?readEnv\(['"]VITE_SUPABASE_URL['"]\)[\s\S]*?derivedUrl/;
     expect(content).toMatch(urlPattern);
   });
 
-  it('should have proper key priority: ANON_KEY > PUBLISHABLE_KEY', async () => {
-    const clientModule = await import('./client.ts?raw');
-    const content = typeof clientModule === 'string' ? clientModule : clientModule.default;
+  it('should have proper key priority: ANON_KEY > PUBLISHABLE_KEY', () => {
+    const content = readClientFileContent();
 
     // Verify that VITE_SUPABASE_ANON_KEY is checked first, then PUBLISHABLE_KEY
-    const keyPattern = /SUPABASE_ANON_KEY\s*=[\s\S]*?readEnv\('VITE_SUPABASE_ANON_KEY'\)[\s\S]*?readEnv\('VITE_SUPABASE_PUBLISHABLE_KEY'\)/;
+    const keyPattern = /SUPABASE_ANON_KEY\s*=[\s\S]*?readEnv\(['"]VITE_SUPABASE_ANON_KEY['"]\)[\s\S]*?readEnv\(['"]VITE_SUPABASE_PUBLISHABLE_KEY['"]\)/;
     expect(content).toMatch(keyPattern);
   });
 });
+

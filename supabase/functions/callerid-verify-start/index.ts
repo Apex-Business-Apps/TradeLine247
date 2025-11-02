@@ -1,21 +1,26 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { corsHeaders, handleCors } from "../_shared/cors.ts";
+import { corsHeaders, preflight } from "../_shared/cors.ts";
+import { withJSON } from "../_shared/secure_headers.ts";
 import { twilioFormPOST } from "../_shared/twilio.ts";
 
 const SID = Deno.env.get("TWILIO_ACCOUNT_SID")!;
 const AUTH = Deno.env.get("TWILIO_AUTH_TOKEN")!;
 const CALLBACK = Deno.env.get("TWILIO_STATUS_CALLBACK_URL")!;
 
+if (!CALLBACK.toLowerCase().startsWith("https://")) {
+  throw new Error('TWILIO_STATUS_CALLBACK_URL must be HTTPS');
+}
+
 export default async (req: Request) => {
-  const preflight = handleCors(req);
-  if (preflight) return preflight;
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const { phone_number_e164, friendly_name } = await req.json();
     if (!phone_number_e164) {
       return new Response(
         JSON.stringify({ error: "phone_number_e164 required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: withJSON(corsHeaders) },
       );
     }
 
@@ -34,17 +39,17 @@ export default async (req: Request) => {
     if (!res.ok) {
       return new Response(JSON.stringify({ error: payload }), {
         status: res.status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: withJSON(corsHeaders),
       });
     }
 
     return new Response(JSON.stringify({ ok: true, data: payload }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: withJSON(corsHeaders),
     });
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: withJSON(corsHeaders),
     });
   }
 };

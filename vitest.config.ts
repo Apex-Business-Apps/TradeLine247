@@ -11,11 +11,21 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    setupFiles: ['src/setupTests.ts'],
+    setupFiles: ['src/setupTests.tsx'],
     globals: true,
     css: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['tests/**', 'node_modules/**'],
+    // Ensure Node.js built-ins and modules are available for tests
+    server: {
+      deps: {
+        inline: [
+          '@supabase/supabase-js',
+          '@/integrations/supabase/client',
+          '@/lib/ensureMembership',
+        ],
+      },
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'lcov', 'html'],

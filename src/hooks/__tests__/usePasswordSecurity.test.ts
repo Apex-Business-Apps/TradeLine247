@@ -5,53 +5,36 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePasswordSecurity } from '../usePasswordSecurity';
-function createMockSupabase() {
-  const auth = {
-    onAuthStateChange: vi.fn(),
-    getSession: vi.fn(),
-    signOut: vi.fn(),
-    signInWithPassword: vi.fn(),
-    signUp: vi.fn(),
-    getUser: vi.fn(),
-  };
 
-  const from = vi.fn(() => ({
-    select: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    delete: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    single: vi.fn(),
-    maybeSingle: vi.fn(),
-    limit: vi.fn().mockReturnThis(),
-  }));
-
+// Mock Supabase - use async mock factory for CI compatibility
+vi.mock('@/integrations/supabase/client', async () => {
+  const mockInvoke = vi.fn();
   return {
-    auth,
-    from,
-    functions: {
-      invoke: vi.fn(),
+    supabase: {
+      functions: {
+        invoke: mockInvoke,
+      },
     },
-  };
-}
-
-const supabaseMock = vi.hoisted(() => {
-  return createMockSupabase();
-});
-
-// Mock Supabase - must use factory function for hoisting
-vi.mock('../../integrations/supabase/client', () => {
-  return {
-    supabase: supabaseMock,
+    isSupabaseEnabled: true,
+    __mockInvoke: mockInvoke, // Export for test access
   };
 });
 
 describe('usePasswordSecurity', () => {
-  const supabase = supabaseMock;
+  let mockInvoke: ReturnType<typeof vi.fn>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
-    Object.assign(supabase, createMockSupabase());
+    // Use ES import instead of require() for proper module resolution
+    const { supabase } = await import('@/integrations/supabase/client');
+
+    // Use vi.mocked() with explicit any type for complex Supabase types
+    mockInvoke = vi.mocked(supabase.functions.invoke) as any;
+
+    mockInvoke.mockResolvedValue({
+      data: { isBreached: false, message: 'Password is safe' },
+      error: null,
+    });
   });
 
   describe('validatePasswordStrength', () => {
@@ -97,9 +80,12 @@ describe('usePasswordSecurity', () => {
       const { result } = renderHook(() => usePasswordSecurity());
 
       const validation1 = result.current.validatePasswordStrength('PASSWORD123!');
+      // password123! has 3 criteria (lower, number, special) - should be valid
       const validation2 = result.current.validatePasswordStrength('password123!');
 
+      // PASSWORD123! has 3 criteria (upper, number, special) so it's valid
       expect(validation1.isValid).toBe(true);
+      // password123! has 3 criteria (lower, number, special) so it's valid
       expect(validation2.isValid).toBe(true);
     });
 
@@ -117,9 +103,12 @@ describe('usePasswordSecurity', () => {
       const { result } = renderHook(() => usePasswordSecurity());
 
       const validation1 = result.current.validatePasswordStrength('Password!');
+      // Password1! has 4 criteria (all) - should be valid
       const validation2 = result.current.validatePasswordStrength('Password1!');
 
+      // Password! has 3 criteria (lower, upper, special) so it's valid
       expect(validation1.isValid).toBe(true);
+      // Password1! has 4 criteria so it's valid
       expect(validation2.isValid).toBe(true);
     });
 
@@ -136,7 +125,7 @@ describe('usePasswordSecurity', () => {
 
   describe('checkPasswordBreach', () => {
     it('should return not breached for valid password', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: { isBreached: false, message: 'Password is safe' },
         error: null,
       });
@@ -147,13 +136,13 @@ describe('usePasswordSecurity', () => {
       
       expect(breachCheck.isBreached).toBe(false);
       expect(breachCheck.message).toBe('Password is safe');
-      expect(supabase.functions.invoke).toHaveBeenCalledWith('check-password-breach', {
+      expect(mockInvoke).toHaveBeenCalledWith('check-password-breach', {
         body: { password: 'SecurePassword123!' },
       });
     });
 
     it('should return breached for compromised password', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: { isBreached: true, message: 'This password appears in known breaches' },
         error: null,
       });
@@ -173,11 +162,11 @@ describe('usePasswordSecurity', () => {
       
       expect(breachCheck.isBreached).toBe(false);
       expect(breachCheck.message).toBe('Password required');
-      expect(supabase.functions.invoke).not.toHaveBeenCalled();
+      expect(mockInvoke).not.toHaveBeenCalled();
     });
 
     it('should handle API errors gracefully', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: null,
         error: { message: 'Service unavailable' },
       });
@@ -192,7 +181,7 @@ describe('usePasswordSecurity', () => {
     });
 
     it('should handle network errors', async () => {
-      supabase.functions.invoke.mockRejectedValue(new Error('Network error'));
+      mockInvoke.mockRejectedValue(new Error('Network error'));
 
       const { result } = renderHook(() => usePasswordSecurity());
       
@@ -212,11 +201,11 @@ describe('usePasswordSecurity', () => {
       expect(validation.isValid).toBe(false);
       expect(validation.isBreached).toBe(false);
       expect(validation.strength).toBe('Too short');
-      expect(supabase.functions.invoke).not.toHaveBeenCalled();
+      expect(mockInvoke).not.toHaveBeenCalled();
     });
 
     it('should check breach if strength is valid', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: { isBreached: false },
         error: null,
       });
@@ -229,11 +218,11 @@ describe('usePasswordSecurity', () => {
       
       expect(validation.isValid).toBe(true);
       expect(validation.isBreached).toBe(false);
-      expect(supabase.functions.invoke).toHaveBeenCalled();
+      expect(mockInvoke).toHaveBeenCalled();
     });
 
     it('should return invalid if password is breached', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: { isBreached: true, message: 'Breached password' },
         error: null,
       });
@@ -250,7 +239,7 @@ describe('usePasswordSecurity', () => {
     });
 
     it('should combine strength and breach checks', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: { isBreached: false },
         error: null,
       });

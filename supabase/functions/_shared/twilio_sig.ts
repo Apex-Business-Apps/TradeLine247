@@ -1,20 +1,26 @@
-import { validateTwilioSignature as validateSignatureCore } from "./twilioValidator.ts";
+export async function validateTwilioSignature(req: Request): Promise<boolean> {
+  const url = new URL(req.url);
+  const token = Deno.env.get("TWILIO_AUTH_TOKEN")!;
+  const sig = req.headers.get("X-Twilio-Signature") || req.headers.get("x-twilio-signature");
+  if (!sig) return false;
 
-export async function validateTwilioSignature(req: Request) {
-  const token = Deno.env.get("TWILIO_AUTH_TOKEN");
-  if (!token) return false;
-
-  const signature = req.headers.get("X-Twilio-Signature") ?? req.headers.get("x-twilio-signature");
-  if (!signature) return false;
-
-  const cloned = req.clone();
-  const text = await cloned.text();
-  const params = new URLSearchParams(text);
-  const payload: Record<string, string> = {};
-  for (const [key, value] of params.entries()) {
-    payload[key] = value;
+  const bodyText = await req.text();
+  const params = new URLSearchParams(bodyText);
+  const sorted = [...params.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  let data = url.origin + url.pathname;
+  for (const [key, value] of sorted) {
+    data += key + value;
   }
 
-  const url = new URL(req.url);
-  return await validateSignatureCore(url.toString(), payload, signature, token);
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(token),
+    { name: "HMAC", hash: "SHA-1" },
+    false,
+    ["sign"],
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
+  const computed = btoa(String.fromCharCode(...new Uint8Array(signature)));
+  return computed === sig;
 }

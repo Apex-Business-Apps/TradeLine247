@@ -9,7 +9,7 @@
  * - Interactive tutorial
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
+import { useTheme } from 'next-themes';
 import { Sparkles, Layout, Palette, Check } from 'lucide-react';
 
 interface PersonalizedWelcomeDialogProps {
@@ -36,16 +37,35 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
 }) => {
   const [step, setStep] = useState(1);
   const [name, setName] = useState('');
-  const [selectedLayout, setSelectedLayout] = useState<'compact' | 'comfortable' | 'spacious'>('comfortable');
-  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark' | 'system'>('system');
-
+  
   const {
     setOnboardingCompleted,
     setPreferredName,
     setDashboardLayout,
-    setTheme,
+    setTheme: setPreferenceTheme,
     updateLastLogin,
+    theme: storedTheme,
+    dashboardLayout: storedLayout,
+    preferredName: storedName,
   } = useUserPreferencesStore();
+  const { setTheme: setNextTheme } = useTheme();
+
+  // Initialize from stored preferences
+  const [selectedLayout, setSelectedLayout] = useState<'compact' | 'comfortable' | 'spacious'>(storedLayout || 'comfortable');
+  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark' | 'system'>(storedTheme || 'system');
+
+  // Initialize selected theme and layout from stored preferences on mount
+  useEffect(() => {
+    if (storedTheme) {
+      setSelectedTheme(storedTheme);
+    }
+    if (storedLayout) {
+      setSelectedLayout(storedLayout);
+    }
+    if (storedName) {
+      setName(storedName);
+    }
+  }, [storedTheme, storedLayout, storedName]);
 
   const totalSteps = 4;
 
@@ -65,7 +85,11 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
     // Save all preferences
     if (name) setPreferredName(name);
     setDashboardLayout(selectedLayout);
-    setTheme(selectedTheme);
+    
+    // Sync theme to both stores
+    setPreferenceTheme(selectedTheme);
+    setNextTheme(selectedTheme);
+    
     setOnboardingCompleted(true);
     updateLastLogin();
 

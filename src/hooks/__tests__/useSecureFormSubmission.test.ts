@@ -5,78 +5,44 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useSecureFormSubmission } from '../useSecureFormSubmission';
-function createMockSupabase() {
-  const auth = {
-    onAuthStateChange: vi.fn(),
-    getSession: vi.fn(),
-    signOut: vi.fn(),
-    signInWithPassword: vi.fn(),
-    signUp: vi.fn(),
-    getUser: vi.fn(),
-  };
 
-  const from = vi.fn(() => ({
-    select: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    delete: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    single: vi.fn(),
-    maybeSingle: vi.fn(),
-    limit: vi.fn().mockReturnThis(),
-  }));
-
+// Mock Supabase - use async mock factory for CI compatibility
+vi.mock('@/integrations/supabase/client', async () => {
+  const mockRpc = vi.fn();
+  const mockInvoke = vi.fn();
   return {
-    auth,
-    from,
-    functions: {
-      invoke: vi.fn(),
+    supabase: {
+      rpc: mockRpc,
+      functions: {
+        invoke: mockInvoke,
+      },
     },
-    rpc: vi.fn(),
-  };
-}
-
-const supabaseMock = vi.hoisted(() => {
-  return createMockSupabase();
-});
-
-// Mock Supabase - must use factory function
-vi.mock('../../integrations/supabase/client', () => {
-  return {
-    supabase: supabaseMock,
+    isSupabaseEnabled: true,
   };
 });
 
 describe('useSecureFormSubmission', () => {
-  const supabase = supabaseMock;
-  let originalCrypto: Crypto | undefined;
+  let mockRpc: ReturnType<typeof vi.fn>;
+  let mockInvoke: ReturnType<typeof vi.fn>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     sessionStorage.clear();
 
-    Object.assign(supabase, createMockSupabase());
+    // Use ES import instead of require() for proper module resolution
+    const { supabase } = await import('@/integrations/supabase/client');
 
-    // Mock crypto.randomUUID
-    originalCrypto = globalThis.crypto;
-    Object.defineProperty(globalThis, 'crypto', {
-      configurable: true,
-      value: {
-        randomUUID: vi.fn(() => 'mock-uuid-123'),
-      },
-    });
+    // Use vi.mocked() with explicit any type for complex Supabase types
+    mockRpc = vi.mocked(supabase.rpc) as any;
+    mockInvoke = vi.mocked(supabase.functions.invoke) as any;
+
+    // Mock crypto.randomUUID with valid UUID format
+    vi.spyOn(global.crypto, 'randomUUID').mockReturnValue('00000000-0000-4000-8000-000000000000');
   });
 
   afterEach(() => {
     sessionStorage.clear();
-    if (originalCrypto) {
-      Object.defineProperty(globalThis, 'crypto', {
-        configurable: true,
-        value: originalCrypto,
-      });
-    } else {
-      Reflect.deleteProperty(globalThis, 'crypto');
-    }
+    vi.restoreAllMocks();
   });
 
   describe('initial state', () => {
@@ -117,15 +83,15 @@ describe('useSecureFormSubmission', () => {
   describe('rate limiting', () => {
     it('should skip rate limit check when no rateLimitKey provided', async () => {
       const { result } = renderHook(() => useSecureFormSubmission());
-      
+
       const allowed = await result.current.checkRateLimit();
-      
+
       expect(allowed).toBe(true);
-      expect(supabase.rpc).not.toHaveBeenCalled();
+      expect(mockRpc).not.toHaveBeenCalled();
     });
 
     it('should check rate limit when rateLimitKey provided', async () => {
-      supabase.rpc.mockResolvedValue({
+      mockRpc.mockResolvedValue({
         data: { allowed: true, remaining: 4, limit: 5 },
         error: null,
       });
@@ -134,22 +100,23 @@ describe('useSecureFormSubmission', () => {
         rateLimitKey: 'test-key',
         maxAttemptsPerHour: 5,
       }));
-      
+
       const allowed = await result.current.checkRateLimit();
 
       expect(allowed).toBe(true);
-      expect(supabase.rpc).toHaveBeenCalledWith('secure_rate_limit', {
+      expect(mockRpc).toHaveBeenCalledWith('secure_rate_limit', {
         identifier: 'test-key',
         max_requests: 5,
         window_seconds: 3600,
       });
+
       await waitFor(() => {
         expect(result.current.attempts).toBe(1); // 5 - 4 = 1
       });
     });
 
     it('should deny when rate limit exceeded', async () => {
-      supabase.rpc.mockResolvedValue({
+      mockRpc.mockResolvedValue({
         data: { allowed: false, remaining: 0, limit: 5 },
         error: null,
       });
@@ -164,7 +131,7 @@ describe('useSecureFormSubmission', () => {
     });
 
     it('should deny on rate limit check error (fail closed)', async () => {
-      supabase.rpc.mockResolvedValue({
+      mockRpc.mockResolvedValue({
         data: null,
         error: { message: 'Database error' },
       });
@@ -179,7 +146,7 @@ describe('useSecureFormSubmission', () => {
     });
 
     it('should deny on rate limit check exception (fail closed)', async () => {
-      supabase.rpc.mockRejectedValue(new Error('Network error'));
+      mockRpc.mockRejectedValue(new Error('Network error'));
 
       const { result } = renderHook(() => useSecureFormSubmission({
         rateLimitKey: 'test-key',
@@ -193,7 +160,7 @@ describe('useSecureFormSubmission', () => {
 
   describe('secureSubmit', () => {
     it('should submit successfully with valid data', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: { success: true, id: '123' },
         error: null,
       });
@@ -204,10 +171,10 @@ describe('useSecureFormSubmission', () => {
         name: 'Test',
         email: 'test@example.com',
       });
-      
+
       expect(response).toEqual({ success: true, id: '123' });
       expect(result.current.isSubmitting).toBe(false);
-      expect(supabase.functions.invoke).toHaveBeenCalledWith(
+      expect(mockInvoke).toHaveBeenCalledWith(
         'test-endpoint',
         expect.objectContaining({
           body: expect.objectContaining({
@@ -230,16 +197,16 @@ describe('useSecureFormSubmission', () => {
         resolvePromise = resolve;
       });
 
-      supabase.functions.invoke.mockReturnValue(promise);
+      mockInvoke.mockReturnValue(promise);
 
       const { result } = renderHook(() => useSecureFormSubmission());
-      
+
       const submitPromise = result.current.secureSubmit('test-endpoint', {});
-      
+
       await waitFor(() => {
         expect(result.current.isSubmitting).toBe(true);
       });
-      
+
       resolvePromise!({ data: { success: true }, error: null });
       await submitPromise;
 
@@ -249,7 +216,7 @@ describe('useSecureFormSubmission', () => {
     });
 
     it('should sanitize data if sanitizeData function provided', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: { success: true },
         error: null,
       });
@@ -268,8 +235,8 @@ describe('useSecureFormSubmission', () => {
       expect(sanitizeData).toHaveBeenCalledWith({
         name: 'Test',
       });
-      
-      expect(supabase.functions.invoke).toHaveBeenCalledWith(
+
+      expect(mockInvoke).toHaveBeenCalledWith(
         'test-endpoint',
         expect.objectContaining({
           body: expect.objectContaining({
@@ -280,7 +247,7 @@ describe('useSecureFormSubmission', () => {
     });
 
     it('should validate response if validateResponse function provided', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: { success: true },
         error: null,
       });
@@ -297,7 +264,7 @@ describe('useSecureFormSubmission', () => {
     });
 
     it('should throw error if response validation fails', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: { success: false },
         error: null,
       });
@@ -314,7 +281,7 @@ describe('useSecureFormSubmission', () => {
     });
 
     it('should throw error if rate limit exceeded', async () => {
-      supabase.rpc.mockResolvedValue({
+      mockRpc.mockResolvedValue({
         data: { allowed: false },
         error: null,
       });
@@ -326,12 +293,12 @@ describe('useSecureFormSubmission', () => {
       await expect(
         result.current.secureSubmit('test-endpoint', {})
       ).rejects.toThrow('Rate limit exceeded');
-      
-      expect(supabase.functions.invoke).not.toHaveBeenCalled();
+
+      expect(mockInvoke).not.toHaveBeenCalled();
     });
 
     it('should throw error on function invocation error', async () => {
-      supabase.functions.invoke.mockResolvedValue({
+      mockInvoke.mockResolvedValue({
         data: null,
         error: { message: 'Function error' },
       });
@@ -344,7 +311,7 @@ describe('useSecureFormSubmission', () => {
     });
 
     it('should always reset isSubmitting even on error', async () => {
-      supabase.functions.invoke.mockRejectedValue(new Error('Network error'));
+      mockInvoke.mockRejectedValue(new Error('Network error'));
 
       const { result } = renderHook(() => useSecureFormSubmission());
       
@@ -358,7 +325,7 @@ describe('useSecureFormSubmission', () => {
 
   describe('getRemainingAttempts', () => {
     it('should calculate remaining attempts based on attempts made', async () => {
-      supabase.rpc.mockResolvedValue({
+      mockRpc.mockResolvedValue({
         data: { allowed: true, remaining: 3, limit: 5 },
         error: null,
       });
@@ -367,9 +334,9 @@ describe('useSecureFormSubmission', () => {
         rateLimitKey: 'test-key',
         maxAttemptsPerHour: 5,
       }));
-      
+
       await result.current.checkRateLimit();
-      
+
       await waitFor(() => {
         expect(result.current.getRemainingAttempts()).toBe(3);
       });

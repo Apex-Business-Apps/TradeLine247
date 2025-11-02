@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Home } from 'lucide-react';
@@ -23,7 +24,7 @@ const ClientDashboard = () => {
             <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
           </div>
           <Button 
-            onClick={() => navigate('/')}
+            onClick={() => navigate(paths.home)}
             variant="outline"
             className="flex items-center gap-2"
           >

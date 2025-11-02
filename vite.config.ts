@@ -1,8 +1,8 @@
-import { defineConfig, type PluginOption } from "vite";
+import { defineConfig, type PluginOption, type UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 
-export default defineConfig(async ({ command }) => {
+export default defineConfig(async ({ command }): Promise<UserConfig> => {
   const plugins: PluginOption[] = [react()];
 
   // ENHANCED: Better Lovable tagger detection and configuration

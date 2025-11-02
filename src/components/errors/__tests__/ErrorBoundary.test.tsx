@@ -12,6 +12,11 @@ vi.mock('@/lib/errorReporter', () => ({
   reportReactError: vi.fn(),
 }));
 
+vi.mock('react-helmet-async', () => ({
+  Helmet: ({ children }: any) => <>{children}</>,
+  HelmetProvider: ({ children }: any) => <>{children}</>,
+}));
+
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, ...props }: any) => (
     <button onClick={onClick} {...props}>{children}</button>
@@ -144,7 +149,18 @@ describe('AppErrorBoundary', () => {
   it('should reload page on retry button click', () => {
     const reloadMock = vi.fn();
     Object.defineProperty(window, 'location', {
-      value: { reload: reloadMock },
+      value: {
+        reload: reloadMock,
+        href: window.location.href,
+        origin: window.location.origin,
+        protocol: window.location.protocol,
+        host: window.location.host,
+        hostname: window.location.hostname,
+        port: window.location.port,
+        pathname: window.location.pathname,
+        search: window.location.search,
+        hash: window.location.hash,
+      },
       writable: true,
     });
 
@@ -166,8 +182,29 @@ describe('AppErrorBoundary', () => {
 
   it('should navigate home on Go Home button click', () => {
     const originalLocation = window.location;
-    delete (window as any).location;
-    (window as any).location = { href: '' };
+    const mockLocation = {
+      href: '',
+      origin: 'http://localhost:3000',
+      protocol: 'http:',
+      host: 'localhost:3000',
+      hostname: 'localhost',
+      port: '3000',
+      pathname: '/',
+      search: '',
+      hash: '',
+      reload: vi.fn(),
+      assign: vi.fn(),
+      replace: vi.fn(),
+      toString: () => 'http://localhost:3000/',
+      ancestorOrigins: {} as DOMStringList,
+    };
+
+    // Use Object.defineProperty for proper Location mocking
+    Object.defineProperty(window, 'location', {
+      value: mockLocation,
+      writable: true,
+      configurable: true,
+    });
 
     const ThrowError = () => {
       throw new Error('Test error');
@@ -187,10 +224,11 @@ describe('AppErrorBoundary', () => {
     expect(homeButton).toBeInTheDocument();
     expect(window.location.href).toBe('/');
 
-    // TypeScript requires proper type when reassigning
+    // Restore original location with proper typing
     Object.defineProperty(window, 'location', {
+      value: originalLocation as Location,
       writable: true,
-      value: originalLocation
+      configurable: true,
     });
   });
 

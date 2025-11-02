@@ -18,8 +18,15 @@ import {
 import { Button } from '@/components/ui/button';
 
 export const ThemeSwitcher: React.FC = () => {
-  const { setTheme } = useTheme();
-  const { setTheme: setPreferenceTheme } = useUserPreferencesStore();
+  const { theme: currentTheme, setTheme } = useTheme();
+  const { theme: preferenceTheme, setTheme: setPreferenceTheme } = useUserPreferencesStore();
+
+  // Sync preference store theme to next-themes if they're out of sync
+  React.useEffect(() => {
+    if (preferenceTheme && preferenceTheme !== currentTheme) {
+      setTheme(preferenceTheme);
+    }
+  }, [preferenceTheme, currentTheme, setTheme]);
 
   const handleThemeChange = (theme: 'light' | 'dark' | 'system') => {
     setTheme(theme);
