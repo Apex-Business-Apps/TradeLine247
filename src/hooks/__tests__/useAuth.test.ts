@@ -7,8 +7,8 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { useAuth } from '../useAuth';
 import { createMockUser, createMockSession } from '@/__tests__/utils/test-utils';
 
-// Mock dependencies - create mocks inside factory to avoid hoisting issues
-vi.mock('@/integrations/supabase/client', () => {
+// Mock dependencies - use async mock factories for CI compatibility
+vi.mock('@/integrations/supabase/client', async () => {
   const mockGetSession = vi.fn();
   const mockOnAuthStateChange = vi.fn();
   const mockSignOut = vi.fn();
@@ -35,7 +35,7 @@ vi.mock('@/integrations/supabase/client', () => {
   };
 });
 
-vi.mock('@/lib/ensureMembership', () => ({
+vi.mock('@/lib/ensureMembership', async () => ({
   ensureMembership: vi.fn().mockResolvedValue({ orgId: 'org-123', error: undefined }),
 }));
 
@@ -48,12 +48,16 @@ describe('useAuth', () => {
   let mockOnAuthStateChange: ReturnType<typeof vi.fn>;
   let mockSignOut: ReturnType<typeof vi.fn>;
   let mockFrom: ReturnType<typeof vi.fn>;
-  const { ensureMembership } = require('@/lib/ensureMembership');
+  let ensureMembership: ReturnType<typeof vi.fn>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     
-    const { supabase } = require('@/integrations/supabase/client');
+    // Use ES imports instead of require() for proper module resolution
+    const { supabase } = await import('@/integrations/supabase/client');
+    const ensureMembershipModule = await import('@/lib/ensureMembership');
+    ensureMembership = ensureMembershipModule.ensureMembership;
+    
     mockGetSession = supabase.auth.getSession;
     mockOnAuthStateChange = supabase.auth.onAuthStateChange;
     mockSignOut = supabase.auth.signOut;

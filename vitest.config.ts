@@ -16,10 +16,14 @@ export default defineConfig({
     css: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['tests/**', 'node_modules/**'],
-    // Ensure Node.js built-ins are available for fs operations in tests
+    // Ensure Node.js built-ins and modules are available for tests
     server: {
       deps: {
-        inline: ['@supabase/supabase-js'],
+        inline: [
+          '@supabase/supabase-js',
+          '@/integrations/supabase/client',
+          '@/lib/ensureMembership',
+        ],
       },
     },
     coverage: {
