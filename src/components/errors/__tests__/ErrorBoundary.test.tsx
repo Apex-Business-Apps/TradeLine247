@@ -182,8 +182,7 @@ describe('AppErrorBoundary', () => {
 
   it('should navigate home on Go Home button click', () => {
     const originalLocation = window.location;
-    delete (window as any).location;
-    (window as any).location = {
+    const mockLocation = {
       href: '',
       origin: 'http://localhost:3000',
       protocol: 'http:',
@@ -194,7 +193,18 @@ describe('AppErrorBoundary', () => {
       search: '',
       hash: '',
       reload: vi.fn(),
+      assign: vi.fn(),
+      replace: vi.fn(),
+      toString: () => 'http://localhost:3000/',
+      ancestorOrigins: {} as DOMStringList,
     };
+
+    // Use Object.defineProperty for proper Location mocking
+    Object.defineProperty(window, 'location', {
+      value: mockLocation,
+      writable: true,
+      configurable: true,
+    });
 
     const ThrowError = () => {
       throw new Error('Test error');
@@ -214,7 +224,12 @@ describe('AppErrorBoundary', () => {
     expect(homeButton).toBeInTheDocument();
     expect(window.location.href).toBe('/');
 
-    window.location = originalLocation;
+    // Restore original location
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('should display support email link', () => {

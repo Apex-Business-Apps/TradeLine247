@@ -22,12 +22,15 @@ vi.mock('@/integrations/supabase/client', async () => {
 
 describe('usePasswordSecurity', () => {
   let mockInvoke: ReturnType<typeof vi.fn>;
-  
+
   beforeEach(async () => {
     vi.clearAllMocks();
     // Use ES import instead of require() for proper module resolution
     const { supabase } = await import('@/integrations/supabase/client');
-    mockInvoke = supabase.functions.invoke;
+
+    // Use vi.mocked() for proper type-safe mocking
+    mockInvoke = vi.mocked(supabase.functions.invoke);
+
     mockInvoke.mockResolvedValue({
       data: { isBreached: false, message: 'Password is safe' },
       error: null,
