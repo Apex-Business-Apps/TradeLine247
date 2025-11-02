@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { supabase, isSupabaseEnabled } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 
 type Carrier = "ROGERS_FIDO" | "TELUS_KOODO" | "BELL_MOBILITY" | "LANDLINE";
 const FUNCTIONS_BASE = import.meta.env.VITE_FUNCTIONS_BASE!;
@@ -43,10 +43,6 @@ export default function ForwardingWizard() {
 
   useEffect(() => {
     if (!checkId || status !== "pending") return;
-    if (!isSupabaseEnabled) {
-      setNote("Supabase disabled in this environment. Verify manually via inbound call logs.");
-      return;
-    }
     let cancelled = false;
     const interval = setInterval(async () => {
       const { data, error } = await supabase

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { ensureMembership } from '@/lib/ensureMembership';
 import { toast } from '@/hooks/use-toast';
 
@@ -13,11 +13,6 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseEnabled) {
-      setLoading(false);
-      return () => undefined;
-    }
-
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -92,10 +87,6 @@ export const useAuth = () => {
   }, []);
 
   const fetchUserRole = async (userId: string) => {
-    if (!isSupabaseEnabled) {
-      setUserRole('user');
-      return;
-    }
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -117,10 +108,6 @@ export const useAuth = () => {
 
   const signUp = async (email: string, password: string, displayName?: string) => {
     const redirectUrl = `https://tradeline247ai.com/auth/callback`;
-    
-    if (!isSupabaseEnabled) {
-      return { error: new Error('Supabase is disabled') };
-    }
 
     const { error } = await supabase.auth.signUp({
       email,
@@ -136,10 +123,6 @@ export const useAuth = () => {
   };
 
   const signIn = async (email: string, password: string) => {
-    if (!isSupabaseEnabled) {
-      return { error: new Error('Supabase is disabled') };
-    }
-
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -148,9 +131,6 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    if (!isSupabaseEnabled) {
-      return { error: new Error('Supabase is disabled') };
-    }
     const { error } = await supabase.auth.signOut();
     return { error };
   };

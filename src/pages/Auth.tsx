@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,11 +28,6 @@ const Auth = () => {
   const { validatePassword: secureValidatePassword } = usePasswordSecurity();
 
   useEffect(() => {
-    if (!isSupabaseEnabled) {
-      setLoading(false);
-      return () => undefined;
-    }
-
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -142,10 +137,6 @@ const Auth = () => {
     }
 
     const redirectUrl = `${window.location.origin}/`;
-    
-    if (!isSupabaseEnabled) {
-      throw new Error('Supabase is disabled in this environment.');
-    }
 
     const { error } = await supabase.auth.signUp({
       email,
@@ -161,10 +152,6 @@ const Auth = () => {
   };
 
   const signIn = async (email: string, password: string) => {
-    if (!isSupabaseEnabled) {
-      throw new Error('Supabase is disabled in this environment.');
-    }
-
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
