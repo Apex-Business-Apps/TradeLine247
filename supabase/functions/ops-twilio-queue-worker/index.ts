@@ -1,102 +1,111 @@
 // deno-lint-ignore-file no-explicit-any
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { preflight, corsHeaders } from "../_shared/cors.ts";
-import { withJSON } from "../_shared/secure_headers.ts";
+import { secureHeaders, mergeHeaders } from "../_shared/secure_headers.ts";
 import { twilioFormPOST } from "../_shared/twilio_client.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SRV = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID")!;
-const MAX_PER_RUN = 5;
+const MAX_PER_RUN = 5; // tune for CPS
 
-export default async (req: Request) => {
+const supabase = createClient(SUPABASE_URL, SRV);
+
+serve(async (req: Request) => {
   const pf = preflight(req);
   if (pf) return pf;
 
-  const selector = new URL(`${SUPABASE_URL}/rest/v1/twilio_job_queue`);
-  selector.searchParams.set("status", "eq.pending");
-  selector.searchParams.set("next_run_at", `lte.${new Date().toISOString()}`);
-  selector.searchParams.set("order", "created_at.asc");
-  selector.searchParams.set("limit", String(MAX_PER_RUN));
+  // Fetch pending jobs
+  const { data: jobs, error } = await supabase
+    .from("twilio_job_queue")
+    .select("*")
+    .eq("status", "pending")
+    .lte("next_run_at", new Date().toISOString())
+    .order("created_at", { ascending: true })
+    .limit(MAX_PER_RUN);
 
-  const jobResponse = await fetch(selector, {
-    headers: { apikey: ANON, Authorization: `Bearer ${SRV}` },
-  });
+  if (error) {
+    console.error("Error fetching jobs:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to fetch jobs" }),
+      {
+        status: 500,
+        headers: mergeHeaders(corsHeaders, secureHeaders, {
+          "Content-Type": "application/json",
+        }),
+      }
+    );
+  }
 
-  if (!jobResponse.ok) {
-    const body = await jobResponse.text();
-    console.error("Failed to load twilio_job_queue", jobResponse.status, body);
-    return new Response(JSON.stringify({ error: "failed to load queue" }), {
-      status: 502,
-      headers: withJSON(corsHeaders),
+  if (!jobs || jobs.length === 0) {
+    return new Response(JSON.stringify({ processed: 0 }), {
+      headers: mergeHeaders(corsHeaders, secureHeaders, {
+        "Content-Type": "application/json",
+      }),
     });
   }
 
-  const jobs: any[] = await jobResponse.json();
-
-  for (const job of jobs) {
-    await fetch(`${SUPABASE_URL}/rest/v1/twilio_job_queue?id=eq.${job.id}`, {
-      method: "PATCH",
-      headers: {
-        apikey: ANON,
-        Authorization: `Bearer ${SRV}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+  // Process each job
+  for (const j of jobs) {
+    // Mark as processing
+    await supabase
+      .from("twilio_job_queue")
+      .update({
         status: "processing",
-        attempts: job.attempts + 1,
+        attempts: j.attempts + 1,
         updated_at: new Date().toISOString(),
-      }),
-    });
+      })
+      .eq("id", j.id);
 
     try {
-      if (job.kind === "call") {
+      if (j.kind === "call") {
         const form = new URLSearchParams({
-          From: job.payload.from,
-          To: job.payload.to,
-          Url: job.payload.url,
+          From: j.payload.from,
+          To: j.payload.to,
+          Url: j.payload.url,
           Method: "POST",
         });
-        const response = await twilioFormPOST(`/Accounts/${ACCOUNT_SID}/Calls.json`, form);
-        if (!response.ok) {
-          throw new Error(`${response.status} ${await response.text()}`);
+        const res = await twilioFormPOST(
+          `/Accounts/${Deno.env.get("TWILIO_ACCOUNT_SID")}/Calls.json`,
+          form
+        );
+        if (!res.ok) {
+          throw new Error(`${res.status} ${await res.text()}`);
         }
       }
+      // extend: 'callerid.verify', 'number.update', etc.
 
-      await fetch(`${SUPABASE_URL}/rest/v1/twilio_job_queue?id=eq.${job.id}`, {
-        method: "PATCH",
-        headers: {
-          apikey: ANON,
-          Authorization: `Bearer ${SRV}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      // Mark as done
+      await supabase
+        .from("twilio_job_queue")
+        .update({
           status: "done",
           updated_at: new Date().toISOString(),
           last_error: null,
-        }),
-      });
-    } catch (error) {
-      console.error("twilio_job_queue error", error);
-      const delay = Math.min(5 * 60 * 1000, 2 ** Math.min(job.attempts, 6) * 1000);
-      await fetch(`${SUPABASE_URL}/rest/v1/twilio_job_queue?id=eq.${job.id}`, {
-        method: "PATCH",
-        headers: {
-          apikey: ANON,
-          Authorization: `Bearer ${SRV}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+        })
+        .eq("id", j.id);
+    } catch (e) {
+      const delay = Math.min(
+        5 * 60 * 1000,
+        2 ** Math.min(j.attempts, 6) * 1000
+      );
+      await supabase
+        .from("twilio_job_queue")
+        .update({
           status: "pending",
           next_run_at: new Date(Date.now() + delay).toISOString(),
-          last_error: String(error),
+          last_error: String(e),
           updated_at: new Date().toISOString(),
-        }),
-      });
+        })
+        .eq("id", j.id);
     }
   }
 
   return new Response(JSON.stringify({ processed: jobs.length }), {
-    headers: withJSON(corsHeaders),
+    headers: mergeHeaders(corsHeaders, secureHeaders, {
+      "Content-Type": "application/json",
+    }),
   });
-};
+});
+
