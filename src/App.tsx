@@ -19,6 +19,7 @@ const CallCenter = lazy(() => import("./pages/CallCenter"));
 const CallLogs = lazy(() => import("./pages/CallLogs"));
 const Integrations = lazy(() => import("./pages/Integrations"));
 const ClientNumberOnboarding = lazy(() => import("./pages/ops/ClientNumberOnboarding"));
+const ForwardingWizard = lazy(() => import("./routes/ForwardingWizard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading fallback component for better UX during lazy loading
