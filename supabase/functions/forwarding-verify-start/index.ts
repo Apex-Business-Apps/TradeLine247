@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { corsHeaders, handleCors } from "../_shared/cors.ts";
+import { preflight, corsHeaders } from "../_shared/cors.ts";
+import { withJSON } from "../_shared/secure_headers.ts";
 import { twilioFormPOST } from "../_shared/twilio.ts";
 
 const TWILIO_SID = Deno.env.get("TWILIO_ACCOUNT_SID")!;
@@ -11,16 +12,20 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SRV = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+if (!FUNCTIONS_BASE.toLowerCase().startsWith("https://")) {
+  throw new Error('FUNCTIONS_BASE must be HTTPS');
+}
+
 export default async (req: Request) => {
-  const preflight = handleCors(req);
-  if (preflight) return preflight;
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const { org_id, old_number_e164 } = await req.json();
     if (!org_id || !old_number_e164) {
       return new Response(
         JSON.stringify({ error: "org_id and old_number_e164 required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: withJSON(corsHeaders) },
       );
     }
 
@@ -44,7 +49,7 @@ export default async (req: Request) => {
       const fail = await up.json().catch(() => ({}));
       return new Response(JSON.stringify({ error: fail }), {
         status: up.status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: withJSON(corsHeaders),
       });
     }
     const [row] = await up.json();
@@ -76,18 +81,18 @@ export default async (req: Request) => {
       });
       return new Response(JSON.stringify({ error: payload }), {
         status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: withJSON(corsHeaders),
       });
     }
 
     return new Response(
       JSON.stringify({ check_id: row.id, call_sid: payload.sid, status: "pending" }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: withJSON(corsHeaders) },
     );
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: withJSON(corsHeaders),
     });
   }
 };

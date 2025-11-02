@@ -11,8 +11,14 @@
 
 ## Evidence
 
+## Supabase Auth URL Configuration
+
+- [ ] Site URL set to production domain in Supabase Auth settings
+- [ ] Redirect URLs cover magic-link and password-reset flows (HTTPS, no stray trailing slashes)
+
 - [ ] Evidence attached (links to `/ops/twilio-evidence` or test results)
 - [ ] Synthetic-smoke passing ([latest run](https://github.com/apex-business-systems/tradeline247/actions/workflows/synthetic-smoke.yml))
+- [ ] Twilio Debugger webhook targets `ops-twilio-debugger-intake` (HTTPS)
 - [ ] No new secrets in repo (all secrets go to GitHub environments)
 - [ ] Store disclosure unchanged or updated (if applicable)
 

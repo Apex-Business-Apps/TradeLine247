@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { paths } from '@/routes/paths';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -157,10 +158,10 @@ export default function Activation() {
                   </div>
                 </div>
                 <div className="flex gap-2 mt-4">
-                  <Button onClick={() => navigate('/dashboard')}>
+                  <Button onClick={() => navigate(paths.dashboard)}>
                     Go to Dashboard
                   </Button>
-                  <Button variant="outline" onClick={() => navigate('/ops/voice')}>
+                  <Button variant="outline" onClick={() => navigate(paths.voiceSettings)}>
                     Configure Voice Settings
                   </Button>
                 </div>

@@ -6,3 +6,8 @@ export function mergeHeaders(...sets: Array<Record<string, string>>): Record<str
   return sets.reduce((acc, cur) => Object.assign(acc, cur), {});
 }
 
+export const withJSON = (extra: Record<string, string> = {}) => ({
+  "Content-Type": "application/json",
+  ...extra,
+  ...secureHeaders,
+});

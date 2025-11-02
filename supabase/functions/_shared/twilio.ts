@@ -1,4 +1,5 @@
 import { corsHeaders } from "./cors.ts";
+import { secureHeaders } from "./secure_headers.ts";
 
 export type TwilioAuth = { accountSid: string; authToken: string };
 
@@ -59,7 +60,7 @@ export async function twilioFormPOST(
   throw new Error("twilioFormPOST exhausted retries");
 }
 
-export const okHeaders = { ...corsHeaders, "Content-Type": "application/json" };
+export const okHeaders = { ...corsHeaders, ...secureHeaders, "Content-Type": "application/json" };
 
 // Extract <ref> from SUPABASE_URL and build functions domain
 export function functionsBaseFromSupabaseUrl(supabaseUrl: string) {

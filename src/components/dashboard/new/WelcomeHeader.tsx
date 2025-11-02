@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Settings, Home, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import { useDashboardStore } from '@/stores/dashboardStore';
@@ -135,7 +136,7 @@ export const WelcomeHeader: React.FC = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate('/')}
+              onClick={() => navigate(paths.home)}
               className="h-9 w-9 hover:bg-accent"
               data-testid="home-button"
               aria-label="Go to homepage"

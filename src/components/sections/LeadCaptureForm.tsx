@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { paths } from '@/routes/paths';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -132,7 +133,7 @@ export const LeadCaptureForm = () => {
 
       // Redirect to auth page after 3 seconds
       setTimeout(() => {
-        navigate('/auth');
+        navigate(paths.auth);
       }, 3000);
     } catch (error: any) {
       console.error("Lead submission error:", error);
@@ -184,7 +185,7 @@ export const LeadCaptureForm = () => {
                 </p>
               </div>
               <Button 
-                onClick={() => navigate('/auth')} 
+                onClick={() => navigate(paths.auth)} 
                 className="w-full hover-scale transition-all duration-300 animate-fade-in" 
                 style={{ animationDelay: '600ms' }}
               >

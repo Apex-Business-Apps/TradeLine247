@@ -1,12 +1,13 @@
-import { corsHeaders, handleCors } from "../_shared/cors.ts";
+import { corsHeaders, preflight } from "../_shared/cors.ts";
+import { mergeHeaders, secureHeaders, withJSON } from "../_shared/secure_headers.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 export default async (req: Request) => {
-  const preflight = handleCors(req);
-  if (preflight) return preflight;
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const { org_id, error_id, error_type, payload, user_agent } = await req.json();
@@ -25,17 +26,17 @@ export default async (req: Request) => {
       const text = await response.text();
       return new Response(text, {
         status: response.status,
-        headers: { ...corsHeaders, "Content-Type": "text/plain" },
+        headers: mergeHeaders(corsHeaders, secureHeaders, { "Content-Type": "text/plain" }),
       });
     }
 
     return new Response(JSON.stringify({ ok: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: withJSON(corsHeaders),
     });
   } catch (error) {
     return new Response(JSON.stringify({ ok: false, error: String(error) }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: withJSON(corsHeaders),
     });
   }
 };
