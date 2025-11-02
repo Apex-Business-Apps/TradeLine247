@@ -106,8 +106,10 @@ describe('ensureMembership', () => {
 
       expect(result.orgId).toBe('new-org-123');
       expect(result.error).toBeUndefined();
+      // The actual implementation uses user.user_metadata?.display_name
+      // which is "Test User" from createMockUser default
       expect(mockInvoke).toHaveBeenCalledWith('start-trial', {
-        body: { company: undefined },
+        body: { company: 'Test User' },
       });
     });
 

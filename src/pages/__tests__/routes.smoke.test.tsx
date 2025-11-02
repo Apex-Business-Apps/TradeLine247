@@ -30,6 +30,7 @@ vi.mock('@/hooks/usePasswordSecurity', () => ({
   }),
 }));
 
+vi.mock('@/components/seo/AISEOHead', () => ({ AISEOHead: () => null }));
 vi.mock('@/components/seo/SEOHead', () => ({ SEOHead: () => null }));
 vi.mock('@/components/seo/OrganizationSchema', () => ({ OrganizationSchema: () => null }));
 vi.mock('@/sections/HeroRoiDuo', () => ({ default: () => <div data-testid="hero-roi-duo">Hero Section</div> }));
