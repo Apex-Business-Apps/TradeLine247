@@ -36,7 +36,7 @@ vi.mock('@/integrations/supabase/client', async () => {
 });
 
 vi.mock('@/lib/ensureMembership', async () => ({
-  ensureMembership: vi.fn().mockResolvedValue({ orgId: 'org-123', error: undefined }),
+  ensureMembership: vi.fn(() => Promise.resolve({ orgId: 'org-123', error: undefined })),
 }));
 
 vi.mock('@/hooks/use-toast', () => ({
@@ -53,12 +53,17 @@ describe('useAuth', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     // Use ES imports instead of require() for proper module resolution
     const { supabase } = await import('@/integrations/supabase/client');
     const ensureMembershipModule = await import('@/lib/ensureMembership');
     ensureMembership = ensureMembershipModule.ensureMembership;
-    
+
+    // CRITICAL: Reset ensureMembership mock to always return valid result
+    (ensureMembership as any).mockImplementation(() =>
+      Promise.resolve({ orgId: 'org-123', error: undefined })
+    );
+
     mockGetSession = supabase.auth.getSession;
     mockOnAuthStateChange = supabase.auth.onAuthStateChange;
     mockSignOut = supabase.auth.signOut;
