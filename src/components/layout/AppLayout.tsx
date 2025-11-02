@@ -7,6 +7,7 @@ import { useUserPreferencesStore } from "@/stores/userPreferencesStore";
 import { MiniChat } from "@/components/ui/MiniChat";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { Toaster } from "@/components/ui/sonner";
+import { useKlaviyoAnalytics } from "@/hooks/useKlaviyoAnalytics";
 
 // Component to apply reduceMotion preference to document
 const MotionPreferenceSync = () => {
@@ -48,12 +49,15 @@ const ThemeSync = () => {
 
 export const AppLayout = () => {
   const { theme } = useUserPreferencesStore();
+  
+  // Initialize Klaviyo analytics tracking
+  useKlaviyoAnalytics();
 
   return (
     <HelmetProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme={theme || "system"}
+        defaultTheme={theme || "light"}
         enableSystem
         disableTransitionOnChange={false}
       >
@@ -70,7 +74,7 @@ export const AppLayout = () => {
         {/* Connection Indicator - shows network status */}
         <ConnectionIndicator />
         {/* Enhanced Toast Notifications */}
-        <Toaster position="auto" richColors closeButton />
+        <Toaster position="bottom-right" richColors closeButton />
       </ThemeProvider>
     </HelmetProvider>
   );
