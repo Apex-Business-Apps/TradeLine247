@@ -6,8 +6,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ensureMembership } from '../ensureMembership';
 import { createMockUser } from '@/__tests__/utils/test-utils';
 
-// Mock Supabase - inline mocks to avoid hoisting issues
-vi.mock('@/integrations/supabase/client', () => {
+// Mock Supabase - use async mock factory for CI compatibility
+vi.mock('@/integrations/supabase/client', async () => {
   const mockFrom = vi.fn();
   const mockInvoke = vi.fn();
   return {
@@ -17,6 +17,7 @@ vi.mock('@/integrations/supabase/client', () => {
         invoke: mockInvoke,
       },
     },
+    isSupabaseEnabled: true,
   };
 });
 
@@ -25,9 +26,10 @@ describe('ensureMembership', () => {
   let mockInvoke: ReturnType<typeof vi.fn>;
   const mockUser = createMockUser({ id: 'user-123' });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
-    const { supabase } = require('@/integrations/supabase/client');
+    // Use ES import instead of require() for proper module resolution
+    const { supabase } = await import('@/integrations/supabase/client');
     mockFrom = supabase.from;
     mockInvoke = supabase.functions.invoke;
     

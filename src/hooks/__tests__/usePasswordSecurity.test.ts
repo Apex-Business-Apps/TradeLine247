@@ -6,8 +6,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePasswordSecurity } from '../usePasswordSecurity';
 
-// Mock Supabase - inline mocks to avoid hoisting issues
-vi.mock('@/integrations/supabase/client', () => {
+// Mock Supabase - use async mock factory for CI compatibility
+vi.mock('@/integrations/supabase/client', async () => {
   const mockInvoke = vi.fn();
   return {
     supabase: {
@@ -15,6 +15,7 @@ vi.mock('@/integrations/supabase/client', () => {
         invoke: mockInvoke,
       },
     },
+    isSupabaseEnabled: true,
     __mockInvoke: mockInvoke, // Export for test access
   };
 });
@@ -22,9 +23,10 @@ vi.mock('@/integrations/supabase/client', () => {
 describe('usePasswordSecurity', () => {
   let mockInvoke: ReturnType<typeof vi.fn>;
   
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
-    const { supabase } = require('@/integrations/supabase/client');
+    // Use ES import instead of require() for proper module resolution
+    const { supabase } = await import('@/integrations/supabase/client');
     mockInvoke = supabase.functions.invoke;
     mockInvoke.mockResolvedValue({
       data: { isBreached: false, message: 'Password is safe' },

@@ -6,8 +6,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useSecureFormSubmission } from '../useSecureFormSubmission';
 
-// Mock Supabase - inline mocks to avoid hoisting issues
-vi.mock('@/integrations/supabase/client', () => {
+// Mock Supabase - use async mock factory for CI compatibility
+vi.mock('@/integrations/supabase/client', async () => {
   const mockRpc = vi.fn();
   const mockInvoke = vi.fn();
   return {
@@ -17,18 +17,20 @@ vi.mock('@/integrations/supabase/client', () => {
         invoke: mockInvoke,
       },
     },
+    isSupabaseEnabled: true,
   };
 });
 
 describe('useSecureFormSubmission', () => {
   let mockRpc: ReturnType<typeof vi.fn>;
   let mockInvoke: ReturnType<typeof vi.fn>;
-  
-  beforeEach(() => {
+
+  beforeEach(async () => {
     vi.clearAllMocks();
     sessionStorage.clear();
     
-    const { supabase } = require('@/integrations/supabase/client');
+    // Use ES import instead of require() for proper module resolution
+    const { supabase } = await import('@/integrations/supabase/client');
     mockRpc = supabase.rpc;
     mockInvoke = supabase.functions.invoke;
     
