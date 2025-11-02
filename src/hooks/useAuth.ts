@@ -50,7 +50,9 @@ export const useAuth = () => {
       // If there's a JWT error, clear the corrupted session
       if (error?.message?.includes('malformed') || error?.message?.includes('invalid')) {
         console.warn('[Auth] Detected malformed token, clearing session:', error.message);
-        supabase.auth.signOut().catch(() => {/* ignore errors during cleanup */});
+        if (supabase.auth?.signOut) {
+          supabase.auth.signOut().catch(() => {/* ignore errors during cleanup */});
+        }
         setSession(null);
         setUser(null);
         setLoading(false);
@@ -77,7 +79,9 @@ export const useAuth = () => {
     }).catch((err) => {
       // Catch any unhandled JWT errors
       console.error('[Auth] Session check failed:', err);
-      supabase.auth.signOut().catch(() => {/* ignore */});
+      if (supabase.auth?.signOut) {
+        supabase.auth.signOut().catch(() => {/* ignore */});
+      }
       setSession(null);
       setUser(null);
       setLoading(false);

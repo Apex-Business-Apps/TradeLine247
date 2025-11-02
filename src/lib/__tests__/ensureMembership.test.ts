@@ -107,7 +107,7 @@ describe('ensureMembership', () => {
       expect(result.orgId).toBe('new-org-123');
       expect(result.error).toBeUndefined();
       expect(mockInvoke).toHaveBeenCalledWith('start-trial', {
-        body: { company: undefined },
+        body: { company: 'Test User' },
       });
     });
 

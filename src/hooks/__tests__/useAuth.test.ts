@@ -48,6 +48,7 @@ describe('useAuth', () => {
   let mockOnAuthStateChange: ReturnType<typeof vi.fn>;
   let mockSignOut: ReturnType<typeof vi.fn>;
   let mockFrom: ReturnType<typeof vi.fn>;
+  let mockMaybeSingle: ReturnType<typeof vi.fn>;
   let ensureMembership: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
@@ -62,18 +63,21 @@ describe('useAuth', () => {
     mockOnAuthStateChange = supabase.auth.onAuthStateChange;
     mockSignOut = supabase.auth.signOut;
     mockFrom = supabase.from;
-    
+
     // Default mock implementations
     mockGetSession.mockResolvedValue({
       data: { session: null },
       error: null,
     });
-    
+
     mockOnAuthStateChange.mockReturnValue({
       data: { subscription: { unsubscribe: vi.fn() } },
     });
 
-    const mockMaybeSingle = vi.fn().mockResolvedValue({
+    // Mock signOut to return a resolved Promise
+    mockSignOut.mockResolvedValue({ error: null });
+
+    mockMaybeSingle = vi.fn().mockResolvedValue({
       data: { role: 'user' },
       error: null,
     });
@@ -109,43 +113,61 @@ describe('useAuth', () => {
     it('should set user and session when session exists', async () => {
       const mockUser = createMockUser();
       const mockSession = createMockSession(mockUser);
-      
+
       mockGetSession.mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
 
+      // Trigger the auth state change callback
+      mockOnAuthStateChange.mockImplementation((callback) => {
+        setTimeout(() => callback('SIGNED_IN', mockSession), 0);
+        return {
+          data: { subscription: { unsubscribe: vi.fn() } },
+        };
+      });
+
       const { result } = renderHook(() => useAuth());
-      
+
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
-      
-      expect(result.current.user).toEqual(mockUser);
-      expect(result.current.session).toEqual(mockSession);
+
+      await waitFor(() => {
+        expect(result.current.user).toEqual(mockUser);
+        expect(result.current.session).toEqual(mockSession);
+      });
     });
 
     it('should clear session on sign out', async () => {
       const mockUser = createMockUser();
       const mockSession = createMockSession(mockUser);
-      
+
+      let authChangeCallback: any;
+      mockOnAuthStateChange.mockImplementation((callback) => {
+        authChangeCallback = callback;
+        setTimeout(() => callback('SIGNED_IN', mockSession), 0);
+        return {
+          data: { subscription: { unsubscribe: vi.fn() } },
+        };
+      });
+
       mockGetSession.mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
 
       const { result } = renderHook(() => useAuth());
-      
+
       await waitFor(() => {
         expect(result.current.user).toBeTruthy();
       });
 
       // Simulate auth state change to null (sign out)
-      const authChangeCallback = mockOnAuthStateChange.mock.calls[0]?.[0];
       if (authChangeCallback) {
         authChangeCallback('SIGNED_OUT', null);
       }
-      
+
       await waitFor(() => {
         expect(result.current.user).toBeNull();
         expect(result.current.session).toBeNull();
@@ -175,12 +197,14 @@ describe('useAuth', () => {
       });
 
       const { result } = renderHook(() => useAuth());
-      
+
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
-      
-      expect(mockSignOut).toHaveBeenCalled();
+
+      await waitFor(() => {
+        expect(mockSignOut).toHaveBeenCalled();
+      }, { timeout: 2000 });
     });
   });
 

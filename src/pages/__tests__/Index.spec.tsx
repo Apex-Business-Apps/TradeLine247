@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { render } from '@testing-library/react';
+import { HelmetProvider } from 'react-helmet-async';
 import Index from '../Index';
 
 vi.mock('@/hooks/useAnalytics', () => ({
@@ -23,9 +24,11 @@ vi.mock('@/components/layout/Footer', () => ({ Footer: () => <footer data-testid
 describe('Index page', () => {
   it('renders without camelCase fetchPriority attributes on images', () => {
     const { container } = render(
-      <MemoryRouter>
-        <Index />
-      </MemoryRouter>,
+      <HelmetProvider>
+        <MemoryRouter>
+          <Index />
+        </MemoryRouter>
+      </HelmetProvider>,
     );
 
     expect(container.querySelectorAll('[fetchPriority]')).toHaveLength(0);

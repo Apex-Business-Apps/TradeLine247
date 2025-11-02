@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { HelmetProvider } from 'react-helmet-async';
 import Pricing from '../Pricing';
 import Auth from '../Auth';
 import Index from '../Index';
@@ -89,7 +90,11 @@ describe('Router Smoke Tests', () => {
   });
 
   it('should render Index page with hero section', () => {
-    render(<Index />);
+    render(
+      <HelmetProvider>
+        <Index />
+      </HelmetProvider>
+    );
 
     // Check that hero section renders
     expect(screen.getByTestId('hero-roi-duo')).toBeInTheDocument();
