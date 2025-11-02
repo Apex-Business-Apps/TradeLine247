@@ -18,30 +18,66 @@ export const useAuth = () => {
       return () => undefined;
     }
 
-    // Set up auth state listener FIRST
+    // Set up auth state listener FIRST with enhanced error handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Fetch user role when user logs in
-        if (session?.user) {
-          setTimeout(async () => {
-            fetchUserRole(session.user!.id);
-            const result = await ensureMembership(session.user!);
-            if (result.error) {
-              toast({
-                variant: "destructive",
-                title: "Trial Setup Failed",
-                description: result.error,
-              });
-            }
-          }, 0);
-        } else {
+      async (event, session) => {
+        // Handle token refresh events silently to prevent disconnection errors
+        if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          // Fetch user role when user logs in
+          if (session?.user) {
+            setTimeout(async () => {
+              fetchUserRole(session.user!.id);
+              const result = await ensureMembership(session.user!);
+              if (result.error) {
+                toast({
+                  variant: "destructive",
+                  title: "Trial Setup Failed",
+                  description: result.error,
+                });
+              }
+            }, 0);
+          } else {
+            setUserRole(null);
+          }
+          
+          setLoading(false);
+        } else if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
           setUserRole(null);
+          setLoading(false);
+        } else if (event === 'USER_UPDATED') {
+          setSession(session);
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            fetchUserRole(session.user.id);
+          }
+        } else {
+          // For other events, update state normally
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          if (session?.user) {
+            setTimeout(async () => {
+              fetchUserRole(session.user!.id);
+              const result = await ensureMembership(session.user!);
+              if (result.error) {
+                toast({
+                  variant: "destructive",
+                  title: "Trial Setup Failed",
+                  description: result.error,
+                });
+              }
+            }, 0);
+          } else {
+            setUserRole(null);
+          }
+          
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
