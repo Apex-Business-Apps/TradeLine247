@@ -114,7 +114,7 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
             isPassword && "pr-10",
             className
           )}
-          aria-invalid={showError}
+          aria-invalid={showError ? 'true' : 'false'}
           aria-describedby={
             showError ? `${props.id}-error` : hint ? `${props.id}-hint` : undefined
           }

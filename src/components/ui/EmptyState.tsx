@@ -205,7 +205,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 /**
  * No Data Empty State
  */
-export const NoDataEmptyState: React.FC<Omit<EmptyStateProps, 'title' | 'illustration'>> = (props) => {
+export const NoDataEmptyState: React.FC<Omit<EmptyStateProps, 'illustration'> & { title?: string }> = (props) => {
   const Illustration = (
     <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" aria-hidden="true">
       <rect x="50" y="50" width="100" height="100" rx="8" stroke="currentColor" strokeWidth="2" strokeDasharray="4,4" className="opacity-30" />
@@ -228,7 +228,7 @@ export const NoDataEmptyState: React.FC<Omit<EmptyStateProps, 'title' | 'illustr
 /**
  * No Results Empty State (for search/filter)
  */
-export const NoResultsEmptyState: React.FC<Omit<EmptyStateProps, 'title' | 'illustration'>> = (props) => {
+export const NoResultsEmptyState: React.FC<Omit<EmptyStateProps, 'illustration'> & { title?: string }> = (props) => {
   const Illustration = (
     <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" aria-hidden="true">
       <circle cx="100" cy="100" r="60" stroke="currentColor" strokeWidth="2" className="opacity-30" />
@@ -249,7 +249,7 @@ export const NoResultsEmptyState: React.FC<Omit<EmptyStateProps, 'title' | 'illu
 /**
  * Error Empty State
  */
-export const ErrorEmptyState: React.FC<Omit<EmptyStateProps, 'title' | 'illustration'>> = (props) => {
+export const ErrorEmptyState: React.FC<Omit<EmptyStateProps, 'illustration'> & { title?: string }> = (props) => {
   const Illustration = (
     <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" aria-hidden="true">
       <circle cx="100" cy="100" r="70" stroke="currentColor" strokeWidth="2" className="opacity-20" />

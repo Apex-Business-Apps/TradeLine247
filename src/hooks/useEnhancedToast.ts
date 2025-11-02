@@ -13,11 +13,29 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import { toast as sonnerToast, type ToastOptions } from 'sonner';
+import { toast as sonnerToast } from 'sonner';
 import { useNetworkStatus } from './useNetworkStatus';
 import { prefersReducedMotion } from '@/lib/performanceOptimizations';
 
-export interface EnhancedToastOptions extends Omit<ToastOptions, 'duration' | 'position'> {
+// Define our own ToastOptions interface based on sonner's API
+interface BaseToastOptions {
+  description?: string | React.ReactNode;
+  duration?: number;
+  position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+  type?: 'success' | 'error' | 'info' | 'warning' | 'loading';
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  cancel?: {
+    label: string;
+    onClick: () => void;
+  };
+  className?: string;
+  important?: boolean;
+}
+
+export interface EnhancedToastOptions extends Omit<BaseToastOptions, 'duration' | 'position'> {
   /**
    * Action button configuration
    */
@@ -155,10 +173,10 @@ export function useEnhancedToast() {
     }
     
     // Build toast options
-    const toastOptions: ToastOptions = {
+    const toastOptions: any = {
       duration,
       position,
-      description,
+      description: typeof description === 'string' || typeof description === 'undefined' ? description : String(description),
       action: action ? {
         label: action.label,
         onClick: action.onClick,
@@ -172,7 +190,8 @@ export function useEnhancedToast() {
     };
     
     // Show toast
-    const toastId = sonnerToast[options?.type || 'info'](title, toastOptions);
+    const toastType = options?.type || 'info';
+    const toastId = String((sonnerToast as any)[toastType](title, toastOptions));
     
     // Track grouped toasts
     if (groupId) {
