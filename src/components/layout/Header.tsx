@@ -6,38 +6,39 @@ import { Menu, X, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 const navigationItems = [{
   name: 'Features',
-  href: '/features'
+  href: paths.features
 }, {
   name: 'Pricing',
-  href: '/pricing#no-monthly'
+  href: `${paths.pricing}#no-monthly`
 }, {
   name: 'Compare',
-  href: '/compare'
+  href: paths.compare
 }, {
   name: 'Security',
-  href: '/security'
+  href: paths.security
 }, {
   name: 'FAQ',
-  href: '/faq'
+  href: paths.faq
 }, {
   name: 'Contact',
-  href: '/contact'
+  href: paths.contact
 }];
 const adminNavigationItems = [{
   name: 'Dashboard',
-  href: '/dashboard'
+  href: paths.dashboard
 }, {
   name: 'Calls',
-  href: '/calls'
+  href: paths.calls
 }, {
   name: 'Phone Apps',
   href: '/phone-apps'
 }, {
   name: 'Settings',
-  href: '/ops/voice'
+  href: paths.voiceSettings
 }];
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -75,7 +76,7 @@ export const Header: React.FC = () => {
             id="app-home"
             variant="default" 
             size={isScrolled ? 'sm' : 'default'}
-            onClick={() => navigate('/')} 
+            onClick={() => navigate(paths.home)} 
             className="hover-scale transition-all duration-300" 
             aria-label="Go to homepage" 
             data-lovable-lock="structure-only"
@@ -159,7 +160,7 @@ export const Header: React.FC = () => {
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline ml-2">Sign Out</span>
               </Button>
-            </div> : <Button variant="success" size={isScrolled ? 'sm' : 'default'} onClick={() => navigate('/auth')} className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]">
+            </div> : <Button variant="success" size={isScrolled ? 'sm' : 'default'} onClick={() => navigate(paths.auth)} className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]">
               Login
             </Button>}
         </div>

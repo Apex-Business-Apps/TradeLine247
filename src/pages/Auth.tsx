@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,7 +42,7 @@ const Auth = () => {
         
         // Redirect authenticated users to dashboard
         if (session?.user) {
-          navigate('/dashboard');
+          navigate(paths.dashboard);
         }
       }
     );
@@ -62,7 +63,7 @@ const Auth = () => {
 
       // Redirect if already logged in
       if (session?.user) {
-        navigate('/dashboard');
+        navigate(paths.dashboard);
       }
     }).catch((err) => {
       // Catch any unhandled JWT errors
@@ -230,7 +231,7 @@ const Auth = () => {
       } else {
         // Success - redirect will happen via onAuthStateChange listener
         // But also do explicit navigation as backup
-        navigate('/dashboard');
+        navigate(paths.dashboard);
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during sign in');

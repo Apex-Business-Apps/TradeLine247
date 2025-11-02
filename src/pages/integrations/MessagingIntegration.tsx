@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { ArrowLeft, MessageSquare, ExternalLink, Settings, CheckCircle, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -107,7 +108,7 @@ const MessagingIntegration = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(paths.dashboard)}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

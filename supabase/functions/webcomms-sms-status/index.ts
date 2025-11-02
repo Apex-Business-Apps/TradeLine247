@@ -1,12 +1,13 @@
 // PROMPT D: SMS status callback - canonical path
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders, handleCors } from "../_shared/cors.ts";
+import { corsHeaders, preflight } from "../_shared/cors.ts";
 import { validateTwilioSignature } from "../_shared/twilio_sig.ts";
+import { withJSON } from "../_shared/secure_headers.ts";
 
 serve(async (req) => {
-  const preflight = handleCors(req);
-  if (preflight) return preflight;
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
@@ -17,10 +18,10 @@ serve(async (req) => {
       throw new Error("TWILIO_AUTH_TOKEN not configured");
     }
 
-    const isValid = await validateTwilioSignature(req);
+    const isValid = await validateTwilioSignature(req.clone());
     if (!isValid) {
       console.error("Invalid Twilio signature");
-      return new Response("Forbidden", { status: 403, headers: corsHeaders });
+      return new Response("Forbidden", { status: 403, headers: withJSON(corsHeaders) });
     }
 
     const formData = await req.formData();
@@ -56,13 +57,13 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: withJSON(corsHeaders),
     });
   } catch (error) {
     console.error("Error in webcomms-sms-status:", error);
     return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: withJSON(corsHeaders),
     });
   }
 });
