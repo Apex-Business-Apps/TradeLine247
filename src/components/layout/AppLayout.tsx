@@ -5,6 +5,8 @@ import { ThemeProvider, useTheme } from "next-themes";
 import { useEffect } from "react";
 import { useUserPreferencesStore } from "@/stores/userPreferencesStore";
 import { MiniChat } from "@/components/ui/MiniChat";
+import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
+import { Toaster } from "@/components/ui/sonner";
 
 // Component to apply reduceMotion preference to document
 const MotionPreferenceSync = () => {
@@ -59,12 +61,16 @@ export const AppLayout = () => {
         <MotionPreferenceSync />
         <div className="flex min-h-screen flex-col">
           <Header />
-          <div className="flex-1">
+          <main className="flex-1" id="main">
             <Outlet />
-          </div>
+          </main>
         </div>
         {/* Global Chat Widget - uses startup splash robot icon */}
         <MiniChat />
+        {/* Connection Indicator - shows network status */}
+        <ConnectionIndicator />
+        {/* Enhanced Toast Notifications */}
+        <Toaster position="auto" richColors closeButton />
       </ThemeProvider>
     </HelmetProvider>
   );
