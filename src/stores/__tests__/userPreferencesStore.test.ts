@@ -17,9 +17,9 @@ describe('userPreferencesStore', () => {
   describe('initial state', () => {
     it('should have default preferences', () => {
       const state = useUserPreferencesStore.getState();
-      
+
       expect(state.hasCompletedOnboarding).toBe(false);
-      expect(state.theme).toBe('system');
+      expect(state.theme).toBe('light');
       expect(state.dashboardLayout).toBe('comfortable');
       expect(state.showWelcomeMessage).toBe(true);
       expect(state.enableNotifications).toBe(true);
@@ -156,12 +156,12 @@ describe('userPreferencesStore', () => {
       useUserPreferencesStore.getState().setTheme('dark');
       useUserPreferencesStore.getState().setPreferredName('Test User');
       useUserPreferencesStore.getState().addRecentAction('test-action');
-      
+
       // Reset
       useUserPreferencesStore.getState().resetPreferences();
-      
+
       const state = useUserPreferencesStore.getState();
-      expect(state.theme).toBe('system');
+      expect(state.theme).toBe('light');
       expect(state.preferredName).toBeNull();
       expect(state.recentActions).toHaveLength(0);
     });

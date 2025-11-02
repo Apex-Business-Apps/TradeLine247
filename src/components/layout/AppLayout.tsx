@@ -49,7 +49,7 @@ const ThemeSync = () => {
 
 export const AppLayout = () => {
   const { theme } = useUserPreferencesStore();
-  
+
   // Initialize Klaviyo analytics tracking
   useKlaviyoAnalytics();
 
@@ -57,7 +57,7 @@ export const AppLayout = () => {
     <HelmetProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme={theme || "light"}
+        defaultTheme="light"
         enableSystem
         disableTransitionOnChange={false}
       >
