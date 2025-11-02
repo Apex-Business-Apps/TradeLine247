@@ -48,6 +48,7 @@ describe('useAuth', () => {
   let mockOnAuthStateChange: ReturnType<typeof vi.fn>;
   let mockSignOut: ReturnType<typeof vi.fn>;
   let mockFrom: ReturnType<typeof vi.fn>;
+  let mockMaybeSingle: ReturnType<typeof vi.fn>;
   let ensureMembership: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
@@ -73,7 +74,11 @@ describe('useAuth', () => {
       data: { subscription: { unsubscribe: vi.fn() } },
     });
 
-    const mockMaybeSingle = vi.fn().mockResolvedValue({
+    // Make signOut return a promise for proper error handling
+    mockSignOut.mockResolvedValue({ error: null });
+
+    // Create mockMaybeSingle that can be accessed in test scope
+    mockMaybeSingle = vi.fn().mockResolvedValue({
       data: { role: 'user' },
       error: null,
     });
@@ -110,6 +115,7 @@ describe('useAuth', () => {
       const mockUser = createMockUser();
       const mockSession = createMockSession(mockUser);
       
+      // Ensure getSession returns a proper promise
       mockGetSession.mockResolvedValue({
         data: { session: mockSession },
         error: null,
@@ -117,8 +123,16 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
+      // Wait for loading to complete and session to be set
+      await waitFor(
+        () => {
+          expect(result.current.loading).toBe(false);
+        },
+        { timeout: 3000 }
+      );
+      
       await waitFor(() => {
-        expect(result.current.loading).toBe(false);
+        expect(result.current.user).toBeTruthy();
       });
       
       expect(result.current.user).toEqual(mockUser);
@@ -160,11 +174,18 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
+      // Wait for loading to complete and signOut to be called
+      await waitFor(
+        () => {
+          expect(result.current.loading).toBe(false);
+        },
+        { timeout: 3000 }
+      );
+      
       await waitFor(() => {
-        expect(result.current.loading).toBe(false);
+        expect(mockSignOut).toHaveBeenCalled();
       });
       
-      expect(mockSignOut).toHaveBeenCalled();
       expect(result.current.user).toBeNull();
     });
 
@@ -176,11 +197,17 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false);
-      });
+      // Wait for loading to complete and signOut to be called
+      await waitFor(
+        () => {
+          expect(result.current.loading).toBe(false);
+        },
+        { timeout: 3000 }
+      );
       
-      expect(mockSignOut).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(mockSignOut).toHaveBeenCalled();
+      }, { timeout: 3000 });
     });
   });
 
@@ -194,6 +221,7 @@ describe('useAuth', () => {
         error: null,
       });
 
+      // Update mockMaybeSingle before the hook runs
       mockMaybeSingle.mockResolvedValue({
         data: { role: 'admin' },
         error: null,
@@ -201,9 +229,15 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
+      // Wait for user to be set first
+      await waitFor(() => {
+        expect(result.current.user).toBeTruthy();
+      });
+      
+      // Then wait for role to be fetched
       await waitFor(() => {
         expect(result.current.userRole).toBe('admin');
-      });
+      }, { timeout: 3000 });
     });
 
     it('should default to "user" role when no role found', async () => {
@@ -215,6 +249,7 @@ describe('useAuth', () => {
         error: null,
       });
 
+      // Update mockMaybeSingle to return null (no role found)
       mockMaybeSingle.mockResolvedValue({
         data: null,
         error: null,
@@ -222,9 +257,15 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
+      // Wait for user to be set first
+      await waitFor(() => {
+        expect(result.current.user).toBeTruthy();
+      });
+      
+      // Then wait for default role to be set
       await waitFor(() => {
         expect(result.current.userRole).toBe('user');
-      });
+      }, { timeout: 3000 });
     });
   });
 

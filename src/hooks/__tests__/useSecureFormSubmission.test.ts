@@ -34,13 +34,16 @@ describe('useSecureFormSubmission', () => {
     mockRpc = supabase.rpc;
     mockInvoke = supabase.functions.invoke;
     
-    // Mock crypto.randomUUID
-    global.crypto = {
+    // Mock crypto.randomUUID - use vi.stubGlobal for proper test environment compatibility
+    vi.stubGlobal('crypto', {
       randomUUID: vi.fn(() => 'mock-uuid-123'),
-    } as any;
+      getRandomValues: vi.fn((arr) => arr),
+      subtle: {},
+    });
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     sessionStorage.clear();
   });
 

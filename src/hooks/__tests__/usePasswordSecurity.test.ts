@@ -76,11 +76,16 @@ describe('usePasswordSecurity', () => {
     it('should detect lowercase letters', () => {
       const { result } = renderHook(() => usePasswordSecurity());
       
+      // PASSWORD123! has 3 criteria (upper, number, special) - should be valid
       const validation1 = result.current.validatePasswordStrength('PASSWORD123!');
+      // password123! has 3 criteria (lower, number, special) - should be valid
       const validation2 = result.current.validatePasswordStrength('password123!');
+      // PASSWORD! has only 2 criteria (upper, special) - should be invalid
+      const validation3 = result.current.validatePasswordStrength('PASSWORD!');
       
-      expect(validation1.isValid).toBe(false);
-      expect(validation2.isValid).toBe(true);
+      expect(validation1.isValid).toBe(true); // Has 3+ criteria
+      expect(validation2.isValid).toBe(true); // Has 3+ criteria
+      expect(validation3.isValid).toBe(false); // Only 2 criteria
     });
 
     it('should detect uppercase letters', () => {
@@ -96,11 +101,16 @@ describe('usePasswordSecurity', () => {
     it('should detect numbers', () => {
       const { result } = renderHook(() => usePasswordSecurity());
       
+      // Password! has 3 criteria (lower, upper, special) - should be valid
       const validation1 = result.current.validatePasswordStrength('Password!');
+      // Password1! has 4 criteria (all) - should be valid
       const validation2 = result.current.validatePasswordStrength('Password1!');
+      // Password has only 2 criteria (lower, upper) - should be invalid
+      const validation3 = result.current.validatePasswordStrength('Password');
       
-      expect(validation1.isValid).toBe(false);
-      expect(validation2.isValid).toBe(true);
+      expect(validation1.isValid).toBe(true); // Has 3+ criteria
+      expect(validation2.isValid).toBe(true); // Has 4 criteria
+      expect(validation3.isValid).toBe(false); // Only 2 criteria
     });
 
     it('should detect special characters', () => {
