@@ -63,7 +63,6 @@ describe('useAuth', () => {
     (ensureMembership as any).mockImplementation(() =>
       Promise.resolve({ orgId: 'org-123', error: undefined })
     );
-
     mockGetSession = supabase.auth.getSession;
     mockOnAuthStateChange = supabase.auth.onAuthStateChange;
     mockSignOut = supabase.auth.signOut;
@@ -81,7 +80,6 @@ describe('useAuth', () => {
 
     // Mock signOut to return a resolved Promise
     mockSignOut.mockResolvedValue({ error: null });
-
     mockMaybeSingle = vi.fn().mockResolvedValue({
       data: { role: 'user' },
       error: null,
