@@ -28,8 +28,8 @@ describe('usePasswordSecurity', () => {
     // Use ES import instead of require() for proper module resolution
     const { supabase } = await import('@/integrations/supabase/client');
 
-    // Use vi.mocked() for proper type-safe mocking
-    mockInvoke = vi.mocked(supabase.functions.invoke);
+    // Use vi.mocked() with explicit any type for complex Supabase types
+    mockInvoke = vi.mocked(supabase.functions.invoke) as any;
 
     mockInvoke.mockResolvedValue({
       data: { isBreached: false, message: 'Password is safe' },

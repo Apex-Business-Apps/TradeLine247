@@ -32,9 +32,9 @@ describe('useSecureFormSubmission', () => {
     // Use ES import instead of require() for proper module resolution
     const { supabase } = await import('@/integrations/supabase/client');
 
-    // Use vi.mocked() for proper type-safe mocking
-    mockRpc = vi.mocked(supabase.rpc);
-    mockInvoke = vi.mocked(supabase.functions.invoke);
+    // Use vi.mocked() with explicit any type for complex Supabase types
+    mockRpc = vi.mocked(supabase.rpc) as any;
+    mockInvoke = vi.mocked(supabase.functions.invoke) as any;
 
     // Mock crypto.randomUUID with valid UUID format
     vi.spyOn(global.crypto, 'randomUUID').mockReturnValue('00000000-0000-4000-8000-000000000000');

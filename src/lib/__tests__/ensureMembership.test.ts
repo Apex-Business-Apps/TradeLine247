@@ -31,9 +31,9 @@ describe('ensureMembership', () => {
     // Use ES import instead of require() for proper module resolution
     const { supabase } = await import('@/integrations/supabase/client');
 
-    // Use vi.mocked() for proper type-safe mocking
-    mockFrom = vi.mocked(supabase.from);
-    mockInvoke = vi.mocked(supabase.functions.invoke);
+    // Use vi.mocked() with explicit any type for complex Supabase types
+    mockFrom = vi.mocked(supabase.from) as any;
+    mockInvoke = vi.mocked(supabase.functions.invoke) as any;
     
     const mockMaybeSingle = vi.fn();
     mockFrom.mockReturnValue({

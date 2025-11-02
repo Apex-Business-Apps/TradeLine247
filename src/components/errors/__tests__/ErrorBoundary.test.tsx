@@ -224,9 +224,9 @@ describe('AppErrorBoundary', () => {
     expect(homeButton).toBeInTheDocument();
     expect(window.location.href).toBe('/');
 
-    // Restore original location
+    // Restore original location with proper typing
     Object.defineProperty(window, 'location', {
-      value: originalLocation,
+      value: originalLocation as Location,
       writable: true,
       configurable: true,
     });
