@@ -12,6 +12,11 @@ vi.mock('@/lib/errorReporter', () => ({
   reportReactError: vi.fn(),
 }));
 
+vi.mock('react-helmet-async', () => ({
+  Helmet: ({ children }: any) => <>{children}</>,
+  HelmetProvider: ({ children }: any) => <>{children}</>,
+}));
+
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, ...props }: any) => (
     <button onClick={onClick} {...props}>{children}</button>
