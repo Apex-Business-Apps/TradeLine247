@@ -8,8 +8,7 @@ import { HowItWorks } from "@/components/sections/HowItWorks";
 import { LeadCaptureForm } from "@/components/sections/LeadCaptureForm";
 import { NoAIHypeFooter } from "@/components/sections/NoAIHypeFooter";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { SEOHead } from "@/components/seo/SEOHead";
-import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
+import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 
 const Index = () => {
@@ -41,59 +40,42 @@ const Index = () => {
       >
       {/* Content with translucency - Optimized for performance */}
       <div className="relative z-10" style={{ minHeight: '100vh' }}>
-        <SEOHead
+        <AISEOHead
           title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
           description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
-          keywords="AI receptionist, 24/7 customer service, business automation, call handling, lead capture, CRM integration, grow business"
-          canonical="https://www.tradeline247ai.com"
-          structuredData={{
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "TradeLine 24/7",
-            "alternateName": "Apex Business Systems",
-            "description": "Fast and reliable 24/7 customer service and receptionist solutions for businesses",
-            "url": "https://www.tradeline247ai.com",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://www.tradeline247ai.com/pwa-512x512.png",
-              "width": 512,
-              "height": 512
-            },
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "contactType": "customer service",
-              "telephone": "+1-587-742-8885",
-              "email": "info@tradeline247ai.com",
-              "availableLanguage": ["English"],
-              "hoursAvailable": {
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-                "opens": "00:00",
-                "closes": "23:59"
-              }
-            },
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Edmonton",
-              "addressRegion": "AB",
-              "addressCountry": "Canada"
-            },
-            "sameAs": [],
-            "foundingDate": "2024",
-            "keywords": "AI receptionist, customer service automation, business phone answering, lead capture, CRM integration",
-            "areaServed": {
-              "@type": "Country",
-              "name": "Canada"
-            },
-            "serviceType": "AI Customer Service Solutions",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": "https://www.tradeline247ai.com/search?q={search_term_string}",
-              "query-input": "required name=search_term_string"
-            }
+          canonical="/"
+          contentType="service"
+          directAnswer="TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads, and sends clean transcripts via email to Canadian businesses. Never miss a call. Work while you sleep."
+          primaryEntity={{
+            name: "TradeLine 24/7 AI Receptionist Service",
+            type: "Service",
+            description: "24/7 AI-powered phone answering service for Canadian businesses"
           }}
+          keyFacts={[
+            { label: "Availability", value: "24/7" },
+            { label: "Response Time", value: "<2 seconds" },
+            { label: "Uptime", value: "99.9%" },
+            { label: "Service Area", value: "Canada" }
+          ]}
+          faqs={[
+            {
+              question: "What is TradeLine 24/7?",
+              answer: "TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads based on your criteria, and sends clean email transcripts. It never misses a call and works while you sleep."
+            },
+            {
+              question: "How does TradeLine 24/7 work?",
+              answer: "When a call comes in, our AI answers immediately, has a natural conversation with the caller, qualifies them based on your criteria, and sends you a clean email transcript with all the details."
+            },
+            {
+              question: "What areas does TradeLine 24/7 serve?",
+              answer: "TradeLine 24/7 serves businesses across Canada, with primary operations in Edmonton, Alberta."
+            },
+            {
+              question: "How much does TradeLine 24/7 cost?",
+              answer: "TradeLine 24/7 offers flexible pricing: $149 CAD per qualified appointment (pay-per-use) or $249 CAD per month for the Predictable Plan."
+            }
+          ]}
         />
-        <OrganizationSchema />
         
         <main className="flex-1" style={{ minHeight: '60vh' }}>
           <div className="bg-background/20 backdrop-blur-[2px]" style={{ willChange: 'transform' }}>
