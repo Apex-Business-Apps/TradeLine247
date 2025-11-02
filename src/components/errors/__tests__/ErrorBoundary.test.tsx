@@ -149,7 +149,18 @@ describe('AppErrorBoundary', () => {
   it('should reload page on retry button click', () => {
     const reloadMock = vi.fn();
     Object.defineProperty(window, 'location', {
-      value: { reload: reloadMock },
+      value: {
+        reload: reloadMock,
+        href: window.location.href,
+        origin: window.location.origin,
+        protocol: window.location.protocol,
+        host: window.location.host,
+        hostname: window.location.hostname,
+        port: window.location.port,
+        pathname: window.location.pathname,
+        search: window.location.search,
+        hash: window.location.hash,
+      },
       writable: true,
     });
 
@@ -172,7 +183,18 @@ describe('AppErrorBoundary', () => {
   it('should navigate home on Go Home button click', () => {
     const originalLocation = window.location;
     delete (window as any).location;
-    (window as any).location = { href: '' };
+    (window as any).location = {
+      href: '',
+      origin: 'http://localhost:3000',
+      protocol: 'http:',
+      host: 'localhost:3000',
+      hostname: 'localhost',
+      port: '3000',
+      pathname: '/',
+      search: '',
+      hash: '',
+      reload: vi.fn(),
+    };
 
     const ThrowError = () => {
       throw new Error('Test error');

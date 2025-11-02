@@ -155,7 +155,7 @@ export function useEnhancedToast() {
     // Calculate smart duration
     const duration = customDuration ?? calculateSmartDuration(
       title,
-      description,
+      typeof description === 'string' ? description : (description ? String(description) : undefined),
       !!(action || cancel)
     );
     
@@ -204,7 +204,7 @@ export function useEnhancedToast() {
     if (progress !== undefined && progress >= 0 && progress <= 100) {
       sonnerToast.loading(title, {
         ...toastOptions,
-        description: description || `${Math.round(progress)}%`,
+        description: (typeof description === 'string' ? description : (description ? String(description) : undefined)) || `${Math.round(progress)}%`,
       });
       
       // Update to success when complete
