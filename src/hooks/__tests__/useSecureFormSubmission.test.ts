@@ -39,6 +39,7 @@ describe('useSecureFormSubmission', () => {
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     sessionStorage.clear();
     vi.restoreAllMocks();
   });

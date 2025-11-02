@@ -77,6 +77,7 @@ describe('usePasswordSecurity', () => {
       const { result } = renderHook(() => usePasswordSecurity());
 
       const validation1 = result.current.validatePasswordStrength('PASSWORD123!');
+      // password123! has 3 criteria (lower, number, special) - should be valid
       const validation2 = result.current.validatePasswordStrength('password123!');
 
       // PASSWORD123! has 3 criteria (upper, number, special) so it's valid
@@ -99,6 +100,7 @@ describe('usePasswordSecurity', () => {
       const { result } = renderHook(() => usePasswordSecurity());
 
       const validation1 = result.current.validatePasswordStrength('Password!');
+      // Password1! has 4 criteria (all) - should be valid
       const validation2 = result.current.validatePasswordStrength('Password1!');
 
       // Password! has 3 criteria (lower, upper, special) so it's valid

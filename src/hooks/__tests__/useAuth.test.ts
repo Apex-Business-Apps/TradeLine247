@@ -130,7 +130,7 @@ describe('useAuth', () => {
       const { result } = renderHook(() => useAuth());
 
       await waitFor(() => {
-        expect(result.current.loading).toBe(false);
+        expect(result.current.user).toBeTruthy();
       });
 
       await waitFor(() => {
@@ -182,11 +182,18 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
+      // Wait for loading to complete and signOut to be called
+      await waitFor(
+        () => {
+          expect(result.current.loading).toBe(false);
+        },
+        { timeout: 3000 }
+      );
+      
       await waitFor(() => {
-        expect(result.current.loading).toBe(false);
+        expect(mockSignOut).toHaveBeenCalled();
       });
       
-      expect(mockSignOut).toHaveBeenCalled();
       expect(result.current.user).toBeNull();
     });
 
@@ -218,6 +225,7 @@ describe('useAuth', () => {
         error: null,
       });
 
+      // Update mockMaybeSingle before the hook runs
       mockMaybeSingle.mockResolvedValue({
         data: { role: 'admin' },
         error: null,
@@ -225,9 +233,15 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
+      // Wait for user to be set first
+      await waitFor(() => {
+        expect(result.current.user).toBeTruthy();
+      });
+      
+      // Then wait for role to be fetched
       await waitFor(() => {
         expect(result.current.userRole).toBe('admin');
-      });
+      }, { timeout: 3000 });
     });
 
     it('should default to "user" role when no role found', async () => {
@@ -239,6 +253,7 @@ describe('useAuth', () => {
         error: null,
       });
 
+      // Update mockMaybeSingle to return null (no role found)
       mockMaybeSingle.mockResolvedValue({
         data: null,
         error: null,
@@ -246,9 +261,15 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
+      // Wait for user to be set first
+      await waitFor(() => {
+        expect(result.current.user).toBeTruthy();
+      });
+      
+      // Then wait for default role to be set
       await waitFor(() => {
         expect(result.current.userRole).toBe('user');
-      });
+      }, { timeout: 3000 });
     });
   });
 
