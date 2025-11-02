@@ -1,0 +1,108 @@
+name: "CodeQL Security Analysis"
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  schedule:
+    # Run CodeQL analysis every day at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+# Needed for CodeQL to upload results
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+  statuses: write
+
+# Prevent duplicate runs
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: CodeQL Analysis (JavaScript/TypeScript)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+        # CodeQL supports: 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # Queries to run: security-extended includes all security queries
+          queries: security-extended,security-and-quality
+          # Disable default setup for custom configuration
+          config-file: ./.github/codeql/codeql-config.yml
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --fund=false
+
+      - name: Build project (for better analysis)
+        run: npm run build --if-present
+        env:
+          NODE_ENV: production
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+          # Upload SARIF file for security tab
+          upload: true
+
+      - name: Report status (security/codeql)
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const state = "${{ job.status }}" === "success" ? "success" : "failure";
+            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
+
+            // Only create status for PR/push events, not scheduled
+            if (context.eventName !== 'schedule') {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha: sha,
+                state: state,
+                context: "security/codeql",
+                description: state === "success" ? "CodeQL analysis passed" : "CodeQL analysis found issues",
+                target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/security/code-scanning`
+              });
+            }
+
+  summary:
+    name: Security Analysis Summary
+    runs-on: ubuntu-latest
+    needs: [ analyze ]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "# CodeQL Security Analysis Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "- CodeQL Analysis: ${{ needs.analyze.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**View detailed results:** [Security Tab](https://github.com/${{ github.repository }}/security/code-scanning)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Generated at: $(date)" >> $GITHUB_STEP_SUMMARY
