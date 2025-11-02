@@ -1,9 +1,25 @@
 name: Security Scanning
 
 on:
-  workflow_dispatch: # Manual trigger only
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch: # Manual trigger
   schedule:
     - cron: '0 2 * * 1' # Weekly on Monday at 2 AM UTC
+
+# Prevent duplicate runs
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+# Needed for commit status API
+permissions:
+  contents: read
+  statuses: write
+  issues: write # For PR comments
+  pull-requests: write
 
 jobs:
   zap-baseline:
@@ -93,6 +109,22 @@ jobs:
               body: summary
             });
         continue-on-error: true
+
+      - name: Report status (security/npm-audit)
+        if: always() && github.event_name != 'schedule'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const state = "${{ job.status }}" === "success" ? "success" : "failure";
+            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: sha,
+              state: state,
+              context: "security/npm-audit",
+              description: state === "success" ? "No high-severity vulnerabilities" : "Vulnerabilities found"
+            });
 
   dependency-check:
     name: Dependency Security Check
