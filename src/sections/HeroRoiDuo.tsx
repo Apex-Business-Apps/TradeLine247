@@ -34,13 +34,13 @@ export default function HeroRoiDuo() {
     paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
-  }} data-lovable-lock="permanent">
-      <div className="container" data-lovable-lock="permanent">
+  }} data-lovable-lock="structure-only">
+      <div className="container" data-lovable-lock="structure-only">
         {/* Hero Content */}
-        <div className="text-center mb-16" data-lovable-lock="permanent">
+        <div className="text-center mb-16" data-lovable-lock="structure-only">
           
           {/* Logo above hero text - LOCKED */}
-          <div className="flex justify-center mb-8 min-h-[13.3125rem] md:min-h-[17.15625rem] items-center" data-lovable-lock="permanent">
+          <div className="flex justify-center mb-8 min-h-[13.3125rem] md:min-h-[17.15625rem] items-center" data-lovable-lock="structure-only">
             <img 
               src={officialLogo} 
               alt="TradeLine 24/7 Logo" 
@@ -53,14 +53,14 @@ export default function HeroRoiDuo() {
               }}
               loading="eager"
               fetchpriority="high"
-              data-lovable-lock="permanent"
+              data-lovable-lock="structure-only"
             />
           </div>
           
-          <h1 id="hero-h1" className="mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent font-extrabold" style={{ fontSize: 'clamp(2rem, 5vw + 1rem, 4.5rem)', lineHeight: '1.1' }} data-lovable-lock="permanent">
+          <h1 id="hero-h1" className="mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent font-extrabold" style={{ fontSize: 'clamp(2rem, 5vw + 1rem, 4.5rem)', lineHeight: '1.1' }} data-lovable-lock="structure-only">
             Your 24/7 A<span className="text-primary">i</span> Receptionist!
           </h1>
-          <p className="mb-8 max-w-3xl mx-auto font-semibold text-[#1e556b]" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5' }} data-lovable-lock="permanent">
+          <p className="mb-8 max-w-3xl mx-auto font-semibold text-[#1e556b]" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5' }} data-lovable-lock="structure-only">
             Never miss a call. Work while you sleep.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-8 text-sm md:text-base">
@@ -84,15 +84,15 @@ export default function HeroRoiDuo() {
             <span className="text-sm font-semibold uppercase tracking-wide text-primary/80">FOR DEMO</span>
           </a>
           
-          <h2 className="text-[#1e556b] mb-12 mt-16 text-center py-0 font-semibold mx-auto" style={{ fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 2.5rem)' }} data-lovable-lock="permanent">Help us help you.</h2>
+          <h2 className="text-[#1e556b] mb-12 mt-16 text-center py-0 font-semibold mx-auto" style={{ fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 2.5rem)' }} data-lovable-lock="structure-only">Help us help you.</h2>
           
           {/* Custom grid layout for side-by-side components */}
-          <div className="hero-roi__container mx-auto" data-lovable-lock="permanent" aria-label="Start Trial and ROI">
-            <div className="hero-roi__grid" data-node="grid" data-lovable-lock="permanent">
-              <div id="roi-calculator" data-node="ron" data-lovable-lock="permanent">
+          <div className="hero-roi__container mx-auto" data-lovable-lock="structure-only" aria-label="Start Trial and ROI">
+            <div className="hero-roi__grid" data-node="grid" data-lovable-lock="structure-only">
+              <div id="roi-calculator" data-node="ron" data-lovable-lock="structure-only">
                 <RoiCalculator />
               </div>
-              <div id="start-trial-hero" data-node="start" data-lovable-lock="permanent">
+              <div id="start-trial-hero" data-node="start" data-lovable-lock="structure-only">
                 <LeadCaptureCard compact />
               </div>
             </div>

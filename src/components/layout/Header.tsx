@@ -67,10 +67,10 @@ export const Header: React.FC = () => {
       console.warn('Header left elements missing; override not applied');
     }
   }, []);
-  return <header data-site-header className={cn('sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 isolate', isScrolled ? 'shadow-lg py-2' : 'py-4')} style={{ isolation: 'isolate' }} data-lovable-lock="permanent">
-      <div data-header-inner className="container flex h-14 items-center justify-between gap-4" data-lovable-lock="permanent">
+  return <header data-site-header className={cn('sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 isolate', isScrolled ? 'shadow-lg py-2' : 'py-4')} style={{ isolation: 'isolate' }} data-lovable-lock="structure-only">
+      <div data-header-inner className="container flex h-14 items-center justify-between gap-4" data-lovable-lock="structure-only">
         {/* Home Button & Badge */}
-        <div id="app-header-left" data-slot="left" className="flex items-center gap-3 animate-fade-in" data-lovable-lock="permanent">
+        <div id="app-header-left" data-slot="left" className="flex items-center gap-3 animate-fade-in" data-lovable-lock="structure-only">
           <Button 
             id="app-home"
             variant="default" 
@@ -78,7 +78,7 @@ export const Header: React.FC = () => {
             onClick={() => navigate('/')} 
             className="hover-scale transition-all duration-300" 
             aria-label="Go to homepage" 
-            data-lovable-lock="permanent"
+            data-lovable-lock="structure-only"
           >
             Home
           </Button>
@@ -90,14 +90,14 @@ export const Header: React.FC = () => {
             width="156"
             height="65"
             loading="eager"
-            data-lovable-lock="permanent"
+            data-lovable-lock="structure-only"
           />
         </div>
 
         {/* Desktop Navigation */}
-        <nav data-slot="center" aria-label="Primary" className="hidden md:flex animate-fade-in" style={{ animationDelay: '200ms' }} data-lovable-lock="permanent">
-          <NavigationMenu data-lovable-lock="permanent">
-            <NavigationMenuList data-lovable-lock="permanent">
+        <nav data-slot="center" aria-label="Primary" className="hidden md:flex animate-fade-in" style={{ animationDelay: '200ms' }} data-lovable-lock="structure-only">
+          <NavigationMenu data-lovable-lock="structure-only">
+            <NavigationMenuList data-lovable-lock="structure-only">
             {navigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
                 <NavigationMenuLink asChild>
                   <Link to={item.href} className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 story-link hover-scale" style={{
@@ -122,8 +122,8 @@ export const Header: React.FC = () => {
         </nav>
 
         {/* Enhanced CTA Button & Mobile Menu */}
-        <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="permanent">
-          <LanguageSwitcher data-lovable-lock="permanent" />
+        <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
+          <LanguageSwitcher data-lovable-lock="structure-only" />
 
           {/* Burger Menu Button - ALWAYS VISIBLE - Critical Navigation Control */}
           <button
