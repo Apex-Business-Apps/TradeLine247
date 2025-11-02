@@ -31,11 +31,13 @@ describe('useSecureFormSubmission', () => {
 
     // Use ES import instead of require() for proper module resolution
     const { supabase } = await import('@/integrations/supabase/client');
-    mockRpc = supabase.rpc;
-    mockInvoke = supabase.functions.invoke;
 
-    // Mock crypto.randomUUID using vi.spyOn instead of stubGlobal
-    vi.spyOn(global.crypto, 'randomUUID').mockReturnValue('mock-uuid-123');
+    // Use vi.mocked() for proper type-safe mocking
+    mockRpc = vi.mocked(supabase.rpc);
+    mockInvoke = vi.mocked(supabase.functions.invoke);
+
+    // Mock crypto.randomUUID with valid UUID format
+    vi.spyOn(global.crypto, 'randomUUID').mockReturnValue('00000000-0000-4000-8000-000000000000');
   });
 
   afterEach(() => {
