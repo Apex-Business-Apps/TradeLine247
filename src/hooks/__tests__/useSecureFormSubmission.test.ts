@@ -28,23 +28,20 @@ describe('useSecureFormSubmission', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     sessionStorage.clear();
-    
+
     // Use ES import instead of require() for proper module resolution
     const { supabase } = await import('@/integrations/supabase/client');
     mockRpc = supabase.rpc;
     mockInvoke = supabase.functions.invoke;
-    
-    // Mock crypto.randomUUID - use vi.stubGlobal for proper test environment compatibility
-    vi.stubGlobal('crypto', {
-      randomUUID: vi.fn(() => 'mock-uuid-123'),
-      getRandomValues: vi.fn((arr) => arr),
-      subtle: {},
-    });
+
+    // Mock crypto.randomUUID using vi.spyOn instead of stubGlobal
+    vi.spyOn(global.crypto, 'randomUUID').mockReturnValue('mock-uuid-123');
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
     sessionStorage.clear();
+    vi.restoreAllMocks();
   });
 
   describe('initial state', () => {
@@ -85,11 +82,11 @@ describe('useSecureFormSubmission', () => {
   describe('rate limiting', () => {
     it('should skip rate limit check when no rateLimitKey provided', async () => {
       const { result } = renderHook(() => useSecureFormSubmission());
-      
+
       const allowed = await result.current.checkRateLimit();
-      
+
       expect(allowed).toBe(true);
-      expect(supabase.rpc).not.toHaveBeenCalled();
+      expect(mockRpc).not.toHaveBeenCalled();
     });
 
     it('should check rate limit when rateLimitKey provided', async () => {
@@ -102,16 +99,19 @@ describe('useSecureFormSubmission', () => {
         rateLimitKey: 'test-key',
         maxAttemptsPerHour: 5,
       }));
-      
+
       const allowed = await result.current.checkRateLimit();
-      
+
       expect(allowed).toBe(true);
-      expect(supabase.rpc).toHaveBeenCalledWith('secure_rate_limit', {
+      expect(mockRpc).toHaveBeenCalledWith('secure_rate_limit', {
         identifier: 'test-key',
         max_requests: 5,
         window_seconds: 3600,
       });
-      expect(result.current.attempts).toBe(1); // 5 - 4 = 1
+
+      await waitFor(() => {
+        expect(result.current.attempts).toBe(1); // 5 - 4 = 1
+      });
     });
 
     it('should deny when rate limit exceeded', async () => {
@@ -170,10 +170,10 @@ describe('useSecureFormSubmission', () => {
         name: 'Test',
         email: 'test@example.com',
       });
-      
+
       expect(response).toEqual({ success: true, id: '123' });
       expect(result.current.isSubmitting).toBe(false);
-      expect(supabase.functions.invoke).toHaveBeenCalledWith(
+      expect(mockInvoke).toHaveBeenCalledWith(
         'test-endpoint',
         expect.objectContaining({
           body: expect.objectContaining({
@@ -199,17 +199,19 @@ describe('useSecureFormSubmission', () => {
       mockInvoke.mockReturnValue(promise);
 
       const { result } = renderHook(() => useSecureFormSubmission());
-      
+
       const submitPromise = result.current.secureSubmit('test-endpoint', {});
-      
+
       await waitFor(() => {
         expect(result.current.isSubmitting).toBe(true);
       });
-      
+
       resolvePromise!({ data: { success: true }, error: null });
       await submitPromise;
-      
-      expect(result.current.isSubmitting).toBe(false);
+
+      await waitFor(() => {
+        expect(result.current.isSubmitting).toBe(false);
+      });
     });
 
     it('should sanitize data if sanitizeData function provided', async () => {
@@ -232,8 +234,8 @@ describe('useSecureFormSubmission', () => {
       expect(sanitizeData).toHaveBeenCalledWith({
         name: 'Test',
       });
-      
-      expect(supabase.functions.invoke).toHaveBeenCalledWith(
+
+      expect(mockInvoke).toHaveBeenCalledWith(
         'test-endpoint',
         expect.objectContaining({
           body: expect.objectContaining({
@@ -290,8 +292,8 @@ describe('useSecureFormSubmission', () => {
       await expect(
         result.current.secureSubmit('test-endpoint', {})
       ).rejects.toThrow('Rate limit exceeded');
-      
-      expect(supabase.functions.invoke).not.toHaveBeenCalled();
+
+      expect(mockInvoke).not.toHaveBeenCalled();
     });
 
     it('should throw error on function invocation error', async () => {
@@ -331,10 +333,12 @@ describe('useSecureFormSubmission', () => {
         rateLimitKey: 'test-key',
         maxAttemptsPerHour: 5,
       }));
-      
+
       await result.current.checkRateLimit();
-      
-      expect(result.current.getRemainingAttempts()).toBe(3);
+
+      await waitFor(() => {
+        expect(result.current.getRemainingAttempts()).toBe(3);
+      });
     });
 
     it('should never return negative remaining attempts', async () => {

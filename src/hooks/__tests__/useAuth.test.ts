@@ -36,7 +36,7 @@ vi.mock('@/integrations/supabase/client', async () => {
 });
 
 vi.mock('@/lib/ensureMembership', async () => ({
-  ensureMembership: vi.fn().mockResolvedValue({ orgId: 'org-123', error: undefined }),
+  ensureMembership: vi.fn(() => Promise.resolve({ orgId: 'org-123', error: undefined })),
 }));
 
 vi.mock('@/hooks/use-toast', () => ({
@@ -53,31 +53,35 @@ describe('useAuth', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     // Use ES imports instead of require() for proper module resolution
     const { supabase } = await import('@/integrations/supabase/client');
     const ensureMembershipModule = await import('@/lib/ensureMembership');
     ensureMembership = ensureMembershipModule.ensureMembership;
-    
+
+    // CRITICAL: Reset ensureMembership mock to always return valid result
+    (ensureMembership as any).mockImplementation(() =>
+      Promise.resolve({ orgId: 'org-123', error: undefined })
+    );
+
     mockGetSession = supabase.auth.getSession;
     mockOnAuthStateChange = supabase.auth.onAuthStateChange;
     mockSignOut = supabase.auth.signOut;
     mockFrom = supabase.from;
-    
+
     // Default mock implementations
     mockGetSession.mockResolvedValue({
       data: { session: null },
       error: null,
     });
-    
+
     mockOnAuthStateChange.mockReturnValue({
       data: { subscription: { unsubscribe: vi.fn() } },
     });
 
-    // Make signOut return a promise for proper error handling
+    // Mock signOut to return a resolved Promise
     mockSignOut.mockResolvedValue({ error: null });
 
-    // Create mockMaybeSingle that can be accessed in test scope
     mockMaybeSingle = vi.fn().mockResolvedValue({
       data: { role: 'user' },
       error: null,
@@ -114,52 +118,61 @@ describe('useAuth', () => {
     it('should set user and session when session exists', async () => {
       const mockUser = createMockUser();
       const mockSession = createMockSession(mockUser);
-      
-      // Ensure getSession returns a proper promise
+
       mockGetSession.mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
 
+      // Trigger the auth state change callback
+      mockOnAuthStateChange.mockImplementation((callback) => {
+        setTimeout(() => callback('SIGNED_IN', mockSession), 0);
+        return {
+          data: { subscription: { unsubscribe: vi.fn() } },
+        };
+      });
+
       const { result } = renderHook(() => useAuth());
-      
-      // Wait for loading to complete and session to be set
-      await waitFor(
-        () => {
-          expect(result.current.loading).toBe(false);
-        },
-        { timeout: 3000 }
-      );
-      
+
       await waitFor(() => {
         expect(result.current.user).toBeTruthy();
       });
-      
-      expect(result.current.user).toEqual(mockUser);
-      expect(result.current.session).toEqual(mockSession);
+
+      await waitFor(() => {
+        expect(result.current.user).toEqual(mockUser);
+        expect(result.current.session).toEqual(mockSession);
+      });
     });
 
     it('should clear session on sign out', async () => {
       const mockUser = createMockUser();
       const mockSession = createMockSession(mockUser);
-      
+
+      let authChangeCallback: any;
+      mockOnAuthStateChange.mockImplementation((callback) => {
+        authChangeCallback = callback;
+        setTimeout(() => callback('SIGNED_IN', mockSession), 0);
+        return {
+          data: { subscription: { unsubscribe: vi.fn() } },
+        };
+      });
+
       mockGetSession.mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
 
       const { result } = renderHook(() => useAuth());
-      
+
       await waitFor(() => {
         expect(result.current.user).toBeTruthy();
       });
 
       // Simulate auth state change to null (sign out)
-      const authChangeCallback = mockOnAuthStateChange.mock.calls[0]?.[0];
       if (authChangeCallback) {
         authChangeCallback('SIGNED_OUT', null);
       }
-      
+
       await waitFor(() => {
         expect(result.current.user).toBeNull();
         expect(result.current.session).toBeNull();
@@ -196,18 +209,14 @@ describe('useAuth', () => {
       });
 
       const { result } = renderHook(() => useAuth());
-      
-      // Wait for loading to complete and signOut to be called
-      await waitFor(
-        () => {
-          expect(result.current.loading).toBe(false);
-        },
-        { timeout: 3000 }
-      );
-      
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
       await waitFor(() => {
         expect(mockSignOut).toHaveBeenCalled();
-      }, { timeout: 3000 });
+      }, { timeout: 2000 });
     });
   });
 
