@@ -12,6 +12,16 @@ export const VALID_ROUTES = [
   '/terms',
   '/auth',
   '/dashboard',
+  '/calls',
+  '/call-center',
+  '/call-logs',
+  '/numbers/new',
+  '/ops/number-onboarding',
+  '/team/invite',
+  '/integrations',
+  '/phone-apps',
+  '/ops/forwarding',
+  '/ops/voice',
   '/dashboard/integrations/crm',
   '/dashboard/integrations/email',
   '/dashboard/integrations/phone',
@@ -20,7 +30,6 @@ export const VALID_ROUTES = [
   '/dashboard/integrations/automation',
   '/design-tokens',
   '/components',
-  '/call-center',
   '/admin/kb'
 ] as const;
 

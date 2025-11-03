@@ -15,6 +15,7 @@ export const paths = {
   numbersLegacy: "/ops/number-onboarding",
   teamInvite: "/team/invite",
   integrations: "/integrations",
+  phoneApps: "/phone-apps",
   forwardingWizard: "/ops/forwarding",
   voiceSettings: "/ops/voice",
   notFound: "*",
