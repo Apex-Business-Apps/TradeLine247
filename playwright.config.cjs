@@ -12,9 +12,16 @@ module.exports = defineConfig({
     baseURL: process.env.BASE_URL || 'http://localhost:5000',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
-    bypassCSP: true, // bypass CSP so inline fixtures used in tests stop breaking Codemagic builds
+    bypassCSP: true,
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        // Keep inline script/style guards functioning during tests
+        bypassCSP: true,
+      },
+    },
   ],
 });

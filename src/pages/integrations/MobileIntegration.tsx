@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { ArrowLeft, Smartphone, Download, Settings, CheckCircle, ExternalLink, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -91,7 +91,6 @@ const MobileIntegration = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       
       <main className="flex-1 container py-6 space-y-6">
         {/* Header */}
@@ -99,7 +98,7 @@ const MobileIntegration = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(paths.dashboard)}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

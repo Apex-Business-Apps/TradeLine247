@@ -3,39 +3,37 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Phone, UserPlus, PhoneCall, Link as LinkIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
+
+const actions = [
+  {
+    label: 'View Calls',
+    icon: Phone,
+    to: paths.calls,
+    variant: 'default' as const,
+  },
+  {
+    label: 'Add Number',
+    icon: PhoneCall,
+    to: paths.addNumber,
+    variant: 'outline' as const,
+  },
+  {
+    label: 'Invite Staff',
+    icon: UserPlus,
+    to: paths.teamInvite,
+    variant: 'outline' as const,
+  },
+  {
+    label: 'Integrations',
+    icon: LinkIcon,
+    to: paths.integrations,
+    variant: 'outline' as const,
+  },
+];
 
 export const QuickActionsCard: React.FC = () => {
   const navigate = useNavigate();
-
-  const actions = [
-    {
-      label: 'View Calls',
-      icon: Phone,
-      onClick: () => navigate('/call-center'),
-      variant: 'default' as const
-    },
-    {
-      label: 'Add Number',
-      icon: PhoneCall,
-      onClick: () => navigate('/ops/number-onboarding'),
-      variant: 'outline' as const
-    },
-    {
-      label: 'Invite Staff',
-      icon: UserPlus,
-      onClick: () => {
-        // TODO: Open invite modal
-        console.log('Invite staff modal');
-      },
-      variant: 'outline' as const
-    },
-    {
-      label: 'Integrations',
-      icon: LinkIcon,
-      onClick: () => navigate('/integrations'),
-      variant: 'outline' as const
-    }
-  ];
 
   return (
     <Card>
@@ -49,7 +47,7 @@ export const QuickActionsCard: React.FC = () => {
             <Button
               key={action.label}
               variant={action.variant}
-              onClick={action.onClick}
+              onClick={() => navigate(action.to)}
               className="w-full justify-start gap-2"
             >
               <Icon className="h-4 w-4" />
@@ -61,4 +59,3 @@ export const QuickActionsCard: React.FC = () => {
     </Card>
   );
 };
-

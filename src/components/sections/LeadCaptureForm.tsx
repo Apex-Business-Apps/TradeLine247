@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { paths } from '@/routes/paths';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -132,7 +133,7 @@ export const LeadCaptureForm = () => {
 
       // Redirect to auth page after 3 seconds
       setTimeout(() => {
-        navigate('/auth');
+        navigate(paths.auth);
       }, 3000);
     } catch (error: any) {
       console.error("Lead submission error:", error);
@@ -173,7 +174,7 @@ export const LeadCaptureForm = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-primary/5 p-4 rounded-lg animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-slate-600 dark:text-slate-400">
                   <Sparkles className="w-4 h-4 inline mr-1" />
                   We'll reach out within <strong>2 hours</strong> to get you set up.
                 </p>
@@ -184,7 +185,7 @@ export const LeadCaptureForm = () => {
                 </p>
               </div>
               <Button 
-                onClick={() => navigate('/auth')} 
+                onClick={() => navigate(paths.auth)} 
                 className="w-full hover-scale transition-all duration-300 animate-fade-in" 
                 style={{ animationDelay: '600ms' }}
               >
@@ -291,7 +292,7 @@ export const LeadCaptureForm = () => {
               </div>
 
               <div className="animate-fade-in" style={{ animationDelay: '600ms' }}>
-                <label className="flex items-start space-x-3 text-sm text-muted-foreground">
+                <label className="flex items-start space-x-3 text-sm text-slate-600 dark:text-slate-400">
                   <input
                     type="checkbox"
                     required

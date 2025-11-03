@@ -1,5 +1,6 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
-import { corsHeaders } from '../_shared/cors.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { preflight, corsHeaders } from '../_shared/cors.ts';
+import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -31,10 +32,8 @@ interface DashboardSummary {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -44,7 +43,7 @@ Deno.serve(async (req) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -55,7 +54,7 @@ Deno.serve(async (req) => {
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -78,11 +77,10 @@ Deno.serve(async (req) => {
           lastUpdated: new Date().toISOString()
         }),
         {
-          headers: {
-            ...corsHeaders,
+          headers: mergeHeaders(corsHeaders, secureHeaders, {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-cache'
-          }
+          })
         }
       );
     }
@@ -197,11 +195,10 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify(summary),
       {
-        headers: {
-          ...corsHeaders,
+        headers: mergeHeaders(corsHeaders, secureHeaders, {
           'Content-Type': 'application/json',
           'Cache-Control': 'private, max-age=30'
-        }
+        })
       }
     );
 
@@ -215,10 +212,7 @@ Deno.serve(async (req) => {
       }),
       {
         status: 500,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
+        headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
       }
     );
   }

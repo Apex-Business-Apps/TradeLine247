@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CheckCircle, Phone, MessageSquare, Brain, Zap, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,8 +64,6 @@ const Features = () => {
         keywords="AI receptionist features, call management, omnichannel messaging, CRM integration, business automation, 24/7 customer service"
         canonical="https://www.tradeline247ai.com/features"
       />
-      
-      <Header />
       
       <main className="flex-1">
         {/* Hero Section */}

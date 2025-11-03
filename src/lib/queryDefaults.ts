@@ -11,8 +11,8 @@ import { QueryClient, DefaultOptions } from "@tanstack/react-query";
  */
 export const queryDefaults: DefaultOptions = {
   queries: {
-    // Cache data for 1 minute before considering it stale
-    staleTime: 60_000,
+    // Cache data for 30 minutes before considering it stale - increased from 1 minute to prevent connection errors
+    staleTime: 30 * 60 * 1000,
     
     // Only retry failed queries once (not 3x default)
     retry: 1,
@@ -23,8 +23,11 @@ export const queryDefaults: DefaultOptions = {
     // Don't refetch on mount if data is fresh
     refetchOnMount: false,
     
-    // Keep unused data in cache for 5 minutes
-    gcTime: 5 * 60 * 1000,
+    // Only refetch on actual network reconnect
+    refetchOnReconnect: true,
+    
+    // Keep unused data in cache for 60 minutes
+    gcTime: 60 * 60 * 1000,
     
     // Retry delay with exponential backoff
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
@@ -50,11 +53,12 @@ export const realtimeQueryDefaults: Partial<DefaultOptions['queries']> = {
  * For dashboards and reports that don't need to be real-time
  */
 export const analyticsQueryDefaults: Partial<DefaultOptions['queries']> = {
-  staleTime: 5 * 60 * 1000, // 5 minutes
-  gcTime: 30 * 60 * 1000, // 30 minutes
+  staleTime: 30 * 60 * 1000, // 30 minutes - increased from 5 to prevent connection errors
+  gcTime: 60 * 60 * 1000, // 60 minutes
   retry: 0, // Don't retry analytics queries
   refetchOnWindowFocus: false,
-  refetchOnMount: false
+  refetchOnMount: false,
+  refetchOnReconnect: true // Only refetch on actual network reconnect
 };
 
 /**

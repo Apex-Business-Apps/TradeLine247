@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +21,7 @@ export default function CampaignManager() {
   // Security: Check admin access
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/auth');
+      navigate(paths.auth);
     }
   }, [authLoading, user, navigate]);
 

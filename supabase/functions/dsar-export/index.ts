@@ -37,14 +37,16 @@ serve(async (req) => {
     const requestId = crypto.randomUUID();
 
     // Validate: admin can export any user, users can export themselves
-    const isAdmin = await supabaseClient.rpc('has_role', { 
-      p_user: user.id, 
-      p_role: 'admin' 
+    const { data: isAdmin, error: roleError } = await supabaseClient.rpc<boolean>('has_role', {
+      p_user: user.id,
+      p_role: 'admin'
     });
+
+    if (roleError) throw roleError;
 
     const targetUserId = subject_user_id || user.id;
 
-    if (!isAdmin.data && targetUserId !== user.id) {
+    if (!isAdmin && targetUserId !== user.id) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -68,7 +70,23 @@ serve(async (req) => {
     if (dsarError) throw dsarError;
 
     // Gather all user data from relevant tables
-    const exportData: any = {
+    interface ExportSection {
+      [key: string]: unknown;
+    }
+
+    interface ExportData {
+      request_id: string;
+      generated_at: string;
+      timezone: string;
+      user_id: string;
+      personal_information: ExportSection;
+      activity_data: ExportSection;
+      consent_records: ExportSection;
+      support_tickets: ExportSection;
+      communications: ExportSection;
+    }
+
+    const exportData: ExportData = {
       request_id: requestId,
       generated_at: new Date().toISOString(),
       timezone: 'America/Edmonton',
@@ -83,34 +101,49 @@ serve(async (req) => {
     // Fetch user profile (redact sensitive fields)
     const { data: profile } = await supabaseClient
       .from('profiles')
-      .select('id, full_name, created_at, updated_at')
+      .select('id, full_name, created_at, updated_at, phone_e164')
       .eq('id', targetUserId)
       .single();
-    
+
     exportData.personal_information.profile = profile;
 
     // Fetch appointments (sanitized)
-    const { data: appointments } = await supabaseClient
-      .from('appointments')
-      .select('id, start_at, end_at, status, source, note, created_at')
-      .eq('e164', profile?.phone_e164 || '');
-    
+    let appointments: any[] | null = null;
+    if (profile?.phone_e164) {
+      const appointmentsResponse = await supabaseClient
+        .from('appointments')
+        .select('id, start_at, end_at, status, source, note, created_at')
+        .eq('e164', profile.phone_e164);
+
+      appointments = appointmentsResponse.data || [];
+    }
+
     exportData.activity_data.appointments = appointments || [];
 
     // Fetch call logs
-    const { data: calls } = await supabaseClient
-      .from('call_logs')
-      .select('id, call_sid, from_e164, to_e164, status, duration_sec, created_at, summary')
-      .or(`from_e164.eq.${profile?.phone_e164},to_e164.eq.${profile?.phone_e164}`);
-    
+    let calls: any[] | null = null;
+    if (profile?.phone_e164) {
+      const callsResponse = await supabaseClient
+        .from('call_logs')
+        .select('id, call_sid, from_e164, to_e164, status, duration_sec, created_at, summary')
+        .or(`from_e164.eq.${profile.phone_e164},to_e164.eq.${profile.phone_e164}`);
+
+      calls = callsResponse.data || [];
+    }
+
     exportData.activity_data.call_logs = calls || [];
 
     // Fetch consent logs
-    const { data: consents } = await supabaseClient
-      .from('consent_logs')
-      .select('*')
-      .eq('e164', profile?.phone_e164 || '');
-    
+    let consents: any[] | null = null;
+    if (profile?.phone_e164) {
+      const consentsResponse = await supabaseClient
+        .from('consent_logs')
+        .select('*')
+        .eq('e164', profile.phone_e164);
+
+      consents = consentsResponse.data || [];
+    }
+
     exportData.consent_records.consent_logs = consents || [];
 
     // Fetch support tickets
@@ -147,7 +180,22 @@ serve(async (req) => {
       return redacted;
     };
 
-    const redactedExport = redactSecrets(exportData);
+    const redactedExport = redactSecrets(exportData) as ExportData;
+
+    const countRecords = (value: unknown): number => {
+      if (Array.isArray(value)) {
+        return value.length;
+      }
+
+      if (value && typeof value === 'object') {
+        return Object.values(value as Record<string, unknown>).reduce(
+          (sum, nested) => sum + countRecords(nested),
+          0
+        );
+      }
+
+      return Number(Boolean(value));
+    };
 
     // Generate timestamped artifact filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -163,9 +211,9 @@ serve(async (req) => {
         status: 'completed',
         completed_at: new Date().toISOString(),
         evidence_artifact_url: artifactName,
-        metadata: { 
+        metadata: {
           request_id: requestId,
-          total_records: Object.values(redactedExport).flat().length,
+          total_records: countRecords(redactedExport),
           artifact_size_bytes: artifactData.length
         }
       })
@@ -188,10 +236,11 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
-    console.error('DSAR export error:', error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : JSON.stringify(error);
+    console.error('Function error:', message);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', message: error.message }),
+      JSON.stringify({ error: message }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

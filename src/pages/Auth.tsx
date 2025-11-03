@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { paths } from '@/routes/paths';
+import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { Session, User } from '@supabase/supabase-js';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { usePasswordSecurity } from '@/hooks/usePasswordSecurity';
 
@@ -29,6 +29,11 @@ const Auth = () => {
   const { validatePassword: secureValidatePassword } = usePasswordSecurity();
 
   useEffect(() => {
+    if (!isSupabaseEnabled) {
+      setLoading(false);
+      return () => undefined;
+    }
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -37,20 +42,35 @@ const Auth = () => {
         
         // Redirect authenticated users to dashboard
         if (session?.user) {
-          navigate('/dashboard');
+          navigate(paths.dashboard);
         }
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      // If there's a JWT error, clear the corrupted session
+      if (error?.message?.includes('malformed') || error?.message?.includes('invalid')) {
+        console.warn('[Auth] Detected malformed token, clearing session:', error.message);
+        supabase.auth.signOut().catch(() => {/* ignore errors during cleanup */});
+        setSession(null);
+        setUser(null);
+        return;
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       // Redirect if already logged in
       if (session?.user) {
-        navigate('/dashboard');
+        navigate(paths.dashboard);
       }
+    }).catch((err) => {
+      // Catch any unhandled JWT errors
+      console.error('[Auth] Session check failed:', err);
+      supabase.auth.signOut().catch(() => {/* ignore */});
+      setSession(null);
+      setUser(null);
     });
 
     return () => subscription.unsubscribe();
@@ -124,6 +144,10 @@ const Auth = () => {
 
     const redirectUrl = `${window.location.origin}/`;
     
+    if (!isSupabaseEnabled) {
+      throw new Error('Supabase is disabled in this environment.');
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -138,6 +162,10 @@ const Auth = () => {
   };
 
   const signIn = async (email: string, password: string) => {
+    if (!isSupabaseEnabled) {
+      throw new Error('Supabase is disabled in this environment.');
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -203,7 +231,7 @@ const Auth = () => {
       } else {
         // Success - redirect will happen via onAuthStateChange listener
         // But also do explicit navigation as backup
-        navigate('/dashboard');
+        navigate(paths.dashboard);
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during sign in');
@@ -213,8 +241,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      
+
       <main className="flex-1 container py-8 px-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">

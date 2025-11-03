@@ -103,7 +103,6 @@ export const SecurityMonitor = () => {
       }
     }
     // no cleanup: metas are idempotent and harmless across navigations
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;

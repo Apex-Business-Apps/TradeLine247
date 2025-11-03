@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
 import { ensureMembership } from '@/lib/ensureMembership';
 import { toast } from '@/hooks/use-toast';
 
@@ -13,38 +13,92 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    if (!isSupabaseEnabled) {
+      setLoading(false);
+      return () => undefined;
+    }
+
+    // Set up auth state listener FIRST with enhanced error handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Fetch user role when user logs in
-        if (session?.user) {
-          setTimeout(async () => {
-            fetchUserRole(session.user!.id);
-            const result = await ensureMembership(session.user!);
-            if (result.error) {
-              toast({
-                variant: "destructive",
-                title: "Trial Setup Failed",
-                description: result.error,
-              });
-            }
-          }, 0);
-        } else {
+      async (event, session) => {
+        // Handle token refresh events silently to prevent disconnection errors
+        if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          // Fetch user role when user logs in
+          if (session?.user) {
+            setTimeout(async () => {
+              fetchUserRole(session.user!.id);
+              const result = await ensureMembership(session.user!);
+              if (result.error) {
+                toast({
+                  variant: "destructive",
+                  title: "Trial Setup Failed",
+                  description: result.error,
+                });
+              }
+            }, 0);
+          } else {
+            setUserRole(null);
+          }
+          
+          setLoading(false);
+        } else if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
           setUserRole(null);
+          setLoading(false);
+        } else if (event === 'USER_UPDATED') {
+          setSession(session);
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            fetchUserRole(session.user.id);
+          }
+        } else {
+          // For other events, update state normally
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          if (session?.user) {
+            setTimeout(async () => {
+              fetchUserRole(session.user!.id);
+              const result = await ensureMembership(session.user!);
+              if (result.error) {
+                toast({
+                  variant: "destructive",
+                  title: "Trial Setup Failed",
+                  description: result.error,
+                });
+              }
+            }, 0);
+          } else {
+            setUserRole(null);
+          }
+          
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      // If there's a JWT error, clear the corrupted session
+      const errorMsg = error?.message?.toLowerCase() || '';
+      if (errorMsg.includes('malformed') || errorMsg.includes('invalid')) {
+        console.warn('[Auth] Detected malformed token, clearing session:', error.message);
+        if (supabase.auth?.signOut) {
+          supabase.auth.signOut().catch(() => {/* ignore errors during cleanup */});
+        }
+        setSession(null);
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
         fetchUserRole(session.user.id);
         ensureMembership(session.user).then((result) => {
@@ -59,12 +113,25 @@ export const useAuth = () => {
       }
       
       setLoading(false);
+    }).catch((err) => {
+      // Catch any unhandled JWT errors
+      console.error('[Auth] Session check failed:', err);
+      if (supabase.auth?.signOut) {
+        supabase.auth.signOut().catch(() => {/* ignore */});
+      }
+      setSession(null);
+      setUser(null);
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const fetchUserRole = async (userId: string) => {
+    if (!isSupabaseEnabled) {
+      setUserRole('user');
+      return;
+    }
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -87,6 +154,10 @@ export const useAuth = () => {
   const signUp = async (email: string, password: string, displayName?: string) => {
     const redirectUrl = `https://tradeline247ai.com/auth/callback`;
     
+    if (!isSupabaseEnabled) {
+      return { error: new Error('Supabase is disabled') };
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -101,6 +172,10 @@ export const useAuth = () => {
   };
 
   const signIn = async (email: string, password: string) => {
+    if (!isSupabaseEnabled) {
+      return { error: new Error('Supabase is disabled') };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -109,6 +184,9 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
+    if (!isSupabaseEnabled) {
+      return { error: new Error('Supabase is disabled') };
+    }
     const { error } = await supabase.auth.signOut();
     return { error };
   };

@@ -60,7 +60,7 @@ export default function CallCenter() {
   return (
     <>
       <SEOHead 
-        title="Call Center Dashboard - TradeLine 24/7"
+        title="Calls Dashboard - TradeLine 24/7"
         description="Monitor and manage your Twilio voice calls with real-time statistics and call history."
         keywords="call center, Twilio, voice calls, call monitoring, phone system"
       />
@@ -70,7 +70,7 @@ export default function CallCenter() {
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Call Center Dashboard</h1>
+                <h1 className="text-3xl font-bold text-foreground mb-2">Calls Dashboard</h1>
                 <p className="text-muted-foreground">
                   Monitor and manage your Twilio voice calls in real-time
                 </p>

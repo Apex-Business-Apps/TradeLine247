@@ -10,10 +10,20 @@ import { useEffect } from 'react';
  * - tradeline247ai.com -> www.tradeline247ai.com
  * 
  * Does NOT redirect:
- * - Lovable preview environments (.lovableproject.com, .https://tradeline247aicom.lovable.app/, .lovable.dev)
+ * - Lovable preview environments (.lovableproject.com, .lovable.app, .lovable.dev)
  * - Local development (localhost, 127.0.0.1, .local, 192.168.x.x)
  * - Auth callback routes
  */
+const LOVABLE_PREVIEW_DOMAINS = ['lovableproject.com', 'lovable.app', 'lovable.dev', 'gptengineer.app'];
+
+function isLovablePreviewHost(hostname: string): boolean {
+  const normalized = hostname.toLowerCase();
+  return (
+    normalized.includes('.lovable.') ||
+    LOVABLE_PREVIEW_DOMAINS.some(domain => normalized === domain || normalized.endsWith(`.${domain}`))
+  );
+}
+
 export const CanonicalRedirect = () => {
   useEffect(() => {
     // CRITICAL: Wait for React to fully mount before any redirect logic
@@ -24,11 +34,7 @@ export const CanonicalRedirect = () => {
       const pathname = window.location.pathname;
 
       // ENHANCED Preview detection - explicitly check all Lovable domains
-      const isPreview = hostname.includes('lovableproject.com') || 
-                        hostname.includes('https://tradeline247aicom.lovable.app/') || 
-                        hostname.includes('lovable.dev') ||
-                        hostname.includes('.gptengineer.app') ||
-                        hostname.includes('.lovable.');
+      const isPreview = isLovablePreviewHost(hostname);
       
       // Check if this is local development
       const isLocalhost = hostname === 'localhost' || 
