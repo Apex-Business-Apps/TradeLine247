@@ -49,6 +49,40 @@ try {
   // Initialize boot sentinel (production monitoring only)
   initBootSentinel();
   
+  // ENHANCED: Initialize Lovable save/publish failsafe system
+  // Comprehensive failsafe for save/publish operations with automatic retry
+  if (import.meta.env.DEV || /lovable/.test(location.hostname)) {
+    import('./lib/lovableSaveFailsafe')
+      .then(({ initializeLovableFailsafe }) => {
+        initializeLovableFailsafe({
+          maxRetries: 5,
+          retryDelayMs: 1000,
+          maxRetryDelayMs: 30000,
+          queueSize: 50,
+          batchIntervalMs: 5000,
+          healthCheckIntervalMs: 30000,
+          enableFallback: true,
+        });
+        console.log('✅ Lovable save failsafe initialized');
+      })
+      .catch((error) => {
+        console.warn('⚠️ Lovable save failsafe not available:', error);
+      });
+  }
+
+  // ENHANCED: Initialize Lovable GitHub connection health monitoring
+  // This helps diagnose and prevent GitHub reconnection issues
+  if (import.meta.env.DEV || /lovable/.test(location.hostname)) {
+    import('./lib/lovableGitHubMonitor')
+      .then(({ initializeGitHubHealthMonitor }) => {
+        initializeGitHubHealthMonitor();
+      })
+      .catch(() => {
+        // Fallback if monitor not available (may not exist in all repos)
+        console.warn('⚠️ Lovable GitHub monitor not available');
+      });
+  }
+
   // Load optional features after mount (non-blocking)
   setTimeout(() => {
     import("./styles/roi-table.css").catch(e => console.warn('⚠️ ROI table CSS failed:', e));
