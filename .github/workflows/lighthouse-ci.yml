@@ -8,6 +8,8 @@ on:
 permissions:
   contents: read
   actions: read
+  checks: write
+  pull-requests: write
 
 jobs:
   lighthouse:
@@ -21,7 +23,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -32,29 +34,11 @@ jobs:
       - name: Install Lighthouse CI
         run: npm i -g @lhci/cli@0.13.0
 
-      - name: Serve built site and run Lighthouse CI
+      - name: Run Lighthouse CI against built dist
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
         run: |
-          # Start preview server in background
-          npm run preview &
-          SERVER_PID=$!
-
-          # Wait for server to be ready (max 30 seconds)
-          echo "Waiting for server to start..."
-          for i in {1..30}; do
-            if curl -s http://localhost:8080 > /dev/null; then
-              echo "Server is ready!"
-              break
-            fi
-            echo "Attempt $i/30: Server not ready yet..."
-            sleep 1
-          done
-
-          # Run Lighthouse CI against local build
-          echo "Running Lighthouse CI against local build at http://localhost:8080"
-          lhci autorun --config=.lighthouserc.cjs --collect.url="http://localhost:8080"
-
-          # Cleanup
-          kill $SERVER_PID || true
+          lhci autorun --config=.lighthouserc.cjs
 
       - name: Upload LHCI reports
         if: always()
