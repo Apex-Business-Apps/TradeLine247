@@ -36,14 +36,22 @@ for (let i = 0; i < rawArgs.length; i += 1) {
 
 const baseArgs = ['run'];
 if (!hasReporter) {
-  baseArgs.push('--reporter=dot');
+  baseArgs.push('--reporter=basic');
 }
 
 const finalArgs = [...baseArgs, ...forwarded];
 
+const env = { ...process.env };
+const configuredColumns = Number.parseInt(env.COLUMNS ?? '', 10);
+
+if (!Number.isFinite(configuredColumns) || configuredColumns <= 0) {
+  env.COLUMNS = '80';
+}
+
 const child = spawn('npx', ['--no-install', 'vitest', ...finalArgs], {
   stdio: 'inherit',
   shell: false,
+  env,
 });
 
 child.on('exit', (code, signal) => {
