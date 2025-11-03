@@ -67,17 +67,19 @@ const LoadingFallback = () => (
 
 export default function App() {
   return (
-    <BrowserRouter>
-      {/* Suspense prevents a white screen if any child is lazy elsewhere */}
-      <Suspense fallback={<LoadingFallback />}>
-        <Routes>
-          <Route element={<AppLayout />}>
-            {routeEntries.map(({ path, element }) => (
-              <Route key={path} path={path} element={element} />
-            ))}
-          </Route>
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <div className="min-h-screen bg-background text-foreground antialiased">
+      <BrowserRouter>
+        {/* Suspense prevents a white screen if any child is lazy elsewhere */}
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route element={<AppLayout />}>
+              {routeEntries.map(({ path, element }) => (
+                <Route key={path} path={path} element={element} />
+              ))}
+            </Route>
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </div>
   );
 }
