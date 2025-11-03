@@ -320,6 +320,13 @@ body.session-warning::before {
   color: hsl(215.4 16.3% 46.7%) !important;
 }
 
+/* Brand orange text variants: force higher contrast in light mode */
+.text-primary\/90:not(.dark *),
+.text-primary\/80:not(.dark *),
+.text-primary\/70:not(.dark *) {
+  color: hsl(var(--brand-orange-dark)) !important; /* 6.7:1 contrast on white */
+}
+
 /* Enhanced focus states for better accessibility */
 a.text-muted-foreground:focus-visible,
 button.text-muted-foreground:focus-visible {
@@ -339,6 +346,13 @@ button.text-muted-foreground:focus-visible {
 .dark .text-gray-500,
 .dark .text-gray-600 {
   color: hsl(215 20.2% 65.1%) !important;
+}
+
+/* Preserve warm accenting in dark mode while maintaining contrast */
+.dark .text-primary\/90,
+.dark .text-primary\/80,
+.dark .text-primary\/70 {
+  color: hsl(var(--brand-orange-light)) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
