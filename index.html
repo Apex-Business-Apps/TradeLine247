@@ -6,7 +6,26 @@
     <base href="/" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    
+
+    <!-- Contrast floor: guarantees readable base on first paint (before app CSS/JS) -->
+    <style id="contrast-floor">
+      html {
+        color-scheme: light dark;
+      }
+      body {
+        background: #ffffff;
+        color: #111827;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #0a0a0b;
+          color: #fafafa;
+        }
+      }
+    </style>
+
     <!-- Primary Meta Tags -->
     <title>TradeLine 24/7 — Your 24/7 Ai Receptionist!</title>
     <meta name="title" content="TradeLine 24/7 — Your 24/7 Ai Receptionist!" />
