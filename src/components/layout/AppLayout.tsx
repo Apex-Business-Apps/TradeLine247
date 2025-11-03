@@ -57,7 +57,7 @@ export const AppLayout = () => {
     <HelmetProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="light"
+        defaultTheme="system"
         enableSystem
         disableTransitionOnChange={false}
       >

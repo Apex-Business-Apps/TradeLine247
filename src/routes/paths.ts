@@ -13,6 +13,7 @@ export const paths = {
   callLogs: "/call-logs",
   addNumber: "/numbers/new",
   numbersLegacy: "/ops/number-onboarding",
+  phoneApps: "/phone-apps",
   teamInvite: "/team/invite",
   integrations: "/integrations",
   forwardingWizard: "/ops/forwarding",

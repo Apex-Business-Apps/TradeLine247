@@ -18,6 +18,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
 const CallCenter = lazy(() => import("./pages/CallCenter"));
 const CallLogs = lazy(() => import("./pages/CallLogs"));
+const PhoneApps = lazy(() => import("./pages/PhoneApps"));
 const Integrations = lazy(() => import("./pages/Integrations"));
 const ClientNumberOnboarding = lazy(() => import("./pages/ops/ClientNumberOnboarding"));
 const VoiceSettings = lazy(() => import("./pages/ops/VoiceSettings"));
@@ -38,6 +39,7 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.calls, element: <CallCenter /> },
   { path: paths.callCenterLegacy, element: <CallCenter /> },
   { path: paths.callLogs, element: <CallLogs /> },
+  { path: paths.phoneApps, element: <PhoneApps /> },
   { path: paths.addNumber, element: <ClientNumberOnboarding /> },
   { path: paths.numbersLegacy, element: <ClientNumberOnboarding /> },
   { path: paths.voiceSettings, element: <VoiceSettings /> },

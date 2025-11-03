@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeSwitcher } from '@/components/dashboard/ThemeSwitcher';
 const navigationItems = [{
   name: 'Features',
   href: paths.features
@@ -35,7 +36,7 @@ const adminNavigationItems = [{
   href: paths.calls
 }, {
   name: 'Phone Apps',
-  href: '/phone-apps'
+  href: paths.phoneApps
 }, {
   name: 'Settings',
   href: paths.voiceSettings
@@ -122,15 +123,23 @@ export const Header: React.FC = () => {
         </NavigationMenu>
         </nav>
 
-        {/* Enhanced CTA Button & Mobile Menu */}
-        <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
-          <LanguageSwitcher data-lovable-lock="structure-only" />
+        {/* Enhanced Right Section - Apple-grade spacing and hierarchy */}
+        <div data-slot="right" className="flex items-center gap-3 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
+          {/* Theme Switcher - CRITICAL FIX: Now accessible on all pages */}
+          <div className="hidden sm:flex">
+            <ThemeSwitcher />
+          </div>
 
-          {/* Burger Menu Button - ALWAYS VISIBLE - Critical Navigation Control */}
+          {/* Language Switcher */}
+          <div className="hidden sm:flex">
+            <LanguageSwitcher data-lovable-lock="structure-only" />
+          </div>
+
+          {/* Burger Menu Button - Mobile Only (UX FIX: Hide on desktop) */}
           <button
             id="burger-menu-button"
             data-testid="burger-menu-button"
-            className="!flex items-center justify-center p-2 rounded-md border-2 border-primary/20 bg-background hover:bg-accent hover:border-primary/40 transition-all duration-300 hover-scale min-w-[44px] min-h-[44px] !visible !opacity-100"
+            className="md:hidden flex items-center justify-center p-2 rounded-lg border border-border bg-background hover:bg-accent transition-all duration-200 hover-scale min-w-[44px] min-h-[44px]"
             onClick={() => {
               console.log('Burger menu clicked, current state:', isMobileMenuOpen);
               setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -141,27 +150,29 @@ export const Header: React.FC = () => {
             type="button"
           >
             {isMobileMenuOpen ? (
-              <X size={24} className="text-primary" strokeWidth={2.5} />
+              <X size={20} className="text-foreground" strokeWidth={2} />
             ) : (
-              <Menu size={24} className="text-primary" strokeWidth={2.5} />
+              <Menu size={20} className="text-foreground" strokeWidth={2} />
             )}
           </button>
 
-          {user ? <div className="flex items-center gap-2">
-              <div className="flex flex-col items-end">
-                <span className="text-sm text-muted-foreground hidden sm:block">
-                  Welcome, {user.user_metadata?.display_name || user.email}
+          {/* Auth Section */}
+          {user ? <div className="flex items-center gap-3">
+              <div className="hidden lg:flex flex-col items-end">
+                <span className="text-sm text-muted-foreground">
+                  {user.user_metadata?.display_name || user.email?.split('@')[0]}
                 </span>
-                {userRole && <span className={cn("text-xs px-2 py-1 rounded-full font-medium hidden sm:block transition-all duration-300", isAdmin() ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200")}>
+                {userRole && <span className={cn("text-xs px-2 py-0.5 rounded-full font-medium transition-all duration-200", isAdmin() ? "bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive" : "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary")}>
                     {userRole.toUpperCase()}
                   </span>}
               </div>
-              <Button variant="outline" size={isScrolled ? 'sm' : 'default'} onClick={() => signOut()} className="hover-scale transition-all duration-300">
+              <Button variant="outline" size={isScrolled ? 'sm' : 'default'} onClick={() => signOut()} className="hover-scale transition-all duration-200">
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline ml-2">Sign Out</span>
               </Button>
-            </div> : <Button variant="success" size={isScrolled ? 'sm' : 'default'} onClick={() => navigate(paths.auth)} className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]">
-              Login
+            </div> : <Button variant="default" size={isScrolled ? 'sm' : 'default'} onClick={() => navigate(paths.auth)} className="hover-scale transition-all duration-200 shadow-sm hover:shadow-md min-h-[44px]">
+              <span className="hidden sm:inline">Sign In</span>
+              <span className="sm:hidden">Login</span>
             </Button>}
         </div>
       </div>
@@ -172,34 +183,57 @@ export const Header: React.FC = () => {
         aria-label="Mobile"
         aria-hidden={!isMobileMenuOpen}
         className={cn(
-          "md:hidden border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden",
+          "md:hidden border-t border-border bg-background/98 backdrop-blur-lg transition-all duration-300 overflow-hidden shadow-lg",
           isMobileMenuOpen ? "animate-slide-in-right max-h-screen opacity-100" : "max-h-0 opacity-0 pointer-events-none"
         )}
       >
-        <div className="container py-4 space-y-2">
-          {navigationItems.map((item, index) => (
-            <Link
-              key={item.name}
-              to={item.href}
-              className="block px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover-scale animate-fade-in"
-              onClick={() => setIsMobileMenuOpen(false)}
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              {item.name}
-            </Link>
-          ))}
-          {isAdmin() &&
-            adminNavigationItems.map((item, index) => (
+        <div className="container py-6 space-y-4">
+          {/* Mobile Settings Section */}
+          <div className="flex items-center justify-between px-4 pb-3 border-b border-border">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Settings</span>
+            <div className="flex items-center gap-2">
+              <ThemeSwitcher />
+              <LanguageSwitcher />
+            </div>
+          </div>
+
+          {/* Navigation Links */}
+          <div className="space-y-1">
+            <div className="px-4 pb-2">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Navigation</span>
+            </div>
+            {navigationItems.map((item, index) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="block px-4 py-2 text-sm font-medium rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover-scale animate-fade-in"
+                className="block px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200 hover-scale animate-fade-in"
                 onClick={() => setIsMobileMenuOpen(false)}
-                style={{ animationDelay: `${(navigationItems.length + index) * 100}ms` }}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
                 {item.name}
               </Link>
             ))}
+          </div>
+
+          {/* Admin Section */}
+          {isAdmin() && (
+            <div className="space-y-1 pt-2 border-t border-border">
+              <div className="px-4 pb-2">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Admin</span>
+              </div>
+              {adminNavigationItems.map((item, index) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="block px-4 py-3 text-sm font-medium rounded-lg bg-primary/5 hover:bg-primary/10 text-primary transition-all duration-200 hover-scale animate-fade-in"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  style={{ animationDelay: `${(navigationItems.length + index) * 50}ms` }}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </nav>
     </header>;

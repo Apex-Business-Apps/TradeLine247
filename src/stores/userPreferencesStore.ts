@@ -69,7 +69,7 @@ const defaultPreferences: UserPreferences = {
   hasCompletedOnboarding: false,
   preferredName: null,
   lastLoginTime: null,
-  theme: 'light', // Default to light mode instead of system preference
+  theme: 'system', // UX IMPROVEMENT: Respect user's OS dark mode preference
   accentColor: '#3b82f6', // blue-500
   dashboardLayout: 'comfortable',
   showWelcomeMessage: true,
