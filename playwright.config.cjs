@@ -15,13 +15,6 @@ module.exports = defineConfig({
     bypassCSP: true,
   },
   projects: [
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        // Keep inline script/style guards functioning during tests
-        bypassCSP: true,
-      },
-    },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
   ],
 });

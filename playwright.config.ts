@@ -21,11 +21,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        // Explicitly opt out of CSP so inline guards/scripts work under test
-        bypassCSP: true,
-      },
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
   webServer: {
