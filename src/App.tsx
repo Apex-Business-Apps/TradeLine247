@@ -22,6 +22,7 @@ const Integrations = lazy(() => import("./pages/Integrations"));
 const ClientNumberOnboarding = lazy(() => import("./pages/ops/ClientNumberOnboarding"));
 const VoiceSettings = lazy(() => import("./pages/ops/VoiceSettings"));
 const TeamInvite = lazy(() => import("./pages/TeamInvite"));
+const PhoneApps = lazy(() => import("./pages/PhoneApps"));
 const ForwardingWizard = lazy(() => import("./routes/ForwardingWizard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -43,6 +44,7 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.voiceSettings, element: <VoiceSettings /> },
   { path: paths.teamInvite, element: <TeamInvite /> },
   { path: paths.integrations, element: <Integrations /> },
+  { path: paths.phoneApps, element: <PhoneApps /> },
   { path: paths.forwardingWizard, element: <ForwardingWizard /> },
   { path: paths.notFound, element: <NotFound /> },
 ];

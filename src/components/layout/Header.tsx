@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 const navigationItems = [{
   name: 'Features',
   href: paths.features
@@ -35,7 +36,7 @@ const adminNavigationItems = [{
   href: paths.calls
 }, {
   name: 'Phone Apps',
-  href: '/phone-apps'
+  href: paths.phoneApps
 }, {
   name: 'Settings',
   href: paths.voiceSettings
@@ -50,6 +51,7 @@ export const Header: React.FC = () => {
     isAdmin
   } = useAuth();
   const navigate = useNavigate();
+  const { goToWithFeedback } = useSafeNavigation();
   const mobileMenuId = 'mobile-menu';
   useEffect(() => {
     const handleScroll = () => {
@@ -76,7 +78,9 @@ export const Header: React.FC = () => {
             id="app-home"
             variant="default" 
             size={isScrolled ? 'sm' : 'default'}
-            onClick={() => navigate(paths.home)} 
+            onClick={() => goToWithFeedback(paths.home, 'Home').catch((error) => {
+              console.error('[Header] Home navigation failed:', error);
+            })} 
             className="hover-scale transition-all duration-300" 
             aria-label="Go to homepage" 
             data-lovable-lock="structure-only"
@@ -111,9 +115,21 @@ export const Header: React.FC = () => {
             {/* Admin-only navigation items */}
             {isAdmin() && adminNavigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
                 <NavigationMenuLink asChild>
-                  <Link to={item.href} className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-primary/10 px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-primary/20 hover:text-primary focus:bg-primary/20 focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-primary/30 data-[state=open]:bg-primary/30 story-link hover-scale text-primary" style={{
-                  animationDelay: `${(navigationItems.length + index) * 100}ms`
-                }}>
+                  <Link 
+                    to={item.href} 
+                    onClick={(e) => {
+                      // Prevent default and use safe navigation
+                      e.preventDefault();
+                      goToWithFeedback(item.href, item.name).catch((error) => {
+                        console.error(`[Header] Navigation failed for ${item.name}:`, error);
+                      });
+                    }}
+                    className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-primary/10 px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-primary/20 hover:text-primary focus:bg-primary/20 focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-primary/30 data-[state=open]:bg-primary/30 story-link hover-scale text-primary" 
+                    style={{
+                      animationDelay: `${(navigationItems.length + index) * 100}ms`
+                    }}
+                    aria-label={`Navigate to ${item.name}`}
+                  >
                     {item.name}
                   </Link>
                 </NavigationMenuLink>
@@ -160,7 +176,9 @@ export const Header: React.FC = () => {
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline ml-2">Sign Out</span>
               </Button>
-            </div> : <Button variant="success" size={isScrolled ? 'sm' : 'default'} onClick={() => navigate(paths.auth)} className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]">
+            </div> : <Button variant="success" size={isScrolled ? 'sm' : 'default'} onClick={() => goToWithFeedback(paths.auth, 'Login').catch((error) => {
+              console.error('[Header] Auth navigation failed:', error);
+            })} className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]">
               Login
             </Button>}
         </div>
@@ -193,9 +211,16 @@ export const Header: React.FC = () => {
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsMobileMenuOpen(false);
+                  goToWithFeedback(item.href, item.name).catch((error) => {
+                    console.error(`[Header] Mobile navigation failed for ${item.name}:`, error);
+                  });
+                }}
                 className="block px-4 py-2 text-sm font-medium rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover-scale animate-fade-in"
-                onClick={() => setIsMobileMenuOpen(false)}
                 style={{ animationDelay: `${(navigationItems.length + index) * 100}ms` }}
+                aria-label={`Navigate to ${item.name}`}
               >
                 {item.name}
               </Link>
