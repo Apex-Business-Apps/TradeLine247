@@ -34,14 +34,14 @@ jobs:
 
       - name: Serve built site and run Lighthouse CI
         run: |
-          # Start preview server in background
+          # Start preview server in background (Vite preview runs on port 4173)
           npm run preview &
           SERVER_PID=$!
 
           # Wait for server to be ready (max 30 seconds)
           echo "Waiting for server to start..."
           for i in {1..30}; do
-            if curl -s http://localhost:8080 > /dev/null; then
+            if curl -s http://localhost:4173 > /dev/null; then
               echo "Server is ready!"
               break
             fi
@@ -49,9 +49,9 @@ jobs:
             sleep 1
           done
 
-          # Run Lighthouse CI against local build
-          echo "Running Lighthouse CI against local build at http://localhost:8080"
-          lhci autorun --config=.lighthouserc.cjs --collect.url="http://localhost:8080"
+          # Run Lighthouse CI against local build at correct port (4173)
+          echo "Running Lighthouse CI against local build at http://localhost:4173"
+          lhci autorun --config=.lighthouserc.cjs --collect.url="http://localhost:4173"
 
           # Cleanup
           kill $SERVER_PID || true

@@ -2,7 +2,7 @@
 module.exports = {
   ci: {
     collect: {
-      url: [process.env.LHCI_URL || "http://localhost:8080"],
+      url: [process.env.LHCI_URL || "http://localhost:4173"], // FIX: Match Vite preview port
       numberOfRuns: 1,
       settings: {
         chromeFlags: "--no-sandbox --headless --disable-dev-shm-usage",

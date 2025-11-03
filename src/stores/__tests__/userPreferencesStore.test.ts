@@ -19,7 +19,7 @@ describe('userPreferencesStore', () => {
       const state = useUserPreferencesStore.getState();
 
       expect(state.hasCompletedOnboarding).toBe(false);
-      expect(state.theme).toBe('light');
+      expect(state.theme).toBe('system'); // UX IMPROVEMENT: Respects OS dark mode preference
       expect(state.dashboardLayout).toBe('comfortable');
       expect(state.showWelcomeMessage).toBe(true);
       expect(state.enableNotifications).toBe(true);
@@ -161,7 +161,7 @@ describe('userPreferencesStore', () => {
       useUserPreferencesStore.getState().resetPreferences();
 
       const state = useUserPreferencesStore.getState();
-      expect(state.theme).toBe('light');
+      expect(state.theme).toBe('system'); // UX IMPROVEMENT: Respects OS dark mode preference
       expect(state.preferredName).toBeNull();
       expect(state.recentActions).toHaveLength(0);
     });
