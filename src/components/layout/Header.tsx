@@ -2,13 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Logo } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
-import { Menu, X, LogOut } from 'lucide-react';
+import { Menu, X, LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 const navigationItems = [{
   name: 'Features',
   href: paths.features
@@ -50,26 +58,49 @@ export const Header: React.FC = () => {
     signOut,
     isAdmin
   } = useAuth();
-  const navigate = useNavigate();
   const { goToWithFeedback } = useSafeNavigation();
+  const location = useLocation();
   const mobileMenuId = 'mobile-menu';
+  const isUserAdmin = isAdmin();
+
+  // Streamlined navigation handler - single source of truth
+  const handleNavigation = React.useCallback(async (href: string, label: string, closeMenu = false) => {
+    if (closeMenu) setIsMobileMenuOpen(false);
+    try {
+      await goToWithFeedback(href, label);
+    } catch (error) {
+      console.error(`[Header] Navigation failed for ${label}:`, error);
+    }
+  }, [goToWithFeedback]);
+
+  // Optimized scroll handler
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Load header override CSS once on mount
   useEffect(() => {
-    if (document.getElementById('app-header-left') &&
-        document.getElementById('app-home') &&
-        document.getElementById('app-badge-ca')) {
-      import('../nav/AppHeaderOverride.module.css');
-    } else {
-      console.warn('Header left elements missing; override not applied');
-    }
+    const loadOverride = async () => {
+      const leftEl = document.getElementById('app-header-left');
+      const homeEl = document.getElementById('app-home');
+      const badgeEl = document.getElementById('app-badge-ca');
+      if (leftEl && homeEl && badgeEl) {
+        try {
+          await import('../nav/AppHeaderOverride.module.css');
+        } catch (error) {
+          console.warn('[Header] Override CSS load failed:', error);
+        }
+      }
+    };
+    loadOverride();
   }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
   return <header data-site-header className={cn('sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 isolate', isScrolled ? 'shadow-lg py-2' : 'py-4')} style={{ isolation: 'isolate' }} data-lovable-lock="structure-only">
       <div data-header-inner className="container flex h-14 items-center justify-between gap-4" data-lovable-lock="structure-only">
         {/* Home Button & Badge */}
@@ -78,9 +109,7 @@ export const Header: React.FC = () => {
             id="app-home"
             variant="default" 
             size={isScrolled ? 'sm' : 'default'}
-            onClick={() => goToWithFeedback(paths.home, 'Home').catch((error) => {
-              console.error('[Header] Home navigation failed:', error);
-            })} 
+            onClick={() => handleNavigation(paths.home, 'Home')} 
             className="hover-scale transition-all duration-300" 
             aria-label="Go to homepage" 
             data-lovable-lock="structure-only"
@@ -99,37 +128,18 @@ export const Header: React.FC = () => {
           />
         </div>
 
-        {/* Desktop Navigation */}
-        <nav data-slot="center" aria-label="Primary" className="hidden md:flex animate-fade-in" style={{ animationDelay: '200ms' }} data-lovable-lock="structure-only">
+        {/* Desktop Navigation - Marketing Links Only */}
+        <nav data-slot="center" aria-label="Primary" className="hidden lg:flex items-center gap-1 animate-fade-in" style={{ animationDelay: '200ms' }} data-lovable-lock="structure-only">
           <NavigationMenu data-lovable-lock="structure-only">
-            <NavigationMenuList data-lovable-lock="structure-only">
+            <NavigationMenuList data-lovable-lock="structure-only" className="gap-1">
             {navigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
-                <NavigationMenuLink asChild>
-                  <Link to={item.href} className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 story-link hover-scale" style={{
-                  animationDelay: `${index * 100}ms`
-                }}>
-                    {item.name}
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>)}
-            {/* Admin-only navigation items */}
-            {isAdmin() && adminNavigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
                 <NavigationMenuLink asChild>
                   <Link 
                     to={item.href} 
-                    onClick={(e) => {
-                      // Prevent default and use safe navigation
-                      e.preventDefault();
-                      goToWithFeedback(item.href, item.name).catch((error) => {
-                        console.error(`[Header] Navigation failed for ${item.name}:`, error);
-                      });
-                    }}
-                    className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-primary/10 px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-primary/20 hover:text-primary focus:bg-primary/20 focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-primary/30 data-[state=open]:bg-primary/30 story-link hover-scale text-primary" 
+                    className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-accent hover:text-foreground focus:bg-accent focus:text-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 story-link hover-scale" 
                     style={{
-                      animationDelay: `${(navigationItems.length + index) * 100}ms`
-                    }}
-                    aria-label={`Navigate to ${item.name}`}
-                  >
+                      animationDelay: `${index * 100}ms`
+                    }}>
                     {item.name}
                   </Link>
                 </NavigationMenuLink>
@@ -138,93 +148,195 @@ export const Header: React.FC = () => {
         </NavigationMenu>
         </nav>
 
+        {/* Desktop App Navigation - Separate Section for Admin */}
+        {isUserAdmin && (
+          <nav data-slot="app-nav" aria-label="Application" className="hidden lg:flex items-center gap-1 ml-4 pl-4 border-l border-border animate-fade-in" style={{ animationDelay: '250ms' }} data-lovable-lock="structure-only">
+            <NavigationMenu data-lovable-lock="structure-only">
+              <NavigationMenuList data-lovable-lock="structure-only" className="gap-1">
+              {adminNavigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
+                  <NavigationMenuLink asChild>
+                    <Link 
+                      to={item.href} 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavigation(item.href, item.name);
+                      }}
+                      className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition-all duration-300 hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-primary/20 data-[state=open]:bg-primary/20 story-link hover-scale text-primary"
+                      aria-label={`Navigate to ${item.name}`}
+                    >
+                      {item.name}
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>)}
+            </NavigationMenuList>
+          </NavigationMenu>
+          </nav>
+        )}
+
         {/* Enhanced CTA Button & Mobile Menu */}
         <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
           <LanguageSwitcher data-lovable-lock="structure-only" />
 
-          {/* Burger Menu Button - ALWAYS VISIBLE - Critical Navigation Control */}
+          {/* Burger Menu Button - MOBILE ONLY - Hidden on desktop */}
           <button
             id="burger-menu-button"
             data-testid="burger-menu-button"
-            className="!flex items-center justify-center p-2 rounded-md border-2 border-primary/20 bg-background hover:bg-accent hover:border-primary/40 transition-all duration-300 hover-scale min-w-[44px] min-h-[44px] !visible !opacity-100"
-            onClick={() => {
-              console.log('Burger menu clicked, current state:', isMobileMenuOpen);
-              setIsMobileMenuOpen(!isMobileMenuOpen);
-            }}
+            className="flex lg:hidden items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
+            onClick={() => setIsMobileMenuOpen(prev => !prev)}
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
             aria-controls={mobileMenuId}
             type="button"
           >
             {isMobileMenuOpen ? (
-              <X size={24} className="text-primary" strokeWidth={2.5} />
+              <X size={20} className="text-foreground" strokeWidth={2} />
             ) : (
-              <Menu size={24} className="text-primary" strokeWidth={2.5} />
+              <Menu size={20} className="text-foreground" strokeWidth={2} />
             )}
           </button>
 
-          {user ? <div className="flex items-center gap-2">
-              <div className="flex flex-col items-end">
-                <span className="text-sm text-muted-foreground hidden sm:block">
-                  Welcome, {user.user_metadata?.display_name || user.email}
-                </span>
-                {userRole && <span className={cn("text-xs px-2 py-1 rounded-full font-medium hidden sm:block transition-all duration-300", isAdmin() ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200")}>
-                    {userRole.toUpperCase()}
-                  </span>}
-              </div>
-              <Button variant="outline" size={isScrolled ? 'sm' : 'default'} onClick={() => signOut()} className="hover-scale transition-all duration-300">
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline ml-2">Sign Out</span>
+          {/* User Menu - Desktop: Dropdown, Mobile: Simplified */}
+          {user ? (
+            <div className="flex items-center gap-3">
+              {/* Desktop: User Dropdown Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size={isScrolled ? 'sm' : 'default'}
+                    className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300"
+                  >
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm font-medium text-foreground leading-tight">
+                        {user.user_metadata?.display_name || user.email?.split('@')[0] || 'User'}
+                      </span>
+                      {userRole && (
+                        <span className={cn(
+                          "text-xs font-medium leading-tight",
+                          isUserAdmin ? "text-red-600 dark:text-red-400" : "text-blue-600 dark:text-blue-400"
+                        )}>
+                          {userRole.toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{user.user_metadata?.display_name || 'User'}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {isUserAdmin && (
+                    <>
+                      <DropdownMenuItem 
+                        onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
+                        className="cursor-pointer"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleNavigation(paths.voiceSettings, 'Settings')}
+                        className="cursor-pointer"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  <DropdownMenuItem 
+                    onClick={() => signOut()}
+                    className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Mobile: Simplified Sign Out */}
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => signOut()} 
+                className="lg:hidden hover:bg-accent transition-all duration-300"
+                aria-label="Sign out"
+              >
+                <LogOut className="h-5 w-5" />
               </Button>
-            </div> : <Button variant="success" size={isScrolled ? 'sm' : 'default'} onClick={() => goToWithFeedback(paths.auth, 'Login').catch((error) => {
-              console.error('[Header] Auth navigation failed:', error);
-            })} className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]">
+            </div>
+          ) : (
+            <Button 
+              variant="success" 
+              size={isScrolled ? 'sm' : 'default'} 
+              onClick={() => handleNavigation(paths.auth, 'Login')}
+              className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
+            >
               Login
-            </Button>}
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Enhanced Mobile Navigation with Slide Animation */}
+      {/* Enhanced Mobile Navigation with Slide Animation - MOBILE ONLY */}
       <nav
         id={mobileMenuId}
         aria-label="Mobile"
         aria-hidden={!isMobileMenuOpen}
         className={cn(
-          "md:hidden border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden",
-          isMobileMenuOpen ? "animate-slide-in-right max-h-screen opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+          "lg:hidden border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden",
+          isMobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 pointer-events-none"
         )}
       >
-        <div className="container py-4 space-y-2">
-          {navigationItems.map((item, index) => (
-            <Link
-              key={item.name}
-              to={item.href}
-              className="block px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover-scale animate-fade-in"
-              onClick={() => setIsMobileMenuOpen(false)}
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              {item.name}
-            </Link>
-          ))}
-          {isAdmin() &&
-            adminNavigationItems.map((item, index) => (
+        <div className="container py-4 space-y-1">
+          {/* Marketing Links Section */}
+          <div className="px-2 py-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
+              Information
+            </p>
+            {navigationItems.map((item, index) => (
               <Link
                 key={item.name}
                 to={item.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsMobileMenuOpen(false);
-                  goToWithFeedback(item.href, item.name).catch((error) => {
-                    console.error(`[Header] Mobile navigation failed for ${item.name}:`, error);
-                  });
-                }}
-                className="block px-4 py-2 text-sm font-medium rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover-scale animate-fade-in"
-                style={{ animationDelay: `${(navigationItems.length + index) * 100}ms` }}
-                aria-label={`Navigate to ${item.name}`}
+                className="block px-4 py-2.5 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 animate-fade-in"
+                onClick={() => handleNavigation(item.href, item.name, true)}
               >
                 {item.name}
               </Link>
             ))}
+          </div>
+
+          {/* App Navigation Section (Admin Only) */}
+          {isUserAdmin && (
+            <>
+              <div className="border-t border-border my-2" />
+              <div className="px-2 py-2">
+                <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 px-2">
+                  Application
+                </p>
+                {adminNavigationItems.map((item, index) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavigation(item.href, item.name, true);
+                    }}
+                    className="block px-4 py-2.5 text-sm font-semibold rounded-md bg-primary/5 hover:bg-primary/10 text-primary transition-all duration-300 animate-fade-in"
+                    style={{ animationDelay: `${(navigationItems.length + index) * 50}ms` }}
+                    aria-label={`Navigate to ${item.name}`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </nav>
     </header>;
