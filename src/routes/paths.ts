@@ -5,4 +5,8 @@ export const paths = {
   addNumber: "/numbers/new",
   teamInvite: "/team/invite",
   integrations: "/integrations",
+  phoneApps: "/phone-apps",
+  forwardingWizard: "/ops/forwarding",
+  voiceSettings: "/ops/voice",
+  notFound: "*",
 } as const;
