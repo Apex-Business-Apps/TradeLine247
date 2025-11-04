@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useInRouterContext } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Phone, UserPlus, PhoneCall, Link as LinkIcon, Loader2 } from 'lucide-react';
@@ -40,6 +41,7 @@ const actions = [
 export const QuickActionsCard: React.FC = () => {
   const { goToWithFeedback, isNavigating } = useSafeNavigation();
   const [clickedAction, setClickedAction] = useState<string | null>(null);
+  const isInRouter = useInRouterContext();
 
   const handleActionClick = async (action: typeof actions[0]) => {
     try {
@@ -83,27 +85,66 @@ export const QuickActionsCard: React.FC = () => {
         {actions.map((action) => {
           const Icon = action.icon;
           const isActionLoading = isNavigating && clickedAction === action.label;
-          
+          const testId = `quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`;
+          const className = `w-full justify-start gap-2 relative ${
+            isNavigating ? 'pointer-events-none opacity-70' : ''
+          }`;
+
           return (
             <Button
               key={action.label}
               variant={action.variant}
-              onClick={() => handleActionClick(action)}
-              disabled={isNavigating}
-              className="w-full justify-start gap-2 relative"
-              aria-label={`${action.label}: ${action.description}`}
+              asChild={isInRouter}
+              className={className}
               title={action.description}
-              data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
-              data-qa-action={action.label}
+              onClick={
+                isInRouter
+                  ? undefined
+                  : () => {
+                      if (isNavigating) {
+                        return;
+                      }
+                      void handleActionClick(action);
+                    }
+              }
+              disabled={!isInRouter && isNavigating}
+              aria-label={isInRouter ? undefined : `${action.label}: ${action.description}`}
+              data-testid={isInRouter ? undefined : testId}
+              data-qa-action={isInRouter ? undefined : action.label}
             >
-              {isActionLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+              {isInRouter ? (
+                <Link
+                  to={action.to}
+                  role="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    if (isNavigating) {
+                      return;
+                    }
+                    void handleActionClick(action);
+                  }}
+                  aria-label={`${action.label}: ${action.description}`}
+                  aria-disabled={isNavigating}
+                  data-testid={testId}
+                  data-qa-action={action.label}
+                >
+                  {isActionLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Icon className="h-4 w-4" />
+                  )}
+                  <span>{action.label}</span>
+                </Link>
               ) : (
-              <Icon className="h-4 w-4" />
+                <>
+                  {isActionLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Icon className="h-4 w-4" />
+                  )}
+                  <span>{action.label}</span>
+                </>
               )}
-              <span className={isActionLoading ? 'opacity-70' : ''}>
-              {action.label}
-              </span>
             </Button>
           );
         })}

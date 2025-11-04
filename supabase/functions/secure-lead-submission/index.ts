@@ -1,10 +1,9 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'npm:@supabase/supabase-js@2.79.0';
 import { sanitizeText, sanitizeEmail, sanitizeName, detectSuspiciousContent, generateRequestHash } from '../_shared/advancedSanitizer.ts';
 import { createRequestContext, logWithContext, createResponseHeaders } from '../_shared/requestId.ts';
-import { preflight, corsHeaders } from '../_shared/cors.ts';
-import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
+import { preflight, jsonResponse, unexpectedErrorResponse } from '../_shared/cors.ts';
 
 // Server-side validation schema
 interface LeadSubmission {
@@ -131,13 +130,7 @@ serve(async (req) => {
   try {
     // Only accept POST requests
     if (req.method !== 'POST') {
-      return new Response(
-        JSON.stringify({ error: 'Method not allowed' }), 
-        { 
-          status: 405, 
-          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
-        }
-      );
+      return jsonResponse({ error: 'Method not allowed' }, { status: 405 });
     }
 
     // Initialize Supabase client
@@ -163,14 +156,13 @@ serve(async (req) => {
         page_url: 'security/rate-limit'
       });
 
-      return new Response(
-        JSON.stringify({ 
+      return jsonResponse(
+        {
           error: 'Rate limit exceeded. Please try again later.',
           remainingAttempts: 0
-        }),
-        { 
-          status: 429, 
-          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
+        },
+        {
+          status: 429
         }
       );
     }
@@ -192,13 +184,10 @@ serve(async (req) => {
     
     if (idempotencyCheck?.exists && idempotencyCheck?.status === 'completed') {
       logWithContext(requestCtx, 'info', 'Duplicate request detected - returning cached response');
-      return new Response(
-        JSON.stringify(idempotencyCheck.response_data),
-        { 
-          status: 200, 
-          headers: mergeHeaders(corsHeaders, secureHeaders, createResponseHeaders(requestCtx), { 'Content-Type': 'application/json' })
-        }
-      );
+      return jsonResponse(idempotencyCheck.response_data, {
+        status: 200,
+        headers: createResponseHeaders(requestCtx)
+      });
     }
     
     const validation = validateLeadData(requestBody);
@@ -218,14 +207,13 @@ serve(async (req) => {
         page_url: 'security/validation-failed'
       });
 
-      return new Response(
-        JSON.stringify({ 
+      return jsonResponse(
+        {
           error: 'Invalid input data',
           details: validation.errors
-        }),
-        { 
-          status: 400, 
-          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
+        },
+        {
+          status: 400
         }
       );
     }
@@ -267,13 +255,7 @@ serve(async (req) => {
         page_url: 'security/db-error'
       });
 
-      return new Response(
-        JSON.stringify({ error: 'Failed to process submission' }),
-        { 
-          status: 500, 
-          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
-        }
-      );
+      return jsonResponse({ error: 'Failed to process submission' }, { status: 500 });
     }
 
     // Log successful secure submission
@@ -312,23 +294,12 @@ serve(async (req) => {
     });
 
     // Return success response
-    return new Response(
-      JSON.stringify(successResponse),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, ...createResponseHeaders(requestCtx), 'Content-Type': 'application/json' }
-      }
-    );
+    return jsonResponse(successResponse, {
+      status: 200,
+      headers: createResponseHeaders(requestCtx)
+    });
 
   } catch (error) {
-    console.error('Secure lead submission error:', error);
-    
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
+    return unexpectedErrorResponse(error, 'secure-lead-submission');
   }
 });
