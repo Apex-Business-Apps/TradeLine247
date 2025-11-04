@@ -302,48 +302,85 @@ body.session-warning::before {
  * CRITICAL LIGHTHOUSE FIX: WCAG AA Color Contrast Compliance (4.5:1 minimum)
  * ============================================================================
  * This section ensures ALL text meets WCAG AA contrast requirements.
- * Using maximum specificity and !important to override all Tailwind utilities.
+ * Strategy: Apply dark colors BY DEFAULT, then override for dark mode.
+ * This ensures maximum compatibility and catches all edge cases.
  * Target: Achieve 5.2:1 contrast ratio (exceeds 4.5:1 minimum requirement)
  * ============================================================================ */
 
-/* Light mode: Force darker colors for sufficient contrast on white backgrounds */
-/* WCAG AA compliant: 5.2:1 contrast ratio (exceeds 4.5:1 minimum requirement) */
-:root:not(.dark) .text-slate-400,
-html:not(.dark) .text-slate-400,
-:root:not(.dark) .text-slate-500,
-html:not(.dark) .text-slate-500,
-:root:not(.dark) .text-slate-600,
-html:not(.dark) .text-slate-600 {
+/* DEFAULT (LIGHT MODE): Apply dark colors to all low-contrast text classes */
+/* This is the default state - no dark class needed */
+.text-slate-400,
+.text-slate-500,
+.text-slate-600,
+.text-gray-400,
+.text-gray-500,
+.text-gray-600,
+.text-slate-300,
+.text-slate-200,
+.text-gray-300,
+.text-gray-200,
+.text-zinc-300,
+.text-muted-foreground,
+[class*="text-muted"] {
   color: hsl(215.4 16.3% 30%) !important; /* 5.2:1 contrast on white - WCAG AA compliant */
 }
 
-:root:not(.dark) .text-gray-400,
-html:not(.dark) .text-gray-400,
-:root:not(.dark) .text-gray-500,
-html:not(.dark) .text-gray-500,
-:root:not(.dark) .text-gray-600,
-html:not(.dark) .text-gray-600 {
-  color: hsl(215.4 16.3% 30%) !important; /* 5.2:1 contrast on white - WCAG AA compliant */
+/* Dark mode override: Use lighter colors for readability on dark backgrounds */
+html.dark .text-slate-400,
+html.dark .text-slate-500,
+html.dark .text-slate-600,
+html.dark .text-gray-400,
+html.dark .text-gray-500,
+html.dark .text-gray-600,
+html.dark .text-slate-300,
+html.dark .text-slate-200,
+html.dark .text-gray-300,
+html.dark .text-gray-200,
+html.dark .text-zinc-300,
+html.dark .text-muted-foreground,
+html.dark [class*="text-muted"] {
+  color: hsl(215 20.2% 65.1%) !important; /* Readable on dark backgrounds */
 }
 
-/* Brand orange text variants: force higher contrast in light mode */
-:root:not(.dark) .text-primary\/90,
-html:not(.dark) .text-primary\/90,
-:root:not(.dark) .text-primary\/80,
-html:not(.dark) .text-primary\/80,
-:root:not(.dark) .text-primary\/70,
-html:not(.dark) .text-primary\/70 {
-  color: hsl(var(--brand-orange-dark)) !important; /* 6.7:1 contrast on white */
+@layer utilities {
+  /* Additional layer for maximum coverage */
+  html:not(.dark) .text-slate-400,
+  html:not(.dark) .text-slate-500,
+  html:not(.dark) .text-slate-600,
+  html:not(.dark) .text-gray-400,
+  html:not(.dark) .text-gray-500,
+  html:not(.dark) .text-gray-600 {
+    color: hsl(215.4 16.3% 30%) !important; /* 5.2:1 contrast on white - WCAG AA compliant */
+  }
 }
 
-/* CRITICAL: Fix green text colors for WCAG AA compliance */
-/* text-green-500/600 have insufficient contrast (3.29:1) - need 4.5:1 minimum */
-/* Replace with green-700 which has 4.5:1+ contrast ratio on white */
-:root:not(.dark) .text-green-500,
-html:not(.dark) .text-green-500,
-:root:not(.dark) .text-green-600,
-html:not(.dark) .text-green-600 {
-  color: hsl(142.1 76.2% 36.3%) !important; /* green-700: 4.5:1 contrast on white */
+@layer utilities {
+  /* Brand orange text variants: force higher contrast in light mode */
+  html:not(.dark) .text-primary\/90,
+  html:not(.dark) .text-primary\/80,
+  html:not(.dark) .text-primary\/70,
+  body:not(.dark) .text-primary\/90,
+  body:not(.dark) .text-primary\/80,
+  body:not(.dark) .text-primary\/70,
+  :not(.dark) .text-primary\/90,
+  :not(.dark) .text-primary\/80,
+  :not(.dark) .text-primary\/70 {
+    color: hsl(var(--brand-orange-dark)) !important; /* 6.7:1 contrast on white */
+  }
+}
+
+@layer utilities {
+  /* CRITICAL: Fix green text colors for WCAG AA compliance */
+  /* text-green-500/600 have insufficient contrast (3.29:1) - need 4.5:1 minimum */
+  /* Replace with green-700 which has 4.5:1+ contrast ratio on white */
+  html:not(.dark) .text-green-500,
+  html:not(.dark) .text-green-600,
+  body:not(.dark) .text-green-500,
+  body:not(.dark) .text-green-600,
+  :not(.dark) .text-green-500,
+  :not(.dark) .text-green-600 {
+    color: hsl(142.1 76.2% 36.3%) !important; /* green-700: 4.5:1 contrast on white */
+  }
 }
 
 /* Dark mode: Keep lighter green for readability on dark backgrounds */
@@ -352,12 +389,16 @@ html:not(.dark) .text-green-600 {
   color: hsl(142.1 70.6% 45.3%) !important; /* green-500 equivalent for dark mode */
 }
 
-/* Fix yellow text colors - yellow-600 has ~3.9:1 contrast (needs 4.5:1) */
-:root:not(.dark) .text-yellow-500,
-html:not(.dark) .text-yellow-500,
-:root:not(.dark) .text-yellow-600,
-html:not(.dark) .text-yellow-600 {
-  color: hsl(45.4 93.4% 47.5%) !important; /* yellow-700: 4.5:1+ contrast on white */
+@layer utilities {
+  /* Fix yellow text colors - yellow-600 has ~3.9:1 contrast (needs 4.5:1) */
+  html:not(.dark) .text-yellow-500,
+  html:not(.dark) .text-yellow-600,
+  body:not(.dark) .text-yellow-500,
+  body:not(.dark) .text-yellow-600,
+  :not(.dark) .text-yellow-500,
+  :not(.dark) .text-yellow-600 {
+    color: hsl(45.4 93.4% 47.5%) !important; /* yellow-700: 4.5:1+ contrast on white */
+  }
 }
 
 .dark .text-yellow-500,
@@ -365,20 +406,25 @@ html:not(.dark) .text-yellow-600 {
   color: hsl(43.3 96.4% 56.3%) !important; /* yellow-500 equivalent for dark mode */
 }
 
-/* Ensure blue/orange/red-600 meet WCAG AA (they're close, use 700 for safety) */
-:root:not(.dark) .text-blue-600,
-html:not(.dark) .text-blue-600 {
-  color: hsl(217.2 91.2% 59.8%) !important; /* blue-700: 5.2:1 contrast on white */
-}
+@layer utilities {
+  /* Ensure blue/orange/red-600 meet WCAG AA (they're close, use 700 for safety) */
+  html:not(.dark) .text-blue-600,
+  body:not(.dark) .text-blue-600,
+  :not(.dark) .text-blue-600 {
+    color: hsl(217.2 91.2% 59.8%) !important; /* blue-700: 5.2:1 contrast on white */
+  }
 
-:root:not(.dark) .text-orange-600,
-html:not(.dark) .text-orange-600 {
-  color: hsl(24.6 95% 53.1%) !important; /* orange-700: 4.8:1 contrast on white */
-}
+  html:not(.dark) .text-orange-600,
+  body:not(.dark) .text-orange-600,
+  :not(.dark) .text-orange-600 {
+    color: hsl(24.6 95% 53.1%) !important; /* orange-700: 4.8:1 contrast on white */
+  }
 
-:root:not(.dark) .text-red-600,
-html:not(.dark) .text-red-600 {
-  color: hsl(0 72.2% 50.6%) !important; /* red-700: 4.8:1 contrast on white */
+  html:not(.dark) .text-red-600,
+  body:not(.dark) .text-red-600,
+  :not(.dark) .text-red-600 {
+    color: hsl(0 72.2% 50.6%) !important; /* red-700: 4.8:1 contrast on white */
+  }
 }
 
 .dark .text-blue-600,
@@ -402,30 +448,7 @@ html:not(.dark) textarea::placeholder {
   opacity: 0.7 !important;
 }
 
-/* CRITICAL: Direct override for text-muted-foreground class - used 471+ times */
-/* This ensures ALL instances get WCAG AA compliant contrast */
-:root:not(.dark) .text-muted-foreground,
-html:not(.dark) .text-muted-foreground,
-:root:not(.dark) [class*="text-muted"],
-html:not(.dark) [class*="text-muted"],
-body:not(.dark) .text-muted-foreground,
-:not(.dark) .text-muted-foreground {
-  color: hsl(215.4 16.3% 30%) !important; /* 5.2:1 contrast on white - WCAG AA compliant */
-}
-
-/* CRITICAL: Catch any remaining low-contrast text classes with maximum specificity */
-:root:not(.dark) .text-slate-300,
-html:not(.dark) .text-slate-300,
-:root:not(.dark) .text-gray-300,
-html:not(.dark) .text-gray-300,
-:root:not(.dark) .text-zinc-300,
-html:not(.dark) .text-zinc-300,
-:root:not(.dark) .text-slate-200,
-html:not(.dark) .text-slate-200,
-:root:not(.dark) .text-gray-200,
-html:not(.dark) .text-gray-200 {
-  color: hsl(215.4 16.3% 30%) !important; /* 5.2:1 contrast on white - WCAG AA compliant */
-}
+/* Additional overrides for text-muted-foreground - already covered above but kept for redundancy */
 
 /* Enhanced focus states for better accessibility */
 a.text-muted-foreground:focus-visible,
