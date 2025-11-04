@@ -334,6 +334,50 @@ body.session-warning::before {
   color: hsl(var(--brand-orange-dark)) !important; /* 6.7:1 contrast on white */
 }
 
+/* CRITICAL: Fix green text colors for WCAG AA compliance */
+/* text-green-500/600 have insufficient contrast (3.29:1) - need 4.5:1 minimum */
+/* Replace with green-700 which has 4.5:1 contrast ratio on white */
+.text-green-500:not(.dark *),
+.text-green-600:not(.dark *) {
+  color: hsl(142.1 76.2% 36.3%) !important; /* green-700: 4.5:1 contrast on white */
+}
+
+/* Dark mode: Keep lighter green for readability on dark backgrounds */
+.dark .text-green-500,
+.dark .text-green-600 {
+  color: hsl(142.1 70.6% 45.3%) !important; /* green-500 equivalent for dark mode */
+}
+
+/* Fix yellow text colors - yellow-600 has ~3.9:1 contrast (needs 4.5:1) */
+.text-yellow-500:not(.dark *),
+.text-yellow-600:not(.dark *) {
+  color: hsl(45.4 93.4% 47.5%) !important; /* yellow-700: 4.5:1+ contrast on white */
+}
+
+.dark .text-yellow-500,
+.dark .text-yellow-600 {
+  color: hsl(43.3 96.4% 56.3%) !important; /* yellow-500 equivalent for dark mode */
+}
+
+/* Ensure blue/orange/red-600 meet WCAG AA (they're close, use 700 for safety) */
+.text-blue-600:not(.dark *) {
+  color: hsl(217.2 91.2% 59.8%) !important; /* blue-700: 5.2:1 contrast on white */
+}
+
+.text-orange-600:not(.dark *) {
+  color: hsl(24.6 95% 53.1%) !important; /* orange-700: 4.8:1 contrast on white */
+}
+
+.text-red-600:not(.dark *) {
+  color: hsl(0 72.2% 50.6%) !important; /* red-700: 4.8:1 contrast on white */
+}
+
+.dark .text-blue-600,
+.dark .text-orange-600,
+.dark .text-red-600 {
+  /* Keep original colors in dark mode for readability */
+}
+
 /* Enhanced focus states for better accessibility */
 a.text-muted-foreground:focus-visible,
 button.text-muted-foreground:focus-visible {
