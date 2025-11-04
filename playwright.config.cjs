@@ -1,8 +1,10 @@
 // playwright.config.cjs — CommonJS so GitHub Actions Babel doesn’t choke on `import`
 const { defineConfig, devices } = require('@playwright/test');
 
+const baseURL = process.env.BASE_URL || 'http://localhost:4173';
+
 const baseUse = {
-  baseURL: process.env.BASE_URL || 'http://localhost:5000',
+  baseURL,
   trace: 'retain-on-failure',
   video: 'retain-on-failure',
   // Keep test harnesses stable even when production CSP blocks inline execution.
@@ -26,4 +28,10 @@ module.exports = defineConfig({
       },
     },
   ],
+  webServer: {
+    command: 'npm run preview',
+    url: baseURL,
+    reuseExistingServer: true,
+    timeout: 120000,
+  },
 });

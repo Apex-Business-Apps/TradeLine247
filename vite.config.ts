@@ -5,8 +5,8 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react()],
   base: "/",
-  server: { 
-    port: 8080, 
+  server: {
+    port: 5173,
     strictPort: true,
     host: true,
     cors: true
