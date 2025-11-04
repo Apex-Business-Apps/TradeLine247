@@ -5,6 +5,13 @@ const baseURL =
   process.env.BASE_URL ||
   'http://localhost:4173';
 
+const baseUse = {
+  baseURL,
+  trace: 'on-first-retry',
+  screenshot: 'only-on-failure',
+  bypassCSP: true,
+} as const;
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -12,19 +19,13 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined, // throttle on CI, use all cores locally
   reporter: 'html',
-  use: {
-    baseURL,
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    bypassCSP: true,
-  },
+  use: baseUse,
   projects: [
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        // Explicitly opt out of CSP so inline guards/scripts work under test
-        bypassCSP: true,
+        ...baseUse,
       },
     },
   ],

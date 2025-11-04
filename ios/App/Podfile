@@ -6,9 +6,16 @@ unless Dir.pwd == app_dir
   Dir.chdir(app_dir)
 end
 
-app_project_path = File.expand_path('App.xcodeproj', __dir__)
+project_relative = 'App.xcodeproj'
+app_project_path = File.expand_path(project_relative, __dir__)
+project_file = File.join(app_project_path, 'project.pbxproj')
+
 unless File.directory?(app_project_path)
-  abort "[pods] Expected to find App.xcodeproj at #{app_project_path}. Run `npx cap sync ios` first."
+  abort "[pods] Expected to find #{project_relative} at #{app_project_path}. Run `npx cap sync ios` first."
+end
+
+unless File.exist?(project_file)
+  abort "[pods] Missing project.pbxproj inside #{project_relative}. Re-run `npx cap sync ios`."
 end
 
 platform :ios, '15.0'
