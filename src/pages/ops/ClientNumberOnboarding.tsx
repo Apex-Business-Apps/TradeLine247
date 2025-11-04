@@ -569,9 +569,13 @@ export default function ClientNumberOnboarding() {
 
   return (
     <div className="container mx-auto p-6 max-w-5xl">
+      <div className="mb-6 text-center sm:text-left">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Add Number</h1>
+        <p className="text-muted-foreground">Provision or port a new number into the TradeLine 24/7 platform.</p>
+      </div>
       <Card>
         <CardHeader>
-          <CardTitle>Client Number Onboarding</CardTitle>
+          <CardTitle>Add Number</CardTitle>
           <CardDescription>
             Initialize client account and select onboarding track
           </CardDescription>

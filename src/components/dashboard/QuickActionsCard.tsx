@@ -1,70 +1,111 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Phone, UserPlus, PhoneCall, Link as LinkIcon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { InviteStaffDialog } from './InviteStaffDialog';
+import { Phone, UserPlus, PhoneCall, Link as LinkIcon, Loader2 } from 'lucide-react';
+import { paths } from '@/routes/paths';
+import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { toast } from 'sonner';
+
+const actions = [
+  {
+    label: 'View Calls',
+    icon: Phone,
+    to: paths.calls,
+    variant: 'default' as const,
+    description: 'Review call history and activity'
+  },
+  {
+    label: 'Add Number',
+    icon: PhoneCall,
+    to: paths.addNumber,
+    variant: 'outline' as const,
+    description: 'Purchase or provision a new phone number'
+  },
+  {
+    label: 'Invite Staff',
+    icon: UserPlus,
+    to: paths.teamInvite,
+    variant: 'outline' as const,
+    description: 'Grant access to team members'
+  },
+  {
+    label: 'Integrations',
+    icon: LinkIcon,
+    to: paths.integrations,
+    variant: 'outline' as const,
+    description: 'Connect external services'
+  },
+];
 
 export const QuickActionsCard: React.FC = () => {
-  const navigate = useNavigate();
-  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const { goToWithFeedback, isNavigating } = useSafeNavigation();
+  const [clickedAction, setClickedAction] = useState<string | null>(null);
 
-  const actions = [
-    {
-      label: 'View Calls',
-      icon: Phone,
-      onClick: () => navigate('/call-center'),
-      variant: 'default' as const
-    },
-    {
-      label: 'Add Number',
-      icon: PhoneCall,
-      onClick: () => navigate('/ops/number-onboarding'),
-      variant: 'outline' as const
-    },
-    {
-      label: 'Invite Staff',
-      icon: UserPlus,
-      onClick: () => setInviteDialogOpen(true),
-      variant: 'outline' as const
-    },
-    {
-      label: 'Integrations',
-      icon: LinkIcon,
-      onClick: () => navigate('/integrations'),
-      variant: 'outline' as const
+  const handleActionClick = async (action: typeof actions[0]) => {
+    try {
+      setClickedAction(action.label);
+      
+      // Log action click for debugging
+      if (import.meta.env.DEV) {
+        console.log('[QuickActions] Action clicked:', {
+          label: action.label,
+          path: action.to,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Navigate with error handling
+      await goToWithFeedback(action.to, action.label);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[QuickActions] Navigation failed:', {
+        action: action.label,
+        path: action.to,
+        error: errorMessage
+      });
+      
+      toast.error('Action Failed', {
+        description: `Unable to ${action.label.toLowerCase()}. Please try again.`,
+        duration: 4000
+      });
+    } finally {
+      // Clear clicked state after a short delay
+      setTimeout(() => setClickedAction(null), 500);
     }
-  ];
+  };
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {actions.map((action) => {
-            const Icon = action.icon;
-            return (
-              <Button
-                key={action.label}
-                variant={action.variant}
-                onClick={action.onClick}
-                className="w-full justify-start gap-2"
-              >
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Quick Actions</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {actions.map((action) => {
+          const Icon = action.icon;
+          const isActionLoading = isNavigating && clickedAction === action.label;
+          
+          return (
+            <Button
+              key={action.label}
+              variant={action.variant}
+              onClick={() => handleActionClick(action)}
+              disabled={isNavigating}
+              className="w-full justify-start gap-2 relative"
+              aria-label={`${action.label}: ${action.description}`}
+              title={action.description}
+            >
+              {isActionLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
                 <Icon className="h-4 w-4" />
+              )}
+              <span className={isActionLoading ? 'opacity-70' : ''}>
                 {action.label}
-              </Button>
-            );
-          })}
-        </CardContent>
-      </Card>
-      
-      <InviteStaffDialog 
-        open={inviteDialogOpen} 
-        onOpenChange={setInviteDialogOpen} 
-      />
-    </>
+              </span>
+            </Button>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 };
-

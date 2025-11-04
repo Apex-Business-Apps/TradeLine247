@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 // CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
+import { paths } from "./routes/paths";
 
 // PERFORMANCE: Route-based code splitting - lazy load all routes except Index (critical)
 const Pricing = lazy(() => import("./pages/Pricing"));
@@ -19,8 +20,36 @@ const CallCenter = lazy(() => import("./pages/CallCenter"));
 const CallLogs = lazy(() => import("./pages/CallLogs"));
 const Integrations = lazy(() => import("./pages/Integrations"));
 const ClientNumberOnboarding = lazy(() => import("./pages/ops/ClientNumberOnboarding"));
+const VoiceSettings = lazy(() => import("./pages/ops/VoiceSettings"));
+const TeamInvite = lazy(() => import("./pages/TeamInvite"));
+const PhoneApps = lazy(() => import("./pages/PhoneApps"));
 const ForwardingWizard = lazy(() => import("./routes/ForwardingWizard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+
+const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
+  { path: paths.home, element: <Index /> },
+  { path: paths.pricing, element: <Pricing /> },
+  { path: paths.faq, element: <FAQ /> },
+  { path: paths.features, element: <Features /> },
+  { path: paths.compare, element: <Compare /> },
+  { path: paths.security, element: <Security /> },
+  { path: paths.contact, element: <Contact /> },
+  { path: paths.auth, element: <Auth /> },
+  { path: paths.dashboard, element: <ClientDashboard /> },
+  { path: paths.calls, element: <CallCenter /> },
+  { path: paths.callCenterLegacy, element: <CallCenter /> },
+  { path: paths.callLogs, element: <CallLogs /> },
+  { path: paths.addNumber, element: <ClientNumberOnboarding /> },
+  { path: paths.numbersLegacy, element: <ClientNumberOnboarding /> },
+  { path: paths.voiceSettings, element: <VoiceSettings /> },
+  { path: paths.teamInvite, element: <TeamInvite /> },
+  { path: paths.integrations, element: <Integrations /> },
+  { path: paths.phoneApps, element: <PhoneApps /> },
+  { path: paths.forwardingWizard, element: <ForwardingWizard /> },
+  { path: paths.notFound, element: <NotFound /> },
+];
+
+export const appRoutePaths = new Set(routeEntries.map(({ path }) => path));
 
 // Loading fallback component for better UX during lazy loading
 const LoadingFallback = () => (
@@ -31,7 +60,7 @@ const LoadingFallback = () => (
       alignItems: "center",
       justifyContent: "center",
       fontSize: "1.125rem",
-      color: "hsl(var(--muted-foreground))"
+      color: "hsl(var(--muted-foreground))",
     }}
   >
     Loading...
@@ -40,29 +69,19 @@ const LoadingFallback = () => (
 
 export default function App() {
   return (
-    <BrowserRouter>
-      {/* Suspense prevents a white screen if any child is lazy elsewhere */}
-      <Suspense fallback={<LoadingFallback />}>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route index element={<Index />} />
-            <Route path="pricing" element={<Pricing />} />
-            <Route path="faq" element={<FAQ />} />
-            <Route path="features" element={<Features />} />
-            <Route path="compare" element={<Compare />} />
-            <Route path="security" element={<Security />} />
-            <Route path="contact" element={<Contact />} />
-            <Route path="auth" element={<Auth />} />
-            <Route path="dashboard" element={<ClientDashboard />} />
-            <Route path="call-center" element={<CallCenter />} />
-            <Route path="call-logs" element={<CallLogs />} />
-            <Route path="integrations" element={<Integrations />} />
-            <Route path="ops/number-onboarding" element={<ClientNumberOnboarding />} />
-            <Route path="ops/forwarding" element={<ForwardingWizard />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <div className="min-h-screen bg-background text-foreground antialiased">
+      <BrowserRouter>
+        {/* Suspense prevents a white screen if any child is lazy elsewhere */}
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route element={<AppLayout />}>
+              {routeEntries.map(({ path, element }) => (
+                <Route key={path} path={path} element={element} />
+              ))}
+            </Route>
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </div>
   );
 }

@@ -34,6 +34,22 @@ jobs:
       - name: Sync Capacitor iOS project
         run: npx cap sync ios
 
+      - name: Verify synced iOS project layout
+        run: |
+          set -euo pipefail
+          if [ ! -d "$IOS_APP_DIR" ]; then
+            echo "::error::Expected iOS app directory at $IOS_APP_DIR"; exit 1;
+          fi
+          if [ ! -f "$IOS_APP_DIR/Podfile" ]; then
+            echo "::error::Podfile missing from $IOS_APP_DIR"; exit 1;
+          fi
+          if [ ! -d "$IOS_APP_DIR/$PROJECT_PATH" ]; then
+            echo "::error::Missing $PROJECT_PATH inside $IOS_APP_DIR (run npx cap sync ios)"; exit 1;
+          fi
+          if [ ! -f "$IOS_APP_DIR/$PROJECT_PATH/project.pbxproj" ]; then
+            echo "::error::Missing project.pbxproj inside $IOS_APP_DIR/$PROJECT_PATH"; exit 1;
+          fi
+
       - name: Install CocoaPods
         shell: bash
         working-directory: ${{ env.IOS_APP_DIR }}
@@ -41,22 +57,6 @@ jobs:
           set -euo pipefail
 
           echo "Installing pods from $(pwd)"
-
-          if [ ! -f Podfile ]; then
-            echo "Podfile missing from $(pwd)" >&2
-            exit 1
-          fi
-
-          if [ ! -d "$PROJECT_PATH" ]; then
-            echo "Expected to find $PROJECT_PATH after capacitor sync." >&2
-            ls
-            exit 1
-          fi
-
-          if [ ! -f "$PROJECT_PATH/project.pbxproj" ]; then
-            echo "Missing project.pbxproj inside $PROJECT_PATH" >&2
-            exit 1
-          fi
 
           pod install --repo-update
 

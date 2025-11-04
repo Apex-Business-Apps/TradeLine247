@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { ArrowLeft, Smartphone, Download, Settings, CheckCircle, ExternalLink, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -97,7 +98,7 @@ const MobileIntegration = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(paths.dashboard)}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

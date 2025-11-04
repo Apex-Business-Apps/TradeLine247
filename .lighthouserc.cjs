@@ -2,7 +2,8 @@
 module.exports = {
   ci: {
     collect: {
-      url: [process.env.LHCI_URL || "http://localhost:8080"],
+      staticDistDir: "./dist",
+      url: [process.env.LHCI_URL || "/"],
       numberOfRuns: 1,
       settings: {
         chromeFlags: "--no-sandbox --headless --disable-dev-shm-usage",
