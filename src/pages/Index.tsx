@@ -10,6 +10,7 @@ import { NoAIHypeFooter } from "@/components/sections/NoAIHypeFooter";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
+import QuickActions from "../components/QuickActions";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 
 const Index = () => {
@@ -83,6 +84,19 @@ const Index = () => {
           />
 
           <main className="flex-1" style={{ minHeight: "60vh" }}>
+            <div className="bg-background/20 backdrop-blur-[2px]">
+              <div className="container mx-auto px-4 py-6">
+                <div className="mx-auto max-w-5xl space-y-4 text-center">
+                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                    Quick Actions
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Jump straight into your daily workflows. These buttons match the routes Playwright verifies.
+                  </p>
+                  <QuickActions />
+                </div>
+              </div>
+            </div>
             <div className="bg-background/20 backdrop-blur-[2px]" style={{ willChange: "transform" }}>
               <HeroRoiDuo />
             </div>

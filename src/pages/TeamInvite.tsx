@@ -54,7 +54,7 @@ export default function TeamInvite() {
               Team access
             </Badge>
             <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              Invite Your Team
+              Invite Staff
             </h1>
             <p className="text-muted-foreground text-lg">
               Send email invites and control who can configure calls, purchase numbers, and access analytics.

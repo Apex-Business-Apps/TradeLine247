@@ -70,7 +70,7 @@ export default function CallCenter() {
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Calls Dashboard</h1>
+                <h1 className="text-3xl font-bold text-foreground mb-2">Calls</h1>
                 <p className="text-muted-foreground">
                   Monitor and manage your Twilio voice calls in real-time
                 </p>
