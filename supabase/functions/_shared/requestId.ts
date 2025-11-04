@@ -85,3 +85,12 @@ export function createResponseHeaders(
   };
 }
 
+export function ensureRequestId(headers: Headers, fallback?: string): string {
+  const existing =
+    headers.get('x-request-id') ||
+    headers.get('x-b3-traceid') ||
+    headers.get('x-amzn-trace-id');
+
+  return existing?.toString() || fallback || crypto.randomUUID();
+}
+
