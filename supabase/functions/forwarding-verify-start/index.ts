@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+// Removed unnecessary edge-runtime import that caused OpenAI dependency conflict
 import { preflight, corsHeaders } from "../_shared/cors.ts";
 import { withJSON } from "../_shared/secure_headers.ts";
 import { twilioFormPOST } from "../_shared/twilio.ts";

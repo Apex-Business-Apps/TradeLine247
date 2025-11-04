@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "lib": ["deno.window", "dom", "dom.iterable", "dom.asynciterable"],
+    "skipLibCheck": true
+  },
+  "lock": false,
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.79.0",
+    "npm:openai@^4.52.5": "https://esm.sh/openai@4.52.5",
+    "npm:openai": "https://esm.sh/openai@4.52.5"
+  }
+}
