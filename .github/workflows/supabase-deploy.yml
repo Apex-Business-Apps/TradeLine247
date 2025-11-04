@@ -18,45 +18,50 @@ jobs:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
       - name: Validate Supabase secrets
+        id: check-secrets
         run: |
           echo "Checking for required Supabase secrets..."
+          MISSING_SECRETS=0
+          
           if [ -z "$SUPABASE_PROJECT_REF" ] || [ "$SUPABASE_PROJECT_REF" = "" ]; then
-            echo "::error::❌ SUPABASE_PROJECT_REF secret is not set in repository settings"
-            echo ""
-            echo "📋 To fix this:"
-            echo "1. Go to: https://github.com/${{ github.repository }}/settings/secrets/actions"
-            echo "2. Click 'New repository secret'"
-            echo "3. Add secret name: SUPABASE_PROJECT_REF"
-            echo "4. Add secret value: hysvqdwmhxnblxfqnszn"
-            echo ""
-            exit 1
+            echo "::warning::⚠️ SUPABASE_PROJECT_REF secret is not set"
+            MISSING_SECRETS=1
           fi
+          
           if [ -z "$SUPABASE_DB_PASSWORD" ] || [ "$SUPABASE_DB_PASSWORD" = "" ]; then
-            echo "::error::❌ SUPABASE_DB_PASSWORD secret is not set in repository settings"
-            echo ""
-            echo "📋 To fix this:"
-            echo "1. Go to: https://github.com/${{ github.repository }}/settings/secrets/actions"
-            echo "2. Click 'New repository secret'"
-            echo "3. Add secret name: SUPABASE_DB_PASSWORD"
-            echo "4. Add the database password from your Supabase project settings"
-            echo ""
-            exit 1
+            echo "::warning::⚠️ SUPABASE_DB_PASSWORD secret is not set - deployment will be skipped"
+            MISSING_SECRETS=1
           fi
+          
           if [ -z "$SUPABASE_ACCESS_TOKEN" ] || [ "$SUPABASE_ACCESS_TOKEN" = "" ]; then
-            echo "::error::❌ SUPABASE_ACCESS_TOKEN secret is not set in repository settings"
-            echo ""
-            echo "📋 To fix this:"
-            echo "1. Go to: https://github.com/${{ github.repository }}/settings/secrets/actions"
-            echo "2. Click 'New repository secret'"
-            echo "3. Add secret name: SUPABASE_ACCESS_TOKEN"
-            echo "4. Generate a new access token at: https://supabase.com/dashboard/account/tokens"
-            echo ""
-            exit 1
+            echo "::warning::⚠️ SUPABASE_ACCESS_TOKEN secret is not set"
+            MISSING_SECRETS=1
           fi
-          echo "✅ All required Supabase secrets are configured"
+          
+          if [ "$MISSING_SECRETS" -eq 1 ]; then
+            echo ""
+            echo "📋 To enable Supabase deployment, add these secrets:"
+            echo "1. Go to: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            echo "2. Add secrets:"
+            echo "   - SUPABASE_PROJECT_REF = hysvqdwmhxnblxfqnszn"
+            echo "   - SUPABASE_DB_PASSWORD = (your database password from Supabase dashboard)"
+            echo "   - SUPABASE_ACCESS_TOKEN = (generate at: https://supabase.com/dashboard/account/tokens)"
+            echo ""
+            echo "can_deploy=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ All required Supabase secrets are configured"
+            echo "can_deploy=true" >> $GITHUB_OUTPUT
+          fi
       - name: Link to Supabase project
+        if: steps.check-secrets.outputs.can_deploy == 'true'
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
-      - run: supabase db push
-      - run: supabase functions deploy telephony-onboard telephony-voice telephony-sms
-      - run: supabase secrets list
+      - name: Deploy database migrations
+        if: steps.check-secrets.outputs.can_deploy == 'true'
+        run: supabase db push
+      - name: Deploy Supabase functions
+        if: steps.check-secrets.outputs.can_deploy == 'true'
+        run: supabase functions deploy telephony-onboard telephony-voice telephony-sms
+      - name: List Supabase secrets
+        if: steps.check-secrets.outputs.can_deploy == 'true'
+        run: supabase secrets list
