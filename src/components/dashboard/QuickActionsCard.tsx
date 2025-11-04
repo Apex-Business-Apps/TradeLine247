@@ -93,6 +93,8 @@ export const QuickActionsCard: React.FC = () => {
               className="w-full justify-start gap-2 relative"
               aria-label={`${action.label}: ${action.description}`}
               title={action.description}
+              data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
+              data-qa-action={action.label}
             >
               {isActionLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
