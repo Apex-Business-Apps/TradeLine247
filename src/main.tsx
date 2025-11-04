@@ -3,8 +3,10 @@
 // ===================================================================
 console.log('🚀 TradeLine 24/7 - Starting main.tsx...');
 
+import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 import "./index.css";
 import { initBootSentinel } from "./lib/bootSentinel";
 import { runSwCleanup } from "./lib/swCleanup";
@@ -111,100 +113,79 @@ window.addEventListener('error', (e) => { if (isPreview) diag('App error', e.err
 window.addEventListener('unhandledrejection', (e) => { if (isPreview) diag('Unhandled rejection', e.reason); });
 
 // CRITICAL: Synchronous render path for immediate FCP
-// Use Promise.race with timeout to ensure React mounts quickly
-async function boot() {
+// Use App already imported at top for fastest possible mount
+function boot() {
   try {
     // Create root immediately for faster initial render
     const reactRoot = createRoot(root!);
     
-    // CRITICAL: Timeout protection - if import takes >10s, show fallback (generous timeout for CI)
-    const importPromise = import('./App');
-    const timeoutPromise = new Promise<never>((_, reject) => 
-      setTimeout(() => reject(new Error('App import timeout')), 10000)
+    // CRITICAL: Render immediately using already-imported App - no async delay
+    // Wrap with Error Boundary to catch mount failures
+    reactRoot.render(
+      React.createElement(SafeErrorBoundary, null,
+        React.createElement(App)
+      )
     );
     
-    try {
-      const mod = await Promise.race([importPromise, timeoutPromise]);
-      const App = (mod as any)?.default ?? (() => null);
-      
-      // CRITICAL: Render immediately - don't wait for anything else
-      reactRoot.render(React.createElement(App));
-      
-      // Ensure root is visible (CSS might hide it initially)
-      root!.style.opacity = '1';
-      root!.style.visibility = 'visible';
-      
-      console.log('✅ React mounted successfully');
-      
-      // Run SW cleanup hotfix (one-time, auto-expires after 7 days)
-      runSwCleanup().catch(err => console.warn('[SW Cleanup] Failed:', err));
-      
-      // Initialize boot sentinel (production monitoring only)
-      initBootSentinel();
-      
-      // Load optional features after mount (non-blocking)
-      setTimeout(() => {
-        import("./styles/roi-table.css").catch(e => console.warn('⚠️ ROI table CSS failed:', e));
-        import("./styles/header-align.css").catch(e => console.warn('⚠️ Header align CSS failed:', e));
-        
-        // Check for safe mode
-        const urlParams = new URLSearchParams(window.location.search);
-        const isSafeMode = urlParams.get('safe') === '1';
-        
-        if (!isSafeMode) {
-          import("./lib/roiTableFix")
-            .then(m => m.watchRoiTableCanon())
-            .catch(e => console.warn('⚠️ ROI watcher failed:', e));
-          
-          import("./lib/pwaInstall")
-            .then(m => m.initPWAInstall())
-            .catch(e => console.warn('⚠️ PWA install failed:', e));
-          
-          window.addEventListener('load', () => {
-            setTimeout(() => {
-              import("./lib/heroGuardian")
-                .then(m => m.initHeroGuardian())
-                .catch(e => console.warn('⚠️ Hero guardian failed:', e));
-            }, 1500);
-          });
-        } else {
-          console.log('🛡️ Safe Mode: Optional features disabled');
-        }
-      }, 100);
-      
-    } catch (timeoutErr) {
-      // Timeout occurred - render error fallback
-      console.error('App import timeout or failed:', timeoutErr);
-      reactRoot.render(
-        React.createElement('div', {
-          style: {
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '2rem',
-            fontFamily: 'system-ui'
-          }
-        }, '⚠️ Application loading...')
-      );
-      root!.style.opacity = '1';
-      root!.style.visibility = 'visible';
-      
-      // Retry import in background
-      import('./App').then(mod => {
-        const App = (mod as any)?.default;
-        if (App) {
-          reactRoot.render(React.createElement(App));
-        }
-      }).catch(e => {
-        console.error('Retry failed:', e);
-      });
+    // Ensure root is visible (CSS might hide it initially)
+    root!.style.opacity = '1';
+    root!.style.visibility = 'visible';
+    
+    // Hide loading fallback immediately
+    const loadingEl = document.getElementById('root-loading');
+    if (loadingEl) {
+      loadingEl.style.display = 'none';
     }
+    
+    console.log('✅ React mounted successfully');
+    
+    // Run SW cleanup hotfix (one-time, auto-expires after 7 days)
+    runSwCleanup().catch(err => console.warn('[SW Cleanup] Failed:', err));
+    
+    // Initialize boot sentinel (production monitoring only)
+    initBootSentinel();
+    
+    // Load optional features after mount (non-blocking)
+    setTimeout(() => {
+      import("./styles/roi-table.css").catch(e => console.warn('⚠️ ROI table CSS failed:', e));
+      import("./styles/header-align.css").catch(e => console.warn('⚠️ Header align CSS failed:', e));
+      
+      // Check for safe mode
+      const urlParams = new URLSearchParams(window.location.search);
+      const isSafeMode = urlParams.get('safe') === '1';
+      
+      if (!isSafeMode) {
+        import("./lib/roiTableFix")
+          .then(m => m.watchRoiTableCanon())
+          .catch(e => console.warn('⚠️ ROI watcher failed:', e));
+        
+        import("./lib/pwaInstall")
+          .then(m => m.initPWAInstall())
+          .catch(e => console.warn('⚠️ PWA install failed:', e));
+        
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            import("./lib/heroGuardian")
+              .then(m => m.initHeroGuardian())
+              .catch(e => console.warn('⚠️ Hero guardian failed:', e));
+          }, 1500);
+        });
+      } else {
+        console.log('🛡️ Safe Mode: Optional features disabled');
+      }
+    }, 100);
+    
   } catch (e) { 
     diag('App failed to start', e);
     // Ensure root is visible even on error
     root!.style.opacity = '1';
     root!.style.visibility = 'visible';
+    
+    // Hide loading fallback on error too
+    const loadingEl = document.getElementById('root-loading');
+    if (loadingEl) {
+      loadingEl.style.display = 'none';
+    }
   }
 }
 

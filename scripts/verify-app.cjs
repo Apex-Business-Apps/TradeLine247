@@ -9,11 +9,16 @@ const ORIGIN = `http://${HOST}:${PORT}`;
 const PATH = process.env.VERIFY_PATH || '/';
 const TIMEOUT_MS = Number(process.env.VERIFY_TIMEOUT_MS || 15000);
 
-const exe = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-const preview = spawn(exe, ['vite', 'preview', '--host', HOST, '--port', String(PORT)], {
+// Windows-compatible spawn configuration
+const isWindows = process.platform === 'win32';
+const exe = isWindows ? 'npx.cmd' : 'npx';
+const spawnOptions = {
   stdio: ['ignore', 'pipe', 'pipe'],
   env: { ...process.env, NODE_ENV: 'production' },
-});
+  // Windows requires shell for .cmd files
+  ...(isWindows && { shell: true }),
+};
+const preview = spawn(exe, ['vite', 'preview', '--host', HOST, '--port', String(PORT)], spawnOptions);
 let exited = false;
 preview.on('exit', c => (exited = true));
 preview.stdout.on('data', d => process.stdout.write(String(d)));

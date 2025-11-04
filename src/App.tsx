@@ -3,6 +3,7 @@ import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import AppLayout from "./components/layout/AppLayout";
+import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 // CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
 import { paths } from "./routes/paths";
@@ -69,19 +70,21 @@ const LoadingFallback = () => (
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
-      <BrowserRouter>
-        {/* Suspense prevents a white screen if any child is lazy elsewhere */}
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route element={<AppLayout />}>
-              {routeEntries.map(({ path, element }) => (
-                <Route key={path} path={path} element={element} />
-              ))}
-            </Route>
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </div>
+    <SafeErrorBoundary>
+      <div className="min-h-screen bg-background text-foreground antialiased">
+        <BrowserRouter>
+          {/* Suspense prevents a white screen if any child is lazy elsewhere */}
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route element={<AppLayout />}>
+                {routeEntries.map(({ path, element }) => (
+                  <Route key={path} path={path} element={element} />
+                ))}
+              </Route>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </div>
+    </SafeErrorBoundary>
   );
 }

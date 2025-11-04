@@ -99,10 +99,10 @@ export const QuickActionsCard: React.FC = () => {
               {isActionLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4" />
               )}
               <span className={isActionLoading ? 'opacity-70' : ''}>
-                {action.label}
+              {action.label}
               </span>
             </Button>
           );
