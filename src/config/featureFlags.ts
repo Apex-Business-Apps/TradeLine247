@@ -18,6 +18,18 @@ export const featureFlags = {
   ANALYTICS_ENABLED: true,
   ERROR_BOUNDARY_ENABLED: true,
   SMOKE_CHECKS_ENABLED: process.env.NODE_ENV === 'development',
+  RCS_ENABLED:
+    (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FEATURE_RCS) !== undefined
+      ? import.meta.env.VITE_FEATURE_RCS === '1'
+      : process.env.FEATURE_RCS === '1',
+  WHATSAPP_ENABLED:
+    (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FEATURE_WHATSAPP) !== undefined
+      ? import.meta.env.VITE_FEATURE_WHATSAPP === '1'
+      : process.env.FEATURE_WHATSAPP === '1',
+  VOICE_AI_ENABLED:
+    (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FEATURE_VOICE_AI) !== undefined
+      ? import.meta.env.VITE_FEATURE_VOICE_AI === '1'
+      : process.env.FEATURE_VOICE_AI === '1',
 } as const;
 
 export type FeatureFlag = keyof typeof featureFlags;

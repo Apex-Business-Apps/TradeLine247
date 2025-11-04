@@ -25,7 +25,7 @@ export const Logo: React.FC<LogoProps> = ({
 }) => {
   const logoImage = <img src={officialLogo} alt="TradeLine 24/7 Logo" className={cn(sizeClasses[size], "w-auto")} />;
   const logoText = <span className={cn("font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent", textSizeClasses[size])}>TradeLine 24/7</span>;
-  const logoIcon = <div className={cn(sizeClasses[size], "aspect-square bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center")}>
+  const logoIcon = <div className={cn(sizeClasses[size], "aspect-square bg-gradient-to-r from-brand-orange to-brand-orange-light rounded-xl flex items-center justify-center")}>
       <span className="text-white font-bold text-xl">TL</span>
     </div>;
   return <div className={cn("flex items-center gap-3", className)} {...props}>

@@ -182,9 +182,7 @@ export const Header: React.FC = () => {
             id="burger-menu-button"
             data-testid="burger-menu-button"
             className="flex lg:hidden items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
-            onClick={() => {
-              setIsMobileMenuOpen(!isMobileMenuOpen);
-            }}
+            onClick={() => setIsMobileMenuOpen(prev => !prev)}
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
             aria-controls={mobileMenuId}
@@ -276,7 +274,7 @@ export const Header: React.FC = () => {
             <Button 
               variant="success" 
               size={isScrolled ? 'sm' : 'default'} 
-            onClick={() => handleNavigation(paths.auth, 'Login')}
+              onClick={() => handleNavigation(paths.auth, 'Login')}
               className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
             >
               Login
