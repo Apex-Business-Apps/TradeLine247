@@ -22,7 +22,7 @@ export default function QuickActions() {
 
   const actions = useMemo<QuickAction[]>(
     () => [
-      { label: "View Calls", to: paths.calls, variant: "primary" },
+      { label: "View Calls", to: paths.calls, variant: "secondary" },
       { label: "Add Number", to: paths.addNumber, variant: "secondary" },
       { label: "Invite Staff", to: paths.teamInvite, variant: "secondary" },
       { label: "Integrations", to: paths.integrations, variant: "secondary" },
