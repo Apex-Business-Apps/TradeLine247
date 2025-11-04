@@ -1,9 +1,10 @@
 // deno-lint-ignore-file no-explicit-any
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { preflight, corsHeaders } from "../_shared/cors.ts";
 import { secureHeaders, mergeHeaders } from "../_shared/secure_headers.ts";
-import { twilioFormPOST } from "../_shared/twilio_client.ts";
+import { twilioFormPOST, TwilioResponseError } from "../_shared/twilio_client.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { ensureRequestId } from "../_shared/requestId.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -15,6 +16,8 @@ const supabase = createClient(SUPABASE_URL, SRV);
 serve(async (req: Request) => {
   const pf = preflight(req);
   if (pf) return pf;
+
+  const requestId = ensureRequestId(req.headers);
 
   // Fetch pending jobs
   const { data: jobs, error } = await supabase
@@ -55,6 +58,8 @@ serve(async (req: Request) => {
         status: "processing",
         attempts: j.attempts + 1,
         updated_at: new Date().toISOString(),
+        locked_at: new Date().toISOString(),
+        locked_by: requestId,
       })
       .eq("id", j.id);
 
@@ -66,13 +71,10 @@ serve(async (req: Request) => {
           Url: j.payload.url,
           Method: "POST",
         });
-        const res = await twilioFormPOST(
+        await twilioFormPOST(
           `/Accounts/${Deno.env.get("TWILIO_ACCOUNT_SID")}/Calls.json`,
-          form
+          form,
         );
-        if (!res.ok) {
-          throw new Error(`${res.status} ${await res.text()}`);
-        }
       }
       // extend: 'callerid.verify', 'number.update', etc.
 
@@ -83,9 +85,20 @@ serve(async (req: Request) => {
           status: "done",
           updated_at: new Date().toISOString(),
           last_error: null,
+          locked_at: null,
+          locked_by: null,
         })
         .eq("id", j.id);
     } catch (e) {
+      console.error(
+        "twilio-job-failed",
+        requestId,
+        j.id,
+        j.kind,
+        e instanceof TwilioResponseError
+          ? { status: e.response.status, message: e.message }
+          : { message: String(e) },
+      );
       const delay = Math.min(
         5 * 60 * 1000,
         2 ** Math.min(j.attempts, 6) * 1000
@@ -97,15 +110,24 @@ serve(async (req: Request) => {
           next_run_at: new Date(Date.now() + delay).toISOString(),
           last_error: String(e),
           updated_at: new Date().toISOString(),
+          locked_at: null,
+          locked_by: null,
         })
         .eq("id", j.id);
     }
   }
 
-  return new Response(JSON.stringify({ processed: jobs.length }), {
-    headers: mergeHeaders(corsHeaders, secureHeaders, {
-      "Content-Type": "application/json",
+  return new Response(
+    JSON.stringify({
+      processed: jobs.length,
+      requestId,
     }),
-  });
+    {
+      headers: mergeHeaders(corsHeaders, secureHeaders, {
+        "Content-Type": "application/json",
+        "X-Request-Id": requestId,
+      }),
+    },
+  );
 });
 

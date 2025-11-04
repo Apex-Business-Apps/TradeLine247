@@ -95,7 +95,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --no-audit --fund=false
-      - run: npm test --if-present -- --ci
+      - run: npm run test:ci --if-present
       - name: Report status (ci/test)
         if: always()
         uses: actions/github-script@v7
