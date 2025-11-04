@@ -80,6 +80,12 @@ All colors MUST be HSL.
 */
 
 @layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  a {
+    color: hsl(var(--primary));
+  }
   :root {
     /* Brand Orange Colors from Logo - Maximum Saturation + 45% Vibrancy + 5% Hue */
     --brand-orange-primary: 21 100% 67%;
