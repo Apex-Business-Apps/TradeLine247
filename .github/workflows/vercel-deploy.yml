@@ -51,7 +51,10 @@ jobs:
 
       - name: Deploy to Vercel Production
         id: vercel-deploy
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --yes)
+          echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "🚀 Deployment completed: $DEPLOYMENT_URL"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -59,5 +62,5 @@ jobs:
       - name: Output deployment URL
         run: |
           echo "🚀 Deployment URL: ${{ steps.vercel-deploy.outputs.url }}"
-          echo "🌐 Production URL: ${{ steps.vercel-deploy.outputs.alias }}"
+          echo "✅ Vercel deployment completed successfully!"
 
