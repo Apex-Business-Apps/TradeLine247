@@ -7,11 +7,10 @@ unless Dir.pwd == app_dir
 end
 
 project_relative = 'App.xcodeproj'
-app_project_path = File.expand_path(project_relative, __dir__)
-project_file = File.join(app_project_path, 'project.pbxproj')
+project_file = File.join(project_relative, 'project.pbxproj')
 
-unless File.directory?(app_project_path)
-  abort "[pods] Expected to find #{project_relative} at #{app_project_path}. Run `npx cap sync ios` first."
+unless File.directory?(project_relative)
+  abort "[pods] Expected to find #{project_relative} under #{Dir.pwd}. Run `npx cap sync ios` first."
 end
 
 unless File.exist?(project_file)
@@ -21,7 +20,7 @@ end
 platform :ios, '15.0'
 use_frameworks! linkage: :static
 
-project app_project_path
+project project_relative
 
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'

@@ -5,6 +5,7 @@ const baseUse = {
   baseURL: process.env.BASE_URL || 'http://localhost:5000',
   trace: 'retain-on-failure',
   video: 'retain-on-failure',
+  // Keep test harnesses stable even when production CSP blocks inline execution.
   bypassCSP: true,
 };
 
