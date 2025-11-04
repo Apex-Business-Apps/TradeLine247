@@ -67,7 +67,7 @@ export function PreviewDiagnostics() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'healthy': return <Badge className="bg-green-600">Healthy</Badge>;
+      case 'healthy': return <Badge className="bg-green-700">Healthy</Badge>;
       case 'warning': return <Badge className="bg-yellow-600">Warning</Badge>;
       case 'error': return <Badge className="bg-red-600">Error</Badge>;
       default: return <Badge>Unknown</Badge>;
