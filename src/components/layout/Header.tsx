@@ -127,7 +127,7 @@ export const Header: React.FC = () => {
   return <header data-site-header className={cn('sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 isolate', isScrolled ? 'shadow-lg py-2' : 'py-4')} style={{ isolation: 'isolate' }} data-lovable-lock="structure-only">
       <div data-header-inner className="container flex h-14 items-center justify-between gap-4" data-lovable-lock="structure-only" style={{ maxWidth: '100%', paddingLeft: 'max(1rem, min(2rem, 4vw))', paddingRight: 'max(1rem, min(2rem, 4vw))' }}>
         {/* Home Button & Badge */}
-        <div id="app-header-left" data-slot="left" className="flex items-center gap-3 animate-fade-in" data-lovable-lock="structure-only">
+        <div id="app-header-left" data-slot="left" className="flex items-center gap-3 animate-fade-in" data-lovable-lock="structure-only" style={{ marginLeft: 0 }}>
           <Button 
             id="app-home"
             variant="default" 
