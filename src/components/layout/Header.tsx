@@ -118,7 +118,7 @@ export const Header: React.FC = () => {
         <div
           id="app-header-left"
           data-slot="left"
-          className="flex items-center gap-3 shrink-0 min-w-0 animate-fade-in"
+          className="flex items-center gap-3 shrink-0 min-w-0"
           data-lovable-lock="structure-only"
         >
           <Button
@@ -148,8 +148,7 @@ export const Header: React.FC = () => {
         <nav
           data-slot="center"
           aria-label="Primary"
-          className="hidden lg:flex items-center gap-2 min-w-0 animate-fade-in"
-          style={{ animationDelay: '200ms' }}
+          className="hidden lg:flex items-center gap-2 min-w-0"
           data-lovable-lock="structure-only"
         >
           <NavigationMenu data-lovable-lock="structure-only">
@@ -181,8 +180,7 @@ export const Header: React.FC = () => {
         {/* Enhanced CTA Button & Mobile Menu */}
         <div
           data-slot="right"
-          className="flex items-center gap-2 animate-fade-in"
-          style={{ animationDelay: '400ms' }}
+          className="flex items-center gap-2"
           data-lovable-lock="structure-only"
         >
           <div className="hidden lg:flex items-center gap-2 shrink-0">
@@ -344,7 +342,7 @@ export const Header: React.FC = () => {
                 to={item.href}
                 className={({ isActive }) =>
                   cn(
-                    'block rounded-md px-4 py-2.5 text-sm font-medium transition-all duration-300 animate-fade-in hover:bg-accent hover:text-accent-foreground',
+                    'block rounded-md px-4 py-2.5 text-sm font-medium transition-all duration-300 hover:bg-accent hover:text-accent-foreground',
                     isActive && 'bg-accent/50 text-foreground'
                   )
                 }
@@ -373,7 +371,7 @@ export const Header: React.FC = () => {
                     to={item.href}
                     className={({ isActive }) =>
                       cn(
-                        'block rounded-md px-4 py-2.5 text-sm font-semibold transition-all duration-300 animate-fade-in bg-primary/5 hover:bg-primary/10 text-primary',
+                        'block rounded-md px-4 py-2.5 text-sm font-semibold transition-all duration-300 bg-primary/5 hover:bg-primary/10 text-primary',
                         isActive && 'bg-primary/20'
                       )
                     }
