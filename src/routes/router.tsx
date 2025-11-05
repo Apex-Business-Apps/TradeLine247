@@ -31,7 +31,6 @@ const withSuspense = (Component: React.ComponentType) => (
 );
 
 const routeComponents = [
-  { path: paths.home, Component: Index },
   { path: paths.pricing, Component: Pricing },
   { path: paths.faq, Component: FAQ },
   { path: paths.features, Component: Features },
@@ -53,7 +52,7 @@ const routeComponents = [
   { path: paths.notFound, Component: NotFound },
 ] as const;
 
-export const appRoutePaths = new Set(routeComponents.map(({ path }) => path));
+export const appRoutePaths = new Set([paths.home, ...routeComponents.map(({ path }) => path)]);
 
 export const router = createBrowserRouter([
   {

@@ -10,6 +10,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 import "./index.css";
+import "./styles/header-align.css";
 import { initBootSentinel } from "./lib/bootSentinel";
 import { runSwCleanup } from "./lib/swCleanup";
 import { featureFlags } from "./config/featureFlags";
@@ -153,8 +154,7 @@ function boot() {
     // Load optional features after mount (non-blocking)
     setTimeout(() => {
       import("./styles/roi-table.css").catch(e => console.warn('⚠️ ROI table CSS failed:', e));
-      import("./styles/header-align.css").catch(e => console.warn('⚠️ Header align CSS failed:', e));
-      
+
       // Check for safe mode
       const urlParams = new URLSearchParams(window.location.search);
       const isSafeMode = urlParams.get('safe') === '1';
