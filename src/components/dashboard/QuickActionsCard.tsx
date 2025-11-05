@@ -75,11 +75,11 @@ export const QuickActionsCard: React.FC = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Quick Actions</CardTitle>
+    <Card className="w-full">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="space-y-2 sm:space-y-2">
         {actions.map((action) => {
           const Icon = action.icon;
           const isActionLoading = isNavigating && clickedAction === action.label;
@@ -112,11 +112,11 @@ export const QuickActionsCard: React.FC = () => {
                   to={action.to}
                   role="button"
                   onClick={(event) => {
-                    event.preventDefault();
                     if (isNavigating) {
+                      event.preventDefault();
                       return;
                     }
-                    void handleActionClick(action);
+                    setClickedAction(action.label);
                   }}
                   aria-label={`${action.label}: ${action.description}`}
                   aria-disabled={isNavigating}
