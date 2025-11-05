@@ -5,10 +5,11 @@
  * Features:
  * - AES-GCM encryption for sensitive data (using Web Crypto API - no dependencies)
  * - Automatic key derivation from user session
- * - Fallback to plain storage for non-sensitive data
+ * - Fallback to plain storage when encryption unavailable
  * - Data integrity verification
  * 
  * Uses browser's built-in Web Crypto API - no external dependencies required.
+ * Automatically falls back to plain storage if Web Crypto API is unavailable.
  */
 
 const STORAGE_PREFIX = 'tl247_secure_';
@@ -18,6 +19,15 @@ interface StorageOptions {
   encrypt?: boolean;
   ttl?: number; // Time to live in milliseconds
   compress?: boolean;
+}
+
+/**
+ * Check if Web Crypto API is available
+ */
+function isWebCryptoAvailable(): boolean {
+  return typeof crypto !== 'undefined' && 
+         typeof crypto.subtle !== 'undefined' &&
+         typeof crypto.getRandomValues !== 'undefined';
 }
 
 /**
@@ -148,6 +158,7 @@ function isExpired(data: { value: string; expires?: number }): boolean {
 
 /**
  * Secure set with encryption and TTL (async for Web Crypto API)
+ * Falls back to plain storage if encryption unavailable
  */
 export async function secureSet(key: string, value: any, options: StorageOptions = {}): Promise<boolean> {
   try {
@@ -169,10 +180,16 @@ export async function secureSet(key: string, value: any, options: StorageOptions
       storageData.expires = Date.now() + ttl;
     }
     
-    if (shouldEncrypt) {
-      const encryptionKey = await getEncryptionKey();
-      storageData.value = await encrypt(serialized, encryptionKey);
-      storageData.encrypted = true;
+    // Try encryption if requested and available
+    if (shouldEncrypt && isWebCryptoAvailable()) {
+      try {
+        const encryptionKey = await getEncryptionKey();
+        storageData.value = await encrypt(serialized, encryptionKey);
+        storageData.encrypted = true;
+      } catch (encryptError) {
+        console.warn('[SecureStorage] Encryption failed, using plain storage:', encryptError);
+        // Fall through to plain storage
+      }
     }
     
     localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(storageData));
@@ -185,6 +202,7 @@ export async function secureSet(key: string, value: any, options: StorageOptions
 
 /**
  * Secure get with decryption and expiration check (async for Web Crypto API)
+ * Handles both encrypted and plain storage gracefully
  */
 export async function secureGet<T = any>(key: string): Promise<T | null> {
   try {
@@ -201,10 +219,20 @@ export async function secureGet<T = any>(key: string): Promise<T | null> {
     
     let decrypted = data.value;
     
-    // Decrypt if needed
-    if (data.encrypted) {
-      const encryptionKey = await getEncryptionKey();
-      decrypted = await decrypt(data.value, encryptionKey);
+    // Decrypt if needed and Web Crypto is available
+    if (data.encrypted && isWebCryptoAvailable()) {
+      try {
+        const encryptionKey = await getEncryptionKey();
+        decrypted = await decrypt(data.value, encryptionKey);
+      } catch (decryptError) {
+        console.warn('[SecureStorage] Decryption failed:', decryptError);
+        // If decryption fails, return null (data corrupted or key changed)
+        return null;
+      }
+    } else if (data.encrypted && !isWebCryptoAvailable()) {
+      // Encrypted data but Web Crypto unavailable - cannot decrypt
+      console.warn('[SecureStorage] Encrypted data found but Web Crypto API unavailable');
+      return null;
     }
     
     const parsed = JSON.parse(decrypted);
@@ -260,5 +288,12 @@ export function isSecureStorageAvailable(): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * Check if encryption is available (Web Crypto API)
+ */
+export function isEncryptionAvailable(): boolean {
+  return isWebCryptoAvailable();
 }
 
