@@ -8,6 +8,15 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './tests/setup.ts',
+    // Only run unit tests, exclude Playwright test files
+    include: ['tests/unit/**/*.{test,spec}.{ts,tsx}'],
+    exclude: [
+      'node_modules/**',
+      'tests/e2e/**',
+      'tests/accessibility/**',
+      'tests/security/**',
+      'tests/performance/**'
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

@@ -129,19 +129,15 @@ export function useOfflineSync() {
     tableName: string,
     metadata?: any
   ) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
 
-      await db.from('sync_state').upsert({
-        user_id: user.id,
-        table_name: tableName,
-        last_sync_at: new Date().toISOString(),
-        metadata: metadata || {},
-      });
-    } catch (error) {
-      throw error;
-    }
+    await db.from('sync_state').upsert({
+      user_id: user.id,
+      table_name: tableName,
+      last_sync_at: new Date().toISOString(),
+      metadata: metadata || {},
+    });
   }, []);
 
   /**
