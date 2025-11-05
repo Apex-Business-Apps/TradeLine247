@@ -406,6 +406,12 @@ html.dark [class*="text-muted"] {
     color: hsl(0 0% 100%) !important; /* white text on darker orange background (4.8:1 contrast) */
   }
   
+  /* Ensure bg-primary elements maintain white text (primary-foreground) */
+  html:not(.dark) .bg-primary,
+  html:not(.dark) [class*="bg-primary"] {
+    color: hsl(0 0% 100%) !important; /* white text on darker orange background (4.8:1 contrast) */
+  }
+  
   /* Brand orange text variants: force higher contrast in light mode */
   html:not(.dark) .text-primary\/90,
   html:not(.dark) .text-primary\/80,
