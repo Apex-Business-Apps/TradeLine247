@@ -17,6 +17,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import '../nav/AppHeaderOverride.module.css';
+
 const navigationItems = [{
   name: 'Features',
   href: paths.features
@@ -93,23 +95,6 @@ export const Header: React.FC = () => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Load header override CSS once on mount
-  useEffect(() => {
-    const loadOverride = async () => {
-      const leftEl = document.getElementById('app-header-left');
-      const homeEl = document.getElementById('app-home');
-      const badgeEl = document.getElementById('app-badge-ca');
-      if (leftEl && homeEl && badgeEl) {
-        try {
-          await import('../nav/AppHeaderOverride.module.css');
-        } catch (error) {
-          console.warn('[Header] Override CSS load failed:', error);
-        }
-      }
-    };
-    loadOverride();
   }, []);
 
   // Close mobile menu on route change
