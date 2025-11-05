@@ -41,7 +41,7 @@ export function jsonResponse(
   },
 ): Response {
   const { headers, includeSecureHeaders = true, ...rest } = init ?? {};
-  const secureSet = includeSecureHeaders ? secureHeaders : undefined;
+  const secureSet = includeSecureHeaders !== false ? secureHeaders : undefined;
   return new Response(JSON.stringify(data), {
     ...rest,
     headers: withCors(secureSet, headers, { "Content-Type": "application/json" }),
