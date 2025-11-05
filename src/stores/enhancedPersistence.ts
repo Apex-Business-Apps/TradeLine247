@@ -9,7 +9,8 @@
  * - Data integrity checks
  */
 
-import { secureSet, secureGet, secureRemove } from '@/lib/secureStorage';
+// Note: Using plain localStorage for enhancedPersistence to avoid async complexity
+// Encryption can be added at the application level if needed
 
 const PERSISTENCE_VERSION = 1;
 const BACKUP_PREFIX = 'tl247_backup_';
@@ -36,19 +37,18 @@ function calculateChecksum(data: string): string {
 }
 
 /**
- * Enhanced set with retry and backup
+ * Enhanced set with retry and backup (using plain localStorage for simplicity)
  */
 export function enhancedSet(
   key: string,
   value: any,
   options: {
-    encrypt?: boolean;
     ttl?: number;
     backup?: boolean;
     maxRetries?: number;
   } = {}
 ): boolean {
-  const { encrypt = false, ttl, backup = true, maxRetries = 3 } = options;
+  const { ttl, backup = true, maxRetries = 3 } = options;
   
   let attempts = 0;
   while (attempts < maxRetries) {
@@ -63,32 +63,29 @@ export function enhancedSet(
       const serialized = JSON.stringify(value);
       persisted.checksum = calculateChecksum(serialized);
       
-      // Store with encryption if requested
-      const success = secureSet(key, persisted, { encrypt, ttl });
+      // Store in localStorage
+      const storageKey = 'tl247_enhanced_' + key;
+      localStorage.setItem(storageKey, JSON.stringify(persisted));
       
-      if (success) {
-        // Create backup if requested
-        if (backup) {
-          try {
-            secureSet(BACKUP_PREFIX + key, persisted, { encrypt: false, ttl: ttl ? ttl * 2 : undefined });
-          } catch (backupError) {
-            console.warn('[EnhancedPersistence] Backup failed:', backupError);
-          }
-        }
-        
-        // Broadcast sync event for cross-tab synchronization
+      // Create backup if requested
+      if (backup) {
         try {
-          window.dispatchEvent(new CustomEvent(SYNC_EVENT, {
-            detail: { key, timestamp: persisted.timestamp }
-          }));
-        } catch (syncError) {
-          // Ignore sync errors (may not be available in all contexts)
+          localStorage.setItem(BACKUP_PREFIX + storageKey, JSON.stringify(persisted));
+        } catch (backupError) {
+          console.warn('[EnhancedPersistence] Backup failed:', backupError);
         }
-        
-        return true;
       }
       
-      attempts++;
+      // Broadcast sync event for cross-tab synchronization
+      try {
+        window.dispatchEvent(new CustomEvent(SYNC_EVENT, {
+          detail: { key, timestamp: persisted.timestamp }
+        }));
+      } catch (syncError) {
+        // Ignore sync errors (may not be available in all contexts)
+      }
+      
+      return true;
     } catch (error) {
       console.error(`[EnhancedPersistence] Set attempt ${attempts + 1} failed:`, error);
       attempts++;
@@ -111,32 +108,40 @@ export function enhancedSet(
  */
 export function enhancedGet<T = any>(key: string): T | null {
   try {
-    // Try primary storage
-    const primary = secureGet<PersistedData>(key);
+    const storageKey = 'tl247_enhanced_' + key;
     
-    if (primary && primary.version === PERSISTENCE_VERSION) {
-      // Verify checksum
-      const serialized = JSON.stringify(primary.data);
-      const expectedChecksum = calculateChecksum(serialized);
+    // Try primary storage
+    const primaryStr = localStorage.getItem(storageKey);
+    if (primaryStr) {
+      const primary = JSON.parse(primaryStr) as PersistedData;
       
-      if (primary.checksum === expectedChecksum) {
-        return primary.data as T;
-      } else {
-        console.warn('[EnhancedPersistence] Checksum mismatch, attempting backup');
+      if (primary.version === PERSISTENCE_VERSION) {
+        // Verify checksum
+        const serialized = JSON.stringify(primary.data);
+        const expectedChecksum = calculateChecksum(serialized);
+        
+        if (primary.checksum === expectedChecksum) {
+          return primary.data as T;
+        } else {
+          console.warn('[EnhancedPersistence] Checksum mismatch, attempting backup');
+        }
       }
     }
     
     // Try backup
-    const backup = secureGet<PersistedData>(BACKUP_PREFIX + key);
-    if (backup && backup.version === PERSISTENCE_VERSION) {
-      // Restore from backup
-      const serialized = JSON.stringify(backup.data);
-      const expectedChecksum = calculateChecksum(serialized);
-      
-      if (backup.checksum === expectedChecksum) {
-        // Restore primary from backup
-        enhancedSet(key, backup.data, { encrypt: false, backup: false });
-        return backup.data as T;
+    const backupStr = localStorage.getItem(BACKUP_PREFIX + storageKey);
+    if (backupStr) {
+      const backup = JSON.parse(backupStr) as PersistedData;
+      if (backup.version === PERSISTENCE_VERSION) {
+        // Restore from backup
+        const serialized = JSON.stringify(backup.data);
+        const expectedChecksum = calculateChecksum(serialized);
+        
+        if (backup.checksum === expectedChecksum) {
+          // Restore primary from backup
+          enhancedSet(key, backup.data, { backup: false });
+          return backup.data as T;
+        }
       }
     }
     
@@ -152,8 +157,9 @@ export function enhancedGet<T = any>(key: string): T | null {
  */
 export function enhancedRemove(key: string): void {
   try {
-    secureRemove(key);
-    secureRemove(BACKUP_PREFIX + key);
+    const storageKey = 'tl247_enhanced_' + key;
+    localStorage.removeItem(storageKey);
+    localStorage.removeItem(BACKUP_PREFIX + storageKey);
   } catch (error) {
     console.error('[EnhancedPersistence] Remove failed:', error);
   }

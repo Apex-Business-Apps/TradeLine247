@@ -125,14 +125,11 @@
 
 ## Dependencies
 
-### Required
-- `crypto-js` - For encryption (needs to be added to package.json)
-
-### Installation
-```bash
-npm install crypto-js
-npm install --save-dev @types/crypto-js
-```
+### ✅ No External Dependencies Required
+- Uses browser's built-in **Web Crypto API** for encryption
+- No npm packages needed
+- Works in all modern browsers
+- Zero bundle size increase
 
 ## Deployment Notes
 

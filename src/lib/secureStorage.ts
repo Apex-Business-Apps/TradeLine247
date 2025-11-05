@@ -3,14 +3,13 @@
  * 
  * Provides encrypted localStorage wrapper for sensitive data persistence.
  * Features:
- * - AES-256 encryption for sensitive data
- * - Automatic key rotation support
- * - Secure key derivation from user session
+ * - AES-GCM encryption for sensitive data (using Web Crypto API - no dependencies)
+ * - Automatic key derivation from user session
  * - Fallback to plain storage for non-sensitive data
  * - Data integrity verification
+ * 
+ * Uses browser's built-in Web Crypto API - no external dependencies required.
  */
-
-import CryptoJS from 'crypto-js';
 
 const STORAGE_PREFIX = 'tl247_secure_';
 const ENCRYPTION_SALT = 'tl247_encryption_salt_v1';
@@ -22,17 +21,47 @@ interface StorageOptions {
 }
 
 /**
+ * Generate encryption key from password using PBKDF2
+ */
+async function deriveKey(password: string): Promise<CryptoKey> {
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits', 'deriveKey']
+  );
+
+  return crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: encoder.encode(ENCRYPTION_SALT),
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+/**
  * Get encryption key from user session (if available)
  * Falls back to device-specific key
  */
-function getEncryptionKey(): string {
+async function getEncryptionKey(): Promise<CryptoKey> {
+  let password: string;
+  
   // Try to get user ID from session
   try {
     const session = sessionStorage.getItem('sb-auth-token');
     if (session) {
       const parsed = JSON.parse(session);
       if (parsed?.user?.id) {
-        return CryptoJS.SHA256(ENCRYPTION_SALT + parsed.user.id).toString();
+        password = ENCRYPTION_SALT + parsed.user.id;
+        return deriveKey(password);
       }
     }
   } catch {
@@ -42,7 +71,8 @@ function getEncryptionKey(): string {
   // Device-specific key (less secure but better than nothing)
   const deviceId = localStorage.getItem('device_id') || generateDeviceId();
   localStorage.setItem('device_id', deviceId);
-  return CryptoJS.SHA256(ENCRYPTION_SALT + deviceId).toString();
+  password = ENCRYPTION_SALT + deviceId;
+  return deriveKey(password);
 }
 
 function generateDeviceId(): string {
@@ -50,11 +80,30 @@ function generateDeviceId(): string {
 }
 
 /**
- * Encrypt data before storage
+ * Encrypt data before storage using Web Crypto API
  */
-function encrypt(data: string, key: string): string {
+async function encrypt(data: string, key: CryptoKey): Promise<string> {
   try {
-    return CryptoJS.AES.encrypt(data, key).toString();
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(data);
+    
+    // Generate IV
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    
+    // Encrypt
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      dataBuffer
+    );
+    
+    // Combine IV and encrypted data
+    const combined = new Uint8Array(iv.length + encrypted.byteLength);
+    combined.set(iv, 0);
+    combined.set(new Uint8Array(encrypted), iv.length);
+    
+    // Convert to base64 for storage
+    return btoa(String.fromCharCode(...combined));
   } catch (error) {
     console.error('[SecureStorage] Encryption failed:', error);
     throw new Error('Failed to encrypt data');
@@ -62,12 +111,27 @@ function encrypt(data: string, key: string): string {
 }
 
 /**
- * Decrypt data after retrieval
+ * Decrypt data after retrieval using Web Crypto API
  */
-function decrypt(encrypted: string, key: string): string {
+async function decrypt(encrypted: string, key: CryptoKey): Promise<string> {
   try {
-    const bytes = CryptoJS.AES.decrypt(encrypted, key);
-    return bytes.toString(CryptoJS.enc.Utf8);
+    // Convert from base64
+    const combined = Uint8Array.from(atob(encrypted), c => c.charCodeAt(0));
+    
+    // Extract IV and encrypted data
+    const iv = combined.slice(0, 12);
+    const data = combined.slice(12);
+    
+    // Decrypt
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      data
+    );
+    
+    // Convert to string
+    const decoder = new TextDecoder();
+    return decoder.decode(decrypted);
   } catch (error) {
     console.error('[SecureStorage] Decryption failed:', error);
     throw new Error('Failed to decrypt data');
@@ -83,9 +147,9 @@ function isExpired(data: { value: string; expires?: number }): boolean {
 }
 
 /**
- * Secure set with encryption and TTL
+ * Secure set with encryption and TTL (async for Web Crypto API)
  */
-export function secureSet(key: string, value: any, options: StorageOptions = {}): boolean {
+export async function secureSet(key: string, value: any, options: StorageOptions = {}): Promise<boolean> {
   try {
     const { encrypt: shouldEncrypt = false, ttl, compress = false } = options;
     
@@ -106,8 +170,8 @@ export function secureSet(key: string, value: any, options: StorageOptions = {})
     }
     
     if (shouldEncrypt) {
-      const encryptionKey = getEncryptionKey();
-      storageData.value = encrypt(serialized, encryptionKey);
+      const encryptionKey = await getEncryptionKey();
+      storageData.value = await encrypt(serialized, encryptionKey);
       storageData.encrypted = true;
     }
     
@@ -120,9 +184,9 @@ export function secureSet(key: string, value: any, options: StorageOptions = {})
 }
 
 /**
- * Secure get with decryption and expiration check
+ * Secure get with decryption and expiration check (async for Web Crypto API)
  */
-export function secureGet<T = any>(key: string): T | null {
+export async function secureGet<T = any>(key: string): Promise<T | null> {
   try {
     const stored = localStorage.getItem(STORAGE_PREFIX + key);
     if (!stored) return null;
@@ -139,8 +203,8 @@ export function secureGet<T = any>(key: string): T | null {
     
     // Decrypt if needed
     if (data.encrypted) {
-      const encryptionKey = getEncryptionKey();
-      decrypted = decrypt(data.value, encryptionKey);
+      const encryptionKey = await getEncryptionKey();
+      decrypted = await decrypt(data.value, encryptionKey);
     }
     
     const parsed = JSON.parse(decrypted);
