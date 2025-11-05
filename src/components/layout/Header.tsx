@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Logo } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { Menu, X, LogOut, User, Settings, ChevronDown, Phone, Smartphone } from 'lucide-react';
@@ -79,6 +78,14 @@ export const Header: React.FC = () => {
   const mobileMenuId = 'mobile-menu';
   const isUserAdmin = isAdmin();
 
+  const isActivePath = React.useCallback(
+    (href: string) => {
+      const [path] = href.split('#');
+      return location.pathname === path;
+    },
+    [location.pathname]
+  );
+
   // Streamlined navigation handler - single source of truth
   const handleNavigation = React.useCallback(async (href: string, label: string, closeMenu = false) => {
     if (closeMenu) setIsMobileMenuOpen(false);
@@ -150,9 +157,10 @@ export const Header: React.FC = () => {
             <NavigationMenuList data-lovable-lock="structure-only" className="gap-1">
             {navigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
                 <NavigationMenuLink asChild>
-                  <Link 
-                    to={item.href} 
-                    className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-accent hover:text-foreground focus:bg-accent focus:text-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 story-link hover-scale" 
+                  <Link
+                    to={item.href}
+                    className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-accent hover:text-foreground focus:bg-accent focus:text-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 story-link hover-scale"
+                    aria-current={isActivePath(item.href) ? 'page' : undefined}
                     style={{
                       animationDelay: `${index * 100}ms`
                     }}>
@@ -273,18 +281,36 @@ export const Header: React.FC = () => {
                 className="lg:hidden hover:bg-accent transition-all duration-300"
                 aria-label="Sign out"
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-4 w-4" />
+                <span className="hidden xl:inline">Sign Out</span>
               </Button>
+
+              {/* Mobile: Language Switcher + Sign Out */}
+              <div className="flex items-center gap-2 lg:hidden">
+                <LanguageSwitcher data-lovable-lock="structure-only" />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => signOut()} 
+                  className="hover:bg-accent transition-all duration-300"
+                  aria-label="Sign out"
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
           ) : (
-            <Button 
-              variant="success" 
-              size={isScrolled ? 'sm' : 'default'} 
-              onClick={() => handleNavigation(paths.auth, 'Login')}
-              className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
-            >
-              Login
-            </Button>
+            <>
+              <LanguageSwitcher data-lovable-lock="structure-only" className="lg:hidden" />
+              <Button 
+                variant="success" 
+                size={isScrolled ? 'sm' : 'default'} 
+                onClick={() => handleNavigation(paths.auth, 'Login')}
+                className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
+              >
+                Login
+              </Button>
+            </>
           )}
 
           {/* Burger Menu Button - Always visible */}
@@ -329,6 +355,7 @@ export const Header: React.FC = () => {
                 to={item.href}
                 className="block px-4 py-2.5 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 animate-fade-in"
                 onClick={() => handleNavigation(item.href, item.name, true)}
+                aria-current={isActivePath(item.href) ? 'page' : undefined}
               >
                 {item.name}
               </Link>
@@ -354,6 +381,7 @@ export const Header: React.FC = () => {
                     className="block px-4 py-2.5 text-sm font-semibold rounded-md bg-primary/5 hover:bg-primary/10 text-primary transition-all duration-300 animate-fade-in"
                     style={{ animationDelay: `${(navigationItems.length + index) * 50}ms` }}
                     aria-label={`Navigate to ${item.name}`}
+                    aria-current={isActivePath(item.href) ? 'page' : undefined}
                   >
                     {item.name}
                   </Link>
