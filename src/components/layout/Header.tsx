@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Logo } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@/components/ui/navigation-menu';
 import { Menu, X, LogOut, User, Settings, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -78,6 +77,14 @@ export const Header: React.FC = () => {
   const mobileMenuId = 'mobile-menu';
   const isUserAdmin = isAdmin();
 
+  const isActivePath = React.useCallback(
+    (href: string) => {
+      const [path] = href.split('#');
+      return location.pathname === path;
+    },
+    [location.pathname]
+  );
+
   // Streamlined navigation handler - single source of truth
   const handleNavigation = React.useCallback(async (href: string, label: string, closeMenu = false) => {
     if (closeMenu) setIsMobileMenuOpen(false);
@@ -149,9 +156,10 @@ export const Header: React.FC = () => {
             <NavigationMenuList data-lovable-lock="structure-only" className="gap-1">
             {navigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
                 <NavigationMenuLink asChild>
-                  <Link 
-                    to={item.href} 
-                    className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-accent hover:text-foreground focus:bg-accent focus:text-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 story-link hover-scale" 
+                  <Link
+                    to={item.href}
+                    className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-accent hover:text-foreground focus:bg-accent focus:text-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 story-link hover-scale"
+                    aria-current={isActivePath(item.href) ? 'page' : undefined}
                     style={{
                       animationDelay: `${index * 100}ms`
                     }}>
@@ -170,14 +178,15 @@ export const Header: React.FC = () => {
               <NavigationMenuList data-lovable-lock="structure-only" className="gap-1">
               {adminNavigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
                   <NavigationMenuLink asChild>
-                    <Link 
-                      to={item.href} 
+                    <Link
+                      to={item.href}
                       onClick={(e) => {
                         e.preventDefault();
                         handleNavigation(item.href, item.name);
                       }}
                       className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition-all duration-300 hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-primary/20 data-[state=open]:bg-primary/20 story-link hover-scale text-primary"
                       aria-label={`Navigate to ${item.name}`}
+                      aria-current={isActivePath(item.href) ? 'page' : undefined}
                     >
                       {item.name}
                     </Link>
@@ -250,23 +259,11 @@ export const Header: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Desktop: Logout Button - Always visible */}
-              <Button 
-                variant="ghost" 
+              {/* Desktop: Logout Button - single instance */}
+              <Button
+                variant="ghost"
                 size={isScrolled ? 'sm' : 'default'}
-                onClick={() => signOut()} 
-                className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                aria-label="Sign out"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="hidden xl:inline">Sign Out</span>
-              </Button>
-
-              {/* Mobile: Sign Out */}
-              <Button 
-                variant="ghost" 
-                size={isScrolled ? 'sm' : 'default'}
-                onClick={() => signOut()} 
+                onClick={() => signOut()}
                 className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                 aria-label="Sign out"
               >
@@ -344,6 +341,7 @@ export const Header: React.FC = () => {
                 to={item.href}
                 className="block px-4 py-2.5 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 animate-fade-in"
                 onClick={() => handleNavigation(item.href, item.name, true)}
+                aria-current={isActivePath(item.href) ? 'page' : undefined}
               >
                 {item.name}
               </Link>
@@ -369,6 +367,7 @@ export const Header: React.FC = () => {
                     className="block px-4 py-2.5 text-sm font-semibold rounded-md bg-primary/5 hover:bg-primary/10 text-primary transition-all duration-300 animate-fade-in"
                     style={{ animationDelay: `${(navigationItems.length + index) * 50}ms` }}
                     aria-label={`Navigate to ${item.name}`}
+                    aria-current={isActivePath(item.href) ? 'page' : undefined}
                   >
                     {item.name}
                   </Link>
