@@ -114,7 +114,7 @@ export const Header: React.FC = () => {
     >
       <div
         data-header-inner
-        className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6"
+        className="mx-auto w-full max-w-screen-2xl flex h-16 items-center justify-between gap-2 px-3 sm:px-4 lg:px-6"
         data-lovable-lock="structure-only"
       >
         {/* Home Button & Badge */}
@@ -122,7 +122,7 @@ export const Header: React.FC = () => {
           id="app-header-left"
           data-testid="app-header-left"
           data-slot="left"
-          className="flex items-center gap-3 shrink-0 min-w-0"
+          className="flex items-center gap-2 shrink-0 min-w-0 ml-0"
           data-lovable-lock="structure-only"
           role="navigation"
           aria-label="Header left section"
@@ -170,6 +170,7 @@ export const Header: React.FC = () => {
                           isActive && 'bg-accent/50 text-foreground'
                         )
                       }
+                      aria-current={({ isActive }: { isActive: boolean }) => isActive ? 'page' : undefined}
                       style={{
                         animationDelay: `${index * 100}ms`
                       }}
@@ -273,16 +274,6 @@ export const Header: React.FC = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button
-                  variant="ghost"
-                  size={isScrolled ? 'sm' : 'default'}
-                  onClick={() => signOut()}
-                  className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 h-11 px-4"
-                  aria-label="Sign out"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden xl:inline">Sign Out</span>
-                </Button>
               </>
             ) : (
               <Button
@@ -352,6 +343,7 @@ export const Header: React.FC = () => {
                     isActive && 'bg-accent/50 text-foreground'
                   )
                 }
+                aria-current={({ isActive }: { isActive: boolean }) => isActive ? 'page' : undefined}
                 onClick={(event) => {
                   event.preventDefault();
                   handleNavigation(item.href, item.name, true);
@@ -381,6 +373,7 @@ export const Header: React.FC = () => {
                         isActive && 'bg-primary/20'
                       )
                     }
+                    aria-current={({ isActive }: { isActive: boolean }) => isActive ? 'page' : undefined}
                     onClick={(event) => {
                       event.preventDefault();
                       handleNavigation(item.href, item.name, true);
