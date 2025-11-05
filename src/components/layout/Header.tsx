@@ -190,10 +190,8 @@ export const Header: React.FC = () => {
 
         {/* Enhanced CTA Button & Mobile Menu */}
         <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
-          {/* Language Switcher - Always visible on desktop */}
-          <div className="hidden lg:block">
-            <LanguageSwitcher data-lovable-lock="structure-only" />
-          </div>
+          {/* Language Switcher - Single instance, always visible */}
+          <LanguageSwitcher data-lovable-lock="structure-only" />
 
           {/* User Menu - Desktop: Dropdown, Mobile: Simplified */}
           {user ? (
@@ -264,32 +262,26 @@ export const Header: React.FC = () => {
                 <span className="hidden xl:inline">Sign Out</span>
               </Button>
 
-              {/* Mobile: Language Switcher + Sign Out */}
-              <div className="flex items-center gap-2 lg:hidden">
-                <LanguageSwitcher data-lovable-lock="structure-only" />
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={() => signOut()} 
-                  className="hover:bg-accent transition-all duration-300"
-                  aria-label="Sign out"
-                >
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </div>
+              {/* Mobile: Sign Out */}
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => signOut()} 
+                className="lg:hidden hover:bg-accent transition-all duration-300"
+                aria-label="Sign out"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
             </div>
           ) : (
-            <>
-              <LanguageSwitcher data-lovable-lock="structure-only" className="lg:hidden" />
-              <Button 
-                variant="success" 
-                size={isScrolled ? 'sm' : 'default'} 
-                onClick={() => handleNavigation(paths.auth, 'Login')}
-                className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
-              >
-                Login
-              </Button>
-            </>
+            <Button 
+              variant="success" 
+              size={isScrolled ? 'sm' : 'default'} 
+              onClick={() => handleNavigation(paths.auth, 'Login')}
+              className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
+            >
+              Login
+            </Button>
           )}
 
           {/* Burger Menu Button - Always visible */}
