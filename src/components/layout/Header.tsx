@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Logo } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
-import { Menu, X, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { Menu, X, LogOut, User, Settings, ChevronDown, Phone, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, useLocation } from 'react-router-dom';
@@ -37,6 +37,7 @@ const navigationItems = [{
   name: 'Contact',
   href: paths.contact
 }];
+
 const adminNavigationItems = [{
   name: 'Dashboard',
   href: paths.dashboard
@@ -163,30 +164,6 @@ export const Header: React.FC = () => {
         </NavigationMenu>
         </nav>
 
-        {/* Desktop App Navigation - Separate Section for Admin */}
-        {isUserAdmin && (
-          <nav data-slot="app-nav" aria-label="Application" className="hidden lg:flex items-center gap-1 ml-4 pl-4 border-l border-border animate-fade-in" style={{ animationDelay: '250ms' }} data-lovable-lock="structure-only">
-            <NavigationMenu data-lovable-lock="structure-only">
-              <NavigationMenuList data-lovable-lock="structure-only" className="gap-1">
-              {adminNavigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
-                  <NavigationMenuLink asChild>
-                    <Link 
-                      to={item.href} 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleNavigation(item.href, item.name);
-                      }}
-                      className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition-all duration-300 hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-primary/20 data-[state=open]:bg-primary/20 story-link hover-scale text-primary"
-                      aria-label={`Navigate to ${item.name}`}
-                    >
-                      {item.name}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>)}
-            </NavigationMenuList>
-          </NavigationMenu>
-          </nav>
-        )}
 
         {/* Enhanced CTA Button & Mobile Menu */}
         <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
@@ -227,9 +204,14 @@ export const Header: React.FC = () => {
                       <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
                   {isUserAdmin && (
                     <>
+                      <DropdownMenuSeparator />
+                      <div className="px-2 py-1.5">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          Application
+                        </p>
+                      </div>
                       <DropdownMenuItem 
                         onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
                         className="cursor-pointer"
@@ -238,15 +220,36 @@ export const Header: React.FC = () => {
                         Dashboard
                       </DropdownMenuItem>
                       <DropdownMenuItem 
+                        onClick={() => handleNavigation(paths.calls, 'Calls')}
+                        className="cursor-pointer"
+                      >
+                        <Phone className="mr-2 h-4 w-4" />
+                        Calls
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleNavigation(paths.phoneApps, 'Phone Apps')}
+                        className="cursor-pointer"
+                      >
+                        <Smartphone className="mr-2 h-4 w-4" />
+                        Phone Apps
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
                         onClick={() => handleNavigation(paths.voiceSettings, 'Settings')}
                         className="cursor-pointer"
                       >
                         <Settings className="mr-2 h-4 w-4" />
                         Settings
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
                     </>
                   )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => signOut()}
+                    className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:text-red-400 dark:focus:bg-red-950/20"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
@@ -358,6 +361,7 @@ export const Header: React.FC = () => {
               </div>
             </>
           )}
+
         </div>
       </nav>
     </header>;

@@ -112,11 +112,11 @@ export const QuickActionsCard: React.FC = () => {
                   to={action.to}
                   role="button"
                   onClick={(event) => {
-                    event.preventDefault();
                     if (isNavigating) {
+                      event.preventDefault();
                       return;
                     }
-                    void handleActionClick(action);
+                    setClickedAction(action.label);
                   }}
                   aria-label={`${action.label}: ${action.description}`}
                   aria-disabled={isNavigating}
