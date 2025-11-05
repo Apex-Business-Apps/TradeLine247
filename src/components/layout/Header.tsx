@@ -128,12 +128,15 @@ export const Header: React.FC = () => {
     setIsMobileMenuOpen(false);
   }, [location?.pathname]);
   return <header
+      id="app-header"
       data-site-header
+      data-testid="app-header"
       className={cn(
         'sticky top-0 z-40 w-full bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b isolate transition-all duration-300',
         isScrolled ? 'shadow-lg' : ''
       )}
       data-lovable-lock="structure-only"
+      role="banner"
     >
       <div
         data-header-inner
@@ -143,9 +146,12 @@ export const Header: React.FC = () => {
         {/* Home Button & Badge */}
         <div
           id="app-header-left"
+          data-testid="app-header-left"
           data-slot="left"
           className="flex items-center gap-3 shrink-0 min-w-0"
           data-lovable-lock="structure-only"
+          role="navigation"
+          aria-label="Header left section"
         >
           <Button
             id="app-home"
