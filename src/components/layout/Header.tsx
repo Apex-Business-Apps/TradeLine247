@@ -181,7 +181,7 @@ export const Header: React.FC = () => {
           <button
             id="burger-menu-button"
             data-testid="burger-menu-button"
-            className="flex lg:hidden items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
+            className="flex items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
             onClick={() => setIsMobileMenuOpen(prev => !prev)}
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
