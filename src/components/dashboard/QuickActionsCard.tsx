@@ -101,9 +101,6 @@ export const QuickActionsCard: React.FC = () => {
                 isInRouter
                   ? undefined
                   : () => {
-                      if (isNavigating) {
-                        return;
-                      }
                       void handleActionClick(action);
                     }
               }
