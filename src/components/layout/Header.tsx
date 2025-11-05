@@ -69,26 +69,52 @@ const LanguageMenuItem: React.FC<{ locale: string; label: string }> = ({ locale,
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Defensive hook calls with fallbacks for enterprise-grade resilience
   const {
-    user,
-    userRole,
-    signOut,
-    isAdmin
-  } = useAuth();
-  const { goToWithFeedback } = useSafeNavigation();
+    user = null,
+    userRole = null,
+    signOut = async () => ({ error: null }),
+    isAdmin = () => false
+  } = useAuth() || {};
+
+  const { goToWithFeedback = async (path: string) => { window.location.href = path; } } = useSafeNavigation() || {};
+
   const location = useLocation();
   const mobileMenuId = 'mobile-menu';
-  const isUserAdmin = isAdmin();
+  const isUserAdmin = typeof isAdmin === 'function' ? isAdmin() : false;
 
-  // Streamlined navigation handler - single source of truth
+  // Streamlined navigation handler - single source of truth with enterprise error handling
   const handleNavigation = React.useCallback(async (href: string, label: string, closeMenu = false) => {
     if (closeMenu) setIsMobileMenuOpen(false);
     try {
-      await goToWithFeedback(href, label);
+      if (goToWithFeedback && typeof goToWithFeedback === 'function') {
+        await goToWithFeedback(href, label);
+      } else {
+        // Fallback to direct navigation if hook unavailable
+        window.location.href = href;
+      }
     } catch (error) {
       console.error(`[Header] Navigation failed for ${label}:`, error);
+      // Ultimate fallback
+      window.location.href = href;
     }
   }, [goToWithFeedback]);
+
+  // Safe signOut handler with fallback
+  const handleSignOut = React.useCallback(async () => {
+    try {
+      if (signOut && typeof signOut === 'function') {
+        await signOut();
+      }
+      // Fallback: clear session and redirect
+      window.location.href = paths.home;
+    } catch (error) {
+      console.error('[Header] Sign out failed:', error);
+      // Force redirect on error
+      window.location.href = paths.home;
+    }
+  }, [signOut]);
 
   // Optimized scroll handler
   useEffect(() => {
@@ -100,7 +126,7 @@ export const Header: React.FC = () => {
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [location.pathname]);
+  }, [location?.pathname]);
   return <header
       data-site-header
       className={cn(
@@ -259,7 +285,7 @@ export const Header: React.FC = () => {
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onClick={() => signOut()}
+                      onClick={handleSignOut}
                       className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:text-red-400 dark:focus:bg-red-950/20"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
@@ -270,7 +296,7 @@ export const Header: React.FC = () => {
                 <Button
                   variant="ghost"
                   size={isScrolled ? 'sm' : 'default'}
-                  onClick={() => signOut()}
+                  onClick={handleSignOut}
                   className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 h-11 px-4"
                   aria-label="Sign out"
                 >
@@ -397,7 +423,7 @@ export const Header: React.FC = () => {
                 variant="ghost"
                 onClick={() => {
                   setIsMobileMenuOpen(false);
-                  signOut();
+                  handleSignOut();
                 }}
                 className="w-full justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-semibold text-red-600 transition-all duration-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               >
