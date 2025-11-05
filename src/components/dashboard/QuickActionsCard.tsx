@@ -101,11 +101,9 @@ export const QuickActionsCard: React.FC = () => {
                 isInRouter
                   ? undefined
                   : () => {
-                      if (isNavigating) {
-                        return;
-                      }
                       void handleActionClick(action);
                     }
+              }
               }
               disabled={!isInRouter && isNavigating}
               aria-label={isInRouter ? undefined : `${action.label}: ${action.description}`}
