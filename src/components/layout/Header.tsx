@@ -140,7 +140,7 @@ export const Header: React.FC = () => {
     >
       <div
         data-header-inner
-        className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6"
+        className="mx-auto w-full max-w-screen-2xl flex h-16 items-center justify-between gap-2 px-3 sm:px-4 lg:px-6"
         data-lovable-lock="structure-only"
       >
         {/* Home Button & Badge */}
@@ -148,7 +148,7 @@ export const Header: React.FC = () => {
           id="app-header-left"
           data-testid="app-header-left"
           data-slot="left"
-          className="flex items-center gap-3 shrink-0 min-w-0"
+          className="flex items-center gap-2 shrink-0 min-w-0 ml-0"
           data-lovable-lock="structure-only"
           role="navigation"
           aria-label="Header left section"
@@ -200,7 +200,11 @@ export const Header: React.FC = () => {
                         animationDelay: `${index * 100}ms`
                       }}
                     >
-                      {item.name}
+                      {({ isActive }) => (
+                        <span aria-current={isActive ? 'page' : undefined}>
+                          {item.name}
+                        </span>
+                      )}
                     </NavLink>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
@@ -384,7 +388,11 @@ export const Header: React.FC = () => {
                 }}
                 style={{ animationDelay: `${index * 75}ms` }}
               >
-                {item.name}
+                {({ isActive }) => (
+                  <span aria-current={isActive ? 'page' : undefined}>
+                    {item.name}
+                  </span>
+                )}
               </NavLink>
             ))}
           </div>
@@ -414,7 +422,11 @@ export const Header: React.FC = () => {
                     style={{ animationDelay: `${(navigationItems.length + index) * 75}ms` }}
                     aria-label={`Navigate to ${item.name}`}
                   >
-                    {item.name}
+                    {({ isActive }) => (
+                      <span aria-current={isActive ? 'page' : undefined}>
+                        {item.name}
+                      </span>
+                    )}
                   </NavLink>
                 ))}
               </div>
