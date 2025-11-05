@@ -9,6 +9,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,6 +50,20 @@ const adminNavigationItems = [{
   name: 'Settings',
   href: paths.voiceSettings
 }];
+
+// Language menu item component for dropdown
+const LanguageMenuItem: React.FC<{ locale: string; label: string }> = ({ locale, label }) => {
+  const { i18n } = useTranslation();
+  return (
+    <DropdownMenuItem
+      onClick={() => i18n.changeLanguage(locale)}
+      className={cn("cursor-pointer", i18n.language === locale && "bg-accent")}
+    >
+      {label}
+    </DropdownMenuItem>
+  );
+};
+
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -175,30 +190,10 @@ export const Header: React.FC = () => {
 
         {/* Enhanced CTA Button & Mobile Menu */}
         <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
-          <LanguageSwitcher data-lovable-lock="structure-only" />
-
-          {/* Burger Menu Button - MOBILE ONLY - Hidden on desktop */}
-          <button
-            id="burger-menu-button"
-            data-testid="burger-menu-button"
-            className="flex items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
-            onClick={() => setIsMobileMenuOpen(prev => !prev)}
-            aria-label="Toggle mobile menu"
-            aria-expanded={isMobileMenuOpen}
-            aria-controls={mobileMenuId}
-            type="button"
-          >
-            {isMobileMenuOpen ? (
-              <X size={20} className="text-foreground" strokeWidth={2} />
-            ) : (
-              <Menu size={20} className="text-foreground" strokeWidth={2} />
-            )}
-          </button>
-
-          {/* User Menu - Desktop: Dropdown, Mobile: Simplified */}
+          {/* User Menu - Desktop: Dropdown with Language Switcher integrated, Mobile: Simplified */}
           {user ? (
-            <div className="flex items-center gap-3">
-              {/* Desktop: User Dropdown Menu */}
+            <div className="flex items-center gap-2">
+              {/* Desktop: User Dropdown Menu with Language Switcher */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
@@ -249,6 +244,12 @@ export const Header: React.FC = () => {
                       <DropdownMenuSeparator />
                     </>
                   )}
+                  {/* Language Switcher in Dropdown */}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel className="text-xs">Language</DropdownMenuLabel>
+                  <LanguageMenuItem locale="en" label="English" />
+                  <LanguageMenuItem locale="fr-CA" label="Français (CA)" />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={() => signOut()}
                     className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400"
@@ -259,27 +260,51 @@ export const Header: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Mobile: Simplified Sign Out */}
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => signOut()} 
-                className="lg:hidden hover:bg-accent transition-all duration-300"
-                aria-label="Sign out"
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
+              {/* Mobile: Language Switcher + Sign Out */}
+              <div className="flex items-center gap-2 lg:hidden">
+                <LanguageSwitcher data-lovable-lock="structure-only" />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => signOut()} 
+                  className="hover:bg-accent transition-all duration-300"
+                  aria-label="Sign out"
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
           ) : (
-            <Button 
-              variant="success" 
-              size={isScrolled ? 'sm' : 'default'} 
-              onClick={() => handleNavigation(paths.auth, 'Login')}
-              className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
-            >
-              Login
-            </Button>
+            <>
+              <LanguageSwitcher data-lovable-lock="structure-only" />
+              <Button 
+                variant="success" 
+                size={isScrolled ? 'sm' : 'default'} 
+                onClick={() => handleNavigation(paths.auth, 'Login')}
+                className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
+              >
+                Login
+              </Button>
+            </>
           )}
+
+          {/* Burger Menu Button - MOBILE ONLY - Hidden on desktop */}
+          <button
+            id="burger-menu-button"
+            data-testid="burger-menu-button"
+            className="flex items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px] lg:hidden"
+            onClick={() => setIsMobileMenuOpen(prev => !prev)}
+            aria-label="Toggle mobile menu"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls={mobileMenuId}
+            type="button"
+          >
+            {isMobileMenuOpen ? (
+              <X size={20} className="text-foreground" strokeWidth={2} />
+            ) : (
+              <Menu size={20} className="text-foreground" strokeWidth={2} />
+            )}
+          </button>
         </div>
       </div>
 

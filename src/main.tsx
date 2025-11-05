@@ -86,7 +86,10 @@ if ('serviceWorker' in navigator) {
 
 const root = document.getElementById('root');
 if (!root) { 
-  document.body.innerHTML = '<pre>Missing #root</pre>'; 
+  // Secure DOM manipulation - use textContent instead of innerHTML
+  const errorMsg = document.createElement('pre');
+  errorMsg.textContent = 'Missing #root';
+  document.body.appendChild(errorMsg); 
   throw new Error('Missing #root'); 
 }
 
