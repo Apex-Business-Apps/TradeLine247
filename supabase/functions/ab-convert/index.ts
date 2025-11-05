@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { preflight, corsHeaders } from '../_shared/cors.ts';
-import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
+import { createClient } from 'npm:@supabase/supabase-js@2.79.0';
+import { preflight, jsonResponse, unexpectedErrorResponse, withCors } from '../_shared/cors.ts';
+import { secureHeaders } from '../_shared/secure_headers.ts';
 
 interface ConvertRequest {
   testName: string;
@@ -14,13 +14,13 @@ serve(async (req) => {
 
   try {
     if (req.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405, headers: mergeHeaders(corsHeaders, secureHeaders) });
+      return jsonResponse({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const { testName, conversionValue }: ConvertRequest = await req.json();
     
     if (!testName) {
-      return new Response('Test name required', { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders) });
+      return jsonResponse({ error: 'Test name required' }, { status: 400 });
     }
 
     // Verify signed cookie integrity
@@ -30,7 +30,7 @@ serve(async (req) => {
 
     if (!anonIdCookie || !integrityCookie) {
       console.log('Missing required cookies for conversion');
-      return new Response('Invalid cohort', { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders) });
+      return jsonResponse({ error: 'Invalid cohort' }, { status: 400 });
     }
 
     const anonymousId = anonIdCookie[1];
@@ -39,7 +39,7 @@ serve(async (req) => {
 
     if (!variant || !signature) {
       console.log('Invalid integrity cookie format');
-      return new Response('Invalid cohort', { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders) });
+      return jsonResponse({ error: 'Invalid cohort' }, { status: 400 });
     }
 
     // Verify HMAC signature
@@ -62,11 +62,11 @@ serve(async (req) => {
       
       if (!isValid) {
         console.log('Invalid HMAC signature for conversion');
-        return new Response('Invalid cohort', { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders) });
+        return jsonResponse({ error: 'Invalid cohort' }, { status: 400 });
       }
     } catch (error) {
       console.log('HMAC verification error:', error);
-      return new Response('Invalid cohort', { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders) });
+      return jsonResponse({ error: 'Invalid cohort' }, { status: 400 });
     }
 
     const supabase = createClient(
@@ -91,7 +91,7 @@ serve(async (req) => {
 
     if (error) {
       console.error('Conversion update error:', error);
-      return new Response('Error updating conversion', { status: 500, headers: mergeHeaders(corsHeaders, secureHeaders) });
+      return jsonResponse({ error: 'Error updating conversion' }, { status: 500 });
     }
 
     // Track conversion in analytics (server-side only)
@@ -107,10 +107,9 @@ serve(async (req) => {
 
     console.log(`Conversion tracked: ${testName} -> ${variant}`);
 
-    return new Response(null, { status: 204, headers: mergeHeaders(corsHeaders, secureHeaders) });
+    return new Response(null, { status: 204, headers: withCors(secureHeaders) });
 
   } catch (error) {
-    console.error('Error in ab-convert:', error);
-    return new Response('Internal server error', { status: 500, headers: mergeHeaders(corsHeaders, secureHeaders) });
+    return unexpectedErrorResponse(error, 'ab-convert');
   }
 });
