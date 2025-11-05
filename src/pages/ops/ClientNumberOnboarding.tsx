@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Phone, MessageSquare, RefreshCw, DollarSign, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { flags } from "@/config/flags";
 
 export default function ClientNumberOnboarding() {
   const navigate = useNavigate();
@@ -742,7 +743,7 @@ export default function ClientNumberOnboarding() {
           </div>
 
           {/* Trust & Reputation Setup - Admin Only */}
-          {profile?.role === 'admin' && (
+          {flags.conversionV1 && profile?.role === 'admin' && (
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold mb-2">Trust & Reputation Setup</h3>
               <p className="text-sm text-muted-foreground mb-4">
@@ -761,7 +762,7 @@ export default function ClientNumberOnboarding() {
           )}
 
           {/* Billing Mapping - Admin Only */}
-          {profile?.role === 'admin' && (
+          {flags.conversionV1 && profile?.role === 'admin' && (
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold mb-2">Billing & Usage Mapping</h3>
               <p className="text-sm text-muted-foreground mb-4">
