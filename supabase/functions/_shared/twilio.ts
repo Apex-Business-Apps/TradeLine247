@@ -1,7 +1,15 @@
 import { corsHeaders } from "./cors.ts";
 import { secureHeaders } from "./secure_headers.ts";
+import Twilio from "npm:twilio@4";
 
 export type TwilioAuth = { accountSid: string; authToken: string };
+
+// Twilio client helper (for Deno Edge Functions)
+export function twilioClient(accountSid?: string, authToken?: string) {
+  const sid = accountSid ?? Deno.env.get("TWILIO_ACCOUNT_SID") ?? "";
+  const tok = authToken ?? Deno.env.get("TWILIO_AUTH_TOKEN") ?? "";
+  return Twilio(sid, tok);
+}
 
 const TWILIO_API_BASE = "https://api.twilio.com/2010-04-01";
 const ENV_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID") ?? "";
