@@ -28,47 +28,14 @@ export function useOfflineSync() {
     error: null,
   });
 
-  // Monitor online status
-  useEffect(() => {
-    const handleOnline = () => {
-      setSyncState(prev => ({ ...prev, isOnline: true }));
-      syncNow(); // Auto-sync when coming back online
-    };
-
-    const handleOffline = () => {
-      setSyncState(prev => ({ ...prev, isOnline: false }));
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  // Update pending count periodically
-  useEffect(() => {
-    const updatePendingCount = () => {
-      const count = persistentQueue.getPendingCount();
-      setSyncState(prev => ({ ...prev, pendingCount: count }));
-    };
-
-    updatePendingCount();
-    const interval = setInterval(updatePendingCount, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   /**
    * Manually trigger sync
    */
   const syncNow = useCallback(async () => {
     if (!navigator.onLine) {
-      setSyncState(prev => ({ 
-        ...prev, 
-        error: 'Cannot sync while offline' 
+      setSyncState(prev => ({
+        ...prev,
+        error: 'Cannot sync while offline'
       }));
       return;
     }
@@ -98,6 +65,39 @@ export function useOfflineSync() {
       }));
       throw error;
     }
+  }, []);
+
+  // Monitor online status
+  useEffect(() => {
+    const handleOnline = () => {
+      setSyncState(prev => ({ ...prev, isOnline: true }));
+      syncNow(); // Auto-sync when coming back online
+    };
+
+    const handleOffline = () => {
+      setSyncState(prev => ({ ...prev, isOnline: false }));
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [syncNow]);
+
+  // Update pending count periodically
+  useEffect(() => {
+    const updatePendingCount = () => {
+      const count = persistentQueue.getPendingCount();
+      setSyncState(prev => ({ ...prev, pendingCount: count }));
+    };
+
+    updatePendingCount();
+    const interval = setInterval(updatePendingCount, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   /**

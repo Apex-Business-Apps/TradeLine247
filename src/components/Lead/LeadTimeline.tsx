@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,9 +28,23 @@ export function LeadTimeline({ leadId }: LeadTimelineProps) {
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchInteractions = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('interactions')
+      .select('*')
+      .eq('lead_id', leadId)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setInteractions(data);
+    }
+    setLoading(false);
+  }, [leadId]);
+
   useEffect(() => {
     fetchInteractions();
-    
+
     // Subscribe to real-time updates
     const channel = supabase
       .channel('lead-interactions')
@@ -51,21 +65,7 @@ export function LeadTimeline({ leadId }: LeadTimelineProps) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [leadId]);
-
-  const fetchInteractions = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('interactions')
-      .select('*')
-      .eq('lead_id', leadId)
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      setInteractions(data);
-    }
-    setLoading(false);
-  };
+  }, [leadId, fetchInteractions]);
 
   const getIcon = (type: string) => {
     switch (type) {

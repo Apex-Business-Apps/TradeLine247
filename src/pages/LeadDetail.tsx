@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AppLayout } from '@/components/Layout/AppLayout';
@@ -35,14 +35,9 @@ export default function LeadDetail() {
   const [lead, setLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchLead = useCallback(async () => {
     if (!id) return;
-    fetchLead();
-  }, [id]);
 
-  const fetchLead = async () => {
-    if (!id) return;
-    
     setLoading(true);
     const { data, error } = await supabase
       .from('leads')
@@ -62,7 +57,12 @@ export default function LeadDetail() {
 
     setLead(data);
     setLoading(false);
-  };
+  }, [id, toast, navigate]);
+
+  useEffect(() => {
+    if (!id) return;
+    fetchLead();
+  }, [id, fetchLead]);
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
