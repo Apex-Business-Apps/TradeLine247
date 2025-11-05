@@ -303,16 +303,6 @@ export const Header: React.FC = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button
-                  variant="ghost"
-                  size={isScrolled ? 'sm' : 'default'}
-                  onClick={handleSignOut}
-                  className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 h-11 px-4"
-                  aria-label="Sign out"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden xl:inline">Sign Out</span>
-                </Button>
               </>
             ) : (
               <Button
