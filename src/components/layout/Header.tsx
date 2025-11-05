@@ -170,12 +170,15 @@ export const Header: React.FC = () => {
                           isActive && 'bg-accent/50 text-foreground'
                         )
                       }
-                      aria-current={({ isActive }: { isActive: boolean }) => isActive ? 'page' : undefined}
                       style={{
                         animationDelay: `${index * 100}ms`
                       }}
                     >
-                      {item.name}
+                      {({ isActive }) => (
+                        <span aria-current={isActive ? 'page' : undefined}>
+                          {item.name}
+                        </span>
+                      )}
                     </NavLink>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
@@ -343,14 +346,17 @@ export const Header: React.FC = () => {
                     isActive && 'bg-accent/50 text-foreground'
                   )
                 }
-                aria-current={({ isActive }: { isActive: boolean }) => isActive ? 'page' : undefined}
                 onClick={(event) => {
                   event.preventDefault();
                   handleNavigation(item.href, item.name, true);
                 }}
                 style={{ animationDelay: `${index * 75}ms` }}
               >
-                {item.name}
+                {({ isActive }) => (
+                  <span aria-current={isActive ? 'page' : undefined}>
+                    {item.name}
+                  </span>
+                )}
               </NavLink>
             ))}
           </div>
@@ -373,7 +379,6 @@ export const Header: React.FC = () => {
                         isActive && 'bg-primary/20'
                       )
                     }
-                    aria-current={({ isActive }: { isActive: boolean }) => isActive ? 'page' : undefined}
                     onClick={(event) => {
                       event.preventDefault();
                       handleNavigation(item.href, item.name, true);
@@ -381,7 +386,11 @@ export const Header: React.FC = () => {
                     style={{ animationDelay: `${(navigationItems.length + index) * 75}ms` }}
                     aria-label={`Navigate to ${item.name}`}
                   >
-                    {item.name}
+                    {({ isActive }) => (
+                      <span aria-current={isActive ? 'page' : undefined}>
+                        {item.name}
+                      </span>
+                    )}
                   </NavLink>
                 ))}
               </div>
