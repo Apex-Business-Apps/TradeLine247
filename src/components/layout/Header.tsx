@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import '@/components/nav/AppHeaderOverride.module.css';
+import '@/styles/header-align.css';
 
 const navigationItems = [{
   name: 'Features',
