@@ -6,6 +6,7 @@ import { Phone, UserPlus, PhoneCall, Link as LinkIcon, Loader2 } from 'lucide-re
 import { paths } from '@/routes/paths';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const actions = [
   {
@@ -48,22 +49,19 @@ export const QuickActionsCard: React.FC = () => {
       setClickedAction(action.label);
       
       // Log action click for debugging
-      if (import.meta.env.DEV) {
-        console.log('[QuickActions] Action clicked:', {
-          label: action.label,
-          path: action.to,
-          timestamp: new Date().toISOString()
-        });
-      }
+      logger.debug('[QuickActions] Action clicked', {
+        label: action.label,
+        path: action.to,
+        timestamp: new Date().toISOString()
+      });
 
       // Navigate with error handling
       await goToWithFeedback(action.to, action.label);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('[QuickActions] Navigation failed:', {
+      logger.error('[QuickActions] Navigation failed', error instanceof Error ? error : new Error(errorMessage), {
         action: action.label,
-        path: action.to,
-        error: errorMessage
+        path: action.to
       });
       
       toast.error('Action Failed', {

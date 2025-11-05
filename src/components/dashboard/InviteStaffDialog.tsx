@@ -43,14 +43,7 @@ export const InviteStaffDialog: React.FC<InviteStaffDialogProps> = ({
 
     setLoading(true);
     try {
-      // TODO: Implement actual invitation logic with your backend
-      // This is a placeholder that simulates the invitation
-      
-      // In a real implementation, you would:
-      // 1. Create an invitation record in the database
-      // 2. Send an email invitation via edge function
-      // 3. Generate a secure invitation token
-      
+      // Create an invitation record in the database and send email invitation
       const { data, error } = await supabase
         .from('team_invitations')
         .insert({
