@@ -25,7 +25,7 @@ export default function App() {
   return (
     <SafeErrorBoundary>
       <div className="min-h-screen bg-background text-foreground antialiased">
-        <RouterProvider router={router} fallbackElement={<LoadingFallback />} />
+        <RouterProvider router={router} />
       </div>
     </SafeErrorBoundary>
   );

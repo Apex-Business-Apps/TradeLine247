@@ -35,15 +35,18 @@ export default function ClientNumberOnboarding() {
       if (!user) return;
       
       try {
+        // Get user's organization from organization_members table
         const { data, error } = await supabase
-          .from('profiles')
-          .select('organization_id')
-          .eq('id', user.id)
+          .from('organization_members')
+          .select('org_id')
+          .eq('user_id', user.id)
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.log("No organization found for user:", error);
+        }
         
-        const tenantId = data?.organization_id || null;
+        const tenantId = data?.org_id || null;
         setProfile({ tenant_id: tenantId, role: userRole });
         setFormData(prev => ({ ...prev, tenant_id: tenantId || "" }));
       } catch (error: any) {
