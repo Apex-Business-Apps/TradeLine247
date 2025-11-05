@@ -157,16 +157,16 @@ serve(async (req) => {
       // Don't fail the request if email fails - message is saved
     }
 
-      return jsonResponse(
-        {
-          success: true,
-          id: contactRecord.id,
-          remaining: rateCheck.remaining
-        },
-        {
-          status: 202
-        }
-      );
+    return jsonResponse(
+      {
+        success: true,
+        id: contactRecord.id,
+        remaining: rateCheck.remaining
+      },
+      {
+        status: 202
+      }
+    );
 
   } catch (error) {
     return unexpectedErrorResponse(error, 'contact-submit');
