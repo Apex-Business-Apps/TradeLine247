@@ -119,10 +119,9 @@ export const Header: React.FC = () => {
   return <header
       data-site-header
       className={cn(
-        'sticky top-0 z-40 w-full bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-all duration-300',
+        'sticky top-0 z-40 w-full bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-all duration-300 isolate',
         isScrolled ? 'shadow-lg' : ''
       )}
-      style={{ isolation: 'isolate' }}
       data-lovable-lock="structure-only"
     >
       <div
