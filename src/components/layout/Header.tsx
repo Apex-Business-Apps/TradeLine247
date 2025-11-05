@@ -190,10 +190,8 @@ export const Header: React.FC = () => {
 
         {/* Enhanced CTA Button & Mobile Menu */}
         <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
-          {/* Language Switcher - Always visible on desktop */}
-          <div className="hidden lg:block">
-            <LanguageSwitcher data-lovable-lock="structure-only" />
-          </div>
+          {/* Language Switcher - Single instance, always visible */}
+          <LanguageSwitcher data-lovable-lock="structure-only" />
 
           {/* User Menu - Desktop: Dropdown, Mobile: Simplified */}
           {user ? (
@@ -253,6 +251,18 @@ export const Header: React.FC = () => {
               </DropdownMenu>
 
               {/* Desktop: Logout Button - Always visible */}
+              <Button 
+                variant="ghost" 
+                size={isScrolled ? 'sm' : 'default'}
+                onClick={() => signOut()} 
+                className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                aria-label="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden xl:inline">Sign Out</span>
+              </Button>
+
+              {/* Mobile: Sign Out */}
               <Button 
                 variant="ghost" 
                 size={isScrolled ? 'sm' : 'default'}
