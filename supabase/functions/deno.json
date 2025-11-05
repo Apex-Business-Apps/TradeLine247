@@ -7,9 +7,9 @@
   },
   "lock": false,
   "imports": {
-    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.79.0",
-    "openai": "npm:openai@4.52.5",
-    "resend": "npm:resend@2.0.0",
-    "stripe": "npm:stripe@14.21.0"
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.79.0",
+    "openai": "https://esm.sh/openai@4.52.5",
+    "resend": "https://esm.sh/resend@2.0.0",
+    "stripe": "https://esm.sh/stripe@14.21.0"
   }
 }

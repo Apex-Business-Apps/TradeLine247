@@ -1,6 +1,6 @@
 import { corsHeaders } from "./cors.ts";
 import { secureHeaders } from "./secure_headers.ts";
-import Twilio from "npm:twilio@4";
+import Twilio from "https://esm.sh/twilio@4";
 
 export type TwilioAuth = { accountSid: string; authToken: string };
 

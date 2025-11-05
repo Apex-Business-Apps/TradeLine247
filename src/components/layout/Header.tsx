@@ -190,10 +190,15 @@ export const Header: React.FC = () => {
 
         {/* Enhanced CTA Button & Mobile Menu */}
         <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
-          {/* User Menu - Desktop: Dropdown with Language Switcher integrated, Mobile: Simplified */}
+          {/* Language Switcher - Always visible on desktop */}
+          <div className="hidden lg:block">
+            <LanguageSwitcher data-lovable-lock="structure-only" />
+          </div>
+
+          {/* User Menu - Desktop: Dropdown, Mobile: Simplified */}
           {user ? (
             <div className="flex items-center gap-2">
-              {/* Desktop: User Dropdown Menu with Language Switcher */}
+              {/* Desktop: User Dropdown Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
@@ -244,21 +249,20 @@ export const Header: React.FC = () => {
                       <DropdownMenuSeparator />
                     </>
                   )}
-                  {/* Language Switcher in Dropdown */}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuLabel className="text-xs">Language</DropdownMenuLabel>
-                  <LanguageMenuItem locale="en" label="English" />
-                  <LanguageMenuItem locale="fr-CA" label="Français (CA)" />
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={() => signOut()}
-                    className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              {/* Desktop: Logout Button - Always visible */}
+              <Button 
+                variant="ghost" 
+                size={isScrolled ? 'sm' : 'default'}
+                onClick={() => signOut()} 
+                className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                aria-label="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden xl:inline">Sign Out</span>
+              </Button>
 
               {/* Mobile: Language Switcher + Sign Out */}
               <div className="flex items-center gap-2 lg:hidden">
@@ -276,7 +280,7 @@ export const Header: React.FC = () => {
             </div>
           ) : (
             <>
-              <LanguageSwitcher data-lovable-lock="structure-only" />
+              <LanguageSwitcher data-lovable-lock="structure-only" className="lg:hidden" />
               <Button 
                 variant="success" 
                 size={isScrolled ? 'sm' : 'default'} 
@@ -288,11 +292,11 @@ export const Header: React.FC = () => {
             </>
           )}
 
-          {/* Burger Menu Button - MOBILE ONLY - Hidden on desktop */}
+          {/* Burger Menu Button - Always visible */}
           <button
             id="burger-menu-button"
             data-testid="burger-menu-button"
-            className="flex items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px] lg:hidden"
+            className="flex items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
             onClick={() => setIsMobileMenuOpen(prev => !prev)}
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
