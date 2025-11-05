@@ -65,7 +65,7 @@ export const AppLayout = () => {
         <MotionPreferenceSync />
         <div className="flex min-h-screen flex-col">
           <Header />
-          <main className="flex-1" id="main">
+          <main className="flex-1" id="content">
             <Outlet />
           </main>
         </div>

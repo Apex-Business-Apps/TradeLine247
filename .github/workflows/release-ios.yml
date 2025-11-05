@@ -43,9 +43,9 @@ jobs:
 
       - name: Install CocoaPods
         shell: bash
+        working-directory: ${{ env.IOS_APP_DIR }}
         run: |
           set -euo pipefail
-          cd "$IOS_APP_DIR"
 
           if [ ! -f Podfile ]; then
             echo "Podfile missing from $(pwd)" >&2
