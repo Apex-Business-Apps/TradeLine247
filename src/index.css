@@ -89,8 +89,8 @@ All colors MUST be HSL.
   :root {
     /* Brand Orange Colors from Logo - Maximum Saturation + 45% Vibrancy + 5% Hue */
     /* WCAG AA Compliance: Primary orange must be dark enough for white text (4.5:1 minimum) */
-    /* CRITICAL: 45% gave 3.8:1, 38% gives 4.8:1 contrast with white - meets WCAG AA */
-    --brand-orange-primary: 21 100% 38%; /* Changed from 45% to 38% for WCAG AA (4.8:1 contrast with white) */
+    /* Optimized: 41% gives exactly 4.50:1 contrast with white - optimal balance of brand identity and accessibility */
+    --brand-orange-primary: 21 100% 41%; /* Optimized: 4.50:1 contrast (WCAG AA compliant) - lightest compliant shade */
     --brand-orange-light: 29 100% 95%;
     --brand-orange-dark: 15 100% 35%;
     
@@ -397,7 +397,7 @@ html.dark [class*="text-muted"] {
   /* Exclude elements with bg-primary to preserve button/badge styling */
   html:not(.dark) .text-primary:not(.bg-primary):not([class*="bg-primary"]),
   html:not(.dark) [class*="text-primary"]:not([class*="bg-"]) {
-    color: hsl(21 100% 38%) !important; /* 4.8:1 contrast on white - WCAG AA compliant */
+    color: hsl(21 100% 41%) !important; /* 4.50:1 contrast on white - WCAG AA compliant, optimal brand alignment */
   }
   
   /* Ensure bg-primary elements maintain white text (primary-foreground) */
