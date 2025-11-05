@@ -5,13 +5,13 @@ const baseURL =
   process.env.BASE_URL ||
   'http://localhost:5173';
 
-const baseUse: Parameters<typeof defineConfig>[0]['use'] = {
+const baseUse = {
   baseURL,
   trace: 'on-first-retry',
   screenshot: 'only-on-failure',
   // Allow inline scripts/styles under test harnesses even when CSP forbids them in production.
   bypassCSP: true,
-};
+} as const satisfies Parameters<typeof defineConfig>[0]['use'];
 
 export default defineConfig({
   testDir: './tests',

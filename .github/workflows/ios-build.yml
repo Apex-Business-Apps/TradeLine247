@@ -32,7 +32,10 @@ jobs:
         run: npm run build
 
       - name: Sync Capacitor iOS project
-        run: npx cap sync ios
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx cap sync ios
 
       - name: Verify synced iOS project layout
         run: |

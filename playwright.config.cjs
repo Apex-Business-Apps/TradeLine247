@@ -6,13 +6,13 @@ const baseURL =
   process.env.BASE_URL ||
   'http://localhost:5173';
 
-const baseUse = {
+const baseUse = Object.freeze({
   baseURL,
   trace: 'retain-on-failure',
   video: 'retain-on-failure',
   // Keep test harnesses stable even when production CSP blocks inline execution.
   bypassCSP: true,
-};
+});
 
 module.exports = defineConfig({
   testDir: 'tests',
