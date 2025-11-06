@@ -140,7 +140,7 @@ export const Header: React.FC = () => {
     >
       <div
         data-header-inner
-        className="mx-auto w-full max-w-screen-2xl flex h-16 items-center justify-between gap-2 px-4 md:px-4"
+        className="mx-auto w-full max-w-screen-2xl flex h-16 items-center justify-between gap-2 px-4"
         data-lovable-lock="structure-only"
       >
         {/* Home Button & Badge */}
