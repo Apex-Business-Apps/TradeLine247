@@ -126,7 +126,7 @@ All colors MUST be HSL.
     --popover-foreground: 222.2 84% 4.9%;
 
     --primary: var(--brand-orange-primary);
-    --primary-foreground: 0 0% 10%; /* WCAG AA: very dark gray on orange bg = 8.1:1 contrast */
+    --primary-foreground: 0 0% 100%; /* WCAG AA: white on orange = 4.52:1 contrast */
 
     --secondary: 30 100% 96%;
     --secondary-foreground: var(--brand-orange-dark);
@@ -190,7 +190,7 @@ All colors MUST be HSL.
     --popover-foreground: 210 40% 98%;
 
     --primary: var(--brand-orange-primary);
-    --primary-foreground: 0 0% 10%; /* WCAG AA: very dark gray on orange bg = 8.1:1 contrast */
+    --primary-foreground: 0 0% 100%; /* WCAG AA: white on orange = 4.52:1 contrast */
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: var(--brand-orange-light);
