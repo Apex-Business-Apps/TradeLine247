@@ -96,8 +96,8 @@ export const WelcomeHeader: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick Navigation */}
-          <div className="flex items-center gap-2">
+          {/* Quick Navigation - Hide some buttons on very small screens */}
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Notifications */}
             <Button
               variant="ghost"
@@ -132,12 +132,12 @@ export const WelcomeHeader: React.FC = () => {
               <Settings className="h-4 w-4" />
             </Button>
 
-            {/* Home */}
+            {/* Home - Hidden on mobile to save space */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate(paths.home)}
-              className="h-9 w-9 hover:bg-accent"
+              className="hidden sm:flex h-9 w-9 hover:bg-accent"
               data-testid="home-button"
               aria-label="Go to homepage"
             >

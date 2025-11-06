@@ -29,7 +29,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'Android',
     features: ['Call screening', 'Smart replies', 'Contact integration', 'Call recording'],
-    color: 'bg-green-500/10 text-green-600 border-green-500/20'
+    color: 'bg-green-500/10 text-green-800 border-green-500/20'
   },
   {
     id: 'imessage',
@@ -49,7 +49,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'Android',
     features: ['RCS support', 'Smart compose', 'Spam detection', 'Web sync'],
-    color: 'bg-green-500/10 text-green-600 border-green-500/20'
+    color: 'bg-green-500/10 text-green-800 border-green-500/20'
   }
 ];
 
@@ -166,7 +166,7 @@ const PhoneIntegration = () => {
                         </Badge>
                       </div>
                     </div>
-                    <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                    <Badge className="bg-green-500/10 text-green-800 border-green-500/20">
                       Available
                     </Badge>
                   </div>

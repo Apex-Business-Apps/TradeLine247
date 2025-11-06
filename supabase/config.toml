@@ -1,1 +1,13 @@
 project_id = "hysvqdwmhxnblxfqnszn"
+
+# Deploy only core functions to avoid build timeout
+# Add more functions as needed by uncommenting them
+
+[functions.contact-submit]
+verify_jwt = false
+
+[functions.healthz]
+verify_jwt = false
+
+[functions.unsubscribe]
+verify_jwt = false
