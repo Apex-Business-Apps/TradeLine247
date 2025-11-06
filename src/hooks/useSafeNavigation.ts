@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { paths } from '@/routes/paths';
+import { errorReporter } from '@/lib/errorReporter';
 
 /**
  * Enterprise-grade navigation hook with comprehensive error handling,
@@ -22,8 +23,8 @@ export function useSafeNavigation() {
    */
   const validateRoute = useCallback((path: string): boolean => {
     // Check if path exists in paths object
-    const validPaths = Object.values(paths);
-    const isValid = validPaths.includes(path as any);
+    const validPaths = Object.values(paths) as string[];
+    const isValid = validPaths.includes(path);
     
     // Also check for dynamic routes (e.g., paths with params)
     if (!isValid) {
@@ -32,9 +33,14 @@ export function useSafeNavigation() {
       
       // Log in development
       if (import.meta.env.DEV) {
-        console.warn(`[Navigation] Route validation failed: ${path}`, {
-          validPaths,
-          attemptedPath: path
+        errorReporter.report({
+          type: 'error',
+          message: `[Navigation] Route validation failed: ${path}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { validPaths, attemptedPath: path }
         });
       }
     }
@@ -68,9 +74,14 @@ export function useSafeNavigation() {
     // Validate route before navigation
     if (!validateRoute(path)) {
       const error = new Error(`Invalid route: ${path}`);
-      console.error('[Navigation] Route validation failed:', {
-        path,
-        validRoutes: Object.values(paths)
+      errorReporter.report({
+        type: 'error',
+        message: '[Navigation] Route validation failed',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { path, validRoutes: Object.values(paths) }
       });
       
       if (showError) {
@@ -87,7 +98,15 @@ export function useSafeNavigation() {
         setIsNavigating(true);
         navigate(paths.dashboard, { replace: true });
       } catch (fallbackError) {
-        console.error('[Navigation] Fallback navigation failed:', fallbackError);
+        errorReporter.report({
+          type: 'error',
+          message: `[Navigation] Fallback navigation failed: ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`,
+          stack: fallbackError instanceof Error ? fallbackError.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         // Last resort: reload page
         window.location.href = paths.home;
       } finally {
@@ -119,11 +138,15 @@ export function useSafeNavigation() {
         ? error 
         : new Error(`Navigation failed: ${path}`);
       
-      console.error('[Navigation] Navigation error:', {
-        path,
-        error: navError,
+      errorReporter.report({
+        type: 'error',
+        message: '[Navigation] Navigation error',
         stack: navError.stack,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { path, error: navError.message }
       });
       
       if (showError) {
@@ -161,7 +184,16 @@ export function useSafeNavigation() {
       showLoading: true,
       showError: true,
       onError: (error) => {
-        console.error(`[Navigation] Failed to navigate to ${label || path}:`, error);
+        errorReporter.report({
+          type: 'error',
+          message: `[Navigation] Failed to navigate to ${label || path}`,
+          stack: error.stack,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { label, path }
+        });
       }
     });
   }, [safeNavigate]);

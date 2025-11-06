@@ -13,6 +13,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSecureABTest } from "@/hooks/useSecureABTest";
 import { useSecureFormSubmission } from "@/hooks/useSecureFormSubmission";
 import { FormErrorFallback } from "@/components/errors/FormErrorFallback";
+import { errorReporter } from "@/lib/errorReporter";
 import { z } from "zod";
 // Client-side validation schema matching server-side
 const leadFormSchema = z.object({
@@ -136,7 +137,16 @@ export const LeadCaptureForm = () => {
         navigate(paths.auth);
       }, 3000);
     } catch (error: any) {
-      console.error("Lead submission error:", error);
+      errorReporter.report({
+        type: 'error',
+        message: `Lead submission error: ${error.message || 'Unknown error'}`,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { formData: { name: formData.name, company: formData.company }, variant }
+      });
       
       // Set error for FormErrorFallback
       setSubmitError(error?.message || 'Something went wrong. Mind trying again?');
@@ -225,7 +235,8 @@ export const LeadCaptureForm = () => {
                 error={submitError} 
                 onRetry={() => {
                   setSubmitError(null);
-                  handleSubmit(new Event('submit') as any);
+                  const syntheticEvent = new Event('submit', { bubbles: true, cancelable: true }) as unknown as React.FormEvent;
+                  handleSubmit(syntheticEvent);
                 }} 
               />
             )}

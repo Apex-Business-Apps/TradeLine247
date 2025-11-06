@@ -9,13 +9,19 @@ export interface RcsOutboundPayload {
   statusCallbackUrl?: string;
 }
 
+interface TwilioModule {
+  default?: (accountSid: string, authToken: string) => any;
+  (accountSid: string, authToken: string): any;
+}
+
 let clientPromise: Promise<any> | undefined;
 
 async function loadClient(): Promise<any> {
   if (clientPromise) return clientPromise;
 
   clientPromise = import('twilio').then((mod) => {
-    const twilio = (mod as any).default ?? (mod as any);
+    const twilioMod = mod as any;
+    const twilio = twilioMod.default ?? twilioMod;
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
 

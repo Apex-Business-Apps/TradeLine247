@@ -97,7 +97,7 @@ export const PageHealthChecker: React.FC = () => {
   };
 
   const getStatusBadge = (status: PageTest['status']) => {
-    const variants = {
+    const variants: Record<PageTest['status'], 'default' | 'destructive' | 'secondary' | 'outline'> = {
       success: 'default',
       error: 'destructive',
       warning: 'secondary',
@@ -105,7 +105,7 @@ export const PageHealthChecker: React.FC = () => {
     };
     
     return (
-      <Badge variant={variants[status] as any}>
+      <Badge variant={variants[status]}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </Badge>
     );

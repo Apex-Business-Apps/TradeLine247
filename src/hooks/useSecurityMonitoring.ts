@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface SecurityDashboardData {
   failed_auth: {
@@ -40,7 +41,14 @@ export const useSecurityMonitoring = () => {
       const { data, error } = await supabase.rpc('get_security_dashboard_data');
       
       if (error) {
-        console.error('Security monitoring error:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Security monitoring error: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         throw error;
       }
       

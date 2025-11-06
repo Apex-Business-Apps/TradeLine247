@@ -52,8 +52,7 @@ function normalizeError(value: unknown): Error {
 class ErrorReporter {
   private errors: ErrorReport[] = [];
   private maxErrors = 50;
-  private reportEndpoint = '/api/errors'; // Could be Supabase function
-
+  
   constructor() {
     if (typeof window !== 'undefined') {
       this.setupGlobalHandlers();
@@ -193,10 +192,28 @@ class ErrorReporter {
     // Only send critical errors to avoid spam
     if (error.type === 'error' || error.type === 'unhandledRejection') {
       try {
-        await fetch(this.reportEndpoint, {
+        // Use proper Supabase edge function endpoint
+        const projectId = 'hysvqdwmhxnblxfqnszn';
+        const endpoint = `https://${projectId}.supabase.co/functions/v1/ops-error-intake`;
+        
+        await fetch(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(error)
+          headers: { 
+            'Content-Type': 'application/json',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo'
+          },
+          body: JSON.stringify({
+            error_id: crypto.randomUUID(),
+            error_type: error.type,
+            payload: {
+              message: error.message,
+              stack: error.stack,
+              url: error.url,
+              metadata: error.metadata
+            },
+            user_agent: error.userAgent,
+            org_id: null
+          })
         });
       } catch (e) {
         // Silent fail - don't want to create error loops

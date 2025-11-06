@@ -11,12 +11,20 @@ import { usePrivacyAnalytics } from '@/hooks/usePrivacyAnalytics';
  * - All external calls wrapped in try/catch; SSR guarded.
  */
 
+interface ImportMetaEnv {
+  readonly VITE_SECURITY_HARDENED?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 const HARDENED =
   (typeof import.meta !== 'undefined' &&
-    (import.meta as any).env &&
-    (import.meta as any).env.VITE_SECURITY_HARDENED === 'true') ||
+    (import.meta as ImportMeta).env &&
+    (import.meta as ImportMeta).env.VITE_SECURITY_HARDENED === 'true') ||
   (typeof process !== 'undefined' &&
-    (process.env as any)?.VITE_SECURITY_HARDENED === 'true');
+    process.env?.VITE_SECURITY_HARDENED === 'true');
 
 const addOrUpdateMeta = (name: string, content: string, isHttpEquiv = false) => {
   if (typeof document === 'undefined') return;

@@ -41,7 +41,7 @@ export const HeroSection = () => {
         
         {/* Main Headline with Staggered Animation */}
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent leading-tight animate-fade-in [animation-delay:200ms]">
-          Your 24/7 A<span className="text-primary">i</span> Receptionist!
+          Your 24/7 Ai Receptionist!
         </h1>
         
         {/* Value Proposition with Delayed Animation */}

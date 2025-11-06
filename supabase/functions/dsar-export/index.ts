@@ -37,7 +37,7 @@ serve(async (req) => {
     const requestId = crypto.randomUUID();
 
     // Validate: admin can export any user, users can export themselves
-    const { data: isAdmin, error: roleError } = await supabaseClient.rpc<boolean>('has_role', {
+    const { data: isAdmin, error: roleError } = await supabaseClient.rpc('has_role', {
       p_user: user.id,
       p_role: 'admin'
     });
@@ -188,7 +188,7 @@ serve(async (req) => {
       }
 
       if (value && typeof value === 'object') {
-        return Object.values(value as Record<string, unknown>).reduce(
+        return Object.values(value as Record<string, unknown>).reduce<number>(
           (sum, nested) => sum + countRecords(nested),
           0
         );

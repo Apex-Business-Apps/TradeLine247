@@ -159,7 +159,7 @@ serve(async (req) => {
       .insert({
         action,
         user_role: 'service_role',
-        from_version: action === 'rotate' ? existingKey.version : null,
+        from_version: action === 'rotate' ? existingKey?.version ?? null : null,
         to_version: newVersion,
         reason: `Key ${action} via init-encryption-key edge function`,
         metadata: {

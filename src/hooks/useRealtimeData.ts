@@ -1,12 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { RealtimeChannel } from '@supabase/supabase-js';
+import { RealtimeChannel, REALTIME_POSTGRES_CHANGES_LISTEN_EVENT } from '@supabase/supabase-js';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface RealtimeOptions {
   table: string;
   schema?: string;
   filter?: string;
   event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
+}
+
+interface RealtimePayload<T = any> {
+  eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+  new: T;
+  old: T;
+}
+
+interface DataWithId {
+  id: string | number;
 }
 
 export function useRealtimeData<T>(
@@ -38,28 +49,30 @@ export function useRealtimeData<T>(
               schema,
               table,
               filter
-            } as any,
-            (payload: any) => {
+            },
+            (payload: RealtimePayload<T>) => {
               console.log('Realtime payload:', payload);
               
               switch (payload.eventType) {
                 case 'INSERT':
-                  setData(prev => [...prev, payload.new as T]);
+                  setData(prev => [...prev, payload.new]);
                   break;
                 case 'UPDATE':
                   setData(prev => 
-                    prev.map(item => 
-                      (item as any).id === (payload.new as any).id 
-                        ? payload.new as T 
-                        : item
-                    )
+                    prev.map(item => {
+                      const itemWithId = item as unknown as DataWithId;
+                      const newWithId = payload.new as unknown as DataWithId;
+                      return itemWithId.id === newWithId.id ? payload.new : item;
+                    })
                   );
                   break;
                 case 'DELETE':
                   setData(prev => 
-                    prev.filter(item => 
-                      (item as any).id !== (payload.old as any).id
-                    )
+                    prev.filter(item => {
+                      const itemWithId = item as unknown as DataWithId;
+                      const oldWithId = payload.old as unknown as DataWithId;
+                      return itemWithId.id !== oldWithId.id;
+                    })
                   );
                   break;
               }
@@ -76,7 +89,15 @@ export function useRealtimeData<T>(
             }
           });
       } catch (err) {
-        console.error('Realtime setup error:', err);
+        errorReporter.report({
+          type: 'error',
+          message: `Realtime setup error: ${err instanceof Error ? err.message : String(err)}`,
+          stack: err instanceof Error ? err.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         setError(err instanceof Error ? err : new Error('Unknown realtime error'));
       }
     };

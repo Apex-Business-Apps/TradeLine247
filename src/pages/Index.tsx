@@ -11,6 +11,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
+import { errorReporter } from "@/lib/errorReporter";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
@@ -23,7 +24,17 @@ const Index = () => {
   useEffect(() => {
     const img = new Image();
     img.src = backgroundImage;
-    img.onerror = () => console.error("Background image failed to load");
+    img.onerror = () => {
+      errorReporter.report({
+        type: 'error',
+        message: 'Background image failed to load',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { imageSrc: backgroundImage }
+      });
+    };
   }, []);
 
   return (
@@ -36,7 +47,7 @@ const Index = () => {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",
-          backgroundColor: "#f8f9fa", // Fallback color if image fails
+          backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
         }}
       >
         {/* Content with translucency - Optimized for performance */}

@@ -137,7 +137,7 @@ function boot() {
       loadingEl.style.display = 'none';
     }
 
-    logger.debug('✅ React mounted successfully');
+    console.log('✅ React mounted successfully');
 
     // Signal to E2E tests that React hydration is complete
     setTimeout(() => {
