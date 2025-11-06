@@ -49,6 +49,12 @@ FOR ALL
 TO anon
 USING (false);
 
+CREATE POLICY "Block anonymous access to encryption_keys"
+ON public.encryption_keys
+FOR ALL
+TO anon
+USING (false);
+
 -- Update leads RLS policies for granular access control
 -- Drop existing broad policy
 DROP POLICY IF EXISTS "Users can view leads in their dealerships" ON public.leads;

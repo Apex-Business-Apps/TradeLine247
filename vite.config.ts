@@ -75,4 +75,52 @@ export default defineConfig(({ mode }) => ({
     },
     dedupe: ['react', 'react-dom'],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Vendor splitting strategy for better caching and performance
+          if (id.includes('node_modules')) {
+            // React core (changes infrequently, cache-friendly)
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'react-vendor';
+            }
+
+            // UI library (Radix UI - changes infrequently)
+            if (id.includes('@radix-ui')) {
+              return 'ui-vendor';
+            }
+
+            // Chart library (heavy, used only in specific pages)
+            if (id.includes('recharts')) {
+              return 'chart-vendor';
+            }
+
+            // PDF generation (very heavy, lazy load candidates)
+            if (id.includes('jspdf') || id.includes('html2canvas')) {
+              return 'pdf-vendor';
+            }
+
+            // Supabase client (changes with backend updates)
+            if (id.includes('@supabase')) {
+              return 'supabase-vendor';
+            }
+
+            // i18n (used app-wide but can be separate)
+            if (id.includes('i18next')) {
+              return 'i18n-vendor';
+            }
+
+            // TanStack Query (state management, changes infrequently)
+            if (id.includes('@tanstack')) {
+              return 'query-vendor';
+            }
+
+            // Other vendor code (catch-all)
+            return 'vendor';
+          }
+        }
+      }
+    }
+  },
 }));

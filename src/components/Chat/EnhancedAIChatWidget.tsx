@@ -37,14 +37,14 @@ export function EnhancedAIChatWidget({ dealershipName, leadId }: EnhancedAIChatW
       const welcomeMessage = locale === 'fr'
         ? `Bonjour! Je suis AutoRepAi, l'assistant de ${dealershipName || 'notre concessionnaire'}. Comment puis-je vous aider aujourd'hui?`
         : `Hi! I'm AutoRepAi, ${dealershipName || 'your dealership'}'s assistant. How can I help you today?`;
-      
+
       setMessages([{
         role: 'assistant',
         content: welcomeMessage,
         timestamp: new Date()
       }]);
     }
-  }, [isOpen, dealershipName, locale]);
+  }, [isOpen, dealershipName, locale, messages.length]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {

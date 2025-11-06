@@ -27,7 +27,7 @@ export function AIChatWidget() {
         content: "Hi! I'm AutoRepAi, your dealership assistant. How can I help you today?"
       }]);
     }
-  }, [isOpen]);
+  }, [isOpen, messages.length]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

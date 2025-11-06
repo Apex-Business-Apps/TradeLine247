@@ -20,7 +20,6 @@ import {
   type QuoteCalculation,
   type FinanceCalculation,
 } from '@/lib/taxCalculator';
-import { downloadQuotePDF } from './QuotePDFGenerator';
 import { FileDown, Languages } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -338,8 +337,14 @@ export function QuoteCalculator() {
                       quote,
                       finance,
                     };
-                    downloadQuotePDF(pdfData, pdfLanguage);
-                    toast.success(`PDF downloaded in ${pdfLanguage === 'en' ? 'English' : 'French'}`);
+                    // Lazy load PDF generator (543 kB) only when user clicks download
+                    import('./QuotePDFGenerator').then(({ downloadQuotePDF }) => {
+                      downloadQuotePDF(pdfData, pdfLanguage);
+                      toast.success(`PDF downloaded in ${pdfLanguage === 'en' ? 'English' : 'French'}`);
+                    }).catch((error) => {
+                      console.error('Failed to load PDF generator:', error);
+                      toast.error('Failed to generate PDF. Please try again.');
+                    });
                   }}
                 >
                   <FileDown className="h-4 w-4 mr-2" />
