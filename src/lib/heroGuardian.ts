@@ -5,6 +5,16 @@
  * All validations are informational only - no errors that could block the app.
  */
 
+interface PerformanceEntryExtended extends PerformanceEntry {
+  renderTime?: number;
+  loadTime?: number;
+  value?: number;
+}
+
+interface WindowWithHeroMetrics extends Window {
+  __heroMetrics?: HeroMetrics[];
+}
+
 export interface HeroMetrics {
   lcp: number;
   cls: number;
@@ -70,7 +80,7 @@ export function monitorHeroPerformance(route: string): Promise<HeroMetrics> {
     try {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1] as any;
+        const lastEntry = entries[entries.length - 1] as PerformanceEntryExtended;
         
         if (lastEntry) {
           lcp = lastEntry.renderTime || lastEntry.loadTime || 0;
@@ -79,9 +89,10 @@ export function monitorHeroPerformance(route: string): Promise<HeroMetrics> {
 
       // Monitor CLS  
       const clsObserver = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries() as any[]) {
-          if (entry.value) {
-            cls += entry.value;
+        for (const entry of list.getEntries()) {
+          const extendedEntry = entry as PerformanceEntryExtended;
+          if (extendedEntry.value) {
+            cls += extendedEntry.value;
           }
         }
       });
@@ -135,8 +146,9 @@ export function initHeroGuardian() {
       
       // Store metrics for analysis
       if (typeof window !== 'undefined') {
-        (window as any).__heroMetrics = (window as any).__heroMetrics || [];
-        (window as any).__heroMetrics.push(metrics);
+        const windowWithMetrics = window as WindowWithHeroMetrics;
+        windowWithMetrics.__heroMetrics = windowWithMetrics.__heroMetrics || [];
+        windowWithMetrics.__heroMetrics.push(metrics);
       }
     });
   }, 2000); // 2 second delay to allow full React mount

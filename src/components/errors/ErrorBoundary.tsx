@@ -4,6 +4,10 @@ import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { reportReactError } from '@/lib/errorReporter';
 
+interface WindowWithTracking extends Window {
+  trackError?: (category: string, message: string, metadata?: Record<string, any>) => void;
+}
+
 interface Props {
   children: ReactNode;
 }
@@ -29,8 +33,9 @@ export class AppErrorBoundary extends Component<Props, State> {
     reportReactError(error, errorInfo);
     
     // Track error in analytics
-    if (typeof window !== 'undefined' && (window as any).trackError) {
-      (window as any).trackError('app_error_boundary', error.message, {
+    const windowWithTracking = window as WindowWithTracking;
+    if (typeof window !== 'undefined' && windowWithTracking.trackError) {
+      windowWithTracking.trackError('app_error_boundary', error.message, {
         componentStack: errorInfo.componentStack,
         stack: error.stack
       });

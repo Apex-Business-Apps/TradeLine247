@@ -1,6 +1,14 @@
 import { useEffect } from 'react';
 import { errorReporter } from '@/lib/errorReporter';
 
+interface PerformanceEntryExtended extends PerformanceEntry {
+  renderTime?: number;
+  loadTime?: number;
+  hadRecentInput?: boolean;
+  value?: number;
+  processingStart?: number;
+}
+
 /**
  * Web Vitals Reporter Component
  * 
@@ -76,8 +84,8 @@ export function WebVitalsReporter() {
     try {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1] as any;
-        const value = lastEntry.renderTime || lastEntry.loadTime;
+        const lastEntry = entries[entries.length - 1] as PerformanceEntryExtended;
+        const value = lastEntry.renderTime || lastEntry.loadTime || 0;
         reportMetric('LCP', value, getRating('LCP', value));
       });
       lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
@@ -97,8 +105,9 @@ export function WebVitalsReporter() {
       let clsValue = 0;
       const clsObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          if (!(entry as any).hadRecentInput) {
-            clsValue += (entry as any).value;
+          const extendedEntry = entry as PerformanceEntryExtended;
+          if (!extendedEntry.hadRecentInput && extendedEntry.value) {
+            clsValue += extendedEntry.value;
           }
         }
         reportMetric('CLS', clsValue, getRating('CLS', clsValue));
@@ -119,8 +128,8 @@ export function WebVitalsReporter() {
     try {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const firstInput = entries[0] as any;
-        const value = firstInput.processingStart - firstInput.startTime;
+        const firstInput = entries[0] as PerformanceEntryExtended;
+        const value = (firstInput.processingStart || 0) - firstInput.startTime;
         reportMetric('FID', value, getRating('INP', value)); // Use INP thresholds
       });
       fidObserver.observe({ type: 'first-input', buffered: true });
@@ -139,7 +148,7 @@ export function WebVitalsReporter() {
     try {
       const fcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const firstPaint = entries.find((e) => e.name === 'first-contentful-paint') as any;
+        const firstPaint = entries.find((e) => e.name === 'first-contentful-paint');
         if (firstPaint) {
           const value = firstPaint.startTime;
           reportMetric('FCP', value, getRating('FCP', value));

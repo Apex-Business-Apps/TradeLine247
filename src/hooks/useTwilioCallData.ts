@@ -53,9 +53,26 @@ export const useTwilioCallData = () => {
       // Process and deduplicate calls by call_sid
       const callMap = new Map<string, TwilioCall>();
       
+      interface TwilioEventData {
+        call_sid?: string;
+        from_number?: string;
+        From?: string;
+        to_number?: string;
+        To?: string;
+        call_status?: string;
+        CallStatus?: string;
+        duration?: number;
+        CallDuration?: number;
+        direction?: string;
+        answered_by?: string;
+        AnsweredBy?: string;
+        recording_url?: string;
+        RecordingUrl?: string;
+      }
+
       if (callData) {
         callData.forEach((event) => {
-          const eventData = event.event_data as any;
+          const eventData = event.event_data as TwilioEventData;
           const callSid = eventData.call_sid;
           
           if (callSid) {

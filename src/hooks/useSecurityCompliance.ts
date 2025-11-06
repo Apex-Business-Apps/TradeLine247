@@ -22,11 +22,17 @@ export const useSecurityCompliance = () => {
       const checks: ComplianceCheck[] = [];
 
       // Check RLS on sensitive tables
+      interface SecurityValidationResult {
+        rls_enabled_tables: number;
+        security_definer_functions: number;
+        rls_policies: number;
+      }
+      
       const { data: rlsTables } = await supabase
         .rpc('validate_security_post_upgrade');
       
       if (rlsTables) {
-        const validationData = rlsTables as any; // Type assertion for database response
+        const validationData = rlsTables as SecurityValidationResult;
         checks.push({
           check_name: 'RLS_ENABLED_TABLES',
           status: validationData.rls_enabled_tables > 0 ? 'passed' : 'failed',

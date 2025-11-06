@@ -235,7 +235,8 @@ export const LeadCaptureForm = () => {
                 error={submitError} 
                 onRetry={() => {
                   setSubmitError(null);
-                  handleSubmit(new Event('submit') as any);
+                  const syntheticEvent = new Event('submit', { bubbles: true, cancelable: true }) as unknown as React.FormEvent;
+                  handleSubmit(syntheticEvent);
                 }} 
               />
             )}

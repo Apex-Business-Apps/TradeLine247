@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { RealtimeChannel } from '@supabase/supabase-js';
+import { RealtimeChannel, REALTIME_POSTGRES_CHANGES_LISTEN_EVENT } from '@supabase/supabase-js';
 import { errorReporter } from '@/lib/errorReporter';
 
 interface RealtimeOptions {
@@ -8,6 +8,16 @@ interface RealtimeOptions {
   schema?: string;
   filter?: string;
   event?: 'INSERT' | 'UPDATE' | 'DELETE' | '*';
+}
+
+interface RealtimePayload<T = any> {
+  eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+  new: T;
+  old: T;
+}
+
+interface DataWithId {
+  id: string | number;
 }
 
 export function useRealtimeData<T>(
@@ -33,34 +43,36 @@ export function useRealtimeData<T>(
         channel = supabase
           .channel(`realtime-${table}`)
           .on(
-            'postgres_changes' as any,
+            REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.ALL,
             {
               event,
               schema,
               table,
               filter
-            } as any,
-            (payload: any) => {
+            },
+            (payload: RealtimePayload<T>) => {
               console.log('Realtime payload:', payload);
               
               switch (payload.eventType) {
                 case 'INSERT':
-                  setData(prev => [...prev, payload.new as T]);
+                  setData(prev => [...prev, payload.new]);
                   break;
                 case 'UPDATE':
                   setData(prev => 
-                    prev.map(item => 
-                      (item as any).id === (payload.new as any).id 
-                        ? payload.new as T 
-                        : item
-                    )
+                    prev.map(item => {
+                      const itemWithId = item as unknown as DataWithId;
+                      const newWithId = payload.new as unknown as DataWithId;
+                      return itemWithId.id === newWithId.id ? payload.new : item;
+                    })
                   );
                   break;
                 case 'DELETE':
                   setData(prev => 
-                    prev.filter(item => 
-                      (item as any).id !== (payload.old as any).id
-                    )
+                    prev.filter(item => {
+                      const itemWithId = item as unknown as DataWithId;
+                      const oldWithId = payload.old as unknown as DataWithId;
+                      return itemWithId.id !== oldWithId.id;
+                    })
                   );
                   break;
               }

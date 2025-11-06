@@ -9,8 +9,17 @@ import { SUPABASE_CONFIG } from '@/config/supabase';
 import { errorReporter } from '@/lib/errorReporter';
 
 // Helpers -----------------------------------------------------
+interface ImportMetaEnv {
+  [key: string]: string | undefined;
+}
+
+interface ImportMeta {
+  env: ImportMetaEnv;
+}
+
 function readEnv(name: string): string | undefined {
-  const v = (import.meta as any)?.env?.[name];
+  const meta = import.meta as ImportMeta;
+  const v = meta?.env?.[name];
   return v && v !== 'undefined' && v !== 'null' ? String(v) : undefined;
 }
 

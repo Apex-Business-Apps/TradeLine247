@@ -23,8 +23,8 @@ export function useSafeNavigation() {
    */
   const validateRoute = useCallback((path: string): boolean => {
     // Check if path exists in paths object
-    const validPaths = Object.values(paths);
-    const isValid = validPaths.includes(path as any);
+    const validPaths = Object.values(paths) as string[];
+    const isValid = validPaths.includes(path);
     
     // Also check for dynamic routes (e.g., paths with params)
     if (!isValid) {
