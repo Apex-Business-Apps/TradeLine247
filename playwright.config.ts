@@ -16,9 +16,9 @@ const baseUse: Parameters<typeof defineConfig>[0]['use'] = {
   viewport: { width: 1366, height: 900 },
   // Disable animations for stable element detection
   reducedMotion: 'reduce',
-  // Longer timeout for CI environment
-  actionTimeout: 30000,
-  navigationTimeout: 30000,
+  // Extended timeout for CI environment + React hydration signal
+  actionTimeout: 45000,
+  navigationTimeout: 45000,
 };
 
 export default defineConfig({

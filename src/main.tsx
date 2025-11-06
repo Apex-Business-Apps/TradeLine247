@@ -132,18 +132,23 @@ function boot() {
         React.createElement(App)
       )
     );
-    
+
     // Ensure root is visible (CSS might hide it initially)
     root!.style.opacity = '1';
     root!.style.visibility = 'visible';
-    
+
     // Hide loading fallback immediately
     const loadingEl = document.getElementById('root-loading');
     if (loadingEl) {
       loadingEl.style.display = 'none';
     }
-    
+
     logger.debug('✅ React mounted successfully');
+
+    // Signal to E2E tests that React hydration is complete
+    setTimeout(() => {
+      (window as any).__REACT_READY__ = true;
+    }, 0);
     
     // Run SW cleanup hotfix (one-time, auto-expires after 7 days)
     runSwCleanup().catch(err => console.warn('[SW Cleanup] Failed:', err));

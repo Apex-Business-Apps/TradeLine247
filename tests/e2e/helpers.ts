@@ -1,18 +1,18 @@
 import { Page, expect } from '@playwright/test';
 
 /**
- * Wait for React hydration to complete.
- * Ensures the header and critical UI elements are mounted before tests proceed.
+ * Wait for React hydration to complete using explicit signal.
+ * This is the most reliable method - main.tsx sets window.__REACT_READY__ after mount.
  */
-export async function waitForReactHydration(page: Page, timeout = 30000): Promise<void> {
-  // Wait for the app header to be present and visible (key indicator React has hydrated)
-  await expect(page.locator('#app-header')).toBeVisible({ timeout });
+export async function waitForReactHydration(page: Page, timeout = 45000): Promise<void> {
+  // Wait for explicit React ready signal from main.tsx
+  await page.waitForFunction(() => (window as any).__REACT_READY__ === true, { timeout });
 
-  // Wait for DOM to be fully loaded
-  await page.waitForLoadState('domcontentloaded');
+  // Additional safety: wait for app header to be visible
+  await expect(page.locator('#app-header')).toBeVisible({ timeout: 10000 });
 
   // Small buffer for any final React effects
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(200);
 }
 
 /**
