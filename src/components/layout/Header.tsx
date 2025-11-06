@@ -213,7 +213,7 @@ export const Header: React.FC = () => {
                       {userRole && (
                         <span className={cn(
                           "text-xs font-medium leading-tight",
-                          isUserAdmin ? "text-red-600 dark:text-red-400" : "text-blue-600 dark:text-blue-400"
+                          isUserAdmin ? "text-primary" : "text-muted-foreground"
                         )}>
                           {userRole.toUpperCase()}
                         </span>
@@ -251,7 +251,7 @@ export const Header: React.FC = () => {
                   )}
                   <DropdownMenuItem 
                     onClick={() => signOut()}
-                    className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400"
+                    className="cursor-pointer text-primary focus:text-primary focus:bg-primary/10 dark:focus:bg-primary/20"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
@@ -272,7 +272,7 @@ export const Header: React.FC = () => {
             </div>
           ) : (
             <Button 
-              variant="success" 
+              variant="default" 
               size={isScrolled ? 'sm' : 'default'} 
               onClick={() => handleNavigation(paths.auth, 'Login')}
               className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
