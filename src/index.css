@@ -126,8 +126,8 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: var(--brand-orange-dark); /* WCAG AA: Use dark orange for buttons (6.4:1 contrast with white) */
-    --primary-foreground: 0 0% 100%; /* WCAG AA: white text on primary surfaces for maximum contrast */
+    --primary: var(--brand-orange-primary); /* Vibrant brand orange for visual impact */
+    --primary-foreground: 0 0% 100%; /* White text on primary surfaces */
 
     --secondary: 30 100% 96%;
     --secondary-foreground: var(--brand-orange-dark);
@@ -190,8 +190,8 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: var(--brand-orange-dark); /* WCAG AA: Use dark orange for buttons (6.4:1 contrast with white) */
-    --primary-foreground: 0 0% 100%; /* WCAG AA: white text on primary surfaces for maximum contrast */
+    --primary: var(--brand-orange-primary); /* Vibrant brand orange */
+    --primary-foreground: 0 0% 100%; /* White text on primary surfaces */
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: var(--brand-orange-light);
@@ -300,172 +300,22 @@ body.session-warning::before {
 }
 
 /* ============================================================================
- * CRITICAL LIGHTHOUSE FIX: WCAG AA Color Contrast Compliance (4.5:1 minimum)
+ * WCAG AA Color Contrast - Targeted Fixes Only
  * ============================================================================
- * This section ensures ALL text meets WCAG AA contrast requirements.
- * Strategy: Apply dark colors BY DEFAULT, then override for dark mode.
- * This ensures maximum compatibility and catches all edge cases.
- * Target: Achieve 5.2:1 contrast ratio (exceeds 4.5:1 minimum requirement)
+ * Apply contrast fixes ONLY where needed, preserving brand colors
  * ============================================================================ */
 
-/* DEFAULT (LIGHT MODE): Apply dark colors to all low-contrast text classes */
-/* This is the default state - no dark class needed */
-.text-slate-400,
-.text-slate-500,
-.text-slate-600,
-.text-gray-400,
-.text-gray-500,
-.text-gray-600,
-.text-slate-300,
-.text-slate-200,
-.text-gray-300,
-.text-gray-200,
-.text-zinc-300,
-.text-muted-foreground,
-[class*="text-muted"] {
-  color: hsl(215.4 16.3% 30%) !important; /* 5.2:1 contrast on white - WCAG AA compliant */
+/* Fix muted text for better readability in light mode */
+.text-muted-foreground {
+  color: hsl(215.4 16.3% 46%) !important; /* Readable while less aggressive */
 }
 
-/* CRITICAL: Fix opacity-based text colors that reduce contrast */
-/* Opacity variants reduce effective contrast ratio - use solid dark colors instead */
-/* Match both escaped and unescaped slash variants */
-.text-foreground\/80,
-.text-foreground\/70,
-.text-foreground\/60,
-.text-primary\/80,
-.text-primary\/70,
-.text-primary\/60,
-.text-primary\/90,
-.text-muted-foreground\/80,
-.text-muted-foreground\/70,
-[class*="text-foreground/"][class*="80"],
-[class*="text-foreground/"][class*="70"],
-[class*="text-primary/"][class*="80"],
-[class*="text-primary/"][class*="70"],
-[class*="text-primary/"][class*="90"] {
-  color: hsl(215.4 16.3% 30%) !important; /* 5.2:1 contrast - solid color, no opacity */
-  opacity: 1 !important; /* Remove opacity to maintain contrast */
+/* Dark mode: lighter muted text for readability */
+html.dark .text-muted-foreground {
+  color: hsl(215 20.2% 65.1%) !important;
 }
 
-/* Fix text on colored backgrounds - ensure minimum contrast */
-.bg-gradient-orange-subtle .text-primary,
-.bg-gradient-orange-subtle .text-foreground,
-.bg-gradient-orange-subtle .text-foreground\/80,
-.bg-gradient-orange-subtle .text-foreground\/70,
-.bg-white\/90 .text-primary,
-.bg-white\/90 .text-primary\/80,
-.bg-white\/90 .text-primary\/70 {
-  color: hsl(215.4 16.3% 30%) !important; /* Dark color for contrast on light backgrounds */
-  opacity: 1 !important;
-}
-
-/* Dark mode override: Use lighter colors for readability on dark backgrounds */
-html.dark .text-slate-400,
-html.dark .text-slate-500,
-html.dark .text-slate-600,
-html.dark .text-gray-400,
-html.dark .text-gray-500,
-html.dark .text-gray-600,
-html.dark .text-slate-300,
-html.dark .text-slate-200,
-html.dark .text-gray-300,
-html.dark .text-gray-200,
-html.dark .text-zinc-300,
-html.dark .text-muted-foreground,
-html.dark [class*="text-muted"] {
-  color: hsl(215 20.2% 65.1%) !important; /* Readable on dark backgrounds */
-}
-
-@layer utilities {
-  /* Additional layer for maximum coverage */
-  html:not(.dark) .text-slate-400,
-  html:not(.dark) .text-slate-500,
-  html:not(.dark) .text-slate-600,
-  html:not(.dark) .text-gray-400,
-  html:not(.dark) .text-gray-500,
-  html:not(.dark) .text-gray-600 {
-    color: hsl(215.4 16.3% 30%) !important; /* 5.2:1 contrast on white - WCAG AA compliant */
-  }
-}
-
-@layer utilities {
-  /* Brand orange text variants: force higher contrast in light mode */
-  html:not(.dark) .text-primary\/90,
-  html:not(.dark) .text-primary\/80,
-  html:not(.dark) .text-primary\/70,
-  body:not(.dark) .text-primary\/90,
-  body:not(.dark) .text-primary\/80,
-  body:not(.dark) .text-primary\/70,
-  :not(.dark) .text-primary\/90,
-  :not(.dark) .text-primary\/80,
-  :not(.dark) .text-primary\/70 {
-    color: hsl(var(--brand-orange-dark)) !important; /* 6.7:1 contrast on white */
-  }
-}
-
-@layer utilities {
-  /* CRITICAL: Fix green text colors for WCAG AA compliance */
-  /* text-green-500/600 have insufficient contrast (3.29:1) - need 4.5:1 minimum */
-  /* Replace with green-700 which has 4.5:1+ contrast ratio on white */
-  html:not(.dark) .text-green-500,
-  html:not(.dark) .text-green-600,
-  body:not(.dark) .text-green-500,
-  body:not(.dark) .text-green-600,
-  :not(.dark) .text-green-500,
-  :not(.dark) .text-green-600 {
-    color: hsl(142.1 76.2% 36.3%) !important; /* green-700: 4.5:1 contrast on white */
-  }
-}
-
-/* Dark mode: Keep lighter green for readability on dark backgrounds */
-.dark .text-green-500,
-.dark .text-green-600 {
-  color: hsl(142.1 70.6% 45.3%) !important; /* green-500 equivalent for dark mode */
-}
-
-@layer utilities {
-  /* Fix yellow text colors - yellow-600 has ~3.9:1 contrast (needs 4.5:1) */
-  html:not(.dark) .text-yellow-500,
-  html:not(.dark) .text-yellow-600,
-  body:not(.dark) .text-yellow-500,
-  body:not(.dark) .text-yellow-600,
-  :not(.dark) .text-yellow-500,
-  :not(.dark) .text-yellow-600 {
-    color: hsl(45.4 93.4% 47.5%) !important; /* yellow-700: 4.5:1+ contrast on white */
-  }
-}
-
-.dark .text-yellow-500,
-.dark .text-yellow-600 {
-  color: hsl(43.3 96.4% 56.3%) !important; /* yellow-500 equivalent for dark mode */
-}
-
-@layer utilities {
-  /* Ensure blue/orange/red-600 meet WCAG AA (they're close, use 700 for safety) */
-  html:not(.dark) .text-blue-600,
-  body:not(.dark) .text-blue-600,
-  :not(.dark) .text-blue-600 {
-    color: hsl(217.2 91.2% 59.8%) !important; /* blue-700: 5.2:1 contrast on white */
-  }
-
-  html:not(.dark) .text-orange-600,
-  body:not(.dark) .text-orange-600,
-  :not(.dark) .text-orange-600 {
-    color: hsl(24.6 95% 53.1%) !important; /* orange-700: 4.8:1 contrast on white */
-  }
-
-  html:not(.dark) .text-red-600,
-  body:not(.dark) .text-red-600,
-  :not(.dark) .text-red-600 {
-    color: hsl(0 72.2% 50.6%) !important; /* red-700: 4.8:1 contrast on white */
-  }
-}
-
-.dark .text-blue-600,
-.dark .text-orange-600,
-.dark .text-red-600 {
-  /* Keep original colors in dark mode for readability */
-}
+/* Green/yellow/blue color fixes removed - use design system tokens instead */
 
 /* CRITICAL: Fix placeholder text contrast - placeholders default to gray-400 (2.4:1) */
 :root:not(.dark) input::placeholder,
@@ -482,34 +332,11 @@ html:not(.dark) textarea::placeholder {
   opacity: 0.7 !important;
 }
 
-/* Additional overrides for text-muted-foreground - already covered above but kept for redundancy */
-
 /* Enhanced focus states for better accessibility */
-a.text-muted-foreground:focus-visible,
-button.text-muted-foreground:focus-visible {
-  color: hsl(215.4 16.3% 30%) !important; /* Darker on focus for 5.5:1 contrast */
+a:focus-visible,
+button:focus-visible {
   outline: 3px solid currentColor;
   outline-offset: 2px;
-}
-
-/* Dark mode: Preserve lighter colors for readability on dark backgrounds */
-.dark .text-slate-400,
-.dark .text-slate-500,
-.dark .text-slate-600 {
-  color: hsl(215 20.2% 65.1%) !important; /* slate-300 equivalent */
-}
-
-.dark .text-gray-400,
-.dark .text-gray-500,
-.dark .text-gray-600 {
-  color: hsl(215 20.2% 65.1%) !important;
-}
-
-/* Preserve warm accenting in dark mode while maintaining contrast */
-.dark .text-primary\/90,
-.dark .text-primary\/80,
-.dark .text-primary\/70 {
-  color: hsl(var(--brand-orange-light)) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
