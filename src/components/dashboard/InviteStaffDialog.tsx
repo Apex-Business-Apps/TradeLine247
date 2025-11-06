@@ -20,6 +20,7 @@ import {
 import { Loader2, Mail, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface InviteStaffDialogProps {
   open: boolean;
@@ -85,7 +86,16 @@ export const InviteStaffDialog: React.FC<InviteStaffDialogProps> = ({
       setName('');
       onOpenChange(false);
     } catch (error: any) {
-      console.error('Error inviting staff:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Error inviting staff: ${error.message || 'Unknown error'}`,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { email, role, error }
+      });
       toast.error('Failed to send invitation', {
         description: error.message || 'Please try again later',
       });

@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ChatIcon } from './ChatIcon';
 import { cn } from '@/lib/utils';
 import { debounce, prefersReducedMotion, batchUpdates } from '@/lib/performanceOptimizations';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface Message {
   id: string;
@@ -99,7 +100,15 @@ export const MiniChat: React.FC = () => {
       console.log('Chat function invoked');
 
       if (functionError) {
-        console.error('Chat API error:', functionError);
+        errorReporter.report({
+          type: 'error',
+          message: `Chat API error: ${functionError.message || 'Unknown error'}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { functionError, messageCount: messages.length }
+        });
         throw new Error(functionError.message || 'Chat function error');
       }
 
@@ -111,7 +120,16 @@ export const MiniChat: React.FC = () => {
       console.log('Chat request completed successfully');
 
     } catch (error: any) {
-      console.error('Chat error:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Chat error: ${error.message || 'Unknown error'}`,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { error, messageCount: messages.length }
+      });
       
       let errorMessage = 'Sorry, I encountered an error. Please try again.';
       

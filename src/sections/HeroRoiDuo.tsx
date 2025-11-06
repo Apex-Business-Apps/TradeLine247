@@ -58,7 +58,7 @@ export default function HeroRoiDuo() {
           </div>
           
           <h1 id="hero-h1" className="mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent font-extrabold" style={{ fontSize: 'clamp(2rem, 5vw + 1rem, 4.5rem)', lineHeight: '1.1' }} data-lovable-lock="structure-only">
-            Your 24/7 A<span className="text-primary">i</span> Receptionist!
+            Your 24/7 Ai Receptionist!
           </h1>
           <p className="mb-8 max-w-3xl mx-auto font-semibold text-foreground/80" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5' }} data-lovable-lock="structure-only">
             Never miss a call. Work while you sleep.

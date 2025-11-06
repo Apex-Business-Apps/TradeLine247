@@ -12,7 +12,7 @@ export const PricingHero = () => {
           </div>
           
           <h1 id="hero-h1" className="text-4xl md:text-6xl mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent font-extrabold lg:text-7xl">
-            Your 24/7 A<span className="text-primary">i</span> Receptionist!
+            Your 24/7 Ai Receptionist!
           </h1>
           <p className="text-xl mb-8 max-w-3xl mx-auto font-semibold text-foreground/90 md:text-4xl">
             Never miss a call. Work while you sleep.

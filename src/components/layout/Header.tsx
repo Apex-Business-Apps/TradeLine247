@@ -8,6 +8,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { errorReporter } from '@/lib/errorReporter';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,7 +49,16 @@ export const Header: React.FC = () => {
     try {
       await goToWithFeedback(href, label);
     } catch (error) {
-      console.error(`[Header] Navigation failed for ${label}:`, error);
+      errorReporter.report({
+        type: 'error',
+        message: `Header navigation failed: ${label} to ${href}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { label, href, error }
+      });
     }
   }, [goToWithFeedback]);
 
