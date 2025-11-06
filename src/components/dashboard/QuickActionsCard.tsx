@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useInRouterContext } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Phone, UserPlus, PhoneCall, Link as LinkIcon, Loader2 } from 'lucide-react';
 import { paths } from '@/routes/paths';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 
 const actions = [
   {
@@ -42,26 +40,28 @@ const actions = [
 export const QuickActionsCard: React.FC = () => {
   const { goToWithFeedback, isNavigating } = useSafeNavigation();
   const [clickedAction, setClickedAction] = useState<string | null>(null);
-  const isInRouter = useInRouterContext();
 
   const handleActionClick = async (action: typeof actions[0]) => {
     try {
       setClickedAction(action.label);
       
       // Log action click for debugging
-      logger.debug('[QuickActions] Action clicked', {
-        label: action.label,
-        path: action.to,
-        timestamp: new Date().toISOString()
-      });
+      if (import.meta.env.DEV) {
+        console.log('[QuickActions] Action clicked:', {
+          label: action.label,
+          path: action.to,
+          timestamp: new Date().toISOString()
+        });
+      }
 
       // Navigate with error handling
       await goToWithFeedback(action.to, action.label);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('[QuickActions] Navigation failed', error instanceof Error ? error : new Error(errorMessage), {
+      console.error('[QuickActions] Navigation failed:', {
         action: action.label,
-        path: action.to
+        path: action.to,
+        error: errorMessage
       });
       
       toast.error('Action Failed', {
@@ -75,71 +75,35 @@ export const QuickActionsCard: React.FC = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Quick Actions</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2 sm:space-y-2">
+      <CardContent className="space-y-2">
         {actions.map((action) => {
           const Icon = action.icon;
           const isActionLoading = isNavigating && clickedAction === action.label;
-          const testId = `quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`;
-          const className = `w-full justify-start gap-2 relative ${
-            isNavigating ? 'pointer-events-none opacity-70' : ''
-          }`;
-
+          
           return (
             <Button
               key={action.label}
               variant={action.variant}
-              asChild={isInRouter}
-              className={className}
-              title={action.description}
-              onClick={
-                isInRouter
-                  ? undefined
-                  : () => {
-                      void handleActionClick(action);
-                    }
-              }
-              disabled={!isInRouter && isNavigating}
+              onClick={() => handleActionClick(action)}
+              disabled={isNavigating}
+              className="w-full justify-start gap-2 relative"
               aria-label={`${action.label}: ${action.description}`}
-              data-testid={testId}
+              title={action.description}
+              data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
               data-qa-action={action.label}
             >
-              {isInRouter ? (
-                <Link
-                  to={action.to}
-                  role="button"
-                  onClick={(event) => {
-                    if (isNavigating) {
-                      event.preventDefault();
-                      return;
-                    }
-                    setClickedAction(action.label);
-                  }}
-                  aria-label={`${action.label}: ${action.description}`}
-                  aria-disabled={isNavigating}
-                  data-testid={testId}
-                  data-qa-action={action.label}
-                >
-                  {isActionLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Icon className="h-4 w-4" />
-                  )}
-                  <span>{action.label}</span>
-                </Link>
+              {isActionLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <>
-                  {isActionLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Icon className="h-4 w-4" />
-                  )}
-                  <span>{action.label}</span>
-                </>
+              <Icon className="h-4 w-4" />
               )}
+              <span className={isActionLoading ? 'opacity-70' : ''}>
+              {action.label}
+              </span>
             </Button>
           );
         })}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,15 +9,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Phone, MessageSquare, RefreshCw, DollarSign, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
-import { flags } from "@/config/flags";
 
 export default function ClientNumberOnboarding() {
   const navigate = useNavigate();
-  const { user, userRole } = useAuth();
   const [loading, setLoading] = useState(false);
   const [evidence, setEvidence] = useState<string[]>([]);
-  const [profile, setProfile] = useState<{ tenant_id: string | null; role: string | null } | null>(null);
   
   const [formData, setFormData] = useState({
     tenant_id: "",
@@ -28,35 +24,6 @@ export default function ClientNumberOnboarding() {
     want_sms: false,
     fallback_e164: ""
   });
-
-  // Load tenant_id from profile on mount
-  useEffect(() => {
-    const loadProfile = async () => {
-      if (!user) return;
-      
-      try {
-        // Get user's organization from organization_members table
-        const { data, error } = await supabase
-          .from('organization_members')
-          .select('org_id')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (error) {
-          console.log("No organization found for user:", error);
-        }
-        
-        const tenantId = data?.org_id || null;
-        setProfile({ tenant_id: tenantId, role: userRole });
-        setFormData(prev => ({ ...prev, tenant_id: tenantId || "" }));
-      } catch (error: any) {
-        console.error("Failed to load profile:", error);
-        toast.error("Failed to load tenant information");
-      }
-    };
-    
-    loadProfile();
-  }, [user, userRole]);
 
   const addEvidence = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -143,18 +110,14 @@ export default function ClientNumberOnboarding() {
         ? normalizedFallback.slice(-10, -7)
         : undefined;
 
-      // DO NOT send tenant_id in body - server derives it from JWT
       const { data, error } = await supabase.functions.invoke(
-        "telephony-provision",
+        "telephony-onboard",
         {
           body: {
+            org_id: formData.tenant_id,
             business_name: formData.business_name,
-            legal_address: formData.legal_address,
-            contact_email: formData.contact_email,
             area_code: areaCode,
             country: "CA",
-            fallback_e164: formData.fallback_e164,
-            existing_numbers: formData.existing_numbers,
           },
         }
       );
@@ -471,16 +434,28 @@ export default function ClientNumberOnboarding() {
         ? formData.existing_numbers.split(",")[0].trim()
         : formData.fallback_e164;
       
-      addEvidence(`Setting up Trust Hub for ${phoneNumber}...`);
-      
-      // Server derives tenant_id from JWT, no need to send it
-      const { data, error } = await supabase.functions.invoke(
-        "trust-setup",
+      // Get subaccount SID
+      const { data: subaccountData } = await supabase.functions.invoke(
+        "ops-twilio-ensure-subaccount",
         {
           body: {
+            tenant_id: formData.tenant_id,
+            business_name: formData.business_name
+          }
+        }
+      );
+
+      addEvidence(`Setting up Trust Hub for ${phoneNumber}...`);
+      
+      const { data, error } = await supabase.functions.invoke(
+        "ops-twilio-trust-setup",
+        {
+          body: {
+            tenant_id: formData.tenant_id,
             business_name: formData.business_name,
             legal_address: formData.legal_address,
             phone_number: phoneNumber,
+            subaccount_sid: subaccountData.subaccount_sid,
             country_code: 'US',
             contact_email: formData.contact_email
           }
@@ -552,12 +527,13 @@ export default function ClientNumberOnboarding() {
       
       addEvidence(`Mapping ${phoneNumber} to tenant for usage tracking...`);
       
-      // Server derives tenant_id from JWT
       const { data, error } = await supabase.functions.invoke(
-        "billing-map",
+        "ops-map-number-to-tenant",
         {
           body: {
+            tenant_id: formData.tenant_id,
             phone_number: phoneNumber,
+            twilio_number_sid: `PN${Date.now()}`, // This should be from actual provisioning
             number_type: 'both' // Supports voice and SMS
           }
         }
@@ -611,15 +587,10 @@ export default function ClientNumberOnboarding() {
               <Label htmlFor="tenant_id">Tenant ID *</Label>
               <Input
                 id="tenant_id"
-                placeholder="Loading..."
+                placeholder="internal-client-id"
                 value={formData.tenant_id}
-                disabled
-                readOnly
-                className="bg-muted cursor-not-allowed"
+                onChange={(e) => setFormData({ ...formData, tenant_id: e.target.value })}
               />
-              <p className="text-xs text-muted-foreground">
-                Automatically derived from your account
-              </p>
             </div>
 
             <div className="space-y-2">
@@ -745,44 +716,40 @@ export default function ClientNumberOnboarding() {
             </div>
           </div>
 
-          {/* Trust & Reputation Setup - Admin Only */}
-          {flags.conversionV1 && profile?.role === 'admin' && (
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-2">Trust & Reputation Setup</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Configure Trust Hub, A2P 10DLC, STIR/SHAKEN, and CNAM caller ID (can run in parallel with onboarding tracks)
-              </p>
-              <Button
-                onClick={handleTrustSetup}
-                disabled={loading || !formData.tenant_id || !formData.business_name}
-                variant="secondary"
-                className="w-full md:w-auto"
-              >
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Setup Trust & Reputation
-              </Button>
-            </div>
-          )}
+          {/* Trust & Reputation Setup */}
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold mb-2">Trust & Reputation Setup</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Configure Trust Hub, A2P 10DLC, STIR/SHAKEN, and CNAM caller ID (can run in parallel with onboarding tracks)
+            </p>
+            <Button
+              onClick={handleTrustSetup}
+              disabled={loading || !formData.tenant_id || !formData.business_name}
+              variant="secondary"
+              className="w-full md:w-auto"
+            >
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Setup Trust & Reputation
+            </Button>
+          </div>
 
-          {/* Billing Mapping - Admin Only */}
-          {flags.conversionV1 && profile?.role === 'admin' && (
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold mb-2">Billing & Usage Mapping</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Map phone numbers to tenant for usage tracking and billing (initialize usage counters for voice minutes and SMS counts)
-              </p>
-              <Button
-                onClick={handleMapNumberToTenant}
-                disabled={loading || !formData.tenant_id || (!formData.existing_numbers && !formData.fallback_e164)}
-                variant="secondary"
-                className="w-full md:w-auto"
-              >
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                <DollarSign className="mr-2 h-4 w-4" />
-                Map Number for Billing
-              </Button>
-            </div>
-          )}
+          {/* Billing Mapping */}
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-semibold mb-2">Billing & Usage Mapping</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Map phone numbers to tenant for usage tracking and billing (initialize usage counters for voice minutes and SMS counts)
+            </p>
+            <Button
+              onClick={handleMapNumberToTenant}
+              disabled={loading || !formData.tenant_id || (!formData.existing_numbers && !formData.fallback_e164)}
+              variant="secondary"
+              className="w-full md:w-auto"
+            >
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              <DollarSign className="mr-2 h-4 w-4" />
+              Map Number for Billing
+            </Button>
+          </div>
 
           {/* Evidence Panel */}
           {evidence.length > 0 && (

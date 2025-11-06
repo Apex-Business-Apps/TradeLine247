@@ -91,8 +91,8 @@ export const NewDashboard = () => {
         {/* Welcome Header */}
         <WelcomeHeader />
 
-        {/* KPI Cards - Responsive: 2 cols mobile, 2 cols tablet, 4 cols desktop */}
-        <div className={`grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 ${gridGapClass}`}>
+        {/* KPI Cards */}
+        <div className={`grid grid-cols-2 md:grid-cols-4 ${gridGapClass}`}>
         {isLoading ? (
           // Loading skeletons
           Array.from({ length: 4 }).map((_, i) => (
@@ -146,9 +146,8 @@ export const NewDashboard = () => {
         )}
         </div>
 
-        {/* Main Content Grid - Responsive: 1 col mobile, 2 cols tablet, 3 cols desktop */}
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${gridGapClass}`}>
-          <div className={`md:col-span-2 lg:col-span-2 ${spacingClass}`}>
+        <div className={`grid grid-cols-1 lg:grid-cols-3 ${gridGapClass}`}>
+          <div className={`lg:col-span-2 ${spacingClass}`}>
             <NextActionsSection nextItems={nextItems} isLoading={isLoading} />
 
             {showRecentActivity && (

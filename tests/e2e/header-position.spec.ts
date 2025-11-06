@@ -22,15 +22,12 @@ test.describe('Header Position', () => {
 
       const boundingBox = await headerLeft.boundingBox();
       expect(boundingBox).not.toBeNull();
-
+      
       if (boundingBox) {
         // Header should be positioned near left edge (within container padding)
-        // At mobile (360px): px-3 = 12px
-        // At tablet (768px): sm:px-4 = 16px
-        // At desktop (1024px): lg:px-6 = 24px
-        // Allow 32px max to accommodate all viewports
-        expect(boundingBox.x).toBeLessThanOrEqual(32);
+        expect(boundingBox.x).toBeLessThanOrEqual(32); // Allow for container padding
       }
     });
   }
 });
+

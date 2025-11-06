@@ -1,38 +1,38 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { BarChart3, Download, MessageSquare, Plug2 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { paths } from "@/routes/paths";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Settings, Download, MessageSquare, BarChart3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 
 const actions = [
   {
-    title: "View Calls",
-    description: "Review inbound and outbound activity",
+    title: 'Configure AI',
+    description: 'Customize your AI receptionist settings',
+    icon: Settings,
+    to: paths.dashboard,
+    variant: 'default' as const,
+  },
+  {
+    title: 'View Calls',
+    description: 'Review inbound and outbound activity',
     icon: BarChart3,
     to: paths.calls,
-    variant: "secondary" as const,
+    variant: 'secondary' as const,
   },
   {
-    title: "Add Number",
-    description: "Buy or provision new phone numbers",
+    title: 'Add Number',
+    description: 'Buy or provision new phone numbers',
     icon: Download,
     to: paths.addNumber,
-    variant: "outline" as const,
+    variant: 'outline' as const,
   },
   {
-    title: "Invite Staff",
-    description: "Grant access to teammates and partners",
+    title: 'Invite Staff',
+    description: 'Grant access to teammates and partners',
     icon: MessageSquare,
     to: paths.teamInvite,
-    variant: "outline" as const,
-  },
-  {
-    title: "Integrations",
-    description: "Connect TradeLine 24/7 with your tools",
-    icon: Plug2,
-    to: paths.integrations,
-    variant: "outline" as const,
+    variant: 'outline' as const,
   },
 ];
 
@@ -41,12 +41,12 @@ export const QuickActions: React.FC = () => {
     <Card
       className="relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm"
       style={{
-        boxShadow: "var(--premium-shadow-subtle)",
-        background:
-          "linear-gradient(135deg, hsl(var(--card) / 0.8) 0%, hsl(var(--card) / 0.6) 100%)",
-        border: "1px solid hsl(var(--premium-border))",
+        boxShadow: 'var(--premium-shadow-subtle)',
+        background: 'linear-gradient(135deg, hsl(var(--card) / 0.8) 0%, hsl(var(--card) / 0.6) 100%)',
+        border: '1px solid hsl(var(--premium-border))',
       }}
     >
+      {/* Premium Glass Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
 
       <CardHeader className="relative z-10 pb-4">
@@ -65,8 +65,6 @@ export const QuickActions: React.FC = () => {
           >
             <Link
               to={action.to}
-              role="button"
-              aria-label={action.title}
               className="group block w-full rounded-2xl bg-gradient-to-r from-muted/10 to-muted/5 px-4 py-4 hover:from-primary/5 hover:to-primary/10 border border-transparent hover:border-primary/20 transition-all duration-300 hover:shadow-[var(--premium-shadow-subtle)] hover:-translate-y-0.5 animate-fade-in"
             >
               <div className="flex items-start space-x-4">
