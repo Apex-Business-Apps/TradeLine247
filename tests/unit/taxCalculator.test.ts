@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest';
 import {
   calculateQuote,
   calculateFinancePayment,
+  calculateProvincialTaxes,
   PROVINCIAL_TAX_RATES
 } from '../../src/lib/taxCalculator';
 
