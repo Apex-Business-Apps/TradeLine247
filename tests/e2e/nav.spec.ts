@@ -10,11 +10,9 @@ const pages = [
 for (const p of pages) {
   test(`Quick Action ${p.path} navigates & survives refresh`, async ({ page }) => {
     await page.goto('/');
-    // Scroll into view to handle below-the-fold content
-    const qa = page.getByTestId(p.testId);
-    await qa.scrollIntoViewIfNeeded();
-    await expect(qa).toBeVisible({ timeout: 15000 });
-    await qa.click();
+    // Wait for Quick Actions to be visible
+    await page.waitForSelector(`[data-testid="${p.testId}"]`, { state: 'visible' });
+    await page.getByTestId(p.testId).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1);
     await page.reload();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1);

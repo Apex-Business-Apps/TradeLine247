@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.79.0';
-import { preflight, jsonResponse, unexpectedErrorResponse } from '../_shared/cors.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { preflight, corsHeaders } from '../_shared/cors.ts';
+import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
 
 serve(async (req) => {
   const pf = preflight(req);
@@ -15,7 +16,10 @@ serve(async (req) => {
     const { sessionId, userAgent } = await req.json();
 
     if (!sessionId) {
-      return jsonResponse({ error: 'Session ID required' }, { status: 400 });
+      return new Response(
+        JSON.stringify({ error: 'Session ID required' }),
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+      );
     }
 
     // Get client IP from headers
@@ -37,7 +41,10 @@ serve(async (req) => {
 
     if (error) {
       console.error('Error registering session:', error);
-      return jsonResponse({ error: 'Failed to register session' }, { status: 500 });
+      return new Response(
+        JSON.stringify({ error: 'Failed to register session' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Clean up old sessions periodically (every 100th request)
@@ -45,10 +52,17 @@ serve(async (req) => {
       await supabase.rpc('cleanup_old_ab_sessions');
     }
 
-    return jsonResponse({ success: true });
+    return new Response(
+      JSON.stringify({ success: true }),
+      { headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+    );
 
   } catch (error) {
-    return unexpectedErrorResponse(error, 'register-ab-session');
+    console.error('Session registration error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });
 

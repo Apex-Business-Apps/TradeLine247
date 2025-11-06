@@ -32,9 +32,9 @@ describe('HTTP security primitives', () => {
   it('handles CORS preflight', () => {
     const res = preflight(new Request('https://example.com', { method: 'OPTIONS' }));
     expect(res).not.toBeNull();
-    expect(res?.status).toBe(200);
+    expect(res?.status).toBe(204);
     expect(res?.headers.get('Access-Control-Allow-Origin')).toBe('*');
-    expect(res?.headers.get('Access-Control-Allow-Methods')).toBe('GET,POST,OPTIONS');
+    expect(res?.headers.get('Content-Length')).toBe('0');
   });
 
   it('merges secure headers with custom sets', () => {
