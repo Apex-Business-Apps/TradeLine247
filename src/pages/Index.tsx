@@ -36,7 +36,7 @@ const Index = () => {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",
-          backgroundColor: "#f8f9fa", // Fallback color if image fails
+          backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
         }}
       >
         {/* Content with translucency - Optimized for performance */}

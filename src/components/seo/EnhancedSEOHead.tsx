@@ -316,9 +316,9 @@ export const EnhancedSEOHead: React.FC<EnhancedSEOHeadProps> = ({
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="apple-mobile-web-app-title" content="TradeLine 24/7" />
       
-      {/* Theme Color */}
-      <meta name="theme-color" content="#ff6b35" />
-      <meta name="msapplication-TileColor" content="#ff6b35" />
+      {/* Theme Color - Use brand orange from design system */}
+      <meta name="theme-color" content="hsl(21, 100%, 67%)" />
+      <meta name="msapplication-TileColor" content="hsl(21, 100%, 67%)" />
     </Helmet>
   );
 };
