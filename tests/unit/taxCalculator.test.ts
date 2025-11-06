@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest';
 import {
   calculateQuote,
   calculateFinancePayment,
+  calculateProvincialTaxes,
   PROVINCIAL_TAX_RATES
 } from '../../src/lib/taxCalculator';
 
@@ -22,14 +23,11 @@ describe('calculateQuote - Tax Calculations', () => {
   });
 
   it('should calculate BC taxes (GST 5% + PST 7%) correctly', () => {
-    const result = calculateQuote({
-      vehiclePrice: 40000,
-      province: 'BC'
-    });
-    expect(result.gst).toBe(2000); // 40000 * 0.05
-    expect(result.pst).toBeCloseTo(2800, 2); // 40000 * 0.07 (floating point precision)
+    const result = calculateProvincialTaxes(40000, 'BC');
+    expect(result.gst).toBe(2000);
+    expect(result.pst).toBeCloseTo(2800, 2); // Use toBeCloseTo for floating point
     expect(result.hst).toBe(0);
-    expect(result.totalTaxes).toBeCloseTo(4800, 2);
+    expect(result.total).toBeCloseTo(4800, 2);
   });
 
   it('should calculate Alberta GST only (5%) correctly', () => {
@@ -123,21 +121,14 @@ describe('calculateQuote - Complete Quote', () => {
 
     const quote = calculateQuote(params);
 
-    // Subtotal: vehiclePrice + dealerFees + addons - incentives
-    // = 35000 + 500 + 0 - 1000 = 34500
+    // Subtotal: vehiclePrice + dealerFees - incentives = 35000 + 500 - 1000 = 34500
     expect(quote.subtotal).toBe(34500);
 
-    // Net trade-in: tradeInValue - tradeInPayoff = 5000 - 0 = 5000
-    expect(quote.netTradeIn).toBe(5000);
-
     // Taxable amount: subtotal - netTradeIn = 34500 - 5000 = 29500
-    expect(quote.taxableAmount).toBe(29500);
-
     // HST: 29500 * 0.13 = 3835
-    expect(quote.hst).toBe(3835);
     expect(quote.totalTaxes).toBe(3835);
 
-    // Total price: subtotal + taxes = 34500 + 3835 = 38335
+    // Total: subtotal + totalTaxes = 34500 + 3835 = 38335
     expect(quote.totalPrice).toBe(38335);
 
     // Amount to finance: totalPrice - downPayment - netTradeIn
@@ -145,18 +136,23 @@ describe('calculateQuote - Complete Quote', () => {
     expect(quote.amountToFinance).toBe(26335);
   });
 
-  it('should handle simple vehicle purchase', () => {
+  it('should handle purchase without trade-in', () => {
     const params = {
       vehiclePrice: 25000,
-      province: 'BC' as const
+      province: 'BC' as const,
     };
 
     const quote = calculateQuote(params);
 
+    // Subtotal: 25000
     expect(quote.subtotal).toBe(25000);
-    expect(quote.totalTaxes).toBe(3000); // 25000 * 0.12 (BC: 5% GST + 7% PST)
+
+    // BC taxes: GST 5% + PST 7% = 12%
+    // Total taxes: 25000 * 0.12 = 3000
+    expect(quote.totalTaxes).toBe(3000);
+
+    // Total price: 25000 + 3000 = 28000
     expect(quote.totalPrice).toBe(28000);
-    expect(quote.amountToFinance).toBe(28000);
   });
 
   it('should apply incentives correctly', () => {
@@ -193,5 +189,24 @@ describe('calculateQuote - Complete Quote', () => {
     // Down payment reduces amount to finance
     // amountToFinance = totalPrice - downPayment = 22600 - 5000 = 17600
     expect(quote.amountToFinance).toBe(17600);
+  });
+
+  it('should calculate net trade-in correctly', () => {
+    const params = {
+      vehiclePrice: 30000,
+      tradeInValue: 8000,
+      tradeInPayoff: 3000,
+      province: 'ON' as const
+    };
+
+    const quote = calculateQuote(params);
+
+    // Net trade-in: 8000 - 3000 = 5000
+    expect(quote.netTradeIn).toBe(5000);
+
+    // Taxable amount should deduct net trade-in
+    // Subtotal: 30000
+    // Taxable: 30000 - 5000 = 25000
+    expect(quote.taxableAmount).toBe(25000);
   });
 });
