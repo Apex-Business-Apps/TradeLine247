@@ -1,14 +1,14 @@
 #app-header-left {
   justify-content: flex-start !important;
-  margin-left: 8px !important;
+  margin-left: 0 !important;
 }
 
 @media (max-width: 1024px) {
   #app-header-left {
-    margin-left: 4px !important;
+    margin-left: 0 !important;
   }
   #app-home, #app-badge-ca {
-    padding-left: 4px !important;
+    padding-left: 0 !important;
     padding-right: 4px !important;
     flex-shrink: 0 !important;
   }
