@@ -2,7 +2,13 @@
 // Prevents duplicate operations from retries or race conditions
 
 import { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { createHash } from "https://deno.land/std@0.224.0/crypto/crypto.ts";
+const encoder = new TextEncoder();
+async function sha256Hex(input: string): Promise<string> {
+  const bytes = encoder.encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
 
 export interface IdempotencyResult {
   is_duplicate: boolean;
@@ -15,14 +21,13 @@ export interface IdempotencyResult {
 /**
  * Generate idempotency key from request
  */
-export function generateIdempotencyKey(
+export async function generateIdempotencyKey(
   operationType: string,
   ...args: any[]
-): string {
+): Promise<string> {
   const data = JSON.stringify({ operationType, args });
-  const hash = createHash("sha256");
-  hash.update(data);
-  return `${operationType}_${hash.toString()}`;
+  const hash = await sha256Hex(data);
+  return `${operationType}_${hash}`;
 }
 
 /**
