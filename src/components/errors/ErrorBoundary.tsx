@@ -25,9 +25,7 @@ export class AppErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
-    // Report to centralized error reporter
+    // Use centralized error reporter (already logs to console in dev)
     reportReactError(error, errorInfo);
     
     // Track error in analytics

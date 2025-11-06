@@ -113,9 +113,21 @@ export const useAuth = () => {
       }
       
       setLoading(false);
-    }).catch((err) => {
-      // Catch any unhandled JWT errors
-      console.error('[Auth] Session check failed:', err);
+    }).catch(async (err) => {
+      // Report auth errors to centralized monitoring
+      if (typeof window !== 'undefined') {
+        const { errorReporter } = await import('@/lib/errorReporter');
+        errorReporter.report({
+          type: 'error',
+          message: err instanceof Error ? err.message : 'Auth session check failed',
+          stack: err instanceof Error ? err.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { context: 'useAuth_session_check' }
+        });
+      }
       if (supabase.auth?.signOut) {
         supabase.auth.signOut().catch(() => {/* ignore */});
       }
