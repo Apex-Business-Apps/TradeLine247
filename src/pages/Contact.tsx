@@ -14,6 +14,7 @@ import { FormErrorFallback } from "@/components/errors/FormErrorFallback";
 import { z } from "zod";
 import { PUBLIC_HELPLINE_E164, PUBLIC_HELPLINE_DISPLAY, PUBLIC_EMAIL } from "@/config/public";
 import builtCanadianBadge from "@/assets/badges/built-canadian.svg";
+import { errorReporter } from "@/lib/errorReporter";
 
 const contactFormSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),
@@ -161,7 +162,15 @@ const Contact = () => {
       });
 
     } catch (error: any) {
-      console.error("Contact form error:", error);
+      errorReporter.report({
+        type: 'error',
+        message: `Contact form error: ${error?.message || error}`,
+        stack: error?.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       
       // Set error for FormErrorFallback
       setSubmitError('Unable to send message at this time.');

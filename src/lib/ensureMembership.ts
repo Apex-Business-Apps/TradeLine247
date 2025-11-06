@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { errorReporter } from "@/lib/errorReporter";
 
 export interface MembershipResult {
   orgId: string | null;
@@ -22,7 +23,15 @@ export async function ensureMembership(user: User): Promise<MembershipResult> {
 
     if (memErr) {
       // Non-fatal: proceed to function for idempotent ensure
-      console.warn("ensureMembership: membership check warning", memErr);
+      errorReporter.report({
+        type: 'error',
+        message: `ensureMembership: membership check warning: ${memErr.message}`,
+        timestamp: new Date().toISOString(),
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        environment: errorReporter['getEnvironment'](),
+        metadata: { userId: user.id }
+      });
     }
 
     if (membership?.org_id) {
@@ -36,19 +45,44 @@ export async function ensureMembership(user: User): Promise<MembershipResult> {
     });
 
     if (error) {
-      console.error("ensureMembership: start-trial error", error);
+      errorReporter.report({
+        type: 'error',
+        message: `ensureMembership: start-trial error: ${error.message}`,
+        timestamp: new Date().toISOString(),
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        environment: errorReporter['getEnvironment'](),
+        metadata: { userId: user.id }
+      });
       return { orgId: null, error: error.message || "Couldn't create trial" };
     }
 
     if (!data?.ok) {
       const msg = data?.error || "Couldn't create trial";
-      console.error("ensureMembership: start-trial failed", msg);
+      errorReporter.report({
+        type: 'error',
+        message: `ensureMembership: start-trial failed: ${msg}`,
+        timestamp: new Date().toISOString(),
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        environment: errorReporter['getEnvironment'](),
+        metadata: { userId: user.id }
+      });
       return { orgId: null, error: msg };
     }
 
     return { orgId: (data?.orgId as string) ?? null };
   } catch (e: any) {
-    console.error("ensureMembership: unexpected error", e);
+    errorReporter.report({
+      type: 'error',
+      message: `ensureMembership: unexpected error: ${e?.message}`,
+      stack: e?.stack,
+      timestamp: new Date().toISOString(),
+      url: typeof window !== 'undefined' ? window.location.href : '',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+      environment: errorReporter['getEnvironment'](),
+      metadata: { userId: user.id }
+    });
     return { orgId: null, error: e?.message || "Unexpected error during trial setup" };
   }
 }
