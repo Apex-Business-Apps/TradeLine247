@@ -318,8 +318,9 @@ const Auth = () => {
                     />
                   </div>
                   
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
+                    variant="success"
                     className="w-full"
                     disabled={loading}
                   >

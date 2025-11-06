@@ -14,6 +14,41 @@ interface ErrorReport {
   metadata?: Record<string, any>;
 }
 
+/**
+ * Type guard to check if value is an Error object
+ */
+function isError(value: unknown): value is Error {
+  return value instanceof Error;
+}
+
+/**
+ * Normalizes any value to an Error object with proper stack trace
+ */
+function normalizeError(value: unknown): Error {
+  if (isError(value)) {
+    return value;
+  }
+
+  // Convert non-Error values to Error objects
+  if (typeof value === 'string') {
+    return new Error(value);
+  }
+
+  if (value && typeof value === 'object') {
+    // Try to extract message from object
+    const message = (value as any).message || (value as any).error || JSON.stringify(value);
+    const error = new Error(message);
+    // Preserve original stack if available
+    if ((value as any).stack) {
+      error.stack = (value as any).stack;
+    }
+    return error;
+  }
+
+  // Fallback for primitives
+  return new Error(String(value));
+}
+
 class ErrorReporter {
   private errors: ErrorReport[] = [];
   private maxErrors = 50;
@@ -45,16 +80,18 @@ class ErrorReporter {
 
     // Catch unhandled promise rejections
     window.addEventListener('unhandledrejection', (event) => {
+      const normalizedError = normalizeError(event.reason);
       this.report({
         type: 'unhandledRejection',
-        message: event.reason?.message || String(event.reason),
-        stack: event.reason?.stack,
+        message: normalizedError.message,
+        stack: normalizedError.stack,
         timestamp: new Date().toISOString(),
         url: window.location.href,
         userAgent: navigator.userAgent,
         environment: this.getEnvironment(),
         metadata: {
-          reason: event.reason
+          reason: event.reason,
+          wasNormalized: !isError(event.reason)
         }
       });
     });
@@ -81,20 +118,22 @@ class ErrorReporter {
         }
         return response;
       } catch (error) {
+        const normalizedError = normalizeError(error);
         this.report({
           type: 'network',
-          message: `Fetch failed: ${error}`,
-          stack: error instanceof Error ? error.stack : undefined,
+          message: `Fetch failed: ${normalizedError.message}`,
+          stack: normalizedError.stack,
           timestamp: new Date().toISOString(),
           url: window.location.href,
           userAgent: navigator.userAgent,
           environment: this.getEnvironment(),
           metadata: {
             fetchUrl: args[0],
-            error: String(error)
+            error: String(error),
+            wasNormalized: !isError(error)
           }
         });
-        throw error;
+        throw normalizedError; // Re-throw normalized error with stack
       }
     };
   }
@@ -199,17 +238,21 @@ class ErrorReporter {
 export const errorReporter = new ErrorReporter();
 
 // Export for React Error Boundaries
-export function reportReactError(error: Error, errorInfo: any) {
+export function reportReactError(error: unknown, errorInfo?: { componentStack?: string }) {
+  // Normalize error to ensure we have proper Error object with stack
+  const normalizedError = normalizeError(error);
+
   errorReporter.report({
     type: 'react',
-    message: error.message,
-    stack: error.stack,
+    message: normalizedError.message,
+    stack: normalizedError.stack,
     timestamp: new Date().toISOString(),
     url: window.location.href,
     userAgent: navigator.userAgent,
     environment: errorReporter['getEnvironment'](),
     metadata: {
-      componentStack: errorInfo.componentStack
+      componentStack: errorInfo?.componentStack,
+      wasNormalized: !isError(error)
     }
   });
 }
