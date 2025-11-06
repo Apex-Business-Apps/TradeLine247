@@ -143,7 +143,8 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    logWithContext(ctx, 'error', 'Backup code verification error', { error: error.message });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logWithContext(ctx, 'error', 'Backup code verification error', { error: errorMessage });
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

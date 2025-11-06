@@ -33,11 +33,9 @@ export async function generateIdempotencyKey(
 /**
  * Hash request parameters for comparison
  */
-export function hashRequest(...args: any[]): string {
+export async function hashRequest(...args: any[]): Promise<string> {
   const data = JSON.stringify(args);
-  const hash = createHash("sha256");
-  hash.update(data);
-  return hash.toString();
+  return await sha256Hex(data);
 }
 
 /**
@@ -115,8 +113,8 @@ export async function withIdempotency<T>(
   args: any[],
   operation: () => Promise<T>
 ): Promise<T> {
-  const requestHash = hashRequest(...args);
-  const idempotencyKey = generateIdempotencyKey(operationType, ...args);
+  const requestHash = await hashRequest(...args);
+  const idempotencyKey = await generateIdempotencyKey(operationType, ...args);
 
   // Check if already executed
   const check = await checkIdempotency(

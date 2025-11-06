@@ -17,3 +17,10 @@ export function mergeHeaders(
   }, {});
 }
 
+export function withJSON(headers: Record<string, string>): Record<string, string> {
+  return {
+    ...headers,
+    "Content-Type": "application/json",
+  };
+}
+

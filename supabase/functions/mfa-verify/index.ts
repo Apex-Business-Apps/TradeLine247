@@ -39,10 +39,15 @@ async function generateTOTP(secret: string, time: number): Promise<string> {
   timeView.setBigUint64(0, BigInt(time), false);
 
   // HMAC-SHA1
+  const algorithm: HmacImportParams = {
+    name: 'HMAC',
+    hash: { name: 'SHA-1' }
+  };
+  
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
     key,
-    { name: 'HMAC', hash: 'SHA-1' },
+    algorithm,
     false,
     ['sign']
   );
@@ -219,7 +224,8 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    logWithContext(ctx, 'error', 'MFA verification error', { error: error.message });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logWithContext(ctx, 'error', 'MFA verification error', { error: errorMessage });
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
