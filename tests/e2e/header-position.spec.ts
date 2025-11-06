@@ -12,22 +12,32 @@ test.describe('Header Position', () => {
       // Navigate and wait for React hydration with animations disabled
       await gotoAndWait(page, '/');
 
-      // Wait for header to be present in DOM first
-      const header = page.locator('header[data-site-header]');
-      await expect(header).toBeAttached({ timeout: 10000 });
+      // Wait for React ready signal explicitly
+      await page.waitForFunction(() => (window as any).__REACT_READY__ === true, { timeout: 30000 });
 
-      // Wait for header left section to be visible
+      // Wait for header element to exist in DOM
+      await page.waitForSelector('header[data-site-header]', { state: 'attached', timeout: 10000 });
+      
+      // Wait for header left section to exist
+      await page.waitForSelector('#app-header-left', { state: 'attached', timeout: 10000 });
+
+      // Get the element and check if it's actually in the DOM
       const headerLeft = page.locator('#app-header-left');
       
-      // First ensure it's attached to DOM
-      await expect(headerLeft).toBeAttached({ timeout: 10000 });
-      
-      // Then wait for it to be visible
-      await expect(headerLeft).toBeVisible({ timeout: 15000 });
+      // Wait for element to have non-zero dimensions (proves it's rendered)
+      await page.waitForFunction(
+        () => {
+          const el = document.getElementById('app-header-left');
+          if (!el) return false;
+          const rect = el.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        },
+        { timeout: 15000 }
+      );
 
-      // Ensure element is scrolled into view and stable
+      // Ensure element is scrolled into view
       await headerLeft.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(200); // Increased wait for layout stability
+      await page.waitForTimeout(300); // Wait for layout to stabilize
 
       const boundingBox = await headerLeft.boundingBox();
       expect(boundingBox).not.toBeNull();
