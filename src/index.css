@@ -126,7 +126,7 @@ All colors MUST be HSL.
     --popover-foreground: 222.2 84% 4.9%;
 
     --primary: var(--brand-orange-primary);
-    --primary-foreground: var(--brand-orange-dark); /* WCAG AA compliant: dark orange text on light orange bg */
+    --primary-foreground: 0 0% 10%; /* WCAG AA: very dark gray on orange bg = 8.1:1 contrast */
 
     --secondary: 30 100% 96%;
     --secondary-foreground: var(--brand-orange-dark);
@@ -190,7 +190,7 @@ All colors MUST be HSL.
     --popover-foreground: 210 40% 98%;
 
     --primary: var(--brand-orange-primary);
-    --primary-foreground: var(--brand-orange-dark); /* WCAG AA compliant: dark orange text on light orange bg */
+    --primary-foreground: 0 0% 10%; /* WCAG AA: very dark gray on orange bg = 8.1:1 contrast */
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: var(--brand-orange-light);
@@ -413,6 +413,28 @@ html.dark [class*="text-muted"] {
   :not(.dark) .text-green-500,
   :not(.dark) .text-green-600 {
     color: hsl(142.1 76.2% 36.3%) !important; /* green-700: 4.5:1 contrast on white */
+  }
+}
+
+@layer utilities {
+  /* CRITICAL: Fix text-primary on white/light backgrounds */
+  /* Light orange (#ff9257) on white has 2.21:1 contrast - needs 4.5:1 minimum */
+  /* Use brand-orange-dark for 6.7:1 contrast on white backgrounds */
+  html:not(.dark) .text-primary,
+  body:not(.dark) .text-primary,
+  :not(.dark) .text-primary {
+    color: hsl(var(--brand-orange-dark)) !important; /* 6.7:1 contrast on white */
+  }
+
+  /* Override for link hover states that use text-primary */
+  html:not(.dark) a.hover\:text-foreground,
+  html:not(.dark) .hover\:text-foreground {
+    color: hsl(var(--brand-orange-dark)) !important;
+  }
+
+  html:not(.dark) a.hover\:text-foreground:hover,
+  html:not(.dark) .hover\:text-foreground:hover {
+    color: hsl(var(--foreground)) !important;
   }
 }
 
