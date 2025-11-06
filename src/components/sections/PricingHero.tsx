@@ -14,11 +14,11 @@ export const PricingHero = () => {
           <h1 id="hero-h1" className="text-4xl md:text-6xl mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent font-extrabold lg:text-7xl">
             Your 24/7 A<span className="text-primary">i</span> Receptionist!
           </h1>
-          <p className="text-xl mb-8 max-w-3xl mx-auto font-semibold text-[#1e556b] md:text-4xl">
+          <p className="text-xl mb-8 max-w-3xl mx-auto font-semibold text-foreground/90 md:text-4xl">
             Never miss a call. Work while you sleep.
           </p>
           
-          <h2 className="text-2xl font-semibold text-[#1e556b] mb-2 mt-[63px] text-center my-0 py-0 md:text-4xl">
+          <h2 className="text-2xl font-semibold text-foreground/90 mb-2 mt-[63px] text-center my-0 py-0 md:text-4xl">
             Help us help you
           </h2>
           

@@ -174,7 +174,7 @@ export const LeadCaptureForm = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-primary/5 p-4 rounded-lg animate-fade-in" style={{ animationDelay: '400ms' }}>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
+                <p className="text-sm text-muted-foreground">
                   <Sparkles className="w-4 h-4 inline mr-1" />
                   We'll reach out within <strong>2 hours</strong> to get you set up.
                 </p>
@@ -202,7 +202,7 @@ export const LeadCaptureForm = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Tell us about your business
           </h2>
-          <p className="text-lg max-w-2xl mx-auto text-[#1e556b]">
+          <p className="text-lg max-w-2xl mx-auto text-foreground/90">
             Start your free trial today.
           </p>
         </div>
