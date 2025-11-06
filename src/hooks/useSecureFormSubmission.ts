@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface SecureSubmissionOptions {
   rateLimitKey?: string;
@@ -24,7 +25,15 @@ export const useSecureFormSubmission = (options: SecureSubmissionOptions = {}) =
       });
 
       if (error) {
-        console.error('Rate limit check error:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Rate limit check error: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { rateLimitKey, error }
+        });
         // Fail closed - deny on error to prevent bypass
         return false;
       }
@@ -33,14 +42,31 @@ export const useSecureFormSubmission = (options: SecureSubmissionOptions = {}) =
       const result = data as { allowed: boolean; remaining: number; limit: number };
       
       if (!result?.allowed) {
-        console.warn('Rate limit exceeded for:', rateLimitKey);
+        errorReporter.report({
+          type: 'error',
+          message: `Rate limit exceeded for: ${rateLimitKey}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { rateLimitKey, remaining: result.remaining, limit: result.limit }
+        });
         return false;
       }
 
       setAttempts(maxAttemptsPerHour - (result.remaining || 0));
       return true;
     } catch (error) {
-      console.error('Rate limit check failed:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Rate limit check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { rateLimitKey, error }
+      });
       // Fail closed - deny on error to prevent bypass
       return false;
     }

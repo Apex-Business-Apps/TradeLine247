@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSecureABTest } from "@/hooks/useSecureABTest";
 import { useSecureFormSubmission } from "@/hooks/useSecureFormSubmission";
+import { errorReporter } from "@/lib/errorReporter";
 import { z } from "zod";
 
 // Client-side validation schema matching server-side
@@ -141,7 +142,16 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
       }, 5000);
 
     } catch (error: any) {
-      console.error("Lead submission error:", error);
+      errorReporter.report({
+        type: 'error',
+        message: `Lead submission error: ${error.message || 'Unknown error'}`,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { formData: { name: formData.name, company: formData.company }, variant }
+      });
       trackFormSubmission('lead_capture', false, {
         error: error.message || 'unknown_error',
         variant: variant
