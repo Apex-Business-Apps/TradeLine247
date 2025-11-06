@@ -32,7 +32,7 @@ export const useSecurityCompliance = () => {
         .rpc('validate_security_post_upgrade');
       
       if (rlsTables) {
-        const validationData = rlsTables as SecurityValidationResult;
+        const validationData = rlsTables as any as SecurityValidationResult;
         checks.push({
           check_name: 'RLS_ENABLED_TABLES',
           status: validationData.rls_enabled_tables > 0 ? 'passed' : 'failed',

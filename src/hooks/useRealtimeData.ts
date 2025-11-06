@@ -43,7 +43,7 @@ export function useRealtimeData<T>(
         channel = supabase
           .channel(`realtime-${table}`)
           .on(
-            REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.ALL,
+            'postgres_changes' as any,
             {
               event,
               schema,

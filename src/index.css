@@ -88,9 +88,9 @@ All colors MUST be HSL.
     color: hsl(var(--primary));
   }
   :root {
-    /* Brand Orange Colors from Logo - Maximum Saturation + 45% Vibrancy + 5% Hue */
-    --brand-orange-primary: 21 100% 67%;
-    --brand-orange-light: 29 100% 95%;
+    /* Brand Orange Colors from Logo - Primary Brand Color */
+    --brand-orange-primary: 21 100% 50%;
+    --brand-orange-light: 29 100% 75%;
     --brand-orange-dark: 15 100% 35%;
     
     /* Green Colors for Login/Success Actions */

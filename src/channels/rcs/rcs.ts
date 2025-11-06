@@ -20,7 +20,7 @@ async function loadClient(): Promise<any> {
   if (clientPromise) return clientPromise;
 
   clientPromise = import('twilio').then((mod) => {
-    const twilioMod = mod as TwilioModule;
+    const twilioMod = mod as any;
     const twilio = twilioMod.default ?? twilioMod;
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;

@@ -192,7 +192,7 @@ export function useEnhancedToast() {
     // Show toast
     const toastType = options?.type || 'info';
     type ToastFunction = (title: string, options?: any) => string | number;
-    const toastFn = (sonnerToast as Record<string, ToastFunction>)[toastType];
+    const toastFn = (sonnerToast as any)[toastType] as ToastFunction;
     const toastId = String(toastFn(title, toastOptions));
     
     // Track grouped toasts
