@@ -55,7 +55,7 @@ const MessagingHealth = () => {
     switch (status.toLowerCase()) {
       case 'verified':
       case 'approved':
-        return <Badge className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Verified</Badge>;
+        return <Badge className="bg-green-500 text-white"><CheckCircle className="w-3 h-3 mr-1" />Verified</Badge>;
       case 'pending':
         return <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
       case 'rejected':
@@ -68,14 +68,14 @@ const MessagingHealth = () => {
 
   const getDeliveryRateBadge = (rate: number | undefined) => {
     if (!rate) return <Badge variant="secondary">No Data</Badge>;
-    if (rate >= 98) return <Badge className="bg-green-500">{rate}%</Badge>;
+    if (rate >= 98) return <Badge className="bg-green-500 text-white">{rate}%</Badge>;
     if (rate >= 95) return <Badge variant="outline" className="border-yellow-500 text-yellow-600">{rate}%</Badge>;
     return <Badge variant="destructive">{rate}%</Badge>;
   };
 
   const getCallbackTimeBadge = (ms: number | undefined) => {
     if (!ms) return <Badge variant="secondary">No Data</Badge>;
-    if (ms < 500) return <Badge className="bg-green-500">{ms}ms</Badge>;
+    if (ms < 500) return <Badge className="bg-green-500 text-white">{ms}ms</Badge>;
     if (ms < 1000) return <Badge variant="outline" className="border-yellow-500 text-yellow-600">{ms}ms</Badge>;
     return <Badge variant="destructive">{ms}ms</Badge>;
   };

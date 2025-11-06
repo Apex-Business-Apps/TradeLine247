@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 const baseURL =
   process.env.E2E_BASE_URL ||
   process.env.BASE_URL ||
-  'http://localhost:4173';
+  'http://localhost:5173';
 
 const baseUse: Parameters<typeof defineConfig>[0]['use'] = {
   baseURL,
@@ -31,7 +31,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run preview',
+    command: 'npm run build && npm run preview -- --port 5173 --strictPort',
     url: baseURL,
     reuseExistingServer: true,
     timeout: 120000,

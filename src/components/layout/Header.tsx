@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Logo } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
-import { Menu, X, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@/components/ui/navigation-menu';
+import { Menu, X, LogOut, User, Settings, ChevronDown, Phone, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import '../nav/AppHeaderOverride.module.css';
+
 const navigationItems = [{
   name: 'Features',
   href: paths.features
@@ -36,6 +38,7 @@ const navigationItems = [{
   name: 'Contact',
   href: paths.contact
 }];
+
 const adminNavigationItems = [{
   name: 'Dashboard',
   href: paths.dashboard
@@ -49,29 +52,69 @@ const adminNavigationItems = [{
   name: 'Settings',
   href: paths.voiceSettings
 }];
+
+// Language menu item component for dropdown
+const LanguageMenuItem: React.FC<{ locale: string; label: string }> = ({ locale, label }) => {
+  const { i18n } = useTranslation();
+  return (
+    <DropdownMenuItem
+      onClick={() => i18n.changeLanguage(locale)}
+      className={cn("cursor-pointer", i18n.language === locale && "bg-accent")}
+    >
+      {label}
+    </DropdownMenuItem>
+  );
+};
+
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Defensive hook calls with fallbacks for enterprise-grade resilience
   const {
-    user,
-    userRole,
-    signOut,
-    isAdmin
-  } = useAuth();
-  const { goToWithFeedback } = useSafeNavigation();
+    user = null,
+    userRole = null,
+    signOut = async () => ({ error: null }),
+    isAdmin = () => false
+  } = useAuth() || {};
+
+  const { goToWithFeedback = async (path: string) => { window.location.href = path; } } = useSafeNavigation() || {};
+
   const location = useLocation();
   const mobileMenuId = 'mobile-menu';
-  const isUserAdmin = isAdmin();
+  const isUserAdmin = typeof isAdmin === 'function' ? isAdmin() : false;
 
-  // Streamlined navigation handler - single source of truth
+  // Streamlined navigation handler - single source of truth with enterprise error handling
   const handleNavigation = React.useCallback(async (href: string, label: string, closeMenu = false) => {
     if (closeMenu) setIsMobileMenuOpen(false);
     try {
-      await goToWithFeedback(href, label);
+      if (goToWithFeedback && typeof goToWithFeedback === 'function') {
+        await goToWithFeedback(href, label);
+      } else {
+        // Fallback to direct navigation if hook unavailable
+        window.location.href = href;
+      }
     } catch (error) {
       console.error(`[Header] Navigation failed for ${label}:`, error);
+      // Ultimate fallback
+      window.location.href = href;
     }
   }, [goToWithFeedback]);
+
+  // Safe signOut handler with fallback
+  const handleSignOut = React.useCallback(async () => {
+    try {
+      if (signOut && typeof signOut === 'function') {
+        await signOut();
+      }
+      // Fallback: clear session and redirect
+      window.location.href = paths.home;
+    } catch (error) {
+      console.error('[Header] Sign out failed:', error);
+      // Force redirect on error
+      window.location.href = paths.home;
+    }
+  }, [signOut]);
 
   // Optimized scroll handler
   useEffect(() => {
@@ -80,38 +123,43 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Load header override CSS once on mount
-  useEffect(() => {
-    const loadOverride = async () => {
-      const leftEl = document.getElementById('app-header-left');
-      const homeEl = document.getElementById('app-home');
-      const badgeEl = document.getElementById('app-badge-ca');
-      if (leftEl && homeEl && badgeEl) {
-        try {
-          await import('../nav/AppHeaderOverride.module.css');
-        } catch (error) {
-          console.warn('[Header] Override CSS load failed:', error);
-        }
-      }
-    };
-    loadOverride();
-  }, []);
-
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [location.pathname]);
-  return <header data-site-header className={cn('sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 isolate', isScrolled ? 'shadow-lg py-2' : 'py-4')} style={{ isolation: 'isolate' }} data-lovable-lock="structure-only">
-      <div data-header-inner className="container flex h-14 items-center justify-between gap-4" data-lovable-lock="structure-only">
+  }, [location?.pathname]);
+  return <header
+      id="app-header"
+      data-site-header
+      data-testid="app-header"
+      className={cn(
+        'sticky top-0 z-40 w-full bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b isolate transition-all duration-300',
+        isScrolled ? 'shadow-lg' : ''
+      )}
+      data-lovable-lock="structure-only"
+      role="banner"
+    >
+      <div
+        data-header-inner
+        className="mx-auto w-full max-w-screen-2xl flex h-16 items-center justify-between gap-2 px-4"
+        data-lovable-lock="structure-only"
+      >
         {/* Home Button & Badge */}
-        <div id="app-header-left" data-slot="left" className="flex items-center gap-3 animate-fade-in" data-lovable-lock="structure-only">
-          <Button 
+        <div
+          id="app-header-left"
+          data-testid="app-header-left"
+          data-slot="left"
+          className="flex items-center gap-2 shrink-0 min-w-0 ml-0 pl-0"
+          data-lovable-lock="structure-only"
+          role="navigation"
+          aria-label="Header left section"
+        >
+          <Button
             id="app-home"
-            variant="default" 
+            variant="default"
             size={isScrolled ? 'sm' : 'default'}
-            onClick={() => handleNavigation(paths.home, 'Home')} 
-            className="hover-scale transition-all duration-300" 
-            aria-label="Go to homepage" 
+            onClick={() => handleNavigation(paths.home, 'Home')}
+            className="hover-scale transition-all duration-300 h-11 px-4"
+            aria-label="Go to homepage"
             data-lovable-lock="structure-only"
           >
             Home
@@ -129,157 +177,172 @@ export const Header: React.FC = () => {
         </div>
 
         {/* Desktop Navigation - Marketing Links Only */}
-        <nav data-slot="center" aria-label="Primary" className="hidden lg:flex items-center gap-1 animate-fade-in" style={{ animationDelay: '200ms' }} data-lovable-lock="structure-only">
+        <nav
+          data-slot="center"
+          aria-label="Primary"
+          className="hidden lg:flex items-center gap-2 min-w-0"
+          data-lovable-lock="structure-only"
+        >
           <NavigationMenu data-lovable-lock="structure-only">
-            <NavigationMenuList data-lovable-lock="structure-only" className="gap-1">
-            {navigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
-                <NavigationMenuLink asChild>
-                  <Link 
-                    to={item.href} 
-                    className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-accent hover:text-foreground focus:bg-accent focus:text-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 story-link hover-scale" 
-                    style={{
-                      animationDelay: `${index * 100}ms`
-                    }}>
-                    {item.name}
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>)}
+            <NavigationMenuList data-lovable-lock="structure-only" className="gap-2">
+              {navigationItems.map((item, index) => (
+                <NavigationMenuItem key={item.name}>
+                  <NavigationMenuLink asChild>
+                    <NavLink
+                      to={item.href}
+                      className={({ isActive }) =>
+                        cn(
+                          'group inline-flex h-10 min-w-[44px] items-center justify-center rounded-md px-4 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-accent hover:text-foreground focus:bg-accent focus:text-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-accent/50 story-link hover-scale',
+                          isActive && 'bg-accent/50 text-foreground'
+                        )
+                      }
+                      style={{
+                        animationDelay: `${index * 100}ms`
+                      }}
+                    >
+                      {({ isActive }) => (
+                        <span aria-current={isActive ? 'page' : undefined}>
+                          {item.name}
+                        </span>
+                      )}
+                    </NavLink>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              ))}
           </NavigationMenuList>
         </NavigationMenu>
         </nav>
 
-        {/* Desktop App Navigation - Separate Section for Admin */}
-        {isUserAdmin && (
-          <nav data-slot="app-nav" aria-label="Application" className="hidden lg:flex items-center gap-1 ml-4 pl-4 border-l border-border animate-fade-in" style={{ animationDelay: '250ms' }} data-lovable-lock="structure-only">
-            <NavigationMenu data-lovable-lock="structure-only">
-              <NavigationMenuList data-lovable-lock="structure-only" className="gap-1">
-              {adminNavigationItems.map((item, index) => <NavigationMenuItem key={item.name}>
-                  <NavigationMenuLink asChild>
-                    <Link 
-                      to={item.href} 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleNavigation(item.href, item.name);
-                      }}
-                      className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition-all duration-300 hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-primary/20 data-[state=open]:bg-primary/20 story-link hover-scale text-primary"
-                      aria-label={`Navigate to ${item.name}`}
-                    >
-                      {item.name}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>)}
-            </NavigationMenuList>
-          </NavigationMenu>
-          </nav>
-        )}
-
         {/* Enhanced CTA Button & Mobile Menu */}
-        <div data-slot="right" className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '400ms' }} data-lovable-lock="structure-only">
-          <LanguageSwitcher data-lovable-lock="structure-only" />
-
-          {/* Burger Menu Button - MOBILE ONLY - Hidden on desktop */}
-          <button
-            id="burger-menu-button"
-            data-testid="burger-menu-button"
-            className="flex items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
-            onClick={() => setIsMobileMenuOpen(prev => !prev)}
-            aria-label="Toggle mobile menu"
-            aria-expanded={isMobileMenuOpen}
-            aria-controls={mobileMenuId}
-            type="button"
-          >
-            {isMobileMenuOpen ? (
-              <X size={20} className="text-foreground" strokeWidth={2} />
-            ) : (
-              <Menu size={20} className="text-foreground" strokeWidth={2} />
-            )}
-          </button>
-
-          {/* User Menu - Desktop: Dropdown, Mobile: Simplified */}
-          {user ? (
-            <div className="flex items-center gap-3">
-              {/* Desktop: User Dropdown Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size={isScrolled ? 'sm' : 'default'}
-                    className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300"
-                  >
-                    <div className="flex flex-col items-start">
-                      <span className="text-sm font-medium text-foreground leading-tight">
-                        {user.user_metadata?.display_name || user.email?.split('@')[0] || 'User'}
-                      </span>
-                      {userRole && (
-                        <span className={cn(
-                          "text-xs font-medium leading-tight",
-                          isUserAdmin ? "text-red-600 dark:text-red-400" : "text-blue-600 dark:text-blue-400"
-                        )}>
-                          {userRole.toUpperCase()}
+        <div
+          data-slot="right"
+          className="flex items-center gap-2"
+          data-lovable-lock="structure-only"
+        >
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
+            <LanguageSwitcher data-lovable-lock="structure-only" />
+            {user ? (
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size={isScrolled ? 'sm' : 'default'}
+                      className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300 h-11 px-4"
+                    >
+                      <div className="flex flex-col items-start">
+                        <span className="text-sm font-medium text-foreground leading-tight">
+                          {user.user_metadata?.display_name || user.email?.split('@')[0] || 'User'}
                         </span>
-                      )}
-                    </div>
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">{user.user_metadata?.display_name || 'User'}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {isUserAdmin && (
-                    <>
-                      <DropdownMenuItem 
-                        onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
-                        className="cursor-pointer"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleNavigation(paths.voiceSettings, 'Settings')}
-                        className="cursor-pointer"
-                      >
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-                  <DropdownMenuItem 
-                    onClick={() => signOut()}
-                    className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Mobile: Simplified Sign Out */}
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => signOut()} 
-                className="lg:hidden hover:bg-accent transition-all duration-300"
-                aria-label="Sign out"
+                        {userRole && (
+                          <span
+                            className={cn(
+                              'text-xs font-medium leading-tight',
+                              isUserAdmin ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'
+                            )}
+                          >
+                            {userRole.toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium">{user.user_metadata?.display_name || 'User'}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    {isUserAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <div className="px-2 py-1.5">
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            Application
+                          </p>
+                        </div>
+                        <DropdownMenuItem
+                          onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
+                          className="cursor-pointer"
+                        >
+                          <User className="mr-2 h-4 w-4" />
+                          Dashboard
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleNavigation(paths.calls, 'Calls')}
+                          className="cursor-pointer"
+                        >
+                          <Phone className="mr-2 h-4 w-4" />
+                          Calls
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleNavigation(paths.phoneApps, 'Phone Apps')}
+                          className="cursor-pointer"
+                        >
+                          <Smartphone className="mr-2 h-4 w-4" />
+                          Phone Apps
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleNavigation(paths.voiceSettings, 'Settings')}
+                          className="cursor-pointer"
+                        >
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={handleSignOut}
+                      className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:text-red-400 dark:focus:bg-red-950/20"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Button
+                variant="success"
+                size={isScrolled ? 'sm' : 'default'}
+                onClick={() => handleNavigation(paths.auth, 'Login')}
+                className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl h-11 px-4"
               >
-                <LogOut className="h-5 w-5" />
+                Login
               </Button>
-            </div>
-          ) : (
-            <Button 
-              variant="success" 
-              size={isScrolled ? 'sm' : 'default'} 
-              onClick={() => handleNavigation(paths.auth, 'Login')}
-              className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
+            )}
+          </div>
+          <div className="flex items-center gap-2 lg:hidden">
+            {!user && (
+              <Button
+                variant="success"
+                size={isScrolled ? 'sm' : 'default'}
+                onClick={() => handleNavigation(paths.auth, 'Login')}
+                className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl h-11 px-4"
+              >
+                Login
+              </Button>
+            )}
+            <button
+              id="burger-menu-button"
+              data-testid="burger-menu-button"
+              className="flex h-11 w-11 items-center justify-center rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale"
+              onClick={() => setIsMobileMenuOpen(prev => !prev)}
+              aria-label="Toggle mobile menu"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls={mobileMenuId}
+              type="button"
             >
-              Login
-            </Button>
-          )}
+              {isMobileMenuOpen ? (
+                <X size={20} className="text-foreground" strokeWidth={2} />
+              ) : (
+                <Menu size={20} className="text-foreground" strokeWidth={2} />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -293,21 +356,34 @@ export const Header: React.FC = () => {
           isMobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 pointer-events-none"
         )}
       >
-        <div className="container py-4 space-y-1">
+        <div className="container py-4 space-y-3 px-4">
           {/* Marketing Links Section */}
-          <div className="px-2 py-2">
+          <div className="space-y-1">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
               Information
             </p>
             {navigationItems.map((item, index) => (
-              <Link
+              <NavLink
                 key={item.name}
                 to={item.href}
-                className="block px-4 py-2.5 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300 animate-fade-in"
-                onClick={() => handleNavigation(item.href, item.name, true)}
+                className={({ isActive }) =>
+                  cn(
+                    'block rounded-md px-4 py-2.5 text-sm font-medium transition-all duration-300 hover:bg-accent hover:text-accent-foreground',
+                    isActive && 'bg-accent/50 text-foreground'
+                  )
+                }
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleNavigation(item.href, item.name, true);
+                }}
+                style={{ animationDelay: `${index * 75}ms` }}
               >
-                {item.name}
-              </Link>
+                {({ isActive }) => (
+                  <span aria-current={isActive ? 'page' : undefined}>
+                    {item.name}
+                  </span>
+                )}
+              </NavLink>
             ))}
           </div>
 
@@ -315,28 +391,64 @@ export const Header: React.FC = () => {
           {isUserAdmin && (
             <>
               <div className="border-t border-border my-2" />
-              <div className="px-2 py-2">
+              <div className="space-y-1">
                 <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 px-2">
                   Application
                 </p>
                 {adminNavigationItems.map((item, index) => (
-                  <Link
+                  <NavLink
                     key={item.name}
                     to={item.href}
-                    onClick={(e) => {
-                      e.preventDefault();
+                    className={({ isActive }) =>
+                      cn(
+                        'block rounded-md px-4 py-2.5 text-sm font-semibold transition-all duration-300 bg-primary/5 hover:bg-primary/10 text-primary',
+                        isActive && 'bg-primary/20'
+                      )
+                    }
+                    onClick={(event) => {
+                      event.preventDefault();
                       handleNavigation(item.href, item.name, true);
                     }}
-                    className="block px-4 py-2.5 text-sm font-semibold rounded-md bg-primary/5 hover:bg-primary/10 text-primary transition-all duration-300 animate-fade-in"
-                    style={{ animationDelay: `${(navigationItems.length + index) * 50}ms` }}
+                    style={{ animationDelay: `${(navigationItems.length + index) * 75}ms` }}
                     aria-label={`Navigate to ${item.name}`}
                   >
-                    {item.name}
-                  </Link>
+                    {({ isActive }) => (
+                      <span aria-current={isActive ? 'page' : undefined}>
+                        {item.name}
+                      </span>
+                    )}
+                  </NavLink>
                 ))}
               </div>
             </>
           )}
+
+          <div className="border-t border-border" />
+          <div className="space-y-3">
+            <LanguageSwitcher data-lovable-lock="structure-only" className="w-full" />
+            {user ? (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  handleSignOut();
+                }}
+                className="w-full justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-semibold text-red-600 transition-all duration-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            ) : (
+              <Button
+                variant="success"
+                onClick={() => handleNavigation(paths.auth, 'Login', true)}
+                className="w-full justify-center px-4 py-2.5 text-sm font-semibold"
+              >
+                Login
+              </Button>
+            )}
+          </div>
+
         </div>
       </nav>
     </header>;

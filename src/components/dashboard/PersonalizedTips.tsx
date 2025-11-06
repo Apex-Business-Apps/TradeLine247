@@ -125,7 +125,8 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
   const handleTipAction = (tipId: string) => {
     addRecentAction(`Clicked tip: ${tipId}`);
     // In a real implementation, this would navigate or trigger the appropriate action
-    console.log(`[PersonalizedTips] Action clicked for tip: ${tipId}`);
+    // Tip action clicked - tracked via analytics
+    // (Removed debug console.log - use browser devtools if needed)
   };
 
   return (
