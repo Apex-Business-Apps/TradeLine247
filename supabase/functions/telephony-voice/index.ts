@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-// Removed unnecessary edge-runtime import that caused OpenAI dependency conflict
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SRV = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;

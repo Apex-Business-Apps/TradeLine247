@@ -1,4 +1,4 @@
-// Removed unnecessary edge-runtime import that caused OpenAI dependency conflict
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 export default async () => {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>

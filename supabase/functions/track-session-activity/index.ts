@@ -1,6 +1,10 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.79.0';
-import { preflight, jsonResponse, unexpectedErrorResponse } from '../_shared/cors.ts';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 interface SessionActivityRequest {
   user_id: string;
@@ -9,12 +13,17 @@ interface SessionActivityRequest {
 }
 
 serve(async (req) => {
-  const pf = preflight(req);
-  if (pf) return pf;
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
 
   try {
     if (req.method !== 'POST') {
-      return jsonResponse({ error: 'Method not allowed' }, { status: 405 });
+      return new Response(
+        JSON.stringify({ error: 'Method not allowed' }),
+        { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Initialize Supabase client
@@ -25,7 +34,10 @@ serve(async (req) => {
     const { user_id, session_token, activity_timestamp }: SessionActivityRequest = await req.json();
 
     if (!user_id || !session_token || !activity_timestamp) {
-      return jsonResponse({ error: 'Missing required fields' }, { status: 400 });
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Update or insert session activity using background task for better performance
@@ -91,9 +103,16 @@ serve(async (req) => {
     // Execute session update task (simplified for compatibility)
     sessionUpdateTask().catch(console.error);
 
-    return jsonResponse({ success: true });
+    return new Response(
+      JSON.stringify({ success: true }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
 
   } catch (error) {
-    return unexpectedErrorResponse(error, 'track-session-activity');
+    console.error('Session tracking error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });

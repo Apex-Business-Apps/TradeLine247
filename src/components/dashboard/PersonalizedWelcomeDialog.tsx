@@ -25,10 +25,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import { useTheme } from 'next-themes';
 import { Sparkles, Layout, Palette, Check } from 'lucide-react';
-import { flags } from '@/config/flags';
-import { ProgressBarMini } from '@/components/ProgressBarMini';
-import { OnboardingStepsProvider, useOnboardingSteps } from '@/context/OnboardingSteps';
-import { useAuth } from '@/hooks/useAuth';
 
 interface PersonalizedWelcomeDialogProps {
   open: boolean;
@@ -260,8 +256,6 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
     }
   };
 
-  const progressPercent = Math.round((step / totalSteps) * 100);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
@@ -269,32 +263,23 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
           <DialogTitle>Welcome</DialogTitle>
         </DialogHeader>
 
-        {/* Progress Bar - Show when conversionV1 is enabled */}
-        {flags.conversionV1 && (
-          <div className="mb-4">
-            <ProgressBarMini progress={progressPercent} />
-          </div>
-        )}
-
         {renderStepContent()}
 
-        {/* Progress Indicator - Show when conversionV1 is disabled */}
-        {!flags.conversionV1 && (
-          <div className="flex justify-center gap-2 mt-6">
-            {Array.from({ length: totalSteps }).map((_, i) => (
-              <div
-                key={i}
-                className={`h-2 w-2 rounded-full transition-all ${
-                  i + 1 === step
-                    ? 'bg-primary w-6'
-                    : i + 1 < step
-                    ? 'bg-primary/50'
-                    : 'bg-muted'
-                }`}
-              />
-            ))}
-          </div>
-        )}
+        {/* Progress Indicator */}
+        <div className="flex justify-center gap-2 mt-6">
+          {Array.from({ length: totalSteps }).map((_, i) => (
+            <div
+              key={i}
+              className={`h-2 w-2 rounded-full transition-all ${
+                i + 1 === step
+                  ? 'bg-primary w-6'
+                  : i + 1 < step
+                  ? 'bg-primary/50'
+                  : 'bg-muted'
+              }`}
+            />
+          ))}
+        </div>
 
         <DialogFooter className="flex-row justify-between sm:justify-between">
           {step > 1 ? (

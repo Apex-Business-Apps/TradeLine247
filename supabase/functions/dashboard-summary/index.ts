@@ -1,5 +1,6 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.79.0';
-import { preflight, jsonResponse, unexpectedErrorResponse } from '../_shared/cors.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { preflight, corsHeaders } from '../_shared/cors.ts';
+import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -40,7 +41,10 @@ Deno.serve(async (req) => {
     // Get auth token from request
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return jsonResponse({ error: 'Missing authorization header' }, { status: 401 });
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+      );
     }
 
     // Get the authenticated user
@@ -48,7 +52,10 @@ Deno.serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      return jsonResponse({ error: 'Unauthorized' }, { status: 401 });
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+      );
     }
 
     console.log('Dashboard summary request for user:', user.id);
@@ -62,17 +69,18 @@ Deno.serve(async (req) => {
 
     if (!membership) {
       console.warn('No organization membership found for user');
-      return jsonResponse(
-        {
+      return new Response(
+        JSON.stringify({
           kpis: [],
           nextItems: [],
           transcripts: [],
           lastUpdated: new Date().toISOString()
-        },
+        }),
         {
-          headers: {
+          headers: mergeHeaders(corsHeaders, secureHeaders, {
+            'Content-Type': 'application/json',
             'Cache-Control': 'no-cache'
-          }
+          })
         }
       );
     }
@@ -184,13 +192,28 @@ Deno.serve(async (req) => {
       source: 'real_data'
     });
 
-    return jsonResponse(summary, {
-      headers: {
-        'Cache-Control': 'private, max-age=30'
+    return new Response(
+      JSON.stringify(summary),
+      {
+        headers: mergeHeaders(corsHeaders, secureHeaders, {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'private, max-age=30'
+        })
       }
-    });
+    );
 
   } catch (error) {
-    return unexpectedErrorResponse(error, 'dashboard-summary');
+    console.error('Dashboard summary error:', error);
+    
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to generate dashboard summary',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      {
+        status: 500,
+        headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
+      }
+    );
   }
 });

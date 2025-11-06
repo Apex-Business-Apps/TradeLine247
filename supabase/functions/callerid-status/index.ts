@@ -1,4 +1,4 @@
-// Removed unnecessary edge-runtime import that caused OpenAI dependency conflict
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 export default async (req: Request) => {
   const body = await req.text();
   const p = new URLSearchParams(body);
