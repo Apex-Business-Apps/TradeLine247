@@ -5,6 +5,7 @@ test.describe('Header Position', () => {
 
   for (const width of widths) {
     test(`header left elements should be positioned near left edge at ${width}px width`, async ({ page }) => {
+      // Set viewport size
       await page.setViewportSize({ width, height: 800 });
       await page.goto('/');
 
@@ -17,7 +18,11 @@ test.describe('Header Position', () => {
 
       if (boundingBox) {
         // Header should be positioned near left edge (within container padding)
-        expect(boundingBox.x).toBeLessThanOrEqual(32); // Allow for container padding
+        // At mobile (360px): px-3 = 12px
+        // At tablet (768px): sm:px-4 = 16px
+        // At desktop (1024px): lg:px-6 = 24px
+        // Allow 32px max to accommodate all viewports
+        expect(boundingBox.x).toBeLessThanOrEqual(32);
       }
     });
   }
