@@ -2,10 +2,10 @@ import { test, expect } from '@playwright/test';
 import { gotoAndWait } from './helpers';
 
 const pages = [
-  { qa: /View Calls/i, h1: /Calls/i, path: '/calls' },
-  { qa: /Add Number/i, h1: /Add Number|Buy/i, path: '/numbers/new' },
-  { qa: /Invite Staff|Invite/i, h1: /Invite|Team/i, path: '/team/invite' },
-  { qa: /Integrations/i, h1: /Integrations/i, path: '/integrations' },
+  { testId: 'quick-action-view-calls', h1: /Calls/i, path: '/calls' },
+  { testId: 'quick-action-add-number', h1: /Add Number|Buy/i, path: '/numbers/new' },
+  { testId: 'quick-action-invite-staff', h1: /Invite|Team/i, path: '/team/invite' },
+  { testId: 'quick-action-integrations', h1: /Integrations/i, path: '/integrations' },
 ];
 
 test.describe('Nav & refresh', () => {
@@ -14,11 +14,11 @@ test.describe('Nav & refresh', () => {
       // Navigate and wait for React hydration
       await gotoAndWait(page, '/');
 
-      // Wait for button to be visible and click
-      const button = page.getByRole('button', { name: p.qa });
-      await expect(button).toBeVisible({ timeout: 30000 });
-      await button.scrollIntoViewIfNeeded();
-      await button.click();
+      // Scroll quick action into view (below the fold), then assert visibility
+      const qa = page.getByTestId(p.testId);
+      await qa.scrollIntoViewIfNeeded();
+      await expect(qa).toBeVisible({ timeout: 15000 });
+      await qa.click();
 
       // Wait for navigation and heading
       await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1, { timeout: 30000 });

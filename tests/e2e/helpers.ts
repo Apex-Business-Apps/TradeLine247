@@ -8,8 +8,8 @@ export async function waitForReactHydration(page: Page, timeout = 45000): Promis
   // Wait for explicit React ready signal from main.tsx
   await page.waitForFunction(() => (window as any).__REACT_READY__ === true, { timeout });
 
-  // Additional safety: wait for app header to be visible
-  await expect(page.locator('#app-header')).toBeVisible({ timeout: 10000 });
+  // Additional safety: wait for app header to be visible (using data-site-header attribute)
+  await expect(page.locator('header[data-site-header]')).toBeVisible({ timeout: 10000 });
 
   // Small buffer for any final React effects
   await page.waitForTimeout(200);
@@ -38,7 +38,12 @@ export async function disableAnimations(page: Page): Promise<void> {
  * Use this instead of page.goto() for all E2E tests.
  */
 export async function gotoAndWait(page: Page, url: string): Promise<void> {
-  await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+  // Use domcontentloaded for faster initial load, then wait for React
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await disableAnimations(page);
   await waitForReactHydration(page);
+  // Wait for network to be idle after React hydration
+  await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {
+    // Ignore networkidle timeout - page may have long-polling connections
+  });
 }
