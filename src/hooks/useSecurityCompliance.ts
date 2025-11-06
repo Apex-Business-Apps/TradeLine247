@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface ComplianceCheck {
   check_name: string;
@@ -98,7 +99,15 @@ export const useSecurityCompliance = () => {
 
       setComplianceChecks(checks);
     } catch (error) {
-      console.error('Compliance check failed:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Compliance check failed: ${error instanceof Error ? error.message : String(error)}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +132,15 @@ export const useSecurityCompliance = () => {
         setComplianceChecks(typedCompliance);
       }
     } catch (error) {
-      console.error('Failed to get compliance status:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Failed to get compliance status: ${error instanceof Error ? error.message : String(error)}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
   }, []);
 
@@ -141,7 +158,15 @@ export const useSecurityCompliance = () => {
         }
       });
     } catch (error) {
-      console.error('Failed to log compliance event:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Failed to log compliance event: ${error instanceof Error ? error.message : String(error)}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
   }, []);
 

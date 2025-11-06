@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { errorReporter } from '@/lib/errorReporter';
 
 /**
  * Web Vitals Reporter Component
@@ -22,7 +23,15 @@ export function WebVitalsReporter() {
       const isValidMetric = roundedValue > 0 && roundedValue < 60000; // Must be between 0 and 60s for web vitals
       
       if (!isValidMetric) {
-        console.warn(`❌ Invalid ${name} metric: ${roundedValue}ms - ignoring`);
+        errorReporter.report({
+          type: 'error',
+          message: `Invalid ${name} metric: ${roundedValue}ms - ignoring`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { metric: name, value: roundedValue }
+        });
         return;
       }
 
@@ -73,7 +82,14 @@ export function WebVitalsReporter() {
       });
       lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
     } catch (e) {
-      console.warn('LCP observer not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'LCP observer not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
     // Observe CLS
@@ -89,7 +105,14 @@ export function WebVitalsReporter() {
       });
       clsObserver.observe({ type: 'layout-shift', buffered: true });
     } catch (e) {
-      console.warn('CLS observer not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'CLS observer not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
     // Observe FID (First Input Delay) as fallback
@@ -102,7 +125,14 @@ export function WebVitalsReporter() {
       });
       fidObserver.observe({ type: 'first-input', buffered: true });
     } catch (e) {
-      console.warn('FID observer not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'FID observer not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
     // Observe FCP
@@ -117,7 +147,14 @@ export function WebVitalsReporter() {
       });
       fcpObserver.observe({ type: 'paint', buffered: true });
     } catch (e) {
-      console.warn('FCP observer not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'FCP observer not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
     // Calculate TTFB from Navigation Timing
@@ -128,7 +165,14 @@ export function WebVitalsReporter() {
         reportMetric('TTFB', ttfb, getRating('TTFB', ttfb));
       }
     } catch (e) {
-      console.warn('TTFB calculation not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'TTFB calculation not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
   }, []);

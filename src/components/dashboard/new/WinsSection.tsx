@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { errorReporter } from '@/lib/errorReporter';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, TrendingUp, Phone } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,7 +34,15 @@ export const WinsSection: React.FC = () => {
         if (error) throw error;
         setWins(data || []);
       } catch (error) {
-        console.error('Error fetching wins:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Error fetching wins: ${error instanceof Error ? error.message : String(error)}`,
+          stack: error instanceof Error ? error.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
       } finally {
         setIsLoading(false);
       }

@@ -11,6 +11,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { errorReporter } from '@/lib/errorReporter';
 import { Settings, Home, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { paths } from '@/routes/paths';
@@ -44,7 +45,14 @@ export const WelcomeHeader: React.FC = () => {
 
         // If there's a JWT error, clear the corrupted session silently
         if (error?.message?.includes('malformed') || error?.message?.includes('invalid')) {
-          console.warn('[WelcomeHeader] Detected malformed token, ignoring:', error.message);
+          errorReporter.report({
+            type: 'error',
+            message: `[WelcomeHeader] Detected malformed token, ignoring: ${error.message}`,
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            environment: errorReporter['getEnvironment']()
+          });
           return;
         }
 
@@ -62,7 +70,15 @@ export const WelcomeHeader: React.FC = () => {
           }
         }
       } catch (err) {
-        console.error('[WelcomeHeader] Error fetching user:', err);
+        errorReporter.report({
+          type: 'error',
+          message: `[WelcomeHeader] Error fetching user: ${err instanceof Error ? err.message : String(err)}`,
+          stack: err instanceof Error ? err.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         setUserName('there');
       }
     }

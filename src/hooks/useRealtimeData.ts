@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface RealtimeOptions {
   table: string;
@@ -76,7 +77,15 @@ export function useRealtimeData<T>(
             }
           });
       } catch (err) {
-        console.error('Realtime setup error:', err);
+        errorReporter.report({
+          type: 'error',
+          message: `Realtime setup error: ${err instanceof Error ? err.message : String(err)}`,
+          stack: err instanceof Error ? err.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         setError(err instanceof Error ? err : new Error('Unknown realtime error'));
       }
     };

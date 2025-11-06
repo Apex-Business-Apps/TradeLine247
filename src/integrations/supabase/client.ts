@@ -6,6 +6,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { SUPABASE_CONFIG } from '@/config/supabase';
+import { errorReporter } from '@/lib/errorReporter';
 
 // Helpers -----------------------------------------------------
 function readEnv(name: string): string | undefined {
@@ -71,9 +72,17 @@ export const supabase: SupabaseClient<Database> = isSupabaseEnabled
 
 // Optional console note so devs know why features are no-op
 if (!isSupabaseEnabled && typeof console !== 'undefined') {
-  console.warn('[Supabase] Disabled in this environment.', {
-    host: typeof location !== 'undefined' ? location.hostname : 'n/a',
-    urlPresent: !!SUPABASE_URL,
-    anonPresent: !!SUPABASE_ANON_KEY,
+  errorReporter.report({
+    type: 'error',
+    message: '[Supabase] Disabled in this environment.',
+    timestamp: new Date().toISOString(),
+    url: typeof window !== 'undefined' ? window.location.href : '',
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+    environment: errorReporter['getEnvironment'](),
+    metadata: {
+      host: typeof location !== 'undefined' ? location.hostname : 'n/a',
+      urlPresent: !!SUPABASE_URL,
+      anonPresent: !!SUPABASE_ANON_KEY
+    }
   });
 }

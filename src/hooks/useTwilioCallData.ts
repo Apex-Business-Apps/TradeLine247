@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { errorReporter } from '@/lib/errorReporter';
 
 export interface TwilioCall {
   call_sid: string;
@@ -109,7 +110,15 @@ export const useTwilioCallData = () => {
 
       setError(null);
     } catch (err) {
-      console.error('Error fetching Twilio call data:', err);
+      errorReporter.report({
+        type: 'error',
+        message: `Error fetching Twilio call data: ${err instanceof Error ? err.message : String(err)}`,
+        stack: err instanceof Error ? err.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       setError(err instanceof Error ? err.message : 'Failed to fetch call data');
     } finally {
       setLoading(false);

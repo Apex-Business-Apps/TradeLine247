@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
 import { ensureMembership } from '@/lib/ensureMembership';
 import { toast } from '@/hooks/use-toast';
+import { errorReporter } from '@/lib/errorReporter';
 
 export type UserRole = 'admin' | 'moderator' | 'user';
 
@@ -86,7 +87,14 @@ export const useAuth = () => {
       // If there's a JWT error, clear the corrupted session
       const errorMsg = error?.message?.toLowerCase() || '';
       if (errorMsg.includes('malformed') || errorMsg.includes('invalid')) {
-        console.warn('[Auth] Detected malformed token, clearing session:', error.message);
+        errorReporter.report({
+          type: 'error',
+          message: `[Auth] Detected malformed token, clearing session: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         if (supabase.auth?.signOut) {
           supabase.auth.signOut().catch(() => {/* ignore errors during cleanup */});
         }
@@ -152,13 +160,29 @@ export const useAuth = () => {
         .maybeSingle();
       
       if (error) {
-        console.error('Error fetching user role:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Error fetching user role: ${error instanceof Error ? error.message : String(error)}`,
+          stack: error instanceof Error ? error.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         return;
       }
       
       setUserRole(data?.role || 'user');
     } catch (error) {
-      console.error('Error fetching user role:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Error fetching user role: ${error instanceof Error ? error.message : String(error)}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       setUserRole('user');
     }
   };
