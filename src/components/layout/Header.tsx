@@ -291,7 +291,7 @@ export const Header: React.FC = () => {
             </>
           ) : (
             <Button 
-              variant="default" 
+              variant="success" 
               size={isScrolled ? 'sm' : 'default'} 
               onClick={() => handleNavigation(paths.auth, 'Login')}
               className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
