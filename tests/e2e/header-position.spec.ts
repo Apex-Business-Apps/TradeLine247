@@ -7,11 +7,20 @@ test.describe('Header Position', () => {
     test(`header left elements should be positioned near left edge at ${width}px width`, async ({ page }) => {
       // Set viewport size
       await page.setViewportSize({ width, height: 800 });
-      await page.goto('/');
 
-      // Wait for header to be visible
+      // Header is visible on all pages, test on homepage
+      // Wait for network idle to ensure all resources loaded
+      await page.goto('/', { waitUntil: 'networkidle' });
+
+      // Wait for React hydration
+      await page.waitForLoadState('domcontentloaded');
+
+      // Wait for header to be visible (increased timeout for CI reliability)
       const headerLeft = page.locator('#app-header-left');
-      await expect(headerLeft).toBeVisible({ timeout: 10000 });
+      await expect(headerLeft).toBeVisible({ timeout: 15000 });
+
+      // Allow time for any CSS animations to complete
+      await page.waitForTimeout(300);
 
       const boundingBox = await headerLeft.boundingBox();
       expect(boundingBox).not.toBeNull();
@@ -27,4 +36,3 @@ test.describe('Header Position', () => {
     });
   }
 });
-
