@@ -140,7 +140,7 @@ export const Header: React.FC = () => {
     >
       <div
         data-header-inner
-        className="mx-auto w-full max-w-screen-2xl flex h-16 items-center justify-between gap-2 px-3 sm:px-4 lg:px-6"
+        className="mx-auto w-full max-w-screen-2xl flex h-16 items-center justify-between gap-2 px-4"
         data-lovable-lock="structure-only"
       >
         {/* Home Button & Badge */}
@@ -148,7 +148,7 @@ export const Header: React.FC = () => {
           id="app-header-left"
           data-testid="app-header-left"
           data-slot="left"
-          className="flex items-center gap-2 shrink-0 min-w-0 ml-0"
+          className="flex items-center gap-2 shrink-0 min-w-0 ml-0 pl-0"
           data-lovable-lock="structure-only"
           role="navigation"
           aria-label="Header left section"
@@ -303,16 +303,6 @@ export const Header: React.FC = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button
-                  variant="ghost"
-                  size={isScrolled ? 'sm' : 'default'}
-                  onClick={handleSignOut}
-                  className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 h-11 px-4"
-                  aria-label="Sign out"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden xl:inline">Sign Out</span>
-                </Button>
               </>
             ) : (
               <Button
