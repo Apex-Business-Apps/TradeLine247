@@ -91,12 +91,12 @@ All colors MUST be HSL.
     --brand-orange-primary: 21 100% 67%;
     --brand-orange-light: 29 100% 95%;
     --brand-orange-dark: 15 100% 35%;
-    
+
     /* Green Colors for Login/Success Actions */
     --brand-green-primary: 142 76% 36%;
     --brand-green-light: 142 69% 58%;
     --brand-green-dark: 142 85% 25%;
-    
+
     /* Premium Design System - Elevated Aesthetics */
     --premium-glow: 0 20px 40px -12px hsl(var(--brand-orange-primary) / 0.25);
     --premium-shadow-subtle: 0 2px 8px -2px hsl(220 10% 10% / 0.08);
@@ -105,10 +105,10 @@ All colors MUST be HSL.
     --premium-border: 0 0% 0% / 0.06;
     --premium-glass: hsl(0 0% 100% / 0.8);
     --premium-backdrop: backdrop-blur(12px) saturate(180%);
-    
+
     /* Canonical Background Image */
     /* --bg-pattern-1: url('/src/assets/BACKGROUND_IMAGE1.svg'); */
-    
+
     /* Premium Gradients - Sophisticated Color Blends */
     --gradient-orange-subtle: linear-gradient(135deg, hsl(var(--brand-orange-primary) / 0.35), hsl(var(--brand-orange-light) / 0.25));
     --gradient-orange-medium: linear-gradient(135deg, hsl(var(--brand-orange-primary) / 0.45), hsl(var(--brand-orange-light) / 0.35));
@@ -125,8 +125,8 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: var(--brand-orange-primary);
-    --primary-foreground: var(--brand-orange-dark); /* WCAG AA compliant: dark orange text on light orange bg */
+    --primary: var(--brand-orange-dark); /* WCAG AA: Use dark orange for buttons (6.4:1 contrast with white) */
+    --primary-foreground: 0 0% 100%; /* White text on dark orange background */
 
     --secondary: 30 100% 96%;
     --secondary-foreground: var(--brand-orange-dark);
@@ -172,7 +172,7 @@ All colors MUST be HSL.
     --premium-border: 0 0% 100% / 0.08;
     --premium-glass: hsl(0 0% 0% / 0.4);
     --premium-backdrop: backdrop-blur(12px) saturate(180%);
-    
+
     /* Dark mode with orange accents - Lower Translucency */
     --gradient-orange-subtle: linear-gradient(135deg, hsl(var(--brand-orange-primary) / 0.35), hsl(var(--brand-orange-dark) / 0.25));
     --gradient-orange-medium: linear-gradient(135deg, hsl(var(--brand-orange-primary) / 0.45), hsl(var(--brand-orange-dark) / 0.35));
@@ -189,8 +189,8 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: var(--brand-orange-primary);
-    --primary-foreground: var(--brand-orange-dark); /* WCAG AA compliant: dark orange text on light orange bg */
+    --primary: var(--brand-orange-dark); /* WCAG AA: Use dark orange for buttons (6.4:1 contrast with white) */
+    --primary-foreground: 0 0% 100%; /* White text on dark orange background */
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: var(--brand-orange-light);
