@@ -140,7 +140,7 @@ export const Header: React.FC = () => {
     >
       <div
         data-header-inner
-        className="mx-auto w-full max-w-screen-2xl flex h-16 items-center justify-between gap-2 px-3 sm:px-4 lg:px-6"
+        className="mx-auto w-full max-w-screen-2xl flex h-16 items-center justify-between gap-2 px-4 md:px-4"
         data-lovable-lock="structure-only"
       >
         {/* Home Button & Badge */}
@@ -148,7 +148,7 @@ export const Header: React.FC = () => {
           id="app-header-left"
           data-testid="app-header-left"
           data-slot="left"
-          className="flex items-center gap-2 shrink-0 min-w-0 ml-0"
+          className="flex items-center gap-2 shrink-0 min-w-0 ml-0 pl-0"
           data-lovable-lock="structure-only"
           role="navigation"
           aria-label="Header left section"
