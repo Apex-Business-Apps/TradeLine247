@@ -8,8 +8,7 @@ const pages = [
   { qa: /Integrations/i, h1: /Integrations/i, path: '/integrations' },
 ];
 
-// TODO: Re-enable after investigating CI environment navigation timing
-test.describe.skip('Nav & refresh', () => {
+test.describe('Nav & refresh', () => {
   for (const p of pages) {
     test(`Quick Action ${p.path} navigates & survives refresh`, async ({ page }) => {
       // Navigate and wait for React hydration
