@@ -1,0 +1,49 @@
+import { Page, expect } from '@playwright/test';
+
+/**
+ * Wait for React hydration to complete using explicit signal.
+ * This is the most reliable method - main.tsx sets window.__REACT_READY__ after mount.
+ */
+export async function waitForReactHydration(page: Page, timeout = 45000): Promise<void> {
+  // Wait for explicit React ready signal from main.tsx
+  await page.waitForFunction(() => (window as any).__REACT_READY__ === true, { timeout });
+
+  // Additional safety: wait for app header to be visible (using data-site-header attribute)
+  await expect(page.locator('header[data-site-header]')).toBeVisible({ timeout: 10000 });
+
+  // Small buffer for any final React effects
+  await page.waitForTimeout(200);
+}
+
+/**
+ * Disable all CSS animations and transitions for deterministic test execution.
+ * Injected CSS takes precedence over all other styles.
+ */
+export async function disableAnimations(page: Page): Promise<void> {
+  await page.addStyleTag({
+    content: `
+      *, *::before, *::after {
+        animation-duration: 0s !important;
+        animation-delay: 0s !important;
+        transition-duration: 0s !important;
+        transition-delay: 0s !important;
+        scroll-behavior: auto !important;
+      }
+    `,
+  });
+}
+
+/**
+ * Navigate to a page and wait for React hydration.
+ * Use this instead of page.goto() for all E2E tests.
+ */
+export async function gotoAndWait(page: Page, url: string): Promise<void> {
+  // Use domcontentloaded for faster initial load, then wait for React
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await disableAnimations(page);
+  await waitForReactHydration(page);
+  // Wait for network to be idle after React hydration
+  await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {
+    // Ignore networkidle timeout - page may have long-polling connections
+  });
+}

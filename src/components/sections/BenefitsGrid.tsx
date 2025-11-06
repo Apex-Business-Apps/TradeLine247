@@ -29,7 +29,7 @@ export const BenefitsGrid = () => {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             The TradeLine 24/7 Difference
           </h2>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-[#1e556b]">
+          <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-foreground/90">
             Three ways we keep your business moving
           </p>
         </div>
@@ -52,7 +52,7 @@ export const BenefitsGrid = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <CardDescription className="text-center leading-relaxed text-base text-[#1e556b] group-hover:text-foreground transition-colors duration-300">
+                  <CardDescription className="text-center leading-relaxed text-base text-foreground/90 group-hover:text-foreground transition-colors duration-300">
                     {benefit.description}
                   </CardDescription>
                 </CardContent>
