@@ -114,45 +114,6 @@ export function calculateQuote(params: {
   };
 }
 
-export function calculateFinancePayment(params: {
-  quote: QuoteCalculation;
-  financeTerm: number; // months
-  financeRate: number; // annual percentage rate (e.g., 5.99 for 5.99%)
-}): FinanceCalculation {
-  const { quote, financeTerm, financeRate } = params;
-
-  // Convert annual rate to monthly rate
-  const monthlyRate = financeRate / 100 / 12;
-
-  // Calculate monthly payment using standard loan formula
-  // P = L[c(1 + c)^n]/[(1 + c)^n - 1]
-  let paymentAmount = 0;
-  let totalInterest = 0;
-
-  if (monthlyRate > 0) {
-    const numerator = quote.amountToFinance * monthlyRate * Math.pow(1 + monthlyRate, financeTerm);
-    const denominator = Math.pow(1 + monthlyRate, financeTerm) - 1;
-    paymentAmount = numerator / denominator;
-    
-    const totalFinanced = paymentAmount * financeTerm;
-    totalInterest = totalFinanced - quote.amountToFinance;
-  } else {
-    // 0% financing
-    paymentAmount = quote.amountToFinance / financeTerm;
-  }
-
-  const totalFinanced = paymentAmount * financeTerm;
-
-  return {
-    ...quote,
-    financeTerm,
-    financeRate,
-    paymentAmount,
-    totalInterest,
-    totalFinanced,
-  };
-}
-
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-CA', {
     style: 'currency',
@@ -164,4 +125,115 @@ export function formatCurrency(amount: number): string {
 
 export function formatPercent(rate: number): string {
   return `${rate.toFixed(2)}%`;
+}
+
+// ============================================================================
+// LEGACY API FUNCTIONS (for backward compatibility with existing tests)
+// ============================================================================
+
+/**
+ * Legacy function for calculating provincial taxes
+ * Used by existing unit tests - maintained for backward compatibility
+ *
+ * @param amount - The taxable amount
+ * @param province - The province code (e.g., 'ON', 'BC', 'QC')
+ * @returns Object with tax breakdown
+ */
+export function calculateProvincialTaxes(amount: number, province: Province) {
+  const taxRates = PROVINCIAL_TAX_RATES[province] || { gst: 0, pst: 0, hst: 0, total: 0 };
+
+  return {
+    gst: amount * taxRates.gst,
+    pst: amount * taxRates.pst,
+    hst: amount * taxRates.hst,
+    qst: province === 'QC' ? amount * taxRates.pst : 0, // QST is Quebec's PST
+    total: amount * taxRates.total,
+  };
+}
+
+/**
+ * Legacy function overload for calculating finance payments
+ * Used by existing unit tests - maintained for backward compatibility
+ *
+ * @param principal - The loan principal amount
+ * @param annualRate - The annual percentage rate (e.g., 6.99 for 6.99%)
+ * @param termMonths - The loan term in months
+ * @returns Monthly payment amount
+ */
+export function calculateFinancePayment(
+  principal: number,
+  annualRate: number,
+  termMonths: number
+): number;
+
+/**
+ * Modern function signature for calculating finance payments with full quote
+ * Returns complete finance calculation with all fields
+ */
+export function calculateFinancePayment(params: {
+  quote: QuoteCalculation;
+  financeTerm: number;
+  financeRate: number;
+}): FinanceCalculation;
+
+// Implementation with function overloading
+export function calculateFinancePayment(
+  principalOrParams: number | { quote: QuoteCalculation; financeTerm: number; financeRate: number },
+  annualRate?: number,
+  termMonths?: number
+): number | FinanceCalculation {
+  // Legacy signature: (principal: number, annualRate: number, termMonths: number)
+  if (typeof principalOrParams === 'number' && typeof annualRate === 'number' && typeof termMonths === 'number') {
+    const principal = principalOrParams;
+
+    // 0% financing case
+    if (annualRate === 0) {
+      return principal / termMonths;
+    }
+
+    // Calculate monthly payment using standard loan formula
+    const monthlyRate = annualRate / 100 / 12;
+    const numerator = principal * monthlyRate * Math.pow(1 + monthlyRate, termMonths);
+    const denominator = Math.pow(1 + monthlyRate, termMonths) - 1;
+
+    return numerator / denominator;
+  }
+
+  // Modern signature: (params: { quote, financeTerm, financeRate })
+  if (typeof principalOrParams === 'object') {
+    const { quote, financeTerm, financeRate } = principalOrParams;
+
+    // Convert annual rate to monthly rate
+    const monthlyRate = financeRate / 100 / 12;
+
+    // Calculate monthly payment using standard loan formula
+    let paymentAmount = 0;
+    let totalInterest = 0;
+
+    if (monthlyRate > 0) {
+      const numerator = quote.amountToFinance * monthlyRate * Math.pow(1 + monthlyRate, financeTerm);
+      const denominator = Math.pow(1 + monthlyRate, financeTerm) - 1;
+      paymentAmount = numerator / denominator;
+
+      const totalFinanced = paymentAmount * financeTerm;
+      totalInterest = totalFinanced - quote.amountToFinance;
+    } else {
+      // 0% financing
+      paymentAmount = quote.amountToFinance / financeTerm;
+    }
+
+    const totalFinanced = paymentAmount * financeTerm;
+
+    return {
+      ...quote,
+      financeTerm,
+      financeRate,
+      paymentAmount,
+      totalInterest,
+      totalFinanced,
+    };
+  }
+
+  // This should never happen, but TypeScript needs a return
+  throw new Error('Invalid arguments to calculateFinancePayment');
 }
