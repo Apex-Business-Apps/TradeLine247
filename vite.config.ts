@@ -66,6 +66,7 @@ export default defineConfig(({ mode }) => ({
     headers: securityHeaders,
   },
   preview: {
+    port: 8080,
     headers: securityHeaders,
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
