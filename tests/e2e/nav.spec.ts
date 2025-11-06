@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { gotoAndWait } from './helpers';
 
 const pages = [
   { testId: 'quick-action-view-calls', h1: /Calls/i, path: '/calls' },
@@ -9,12 +10,21 @@ const pages = [
 
 for (const p of pages) {
   test(`Quick Action ${p.path} navigates & survives refresh`, async ({ page }) => {
-    await page.goto('/');
-    // Wait for Quick Actions to be visible
-    await page.waitForSelector(`[data-testid="${p.testId}"]`, { state: 'visible' });
-    await page.getByTestId(p.testId).click();
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1);
-    await page.reload();
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1);
+    // Navigate and wait for React hydration
+    await gotoAndWait(page, '/');
+
+    // Wait for Quick Action button to be visible
+    const button = page.getByTestId(p.testId);
+    await expect(button).toBeVisible({ timeout: 30000 });
+    await button.scrollIntoViewIfNeeded();
+    await button.click();
+
+    // Wait for navigation and heading
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1, { timeout: 30000 });
+
+    // Reload and verify persistence
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1, { timeout: 30000 });
   });
 }

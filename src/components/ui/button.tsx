@@ -15,7 +15,7 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "bg-transparent text-foreground hover:bg-muted",
         link: "text-primary underline-offset-4 hover:underline",
-        success: "bg-green-700 text-white hover:bg-green-800",
+        success: "bg-[hsl(142_85%_25%)] text-white hover:bg-[hsl(142_90%_20%)]", // WCAG AA: brand-green-dark (5.76:1 contrast)
       },
       size: {
         default: "h-10 px-4 py-2",

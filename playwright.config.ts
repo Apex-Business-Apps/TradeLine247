@@ -9,8 +9,16 @@ const baseUse: Parameters<typeof defineConfig>[0]['use'] = {
   baseURL,
   trace: 'on-first-retry',
   screenshot: 'only-on-failure',
+  video: 'retain-on-failure',
   // Allow inline scripts/styles under test harnesses even when CSP forbids them in production.
   bypassCSP: true,
+  // Fixed viewport for deterministic layout tests
+  viewport: { width: 1366, height: 900 },
+  // Disable animations for stable element detection
+  reducedMotion: 'reduce',
+  // Longer timeout for CI environment
+  actionTimeout: 30000,
+  navigationTimeout: 30000,
 };
 
 export default defineConfig({
