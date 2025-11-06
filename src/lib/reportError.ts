@@ -29,7 +29,27 @@ export async function reportError(err: unknown, orgId?: string) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-  } catch (_) {
-    // no-op: logging bridge must not throw
+  } catch (reportingError) {
+    // Fallback: Store error in localStorage for debugging
+    try {
+      const fallbackKey = 'error_reporting_failures';
+      const existing = JSON.parse(localStorage.getItem(fallbackKey) || '[]');
+      existing.push({
+        originalError: err instanceof Error ? err.message : String(err),
+        reportingError: reportingError instanceof Error ? reportingError.message : String(reportingError),
+        timestamp: new Date().toISOString(),
+        userAgent: navigator?.userAgent || 'unknown'
+      });
+      // Keep only last 10 failures to prevent localStorage bloat
+      const limited = existing.slice(-10);
+      localStorage.setItem(fallbackKey, JSON.stringify(limited));
+    } catch (storageError) {
+      // Final fallback - console only (better than complete silence)
+      console.error('[reportError] Failed to report error and store fallback:', {
+        originalError: err,
+        reportingError,
+        storageError
+      });
+    }
   }
 }
