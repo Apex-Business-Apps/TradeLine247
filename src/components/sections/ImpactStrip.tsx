@@ -6,17 +6,17 @@ export const ImpactStrip = () => {
     icon: TrendingUp,
     title: "More booked work",
     description: "Fewer voicemails means more conversations and more wins.",
-    color: "text-green-600"
+    color: "text-[hsl(var(--status-success))]" // WCAG AA: 5.76:1 contrast
   }, {
     icon: Clock,
     title: "Time back",
     description: "We cover nights and busy hours so you don't have to.",
-    color: "text-blue-600"
+    color: "text-[hsl(var(--status-info))]" // WCAG AA: 4.56:1 contrast
   }, {
     icon: DollarSign,
     title: "Lower costs",
     description: "Coverage without hiring overhead.",
-    color: "text-orange-600"
+    color: "text-primary" // Brand orange, use for large elements only (3.03:1)
   }];
   return <section className="py-16 bg-muted/30">
       <div className="container">
@@ -37,7 +37,8 @@ export const ImpactStrip = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {impacts.map((impact, index) => {
           const Icon = impact.icon;
-          return <Card key={index} className={`text-center border-0 bg-background/50 backdrop-blur-sm hover:bg-background/80 transition-all duration-300 hover-scale group animate-fade-in`} style={{
+          {/* Increased card opacity to 90% (from 50%) for WCAG contrast */}
+          return <Card key={index} className={`text-center border-0 bg-background/90 backdrop-blur-sm hover:bg-background/95 transition-all duration-300 hover-scale group animate-fade-in`} style={{
             animationDelay: `${index * 150}ms`
           }}>
                 <CardHeader className="pb-4">
