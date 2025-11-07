@@ -83,16 +83,35 @@ All colors MUST be HSL.
 */
 
 @layer base {
+  html,
+  body {
+    color: hsl(var(--foreground));
+    background: hsl(var(--background));
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
   }
+
   a {
-    color: hsl(var(--brand-orange-dark));
+    color: #1d4ed8;
     text-underline-offset: 2px;
     text-decoration-thickness: 1.5px;
   }
+
+  a:hover {
+    color: #1e40af;
+  }
+
   .dark a {
     color: hsl(var(--brand-orange-light));
+  }
+
+  ::placeholder,
+  input::placeholder,
+  textarea::placeholder {
+    color: hsl(var(--muted-foreground));
+    opacity: 1;
   }
   :root {
     /* Brand Orange Colors from Logo - Primary Brand Color */
@@ -166,7 +185,7 @@ All colors MUST be HSL.
     --overlay-orange: hsl(var(--brand-orange-primary) / 0.30);
 
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -181,10 +200,10 @@ All colors MUST be HSL.
     --secondary-foreground: var(--brand-orange-dark);
 
     --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 30%; /* WCAG AA compliant: 5.2:1 contrast ratio (meets 4.5:1 minimum) */
+    --muted-foreground: 215 28% 27%;
 
-    --accent: var(--brand-orange-light);
-    --accent-foreground: var(--brand-orange-dark);
+    --accent: var(--brand-orange-dark);
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -268,7 +287,7 @@ All colors MUST be HSL.
     --muted-foreground: 215 20.2% 65.1%;
 
     --accent: var(--brand-orange-dark);
-    --accent-foreground: var(--brand-orange-light);
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -375,7 +394,7 @@ body.session-warning::before {
 
 /* Fix muted text for better readability in light mode */
 .text-muted-foreground {
-  color: hsl(215.4 16.3% 46%) !important; /* Readable while less aggressive */
+  color: hsl(var(--muted-foreground)) !important;
 }
 
 /* Dark mode: lighter muted text for readability */
@@ -390,14 +409,14 @@ html.dark .text-muted-foreground {
 html:not(.dark) input::placeholder,
 :root:not(.dark) textarea::placeholder,
 html:not(.dark) textarea::placeholder {
-  color: hsl(215.4 16.3% 40%) !important; /* 4.8:1 contrast on white - WCAG AA compliant */
-  opacity: 0.7 !important;
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 1 !important;
 }
 
 .dark input::placeholder,
 .dark textarea::placeholder {
   color: hsl(215 20.2% 65.1%) !important; /* Readable on dark backgrounds */
-  opacity: 0.7 !important;
+  opacity: 1 !important;
 }
 
 /* Enhanced focus states for better accessibility */

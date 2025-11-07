@@ -60,15 +60,15 @@ export default function HeroRoiDuo() {
           <h1 id="hero-h1" className="mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent font-extrabold" style={{ fontSize: 'clamp(2rem, 5vw + 1rem, 4.5rem)', lineHeight: '1.1' }} data-lovable-lock="structure-only">
             Your 24/7 Ai Receptionist!
           </h1>
-          <p className="mb-8 max-w-3xl mx-auto font-semibold text-foreground/80" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5' }} data-lovable-lock="structure-only">
+          <p className="mb-8 max-w-3xl mx-auto font-semibold text-foreground" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5' }} data-lovable-lock="structure-only">
             Never miss a call. Work while you sleep.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-8 text-sm md:text-base">
-            <a href="/security" className="text-primary hover:underline font-medium">🔒 Enterprise Security</a>
+            <a href="/security" className="text-[hsl(var(--brand-orange-dark))] hover:underline font-medium">🔒 Enterprise Security</a>
             <span className="text-muted-foreground">•</span>
-            <a href="/compare" className="text-primary hover:underline font-medium">📊 Compare Services</a>
+            <a href="/compare" className="text-[hsl(var(--brand-orange-dark))] hover:underline font-medium">📊 Compare Services</a>
             <span className="text-muted-foreground">•</span>
-            <a href="/pricing" className="text-primary hover:underline font-medium">💰 See Pricing</a>
+            <a href="/pricing" className="text-[hsl(var(--brand-orange-dark))] hover:underline font-medium">💰 See Pricing</a>
           </div>
           
           {/* Premium Phone Number - WCAG AA: fully opaque white, darker orange (7.14:1) */}
@@ -84,7 +84,7 @@ export default function HeroRoiDuo() {
             <span className="text-sm font-semibold uppercase tracking-wide text-[hsl(var(--brand-orange-dark))]/90">FOR DEMO</span>
           </a>
           
-          <h2 className="text-foreground/90 mb-12 mt-16 text-center py-0 font-semibold mx-auto" style={{ fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 2.5rem)' }} data-lovable-lock="structure-only">Help us help you.</h2>
+          <h2 className="text-foreground mb-12 mt-16 text-center py-0 font-semibold mx-auto" style={{ fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 2.5rem)' }} data-lovable-lock="structure-only">Help us help you.</h2>
           
           {/* Custom grid layout for side-by-side components */}
           <div className="hero-roi__container mx-auto" data-lovable-lock="structure-only" aria-label="Start Trial and ROI">
