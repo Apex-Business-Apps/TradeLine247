@@ -16,6 +16,11 @@
     <meta name="theme-color" content="#d32f2f" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
     
+    <!-- Performance Resource Hints -->
+    <link rel="dns-prefetch" href="https://niorocndzcflrwdrofsp.supabase.co" />
+    <link rel="preconnect" href="https://niorocndzcflrwdrofsp.supabase.co" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
     <!-- Security Headers -->
     <!-- NOTE: X-Frame-Options removed - Service Worker applies CSP with frame-ancestors for superior control -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -24,7 +29,7 @@
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://niorocndzcflrwdrofsp.supabase.co wss://niorocndzcflrwdrofsp.supabase.co https://api.lovable.app; frame-ancestors 'self' https://*.lovable.dev https://*.lovableproject.com https://*.lovable.app; base-uri 'self'; form-action 'self';" />
-    
+
     <title>AutoRepAi - Advanced Dealership AI Platform</title>
     
     <!-- SEO -->
@@ -57,8 +62,16 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
-            .catch(err => console.error('[PWA] Service Worker registration failed:', err));
+            .then(reg => {
+              if (import.meta.env.DEV) {
+                console.log('[PWA] Service Worker registered:', reg.scope);
+              }
+            })
+            .catch(err => {
+              if (import.meta.env.DEV) {
+                console.error('[PWA] Service Worker registration failed:', err);
+              }
+            });
         });
       }
     </script>
