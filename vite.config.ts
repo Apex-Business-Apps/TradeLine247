@@ -1,11 +1,29 @@
 import { defineConfig } from "vite";
+import type { Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { componentTagger } from "lovable-tagger";
 
+function healthMock(): Plugin {
+  return {
+    name: 'dev-health-mock',
+    configureServer(server) {
+      server.middlewares.use('/functions/v1/healthz', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ healthy: true, env: 'dev' }));
+      });
+      server.middlewares.use('/functions/v1/prewarm-cron', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ endpoints_warmed: true, count: 2 }));
+      });
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
+    healthMock(),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   base: "/",

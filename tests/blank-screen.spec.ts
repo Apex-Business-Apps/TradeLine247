@@ -82,7 +82,8 @@ test.describe('Blank Screen Prevention', () => {
     });
     
     // Should be at least viewport height
-    const viewportHeight = await page.viewportSize().then(vp => vp?.height || 0);
+    const vp = page.viewportSize();
+    const viewportHeight = (vp?.height ?? 0);
     expect(rootHeight).toBeGreaterThanOrEqual(viewportHeight * 0.9);
   });
 

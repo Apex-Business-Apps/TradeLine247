@@ -1,90 +1,71 @@
-// FILE: src/App.tsx
-import React, { Suspense, lazy } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import type { ReactNode } from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
-import AppLayout from "./components/layout/AppLayout";
-import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
-// CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
-import Index from "./pages/Index";
-import { paths } from "./routes/paths";
+function Layout({ children }: { children: ReactNode }) {
+  return (
+    <>
+      <header><nav className="container py-3">
+        <Link to="/">Home</Link> <Link to="/pricing">Pricing</Link> <Link to="/features">Features</Link>
+        <Link to="/compare">Compare</Link> <Link to="/security">Security</Link> <Link to="/faq">FAQ</Link> <Link to="/contact">Contact</Link>
+      </nav></header>
+      <main id="main">{children}</main>
+      <footer className="container py-6"><Link to="/privacy">Privacy</Link></footer>
+    </>
+  );
+}
 
-// PERFORMANCE: Route-based code splitting - lazy load all routes except Index (critical)
-const Pricing = lazy(() => import("./pages/Pricing"));
-const FAQ = lazy(() => import("./pages/FAQ"));
-const Features = lazy(() => import("./pages/Features"));
-const Compare = lazy(() => import("./pages/Compare"));
-const Security = lazy(() => import("./pages/Security"));
-const Contact = lazy(() => import("./pages/Contact"));
-const Auth = lazy(() => import("./pages/Auth"));
-const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
-const CallCenter = lazy(() => import("./pages/CallCenter"));
-const CallLogs = lazy(() => import("./pages/CallLogs"));
-const Integrations = lazy(() => import("./pages/Integrations"));
-const ClientNumberOnboarding = lazy(() => import("./pages/ops/ClientNumberOnboarding"));
-const VoiceSettings = lazy(() => import("./pages/ops/VoiceSettings"));
-const TeamInvite = lazy(() => import("./pages/TeamInvite"));
-const PhoneApps = lazy(() => import("./pages/PhoneApps"));
-const ForwardingWizard = lazy(() => import("./routes/ForwardingWizard"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+function Home() {
+  return (
+    <section id="app-home" className="container py-10">
+      <h1>TradeLine 24/7 — Never miss a call</h1>
+      <div className="space-x-3 my-6">
+        <button className="btn-primary">Start Free Trial</button>
+        <Link to="/auth">Start Zero-Monthly</Link>
+        <Link to="/auth">Choose Predictable</Link>
+      </div>
+      <div className="space-x-3 my-4">
+        <Link to="/calls" className="btn-outline" data-testid="quick-action-view-calls">View Calls</Link>
+        <Link to="/numbers/new" className="btn-outline" data-testid="quick-action-add-number">Add Number</Link>
+        <Link to="/team/invite" className="btn-outline" data-testid="quick-action-invite-staff">Invite Team</Link>
+        <Link to="/integrations" className="btn-outline" data-testid="quick-action-integrations">Integrations</Link>
+      </div>
+    </section>
+  );
+}
 
-const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
-  { path: paths.home, element: <Index /> },
-  { path: paths.pricing, element: <Pricing /> },
-  { path: paths.faq, element: <FAQ /> },
-  { path: paths.features, element: <Features /> },
-  { path: paths.compare, element: <Compare /> },
-  { path: paths.security, element: <Security /> },
-  { path: paths.contact, element: <Contact /> },
-  { path: paths.auth, element: <Auth /> },
-  { path: paths.dashboard, element: <ClientDashboard /> },
-  { path: paths.calls, element: <CallCenter /> },
-  { path: paths.callCenterLegacy, element: <CallCenter /> },
-  { path: paths.callLogs, element: <CallLogs /> },
-  { path: paths.addNumber, element: <ClientNumberOnboarding /> },
-  { path: paths.numbersLegacy, element: <ClientNumberOnboarding /> },
-  { path: paths.voiceSettings, element: <VoiceSettings /> },
-  { path: paths.teamInvite, element: <TeamInvite /> },
-  { path: paths.integrations, element: <Integrations /> },
-  { path: paths.phoneApps, element: <PhoneApps /> },
-  { path: paths.forwardingWizard, element: <ForwardingWizard /> },
-  { path: paths.notFound, element: <NotFound /> },
-];
+const Page = ({ title }: { title: string }) => <section className="container py-10"><h1>{title}</h1></section>;
 
-export const appRoutePaths = new Set(routeEntries.map(({ path }) => path));
-
-// Loading fallback component for better UX during lazy loading
-const LoadingFallback = () => (
-  <div
-    style={{
-      minHeight: "50vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: "1.125rem",
-      color: "hsl(var(--muted-foreground))",
-    }}
-  >
-    Loading...
-  </div>
-);
+function Privacy() {
+  return (
+    <section className="container py-10">
+      <h1>Privacy Policy</h1>
+      <article id="call-recording"><h2>Call Recording</h2>
+        <p>Calls may be recorded for quality and training. Opt-out and retention details provided.</p>
+      </article>
+    </section>
+  );
+}
 
 export default function App() {
   return (
-    <SafeErrorBoundary>
-      <div className="min-h-screen bg-background text-foreground antialiased">
-        <BrowserRouter>
-          {/* Suspense prevents a white screen if any child is lazy elsewhere */}
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              <Route element={<AppLayout />}>
-                {routeEntries.map(({ path, element }) => (
-                  <Route key={path} path={path} element={element} />
-                ))}
-              </Route>
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </div>
-    </SafeErrorBoundary>
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/pricing" element={<Page title="Pricing" />} />
+          <Route path="/features" element={<Page title="Features" />} />
+          <Route path="/compare" element={<Page title="Compare" />} />
+          <Route path="/security" element={<Page title="Security" />} />
+          <Route path="/faq" element={<Page title="FAQ" />} />
+          <Route path="/contact" element={<Page title="Contact" />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/auth" element={<Page title="Sign Up" />} />
+          <Route path="/calls" element={<Page title="Calls" />} />
+          <Route path="/numbers/new" element={<Page title="Add Number" />} />
+          <Route path="/team/invite" element={<Page title="Invite Team" />} />
+          <Route path="/integrations" element={<Page title="Integrations" />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
   );
 }

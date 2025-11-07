@@ -180,6 +180,7 @@ function boot() {
           }, 1500);
         });
       } else {
+        console.log('SAFE MODE ACTIVE');
         console.log('🛡️ Safe Mode: Optional features disabled');
       }
     }, 100);
