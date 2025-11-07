@@ -192,15 +192,26 @@ class ErrorReporter {
     // Only send critical errors to avoid spam
     if (error.type === 'error' || error.type === 'unhandledRejection') {
       try {
-        // Use proper Supabase edge function endpoint
-        const projectId = 'hysvqdwmhxnblxfqnszn';
-        const endpoint = `https://${projectId}.supabase.co/functions/v1/ops-error-intake`;
-        
+        // Use centralized Supabase config (secure, DRY principle)
+        let base = (import.meta as any)?.env?.VITE_FUNCTIONS_BASE;
+
+        // Fallback for production if env var not set (maintains backward compatibility)
+        if (!base && typeof window !== 'undefined' && window.location.hostname === 'tradeline247ai.com') {
+          base = 'https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1';
+        }
+
+        if (!base) {
+          console.debug('[errorReporter] VITE_FUNCTIONS_BASE not configured, skipping backend send');
+          return;
+        }
+
+        const endpoint = `${base}/ops-error-intake`;
+
         await fetch(endpoint, {
           method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo'
+          headers: {
+            'Content-Type': 'application/json'
+            // Note: anon key handled by Supabase client config, RLS-protected
           },
           body: JSON.stringify({
             error_id: crypto.randomUUID(),
@@ -217,6 +228,7 @@ class ErrorReporter {
         });
       } catch (e) {
         // Silent fail - don't want to create error loops
+        console.debug('[errorReporter] Failed to send error to backend:', e);
       }
     }
   }

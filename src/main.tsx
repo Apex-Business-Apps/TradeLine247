@@ -83,9 +83,12 @@ if ('serviceWorker' in navigator) {
 }
 
 const root = document.getElementById('root');
-if (!root) { 
-  document.body.innerHTML = '<pre>Missing #root</pre>'; 
-  throw new Error('Missing #root'); 
+if (!root) {
+  // Safe DOM manipulation instead of innerHTML
+  const errorPre = document.createElement('pre');
+  errorPre.textContent = 'Missing #root';
+  document.body.appendChild(errorPre);
+  throw new Error('Missing #root');
 }
 
 // CRITICAL: Hide loading fallback immediately when this script executes (non-blocking, safe)

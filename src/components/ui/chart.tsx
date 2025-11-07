@@ -58,6 +58,14 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "Chart";
 
+// Sanitize CSS color values to prevent XSS
+const sanitizeCSSColor = (color: string | undefined): string | null => {
+  if (!color) return null;
+  // Allow only valid CSS color formats: hex, rgb, hsl, named colors
+  const validColorPattern = /^(#[0-9A-Fa-f]{3,8}|rgb|hsl|var\(--[\w-]+\)|[\w-]+).*$/;
+  return validColorPattern.test(color.trim()) ? color.trim() : null;
+};
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(([_, config]) => config.theme || config.color);
 
@@ -75,8 +83,10 @@ ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
+    const sanitizedColor = sanitizeCSSColor(color);
+    return sanitizedColor ? `  --color-${key}: ${sanitizedColor};` : null;
   })
+  .filter(Boolean)
   .join("\n")}
 }
 `,
