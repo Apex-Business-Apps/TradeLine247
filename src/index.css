@@ -87,7 +87,12 @@ All colors MUST be HSL.
     @apply bg-background text-foreground antialiased;
   }
   a {
-    color: hsl(var(--primary));
+    color: hsl(var(--brand-orange-dark));
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1.5px;
+  }
+  .dark a {
+    color: hsl(var(--brand-orange-light));
   }
   :root {
     /* Brand Orange Colors from Logo - Primary Brand Color */
