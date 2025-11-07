@@ -153,7 +153,8 @@ function boot() {
     // Load optional features after mount (non-blocking)
     setTimeout(() => {
       import("./styles/roi-table.css").catch(e => console.warn('⚠️ ROI table CSS failed:', e));
-      import("./styles/header-align.css").catch(e => console.warn('⚠️ Header align CSS failed:', e));
+      // CRITICAL FIX: header-align.css must load synchronously to prevent layout shifts
+      // Moved to index.css import for synchronous loading
       
       // Check for safe mode
       const urlParams = new URLSearchParams(window.location.search);

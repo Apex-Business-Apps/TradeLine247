@@ -2,6 +2,8 @@
 /* Previously: @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); */
 /* This was render-blocking. Now using async loading in index.html (line 37-38) */
 @import './styles/hero-roi.css';
+/* CRITICAL: header-align.css must load synchronously to prevent header layout shifts and z-index conflicts */
+@import './styles/header-align.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
