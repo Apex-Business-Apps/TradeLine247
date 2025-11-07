@@ -8,6 +8,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './tests/setup.ts',
+    testTimeout: 10000, // 10 second timeout for each test
+    bail: 1, // Stop test execution after first failure (fail fast in CI)
     include: ['tests/unit/**/*.{test,spec}.{ts,tsx}'], // Only run unit tests
     exclude: [
       'node_modules/',
