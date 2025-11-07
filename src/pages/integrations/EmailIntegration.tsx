@@ -100,7 +100,7 @@ TradeLine 24/7 Team`);
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-green-500/10 to-green-500/5">
-              <Mail className="h-6 w-6 text-green-600" />
+              <Mail className="h-6 w-6 text-[hsl(142,85%,25%)]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Email Integrations</h1>
@@ -136,7 +136,7 @@ TradeLine 24/7 Team`);
                       </div>
                     </div>
                   </div>
-                  <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                  <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">
                     Available
                   </Badge>
                 </div>
@@ -148,7 +148,7 @@ TradeLine 24/7 Team`);
                   <div className="space-y-1">
                     {provider.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
-                        <CheckCircle className="h-3 w-3 text-green-500" />
+                        <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}

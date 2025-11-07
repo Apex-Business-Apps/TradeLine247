@@ -29,7 +29,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'Android',
     features: ['Call screening', 'Smart replies', 'Contact integration', 'Call recording'],
-    color: 'bg-green-500/10 text-green-600 border-green-500/20'
+    color: 'bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]'
   },
   {
     id: 'imessage',
@@ -49,7 +49,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'Android',
     features: ['RCS support', 'Smart compose', 'Spam detection', 'Web sync'],
-    color: 'bg-green-500/10 text-green-600 border-green-500/20'
+    color: 'bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]'
   }
 ];
 
@@ -166,7 +166,7 @@ const PhoneIntegration = () => {
                         </Badge>
                       </div>
                     </div>
-                    <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                    <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">
                       Available
                     </Badge>
                   </div>
@@ -178,7 +178,7 @@ const PhoneIntegration = () => {
                     <div className="grid grid-cols-1 gap-1">
                       {integration.features.map((feature) => (
                         <div key={feature} className="flex items-center gap-2 text-xs">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
+                          <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                           <span className="text-muted-foreground">{feature}</span>
                         </div>
                       ))}
@@ -238,7 +238,7 @@ const PhoneIntegration = () => {
                     <div className="grid grid-cols-2 gap-1">
                       {provider.features.map((feature) => (
                         <div key={feature} className="flex items-center gap-2 text-xs">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
+                          <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                           <span className="text-muted-foreground">{feature}</span>
                         </div>
                       ))}

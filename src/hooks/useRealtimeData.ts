@@ -36,12 +36,16 @@ export function useRealtimeData<T>(
   } = options;
 
   useEffect(() => {
-    let channel: RealtimeChannel;
+    let channel: RealtimeChannel | null = null;
+    let isCleanedUp = false;
 
-    const setupRealtime = () => {
+    const setupRealtime = async () => {
       try {
+        // Prevent setup if already cleaned up (race condition protection)
+        if (isCleanedUp) return;
+
         channel = supabase
-          .channel(`realtime-${table}`)
+          .channel(`realtime-${table}-${Date.now()}`) // Unique channel name to prevent conflicts
           .on(
             'postgres_changes' as any,
             {
@@ -51,14 +55,17 @@ export function useRealtimeData<T>(
               filter
             },
             (payload: RealtimePayload<T>) => {
+              // Ignore updates if component unmounted
+              if (isCleanedUp) return;
+
               console.log('Realtime payload:', payload);
-              
+
               switch (payload.eventType) {
                 case 'INSERT':
                   setData(prev => [...prev, payload.new]);
                   break;
                 case 'UPDATE':
-                  setData(prev => 
+                  setData(prev =>
                     prev.map(item => {
                       const itemWithId = item as unknown as DataWithId;
                       const newWithId = payload.new as unknown as DataWithId;
@@ -67,7 +74,7 @@ export function useRealtimeData<T>(
                   );
                   break;
                 case 'DELETE':
-                  setData(prev => 
+                  setData(prev =>
                     prev.filter(item => {
                       const itemWithId = item as unknown as DataWithId;
                       const oldWithId = payload.old as unknown as DataWithId;
@@ -79,9 +86,12 @@ export function useRealtimeData<T>(
             }
           )
           .subscribe((status) => {
+            // Ignore status updates if component unmounted
+            if (isCleanedUp) return;
+
             console.log('Realtime subscription status:', status);
             setIsConnected(status === 'SUBSCRIBED');
-            
+
             if (status === 'CHANNEL_ERROR') {
               setError(new Error('Realtime connection failed'));
             } else {
@@ -98,16 +108,28 @@ export function useRealtimeData<T>(
           userAgent: navigator.userAgent,
           environment: errorReporter['getEnvironment']()
         });
-        setError(err instanceof Error ? err : new Error('Unknown realtime error'));
+
+        if (!isCleanedUp) {
+          setError(err instanceof Error ? err : new Error('Unknown realtime error'));
+        }
       }
     };
 
     setupRealtime();
 
     return () => {
+      // Mark as cleaned up to prevent race conditions
+      isCleanedUp = true;
+
+      // Properly unsubscribe and remove channel
       if (channel) {
+        channel.unsubscribe();
         supabase.removeChannel(channel);
+        channel = null;
       }
+
+      // Reset connection state on cleanup
+      setIsConnected(false);
     };
   }, [table, schema, filter, event]);
 

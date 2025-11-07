@@ -372,23 +372,23 @@ const Auth = () => {
                           <div>
                             <span className="text-muted-foreground">Strength: </span>
                             <span className={`font-medium ${
-                              passwordStrength === 'Very strong' || passwordStrength === 'Strong' ? 'text-green-600' :
-                              passwordStrength === 'Good' ? 'text-yellow-600' :
-                              'text-red-600'
+                              passwordStrength === 'Very strong' || passwordStrength === 'Strong' ? 'text-[hsl(142,85%,25%)]' :
+                              passwordStrength === 'Good' ? 'text-amber-800' :
+                              'text-red-700'
                             }`}>
                               {passwordStrength}
                               {passwordCheckLoading && <Loader2 className="inline w-3 h-3 ml-1 animate-spin" />}
                             </span>
                           </div>
-                          
+
                           {passwordBreached && (
-                            <div className="text-xs text-red-600 font-medium">
+                            <div className="text-xs text-red-700 font-medium">
                               ⚠️ This password appears in known data breaches. Please choose a different password.
                             </div>
                           )}
-                          
+
                           {password.length >= 8 && !passwordBreached && passwordStrength !== 'Too short' && (
-                            <div className="text-xs text-green-600">
+                            <div className="text-xs text-[hsl(142,85%,25%)]">
                               ✓ Password meets security requirements
                             </div>
                           )}

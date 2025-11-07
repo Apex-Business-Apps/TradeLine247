@@ -2,12 +2,14 @@ import { HelmetProvider } from "react-helmet-async";
 import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { ThemeProvider, useTheme } from "next-themes";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useUserPreferencesStore } from "@/stores/userPreferencesStore";
-import { MiniChat } from "@/components/ui/MiniChat";
-import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { Toaster } from "@/components/ui/sonner";
 import { useKlaviyoAnalytics } from "@/hooks/useKlaviyoAnalytics";
+
+// Lazy load non-critical UI components to reduce initial bundle size
+const MiniChat = lazy(() => import("@/components/ui/MiniChat").then(module => ({ default: module.MiniChat })));
+const ConnectionIndicator = lazy(() => import("@/components/ui/ConnectionIndicator").then(module => ({ default: module.ConnectionIndicator })));
 
 // Component to apply reduceMotion preference to document
 const MotionPreferenceSync = () => {
@@ -69,10 +71,14 @@ export const AppLayout = () => {
             <Outlet />
           </main>
         </div>
-        {/* Global Chat Widget - uses startup splash robot icon */}
-        <MiniChat />
-        {/* Connection Indicator - shows network status */}
-        <ConnectionIndicator />
+        {/* Lazy-loaded Global Chat Widget - uses startup splash robot icon */}
+        <Suspense fallback={null}>
+          <MiniChat />
+        </Suspense>
+        {/* Lazy-loaded Connection Indicator - shows network status */}
+        <Suspense fallback={null}>
+          <ConnectionIndicator />
+        </Suspense>
         {/* Enhanced Toast Notifications */}
         <Toaster position="bottom-right" richColors closeButton />
       </ThemeProvider>

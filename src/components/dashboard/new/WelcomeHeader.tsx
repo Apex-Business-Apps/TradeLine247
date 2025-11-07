@@ -164,7 +164,7 @@ export const WelcomeHeader: React.FC = () => {
 
         {/* Status indicator */}
         <div className="flex items-center gap-2 text-sm">
-          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+          <div className="h-2 w-2 rounded-full bg-[hsl(142,85%,35%)] animate-pulse" aria-hidden="true" role="presentation"></div>
           <span className="text-slate-600 dark:text-slate-400">AI receptionist is active</span>
         </div>
       </header>

@@ -19,7 +19,7 @@ const messagingApps = [
     status: 'available',
     features: ['Business API', 'Auto-replies', 'Rich media support', 'Broadcast lists'],
     setupType: 'oauth',
-    color: 'bg-green-500/10 text-green-600 border-green-500/20'
+    color: 'bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]'
   },
   {
     id: 'telegram',
@@ -152,7 +152,7 @@ const MessagingIntegration = () => {
                     </div>
                   </div>
                   <Badge className={app.status === 'available' 
-                    ? "bg-green-500/10 text-green-600 border-green-500/20"
+                    ? "bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]"
                     : "bg-gray-500/10 text-gray-600 border-gray-500/20"
                   }>
                     {app.status === 'available' ? 'Available' : 'Coming Soon'}
@@ -166,7 +166,7 @@ const MessagingIntegration = () => {
                   <div className="space-y-1">
                     {app.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
-                        <CheckCircle className="h-3 w-3 text-green-500" />
+                        <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}

@@ -89,9 +89,9 @@ function getStatusColor(quality: string): string {
     case 'good':
       return 'text-blue-600 dark:text-blue-400';
     case 'slow':
-      return 'text-yellow-600 dark:text-yellow-400';
+      return 'text-amber-800 dark:text-yellow-400';
     case 'offline':
-      return 'text-red-600 dark:text-red-400';
+      return 'text-red-700 dark:text-red-400';
     default:
       return 'text-muted-foreground';
   }
@@ -99,8 +99,9 @@ function getStatusColor(quality: string): string {
 
 /**
  * Connection Indicator Component
+ * Memoized to prevent unnecessary re-renders when network status hasn't changed
  */
-export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({
+export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.memo(({
   showOnlyWhenIssues = true,
   position = 'bottom-right',
   className,
@@ -123,7 +124,7 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({
   // Screen reader announcement (only announce changes)
   useEffect(() => {
     if (!isVisible || announced) return;
-    
+
     const message = getStatusMessage(status.type, status.quality, status.online);
     const announcement = document.createElement('div');
     announcement.setAttribute('role', 'status');
@@ -131,14 +132,23 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({
     announcement.setAttribute('aria-atomic', 'true');
     announcement.className = 'sr-only';
     announcement.textContent = message;
-    
+
     document.body.appendChild(announcement);
-    
-    // Remove after announcement
-    setTimeout(() => {
-      document.body.removeChild(announcement);
+
+    // Remove after announcement with cleanup
+    const timeoutId = setTimeout(() => {
+      if (document.body.contains(announcement)) {
+        document.body.removeChild(announcement);
+      }
       setAnnounced(true);
     }, 1000);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (document.body.contains(announcement)) {
+        document.body.removeChild(announcement);
+      }
+    };
   }, [isVisible, status.type, status.quality, status.online, announced]);
 
   // Reset announced flag when status changes
@@ -195,5 +205,5 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({
       <span className="sr-only">{statusMessage}</span>
     </div>
   );
-};
+});
 

@@ -139,7 +139,7 @@ const MobileIntegration = () => {
                       <p className="text-sm text-muted-foreground">Download from {store.name}</p>
                     </div>
                   </div>
-                  <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                  <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">
                     Available
                   </Badge>
                 </div>

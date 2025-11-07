@@ -62,11 +62,39 @@ export const Header: React.FC = () => {
     }
   }, [goToWithFeedback]);
 
-  // Scroll detection
+  // Scroll detection with throttling to prevent excessive re-renders
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    let timeoutId: NodeJS.Timeout | null = null;
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Only update if scroll threshold actually changed
+      const wasScrolled = lastScrollY > 10;
+      const isNowScrolled = currentScrollY > 10;
+
+      if (wasScrolled !== isNowScrolled) {
+        // Throttle: batch updates using requestAnimationFrame
+        if (!timeoutId) {
+          timeoutId = setTimeout(() => {
+            setIsScrolled(currentScrollY > 10);
+            lastScrollY = currentScrollY;
+            timeoutId = null;
+          }, 100); // 100ms throttle
+        }
+      }
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    };
   }, []);
 
   // Close mobile menu on route change
@@ -117,15 +145,21 @@ export const Header: React.FC = () => {
           >
             Home
           </Button>
-          <img 
-            id="app-badge-ca"
-            src="/assets/brand/badges/built-in-canada-badge.png" 
-            alt="Built in Canada" 
-            className="h-[45px] sm:h-[60px] lg:h-[65px] w-auto"
-            width="156"
-            height="65"
-            loading="eager"
-          />
+          <picture>
+            <source
+              srcSet="/assets/brand/badges/built-in-canada-badge.webp"
+              type="image/webp"
+            />
+            <img
+              id="app-badge-ca"
+              src="/assets/brand/badges/built-in-canada-badge.png"
+              alt="Built in Canada"
+              className="h-[45px] sm:h-[60px] lg:h-[65px] w-auto"
+              width="156"
+              height="65"
+              loading="eager"
+            />
+          </picture>
         </div>
 
         {/* Center: Desktop Marketing Navigation */}

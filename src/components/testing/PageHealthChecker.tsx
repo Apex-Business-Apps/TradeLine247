@@ -90,7 +90,7 @@ export const PageHealthChecker: React.FC = () => {
       case 'error':
         return <XCircle className="h-4 w-4 text-red-600" />;
       case 'warning':
-        return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+        return <AlertCircle className="h-4 w-4 text-amber-800" />;
       default:
         return <RefreshCw className="h-4 w-4 text-gray-400 animate-spin" />;
     }
@@ -152,7 +152,7 @@ export const PageHealthChecker: React.FC = () => {
               <div className="text-sm text-muted-foreground">Errors</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">{warningCount}</div>
+              <div className="text-2xl font-bold text-amber-800">{warningCount}</div>
               <div className="text-sm text-muted-foreground">Warnings</div>
             </div>
             <div className="text-center">
