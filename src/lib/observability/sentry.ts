@@ -100,7 +100,7 @@ export async function initializeSentry(): Promise<void> {
   }
 }
 
-export function captureException(error: Error, context?: Record<string, any>): void {
+export function captureException(error: Error, context?: Record<string, unknown>): void {
   if (!sentryInitialized) {
     console.error('[Sentry] Not initialized. Error:', error);
     return;
@@ -133,7 +133,7 @@ export function setUserContext(userId: string, email?: string): void {
   });
 }
 
-export function startTransaction(name: string, op: string = 'custom'): any {
+export function startTransaction(name: string, op: string = 'custom'): Promise<unknown> | null {
   if (!sentryInitialized) return null;
 
   return import('@sentry/react').then((Sentry) => {
