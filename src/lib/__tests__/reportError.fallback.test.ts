@@ -72,14 +72,19 @@ describe('Report Error - P0 Fix: Silent Error Suppression', () => {
       const testError = 'string error';
       const reportingError = { code: 500, message: 'server error' };
 
+      // Helper to extract message from various error types (matches reportError.ts)
+      const getErrorMessage = (error: unknown): string => {
+        if (error instanceof Error) return error.message;
+        if (error && typeof error === 'object' && 'message' in error) {
+          return String((error as any).message);
+        }
+        return String(error);
+      };
+
       const existing = JSON.parse(localStorage.getItem(fallbackKey) || '[]');
       existing.push({
-        originalError: typeof testError === 'object' && testError !== null && 'message' in testError
-          ? (testError as any).message
-          : String(testError),
-        reportingError: typeof reportingError === 'object' && reportingError !== null && 'message' in reportingError
-          ? (reportingError as any).message
-          : String(reportingError),
+        originalError: getErrorMessage(testError),
+        reportingError: getErrorMessage(reportingError),
         timestamp: new Date().toISOString(),
         userAgent: 'test-agent'
       });

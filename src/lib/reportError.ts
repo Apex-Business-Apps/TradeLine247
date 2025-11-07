@@ -34,9 +34,19 @@ export async function reportError(err: unknown, orgId?: string) {
     try {
       const fallbackKey = 'error_reporting_failures';
       const existing = JSON.parse(localStorage.getItem(fallbackKey) || '[]');
+
+      // Helper to extract message from various error types
+      const getErrorMessage = (error: unknown): string => {
+        if (error instanceof Error) return error.message;
+        if (error && typeof error === 'object' && 'message' in error) {
+          return String(error.message);
+        }
+        return String(error);
+      };
+
       existing.push({
-        originalError: err instanceof Error ? err.message : String(err),
-        reportingError: reportingError instanceof Error ? reportingError.message : String(reportingError),
+        originalError: getErrorMessage(err),
+        reportingError: getErrorMessage(reportingError),
         timestamp: new Date().toISOString(),
         userAgent: navigator?.userAgent || 'unknown'
       });
