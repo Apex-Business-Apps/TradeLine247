@@ -2,16 +2,12 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 
-// Polyfill structuredClone for JSDOM compatibility (must be before JSDOM loads)
-if (typeof global.structuredClone === 'undefined') {
-  global.structuredClone = (obj: unknown) => JSON.parse(JSON.stringify(obj));
-}
-
 export default defineConfig({
   plugins: [react()],
   test: {
     globals: true,
     environment: 'jsdom',
+    globalSetup: './tests/globalSetup.ts',
     setupFiles: './tests/setup.ts',
     testTimeout: 10000, // 10 second timeout for each test
     bail: 1, // Stop test execution after first failure (fail fast in CI)

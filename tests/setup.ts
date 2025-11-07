@@ -2,6 +2,7 @@
  * Vitest Setup File
  *
  * Global test configuration and mocks
+ * Note: structuredClone polyfill is now in globalSetup.ts (runs before JSDOM)
  */
 
 import { expect, afterEach, vi } from 'vitest';
@@ -12,11 +13,6 @@ import '@testing-library/jest-dom/vitest';
 afterEach(() => {
   cleanup();
 });
-
-// Polyfill for structuredClone (needed for JSDOM compatibility with Node.js)
-if (typeof global.structuredClone === 'undefined') {
-  global.structuredClone = (obj: unknown) => JSON.parse(JSON.stringify(obj));
-}
 
 // Mock WebCrypto API with functional implementations for testing
 Object.defineProperty(global, 'crypto', {
