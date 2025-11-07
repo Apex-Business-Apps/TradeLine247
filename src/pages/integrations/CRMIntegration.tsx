@@ -127,7 +127,7 @@ const CRMIntegration = () => {
                       <p className="text-sm text-muted-foreground mt-1">{provider.description}</p>
                     </div>
                   </div>
-                  <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                  <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">
                     {provider.status === 'available' ? 'Available' : 'Coming Soon'}
                   </Badge>
                 </div>

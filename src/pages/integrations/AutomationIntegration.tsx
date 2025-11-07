@@ -156,7 +156,7 @@ const AutomationIntegration = () => {
           </Button>
           
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-amber-600/10 to-amber-600/5">
               <Zap className="h-6 w-6 text-amber-800" />
             </div>
             <div>
@@ -195,7 +195,7 @@ const AutomationIntegration = () => {
                     </div>
                   </div>
                   <Badge className={provider.status === 'available' 
-                    ? "bg-green-500/10 text-green-600 border-green-500/20"
+                    ? "bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]"
                     : "bg-gray-500/10 text-gray-600 border-gray-500/20"
                   }>
                     {provider.status === 'available' ? 'Available' : 'Coming Soon'}
@@ -340,7 +340,7 @@ const AutomationIntegration = () => {
                       <h3 className="font-semibold text-foreground">{template.title}</h3>
                       <Badge className={`text-xs ${
                         template.difficulty === 'Easy' 
-                          ? 'bg-green-500/10 text-green-600 border-green-500/20'
+                          ? 'bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]'
                           : 'bg-amber-600/10 text-amber-800 border-amber-600/20'
                       }`}>
                         {template.difficulty}
@@ -354,7 +354,7 @@ const AutomationIntegration = () => {
                         {template.trigger}
                       </span>
                       <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                      <span className="px-2 py-1 bg-green-500/10 text-green-600 rounded">
+                      <span className="px-2 py-1 bg-green-500/10 text-[hsl(142,85%,25%)] rounded">
                         {template.action}
                       </span>
                     </div>

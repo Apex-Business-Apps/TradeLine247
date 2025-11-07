@@ -31,7 +31,7 @@ const integrations = [
     icon: Mail,
     status: 'available',
     route: '/dashboard/integrations/email',
-    color: 'bg-green-500/10 text-green-600 border-green-500/20'
+    color: 'bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]'
   },
   {
     id: 'phone',
@@ -74,7 +74,7 @@ const integrations = [
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'connected':
-      return <Badge className="bg-green-500/10 text-green-600 border-green-500/20">Connected</Badge>;
+      return <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">Connected</Badge>;
     case 'available':
       return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">Available</Badge>;
     case 'coming-soon':
