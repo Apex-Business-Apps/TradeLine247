@@ -26,13 +26,18 @@ const formatMessageTime = (date: Date): string => {
   return date.toLocaleDateString();
 };
 
-export const MiniChat: React.FC = () => {
+/**
+ * MiniChat Component
+ * Memoized to prevent unnecessary re-renders when parent components update
+ */
+export const MiniChat: React.FC = React.memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const welcomeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   // Optimized scroll with reduced motion support and throttling
@@ -167,8 +172,13 @@ export const MiniChat: React.FC = () => {
   const openChat = () => {
     setIsOpen(true);
     if (messages.length === 0) {
+      // Clear any pending welcome timeout
+      if (welcomeTimeoutRef.current) {
+        clearTimeout(welcomeTimeoutRef.current);
+      }
+
       // Delay welcome message slightly for better UX
-      setTimeout(() => {
+      welcomeTimeoutRef.current = setTimeout(() => {
         const welcomeMessage: Message = {
           id: crypto.randomUUID(),
           role: 'assistant',
@@ -176,6 +186,7 @@ export const MiniChat: React.FC = () => {
           timestamp: new Date(),
         };
         setMessages([welcomeMessage]);
+        welcomeTimeoutRef.current = null;
       }, 300);
     }
   };
@@ -198,6 +209,16 @@ export const MiniChat: React.FC = () => {
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
   }, [isOpen]);
+
+  // Cleanup welcome timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (welcomeTimeoutRef.current) {
+        clearTimeout(welcomeTimeoutRef.current);
+        welcomeTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -382,4 +403,4 @@ export const MiniChat: React.FC = () => {
       )}
     </>
   );
-};
+});

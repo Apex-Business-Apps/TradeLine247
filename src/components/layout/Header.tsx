@@ -62,11 +62,39 @@ export const Header: React.FC = () => {
     }
   }, [goToWithFeedback]);
 
-  // Scroll detection
+  // Scroll detection with throttling to prevent excessive re-renders
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    let timeoutId: NodeJS.Timeout | null = null;
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Only update if scroll threshold actually changed
+      const wasScrolled = lastScrollY > 10;
+      const isNowScrolled = currentScrollY > 10;
+
+      if (wasScrolled !== isNowScrolled) {
+        // Throttle: batch updates using requestAnimationFrame
+        if (!timeoutId) {
+          timeoutId = setTimeout(() => {
+            setIsScrolled(currentScrollY > 10);
+            lastScrollY = currentScrollY;
+            timeoutId = null;
+          }, 100); // 100ms throttle
+        }
+      }
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    };
   }, []);
 
   // Close mobile menu on route change

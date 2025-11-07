@@ -9,7 +9,11 @@ interface ServiceStatus {
   lastCheck: Date;
 }
 
-export const ServiceHealth: React.FC = () => {
+/**
+ * ServiceHealth Component
+ * Memoized to prevent unnecessary re-renders when parent updates
+ */
+export const ServiceHealth: React.FC = React.memo(() => {
   const [services, setServices] = useState<ServiceStatus[]>([
     { name: 'Supabase', status: 'operational', lastCheck: new Date() },
     { name: 'Twilio', status: 'operational', lastCheck: new Date() }
@@ -109,5 +113,5 @@ export const ServiceHealth: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+});
 
