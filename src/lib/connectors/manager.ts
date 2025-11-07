@@ -58,7 +58,7 @@ export class ConnectorManager {
     provider: string,
     operation: string,
     fn: (connector: DMSConnector) => Promise<T>,
-    payload?: any
+    payload?: Record<string, unknown>
   ): Promise<T | null> {
     const breaker = circuitBreakerRegistry.getOrCreate(`connector-${provider}`);
     const connector = this.connectors.get(provider);
@@ -176,11 +176,12 @@ export class ConnectorManager {
         ? JSON.parse(integration.config) 
         : integration.config;
 
+      const configDataObj = configData as Record<string, unknown>;
       const config: ConnectorConfig = {
-        provider: integration.provider as any,
-        apiKey: (configData as any).apiKey || '',
-        baseUrl: (configData as any).baseUrl || '',
-        environment: (configData as any).environment || 'production',
+        provider: integration.provider as 'autovance' | 'dealertrack' | 'other',
+        apiKey: (configDataObj.apiKey as string) || '',
+        baseUrl: (configDataObj.baseUrl as string) || '',
+        environment: (configDataObj.environment as 'sandbox' | 'production') || 'production',
         enabled: true,
       };
 

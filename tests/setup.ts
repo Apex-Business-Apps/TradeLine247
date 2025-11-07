@@ -1,6 +1,6 @@
 /**
  * Vitest Setup File
- * 
+ *
  * Global test configuration and mocks
  */
 
@@ -12,6 +12,11 @@ import '@testing-library/jest-dom/vitest';
 afterEach(() => {
   cleanup();
 });
+
+// Polyfill for structuredClone (needed for JSDOM compatibility with Node.js)
+if (typeof global.structuredClone === 'undefined') {
+  global.structuredClone = (obj: unknown) => JSON.parse(JSON.stringify(obj));
+}
 
 // Mock WebCrypto API with functional implementations for testing
 Object.defineProperty(global, 'crypto', {
@@ -31,7 +36,7 @@ Object.defineProperty(global, 'crypto', {
           usages: ['encrypt', 'decrypt'],
         };
       },
-      async encrypt(algorithm: any, key: any, data: BufferSource) {
+      async encrypt(algorithm: AlgorithmIdentifier, key: CryptoKey, data: BufferSource) {
         // Simple mock encryption for testing (XOR with pattern)
         const dataArray = new Uint8Array(data as ArrayBuffer);
         const encrypted = new Uint8Array(dataArray.length);
@@ -40,7 +45,7 @@ Object.defineProperty(global, 'crypto', {
         }
         return encrypted.buffer;
       },
-      async decrypt(algorithm: any, key: any, data: BufferSource) {
+      async decrypt(algorithm: AlgorithmIdentifier, key: CryptoKey, data: BufferSource) {
         // Reverse of encrypt (XOR is symmetric)
         const dataArray = new Uint8Array(data as ArrayBuffer);
         const decrypted = new Uint8Array(dataArray.length);
@@ -88,11 +93,14 @@ global.IntersectionObserver = class IntersectionObserver {
   constructor() {}
   disconnect() {}
   observe() {}
-  takeRecords() {
+  takeRecords(): IntersectionObserverEntry[] {
     return [];
   }
   unobserve() {}
-} as any;
+  root = null;
+  rootMargin = '';
+  thresholds = [];
+} as unknown as typeof IntersectionObserver;
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {

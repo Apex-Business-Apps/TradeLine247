@@ -50,6 +50,50 @@ export interface AutovanceQuoteResponse {
   fees?: number;
 }
 
+// Dealertrack API response types
+export interface DealertrackVehicleResponse {
+  vin: string;
+  stockNumber?: string;
+  year: number;
+  make: string;
+  model: string;
+  trim?: string;
+  mileage?: number;
+  price?: number;
+  msrp?: number;
+  cost?: number;
+  status: string;
+  images?: string[];
+  options?: string[];
+}
+
+export interface DealertrackLeadResponse {
+  id: string;
+  prospectId: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  source?: string;
+  status?: string;
+}
+
+export interface DealertrackQuoteResponse {
+  id: string;
+  dealId: string;
+  prospectId: string;
+  vehicleVin: string;
+  salePrice: number;
+  downPayment?: number;
+  tradeInValue?: number;
+  apr?: number;
+  term?: number;
+  monthlyPayment?: number;
+  totalPrice?: number;
+  taxes?: number;
+  fees?: number;
+}
+
 export interface ConnectorConfig {
   provider: 'autovance' | 'dealertrack' | 'other';
   baseUrl: string;

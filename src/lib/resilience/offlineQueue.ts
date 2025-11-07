@@ -9,7 +9,7 @@ export interface QueuedOperation {
   id: string;
   connector: string;
   operation: string;
-  payload: any;
+  payload: Record<string, unknown>;
   timestamp: number;
   retries: number;
   maxRetries: number;
@@ -32,7 +32,7 @@ export class OfflineQueue {
   /**
    * Add operation to queue
    */
-  enqueue(connector: string, operation: string, payload: any): string {
+  enqueue(connector: string, operation: string, payload: Record<string, unknown>): string {
     const id = `${connector}-${operation}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     const queuedOp: QueuedOperation = {

@@ -302,10 +302,10 @@ describe('calculateQuote - Edge Cases', () => {
     const vehiclePrice = 20000;
 
     // Test each province has valid tax rate
-    Object.keys(PROVINCIAL_TAX_RATES).forEach((province) => {
+    (Object.keys(PROVINCIAL_TAX_RATES) as Array<keyof typeof PROVINCIAL_TAX_RATES>).forEach((province) => {
       const quote = calculateQuote({
         vehiclePrice,
-        province: province as any
+        province
       });
 
       // Total taxes should be positive

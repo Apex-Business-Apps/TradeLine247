@@ -952,7 +952,7 @@ export interface Database {
         };
       };
     };
-    Views: {};
+    Views: Record<string, never>;
     Functions: {
       has_role: {
         Args: { _user_id: string; _role: UserRole };
