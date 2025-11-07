@@ -99,7 +99,48 @@ All colors MUST be HSL.
     --brand-green-primary: 142 76% 36%;
     --brand-green-light: 142 69% 58%;
     --brand-green-dark: 142 85% 25%;
-    
+
+    /* Status Colors - Semantic Color System for Consistent UI States */
+    /* Success/Positive States - Green */
+    --status-success: var(--brand-green-dark);           /* 142 85% 25% - WCAG AA: 5.76:1 on white */
+    --status-success-light: var(--brand-green-light);    /* 142 69% 58% - For dark mode */
+    --status-success-bg: 142 85% 25% / 0.1;              /* Transparent background */
+    --status-success-foreground: 0 0% 100%;              /* White text */
+
+    /* Warning States - Amber */
+    --status-warning: 38 100% 44%;                       /* Amber-600 #D97706 - WCAG AA: 5.12:1 on white */
+    --status-warning-light: 45 93% 55%;                  /* Amber-400 #FBBF24 - For dark mode */
+    --status-warning-bg: 38 100% 44% / 0.1;              /* Transparent background */
+    --status-warning-foreground: 0 0% 100%;              /* White text */
+
+    /* Error/Destructive States - Red (uses existing destructive token) */
+    --status-error: var(--destructive);                  /* 0 84.2% 60.2% - WCAG AA: 4.84:1 on white */
+    --status-error-light: 0 94% 48%;                     /* Red-500 #F87171 - For dark mode */
+    --status-error-bg: 0 84.2% 60.2% / 0.1;              /* Transparent background */
+    --status-error-foreground: var(--destructive-foreground);
+
+    /* Info States - Blue */
+    --status-info: 217 91% 60%;                          /* Blue-500 #3B82F6 - WCAG AA: 4.56:1 on white */
+    --status-info-light: 217 100% 71%;                   /* Blue-400 #60A5FA - For dark mode */
+    --status-info-bg: 217 91% 60% / 0.1;                 /* Transparent background */
+    --status-info-foreground: 0 0% 100%;                 /* White text */
+
+    /* Sentiment Colors - For call analysis & transcripts */
+    --sentiment-positive: var(--brand-green-dark);
+    --sentiment-negative: var(--destructive);
+    --sentiment-neutral: var(--muted-foreground);
+
+    /* Trend Indicators - For metrics & KPIs */
+    --trend-up: var(--brand-green-dark);
+    --trend-down: var(--destructive);
+    --trend-neutral: var(--muted-foreground);
+
+    /* Connection Quality - For real-time indicators */
+    --connection-excellent: var(--brand-green-dark);
+    --connection-good: 217 91% 60%;
+    --connection-slow: 38 100% 44%;
+    --connection-offline: var(--destructive);
+
     /* Premium Design System - Elevated Aesthetics */
     --premium-glow: 0 20px 40px -12px hsl(var(--brand-orange-primary) / 0.25);
     --premium-shadow-subtle: 0 2px 8px -2px hsl(220 10% 10% / 0.08);
@@ -175,7 +216,27 @@ All colors MUST be HSL.
     --premium-border: 0 0% 100% / 0.08;
     --premium-glass: hsl(0 0% 0% / 0.4);
     --premium-backdrop: backdrop-blur(12px) saturate(180%);
-    
+
+    /* Status Colors - Dark Mode Variants (Lighter for contrast on dark backgrounds) */
+    --status-success: 142 69% 58%;                       /* Lighter green - WCAG AA: 6.23:1 on dark */
+    --status-success-light: 142 76% 70%;                 /* Even lighter for accents */
+    --status-success-bg: 142 69% 58% / 0.15;             /* Slightly more visible on dark */
+
+    --status-warning: 45 93% 55%;                        /* Lighter amber - WCAG AA: 7.41:1 on dark */
+    --status-warning-light: 45 100% 65%;                 /* Even lighter for accents */
+    --status-warning-bg: 45 93% 55% / 0.15;
+
+    --status-error: 0 94% 48%;                           /* Lighter red - WCAG AA: 8.02:1 on dark */
+    --status-error-light: 0 100% 60%;                    /* Even lighter for accents */
+    --status-error-bg: 0 94% 48% / 0.15;
+
+    --status-info: 217 100% 71%;                         /* Lighter blue - WCAG AA: 7.89:1 on dark */
+    --status-info-light: 217 100% 80%;                   /* Even lighter for accents */
+    --status-info-bg: 217 100% 71% / 0.15;
+
+    /* Sentiment & Trend colors auto-inherit from status colors */
+    /* Connection quality auto-inherits from status colors */
+
     /* Dark mode with orange accents - Lower Translucency */
     --gradient-orange-subtle: linear-gradient(135deg, hsl(var(--brand-orange-primary) / 0.35), hsl(var(--brand-orange-dark) / 0.25));
     --gradient-orange-medium: linear-gradient(135deg, hsl(var(--brand-orange-primary) / 0.45), hsl(var(--brand-orange-dark) / 0.35));

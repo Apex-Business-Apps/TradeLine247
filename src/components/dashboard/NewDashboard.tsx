@@ -123,20 +123,20 @@ export const NewDashboard = () => {
             );
           })
         ) : (
-          // Empty state fallback
+          // Empty state - No data yet
           Array.from({ length: 4 }).map((_, i) => {
             const configs = [
-              { title: 'Bookings this week', subtitle: 'Quiet right now. Your next one will show up here.' },
-              { title: 'Expected payout', subtitle: 'Revenue tracking will appear here soon.' },
-              { title: 'Calls we caught', subtitle: 'Call metrics loading...' },
-              { title: 'Missed but saved', subtitle: 'Rescue stats coming up.' }
+              { title: 'Bookings this week', subtitle: 'No appointments yet this week' },
+              { title: 'Expected payout', subtitle: 'Revenue will calculate from calls' },
+              { title: 'Calls we caught', subtitle: 'No calls received yet' },
+              { title: 'Missed but saved', subtitle: 'No recovered calls yet' }
             ];
             return (
-              <Card key={i} className="relative overflow-hidden border-0 opacity-60">
+              <Card key={i} className="relative overflow-hidden border-0 opacity-70 hover:opacity-90 transition-opacity">
                 <CardContent className="p-3">
                   <div className="space-y-2">
-                    <div className="text-lg font-bold text-muted-foreground">--</div>
-                    <p className="text-xs text-muted-foreground">{configs[i].title}</p>
+                    <div className="text-2xl font-bold text-muted-foreground">0</div>
+                    <p className="text-xs font-medium text-muted-foreground">{configs[i].title}</p>
                     <p className="text-xs text-muted-foreground/70">{configs[i].subtitle}</p>
                   </div>
                 </CardContent>
@@ -194,8 +194,12 @@ export const NewDashboard = () => {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-6">
-                      <p className="text-muted-foreground">Your AI receptionist hasn't logged activity yet this week.</p>
+                    <div className="text-center py-8 space-y-3">
+                      <div className="inline-flex p-3 rounded-full bg-muted/50 mb-2">
+                        <Phone className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <p className="font-medium text-foreground">No activity yet</p>
+                      <p className="text-sm text-muted-foreground">Your dashboard will populate once calls start coming in</p>
                     </div>
                   )}
                 </CardContent>
