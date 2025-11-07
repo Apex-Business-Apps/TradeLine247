@@ -53,7 +53,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
             <Icon className={`h-3 w-3 ${color}`} />
           </div>
           {trend && (
-            <div className="text-xs text-green-700 dark:text-green-400 font-medium">
+            <div className="text-xs text-green-600 dark:text-green-400 font-medium">
               {trend}
             </div>
           )}

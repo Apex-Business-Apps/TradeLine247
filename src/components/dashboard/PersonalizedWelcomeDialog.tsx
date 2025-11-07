@@ -104,7 +104,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
           <div className="space-y-6">
             <div className="flex justify-center">
               <div className="p-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full">
-                <Sparkles className="h-12 w-12 text-blue-700" />
+                <Sparkles className="h-12 w-12 text-blue-500" />
               </div>
             </div>
             <div className="space-y-2 text-center">
@@ -148,7 +148,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
           <div className="space-y-6">
             <div className="space-y-2 text-center">
               <div className="flex justify-center mb-4">
-                <Layout className="h-10 w-10 text-blue-700" />
+                <Layout className="h-10 w-10 text-blue-500" />
               </div>
               <DialogTitle className="text-xl font-bold">Choose Your Layout</DialogTitle>
               <DialogDescription className="text-slate-700 dark:text-slate-300">
@@ -202,7 +202,7 @@ export const PersonalizedWelcomeDialog: React.FC<PersonalizedWelcomeDialogProps>
           <div className="space-y-6">
             <div className="space-y-2 text-center">
               <div className="flex justify-center mb-4">
-                <Palette className="h-10 w-10 text-blue-700" />
+                <Palette className="h-10 w-10 text-blue-500" />
               </div>
               <DialogTitle className="text-xl font-bold">Pick Your Theme</DialogTitle>
               <DialogDescription className="text-slate-700 dark:text-slate-300">

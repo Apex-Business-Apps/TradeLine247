@@ -113,9 +113,9 @@ export const SmokeChecks = () => {
         {results.map((result, i) => (
           <div key={i} className="flex items-start gap-2 text-sm">
             {result.passed ? (
-              <CheckCircle className="w-4 h-4 text-green-700 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
             ) : (
-              <XCircle className="w-4 h-4 text-red-700 flex-shrink-0 mt-0.5" />
+              <XCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
             )}
             <div>
               <div className={result.passed ? 'text-green-800' : 'text-red-800'}>

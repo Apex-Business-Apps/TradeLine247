@@ -95,7 +95,7 @@ const CRMIntegration = () => {
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-              <Database className="h-6 w-6 text-blue-700" />
+              <Database className="h-6 w-6 text-blue-600" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">CRM Integrations</h1>
