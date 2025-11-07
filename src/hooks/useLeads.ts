@@ -12,6 +12,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { TradeInData, LeadMetadata } from '@/types/database';
 
 export interface Lead {
   id: string;
@@ -26,9 +27,9 @@ export interface Lead {
   phone: string | null;
   preferred_contact: string | null;
   vehicle_interest: string | null;
-  trade_in: any | null;
+  trade_in: TradeInData | null;
   notes: string | null;
-  metadata: any | null;
+  metadata: LeadMetadata | null;
   created_at: string;
   updated_at: string;
 }
