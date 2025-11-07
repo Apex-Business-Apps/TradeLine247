@@ -194,9 +194,10 @@ describe('AuthLanding - P0 Fix: Form Validation and Handler', () => {
       await user.type(emailInput, 'test@example.com');
       await user.click(submitButton);
 
-      // Should show loading state
+      // Should show loading spinner (Loader2 icon)
       await waitFor(() => {
-        expect(screen.getByRole('button')).toHaveTextContent('');
+        const loadingSpinner = screen.getByRole('button', { name: /Start My 14-Day Trial/i });
+        expect(loadingSpinner).toBeDisabled();
       }, { timeout: 100 });
     });
 

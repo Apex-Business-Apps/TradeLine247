@@ -104,7 +104,7 @@ export default function AuthLanding() {
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} noValidate className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="businessName">
               Business Name <span className="text-destructive">*</span>
