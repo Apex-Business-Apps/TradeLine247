@@ -301,7 +301,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                       <input
                         type="checkbox"
                         required
-                        className="mt-1 rounded border-gray-300 text-primary focus:ring-primary"
+                        className="mt-1 rounded border-border text-primary focus:ring-primary"
                       />
                       <span>
                         I'm cool with emails about setup and updates. Unsubscribe anytime.
