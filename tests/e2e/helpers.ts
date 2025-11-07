@@ -8,11 +8,19 @@ export async function waitForReactHydration(page: Page, timeout = 45000): Promis
   // Wait for explicit React ready signal from main.tsx
   await page.waitForFunction(() => (window as any).__REACT_READY__ === true, { timeout });
 
-  // Additional safety: wait for app header to be visible (using data-site-header attribute)
-  await expect(page.locator('header[data-site-header]')).toBeVisible({ timeout: 10000 });
+  // Additional safety: wait for app header to be attached first
+  const header = page.locator('header[data-site-header]');
+  await expect(header).toBeAttached({ timeout: 10000 });
+  
+  // Then wait for it to be visible
+  await expect(header).toBeVisible({ timeout: 10000 });
 
-  // Small buffer for any final React effects
-  await page.waitForTimeout(200);
+  // Wait for header left section to be ready (critical for position tests)
+  const headerLeft = page.locator('#app-header-left');
+  await expect(headerLeft).toBeAttached({ timeout: 10000 });
+
+  // Small buffer for any final React effects and layout stabilization
+  await page.waitForTimeout(300);
 }
 
 /**

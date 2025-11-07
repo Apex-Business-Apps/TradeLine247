@@ -95,11 +95,10 @@ export const Header: React.FC = () => {
     >
       <div 
         data-header-inner 
-        className="container flex h-14 items-center justify-between gap-4"
+        className="container h-14 items-center gap-4"
         style={{ 
-          maxWidth: '100%', 
-          paddingLeft: 'max(1rem, min(2rem, 4vw))', 
-          paddingRight: 'max(1rem, min(2rem, 4vw))' 
+          maxWidth: '100%'
+          /* Padding handled by header-align.css for consistency */
         }}
       >
         {/* Left: Home Button & Badge */}
