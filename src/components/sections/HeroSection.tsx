@@ -17,6 +17,8 @@ export const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-background/72 via-transparent to-background/67"></div>
       {/* Saturated orange wash (top of background layers) */}
       <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/100 via-brand-orange-light/100 to-brand-orange/89"></div>
+      {/* Unified overlay ensures WCAG contrast */}
+      <div className="absolute inset-0 bg-black/40 pointer-events-none" aria-hidden="true"></div>
       
       {/* Enhanced Glowing Orbs with Animation */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-orange/40 rounded-full blur-3xl animate-pulse"></div>
@@ -45,16 +47,16 @@ export const HeroSection = () => {
         </h1>
         
         {/* Value Proposition with Delayed Animation */}
-        <p className="text-lg md:text-xl text-foreground/90 mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
+        <p className="text-lg md:text-xl text-foreground mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
           We pick up when you can't, so customers aren't kept waiting.
         </p>
         
         {/* Enhanced CTA Section */}
         <div className="space-y-4 mt-12 animate-fade-in [animation-delay:600ms]">
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              size="lg" 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground text-xl px-12 py-6 rounded-full transition-all duration-300 hover-scale shadow-lg hover:shadow-xl hover:shadow-primary/25" 
+            <Button
+              size="lg"
+              className="text-primary-foreground text-xl px-12 py-6 rounded-full transition-all duration-300 hover-scale shadow-lg hover:shadow-xl hover:shadow-primary/25"
               style={{boxShadow: 'var(--premium-glow)'}}
               asChild
             >

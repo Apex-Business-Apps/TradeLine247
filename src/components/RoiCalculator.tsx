@@ -139,20 +139,20 @@ const RoiCalculator = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="bg-muted/50 p-3 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-primary" />
+                    <TrendingUp className="h-4 w-4 text-[hsl(var(--brand-orange-dark))]" />
                     <span className="font-medium text-foreground px-0 mx-0 text-xs -ml-[3px]">Recovered appointments</span>
                   </div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-2xl font-bold text-[hsl(var(--brand-orange-dark))]">
                     {Math.round(results.qualifiedAppts)}
                   </div>
                 </div>
 
                 <div className="bg-muted/50 p-3 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="h-4 w-4 text-primary" />
+                    <DollarSign className="h-4 w-4 text-[hsl(var(--brand-orange-dark))]" />
                     <span className="text-sm font-medium text-foreground">Projected revenue (CAD)</span>
                   </div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-2xl font-bold text-[hsl(var(--brand-orange-dark))]">
                     {cad.format(results.monthlyRevenue)}
                   </div>
                 </div>
@@ -171,25 +171,30 @@ const RoiCalculator = () => {
 
                 <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm text-muted-foreground">ROI (Commission)</span>
-                  <span className="font-medium text-primary">{Math.round(results.roiCommission * 100)}%</span>
+                  <span className="font-medium text-[hsl(var(--brand-orange-dark))]">{Math.round(results.roiCommission * 100)}%</span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm text-muted-foreground">ROI (Predictable)</span>
-                  <span className="font-medium text-primary">{Math.round(results.roiPredictable * 100)}%</span>
+                  <span className="font-medium text-[hsl(var(--brand-orange-dark))]">{Math.round(results.roiPredictable * 100)}%</span>
                 </div>
               </div>
 
-              <Badge className="w-full justify-center py-2 bg-primary text-primary-foreground">
+              <Badge className="w-full justify-center py-2 bg-[hsl(var(--brand-orange-dark))] text-primary-foreground">
                 Best value this month: {results.bestPlan}
               </Badge>
 
               <div className="space-y-2 pt-2">
-                <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
+                <Button size="lg" className="w-full" asChild>
                   <a href="/auth?plan=commission">Start Zero-Monthly</a>
                 </Button>
-                
-                <Button size="lg" variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground" asChild>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full border-[hsl(var(--brand-orange-dark))] text-[hsl(var(--brand-orange-dark))] hover:bg-[hsl(var(--brand-orange-dark))] hover:text-primary-foreground"
+                  asChild
+                >
                   <a href="/auth?plan=core">Choose Predictable</a>
                 </Button>
               </div>

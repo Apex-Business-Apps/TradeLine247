@@ -250,7 +250,7 @@ export const LeadCaptureForm = () => {
                   value={formData.name} 
                   onChange={e => handleInputChange("name", e.target.value)} 
                   required 
-                  className="transition-all duration-300 focus:scale-105"
+                  className="transition-all duration-300 focus:scale-105 text-foreground"
                 />
               </div>
 
@@ -298,7 +298,7 @@ export const LeadCaptureForm = () => {
                   placeholder="What do you want help with?" 
                   value={formData.notes} 
                   onChange={e => handleInputChange("notes", e.target.value)} 
-                  className="min-h-[100px] transition-all duration-300 focus:scale-105" 
+                  className="min-h-[100px] transition-all duration-300 focus:scale-105 text-foreground"
                 />
               </div>
 
@@ -307,7 +307,7 @@ export const LeadCaptureForm = () => {
                   <input
                     type="checkbox"
                     required
-                    className="mt-1 rounded border-border text-primary focus:ring-primary transition-all duration-200"
+                    className="mt-1 rounded border-border text-[hsl(var(--brand-orange-dark))] focus:ring-primary transition-all duration-200"
                   />
                   <span>
                 I'm cool with emails about setup and updates. Unsubscribe anytime.

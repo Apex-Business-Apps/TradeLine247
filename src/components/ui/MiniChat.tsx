@@ -229,7 +229,7 @@ export const MiniChat: React.FC = React.memo(() => {
         aria-controls="mini-chat-dialog"
         className={cn(
           "fixed right-4 bottom-4 sm:bottom-4 max-sm:bottom-20 z-[60] rounded-full shadow-lg",
-          "p-3 bg-primary hover:bg-primary/90 text-primary-foreground",
+          "p-3 bg-[hsl(var(--brand-orange-dark))] hover:brightness-110 text-primary-foreground",
           "transition-all duration-300 hover:scale-110 active:scale-95",
           "flex items-center justify-center",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",

@@ -6,6 +6,7 @@ import { paths } from '@/routes/paths';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { toast } from 'sonner';
 import { errorReporter } from '@/lib/errorReporter';
+import { cn } from '@/lib/utils';
 
 const actions = [
   {
@@ -96,7 +97,10 @@ export const QuickActionsCard: React.FC = () => {
               variant={action.variant}
               onClick={() => handleActionClick(action)}
               disabled={isNavigating}
-              className="w-full justify-start gap-2 relative"
+              className={cn(
+                'w-full justify-start gap-2 relative',
+                action.variant === 'default' ? 'text-primary-foreground' : 'text-foreground'
+              )}
               aria-label={`${action.label}: ${action.description}`}
               title={action.description}
               data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
