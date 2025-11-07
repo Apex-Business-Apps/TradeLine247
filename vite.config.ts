@@ -48,9 +48,6 @@ export default defineConfig(({ mode }) => ({
           // UI components by category (better granularity)
           'radix-primitives': [
             '@radix-ui/react-slot',
-            '@radix-ui/react-portal',
-            '@radix-ui/react-presence',
-            '@radix-ui/react-primitive',
           ],
           'radix-overlays': [
             '@radix-ui/react-dialog',
