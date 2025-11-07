@@ -1,14 +1,37 @@
 import { memo } from 'react';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { AppLayout } from '@/components/Layout/AppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UsersRound, CarFront, ScrollText, TrendingUp } from 'lucide-react';
+import { UsersRound, CarFront, ScrollText, TrendingUp, Loader2 } from 'lucide-react';
 
 const Dashboard = memo(function Dashboard() {
+  const { data: statsData, isLoading } = useDashboardStats();
+
   const stats = [
-    { name: 'Active Leads', value: '24', icon: UsersRound, change: '+12%' },
-    { name: 'Available Vehicles', value: '156', icon: CarFront, change: '+5%' },
-    { name: 'Quotes Sent', value: '18', icon: ScrollText, change: '+8%' },
-    { name: 'Conversion Rate', value: '32%', icon: TrendingUp, change: '+2%' },
+    {
+      name: 'Active Leads',
+      value: isLoading ? '...' : String(statsData?.activeLeads || 0),
+      icon: UsersRound,
+      change: '+12%'
+    },
+    {
+      name: 'Available Vehicles',
+      value: isLoading ? '...' : String(statsData?.totalVehicles || 0),
+      icon: CarFront,
+      change: '+5%'
+    },
+    {
+      name: 'Quotes Sent',
+      value: isLoading ? '...' : String(statsData?.totalQuotes || 0),
+      icon: ScrollText,
+      change: '+8%'
+    },
+    {
+      name: 'Conversion Rate',
+      value: isLoading ? '...' : `${statsData?.conversionRate || 0}%`,
+      icon: TrendingUp,
+      change: '+2%'
+    },
   ];
 
   return (
@@ -31,10 +54,19 @@ const Dashboard = memo(function Dashboard() {
                 <stat.icon className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-success">
-                  {stat.change} from last month
-                </p>
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Loading...</span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    <p className="text-xs text-success">
+                      {stat.change} from last month
+                    </p>
+                  </>
+                )}
               </CardContent>
             </Card>
           ))}
