@@ -11,10 +11,11 @@ import { ConsentManager } from '@/components/Compliance/ConsentManager';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { CreditCard, User, Users, Briefcase, FileText, Shield } from 'lucide-react';
+import { CreditApplicationErrorBoundary } from '@/components/ErrorBoundary/CreditApplicationErrorBoundary';
 
 type ApplicationStep = 'applicant' | 'co-applicant' | 'employment' | 'consent' | 'review';
 
-export default function CreditApplication() {
+function CreditApplicationContent() {
   const { toast } = useToast();
   const [step, setStep] = useState<ApplicationStep>('applicant');
   const [hasCoApplicant, setHasCoApplicant] = useState(false);
@@ -614,5 +615,14 @@ export default function CreditApplication() {
         </div>
       </div>
     </AppLayout>
+  );
+}
+
+// Wrap with error boundary for graceful error handling
+export default function CreditApplication() {
+  return (
+    <CreditApplicationErrorBoundary>
+      <CreditApplicationContent />
+    </CreditApplicationErrorBoundary>
   );
 }
