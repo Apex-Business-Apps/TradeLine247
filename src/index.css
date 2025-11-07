@@ -753,3 +753,46 @@ textarea:focus-visible {
 .dark .text-error {
   color: hsl(var(--status-error)) !important;
 }
+
+/* --- A11Y: axe color-contrast hardening (HOME ONLY) --- */
+@layer components {
+  /* Global home defaults: readable on light surfaces */
+  #app-home { color: hsl(var(--foreground)); }
+
+  /* Anchors the test flagged */
+  #app-home a[href="/auth?plan=commission"],
+  #app-home a[href="/auth?plan=core"] {
+    color: #1f2937 !important;              /* slate-800 on white => >=4.5:1 */
+    text-decoration: underline;
+  }
+
+  /* Buttons / pills the test flagged */
+  #app-home .hover\:shadow-xl.min-h-\[44px\].shadow-lg,
+  #app-home .hover\:shadow-xl.shadow-lg[type="submit"],
+  #app-home button[data-testid="quick-action-view-calls"] > span,
+  #app-home .px-2\.5 {
+    color: hsl(var(--foreground)) !important; /* force dark readable text */
+  }
+
+  /* Outline/ghost primary button at rest (was green text on white = fails) */
+  #app-home .border-primary:not(.bg-primary) {
+    color: hsl(var(--foreground)) !important; /* readable at rest */
+  }
+  /* On hover it already becomes bg-primary + text-primary-foreground (OK) */
+
+  /* Card badges the test flagged (floating labels centered on cards) */
+  #app-home .bg-card.hover\:shadow-lg.relative > .-top-4.left-1\/2.-translate-x-1\/2 {
+    color: hsl(var(--foreground)) !important;
+    background-color: rgba(255, 255, 255, 0.85); /* lift contrast over gradient/image */
+    padding: 0 .25rem;
+    border-radius: .25rem;
+  }
+
+  /* Placeholders often trip axe due to low opacity */
+  #app-home ::placeholder {
+    color: #475569 !important;  /* slate-600 */
+    opacity: 1 !important;
+  }
+}
+/* --- end HOME A11Y hardening --- */
+
