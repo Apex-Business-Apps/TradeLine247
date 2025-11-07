@@ -86,9 +86,9 @@ export const PageHealthChecker: React.FC = () => {
   const getStatusIcon = (status: PageTest['status']) => {
     switch (status) {
       case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-700" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case 'error':
-        return <XCircle className="h-4 w-4 text-red-700" />;
+        return <XCircle className="h-4 w-4 text-error" />;
       case 'warning':
         return <AlertCircle className="h-4 w-4 text-amber-800" />;
       default:
@@ -144,11 +144,11 @@ export const PageHealthChecker: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-700">{successCount}</div>
+              <div className="text-2xl font-bold text-success">{successCount}</div>
               <div className="text-sm text-muted-foreground">Healthy</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-red-700">{errorCount}</div>
+              <div className="text-2xl font-bold text-error">{errorCount}</div>
               <div className="text-sm text-muted-foreground">Errors</div>
             </div>
             <div className="text-center">

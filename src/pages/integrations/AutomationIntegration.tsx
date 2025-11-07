@@ -19,7 +19,7 @@ const automationProviders = [
     status: 'available',
     features: ['Trigger workflows', 'Multi-step zaps', 'Conditional logic', 'Error handling'],
     pricing: 'Free + Premium',
-    color: 'bg-orange-700/10 text-orange-900 border-orange-700/20'
+    color: 'bg-orange-500/10 text-brand-primary border-brand-primary'
   },
   {
     id: 'ifttt',
@@ -29,7 +29,7 @@ const automationProviders = [
     status: 'available',
     features: ['Simple triggers', 'Applet creation', 'Location-based', 'IoT integration'],
     pricing: 'Free + Pro',
-    color: 'bg-blue-700/10 text-blue-900 border-blue-700/20'
+    color: 'bg-blue-500/10 text-info border-info'
   },
   {
     id: 'power-automate',
@@ -39,7 +39,7 @@ const automationProviders = [
     status: 'available',
     features: ['Microsoft 365', 'AI Builder', 'Desktop flows', 'Approval workflows'],
     pricing: 'Subscription',
-    color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20'
+    color: 'bg-indigo-500/10 text-info border-indigo-500/20'
   },
   {
     id: 'make',
@@ -49,7 +49,7 @@ const automationProviders = [
     status: 'coming-soon',
     features: ['Visual builder', 'Complex scenarios', 'Data transformation', 'Real-time sync'],
     pricing: 'Free + Premium',
-    color: 'bg-purple-700/10 text-purple-900 border-purple-700/20'
+    color: 'bg-purple-500/10 text-neutral border-neutral'
   }
 ];
 
@@ -350,7 +350,7 @@ const AutomationIntegration = () => {
                     <p className="text-sm text-muted-foreground">{template.description}</p>
                     
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="px-2 py-1 bg-blue-500/10 text-blue-700 rounded">
+                      <span className="px-2 py-1 bg-blue-500/10 text-info rounded">
                         {template.trigger}
                       </span>
                       <ArrowRight className="h-3 w-3 text-muted-foreground" />

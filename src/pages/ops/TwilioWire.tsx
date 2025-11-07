@@ -287,10 +287,10 @@ export default function TwilioWire() {
                 <Phone className="w-4 h-4 mr-2" />
                 Test Voice Webhook
                 {testResults.voice === 'success' && (
-                  <Check className="w-4 h-4 ml-auto text-green-700" />
+                  <Check className="w-4 h-4 ml-auto text-success" />
                 )}
                 {testResults.voice === 'error' && (
-                  <AlertCircle className="w-4 h-4 ml-auto text-red-700" />
+                  <AlertCircle className="w-4 h-4 ml-auto text-error" />
                 )}
               </Button>
             </div>
@@ -305,10 +305,10 @@ export default function TwilioWire() {
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Test SMS Webhook
                 {testResults.sms === 'success' && (
-                  <Check className="w-4 h-4 ml-auto text-green-700" />
+                  <Check className="w-4 h-4 ml-auto text-success" />
                 )}
                 {testResults.sms === 'error' && (
-                  <AlertCircle className="w-4 h-4 ml-auto text-red-700" />
+                  <AlertCircle className="w-4 h-4 ml-auto text-error" />
                 )}
               </Button>
             </div>

@@ -29,7 +29,7 @@ const messagingApps = [
     status: 'available',
     features: ['Bot API', 'Inline queries', 'File sharing', 'Channel broadcasts'],
     setupType: 'bot-token',
-    color: 'bg-blue-700/10 text-blue-900 border-blue-700/20'
+    color: 'bg-blue-500/10 text-info border-info'
   },
   {
     id: 'slack',
@@ -39,7 +39,7 @@ const messagingApps = [
     status: 'available',
     features: ['Slack app', 'Workflow automation', 'Custom commands', 'Thread replies'],
     setupType: 'oauth',
-    color: 'bg-purple-700/10 text-purple-900 border-purple-700/20'
+    color: 'bg-purple-500/10 text-neutral border-neutral'
   },
   {
     id: 'teams',
@@ -49,7 +49,7 @@ const messagingApps = [
     status: 'available',
     features: ['Teams bot', 'Meeting integration', 'File collaboration', 'Power Automate'],
     setupType: 'oauth',
-    color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20'
+    color: 'bg-indigo-500/10 text-info border-indigo-500/20'
   },
   {
     id: 'discord',
@@ -69,7 +69,7 @@ const messagingApps = [
     status: 'coming-soon',
     features: ['Messenger API', 'Rich cards', 'Quick replies', 'Persistent menu'],
     setupType: 'oauth',
-    color: 'bg-blue-700/10 text-blue-900 border-blue-700/20'
+    color: 'bg-blue-500/10 text-info border-info'
   }
 ];
 
@@ -117,7 +117,7 @@ const MessagingIntegration = () => {
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-orange-500/10 to-orange-500/5">
-              <MessageSquare className="h-6 w-6 text-orange-700" />
+              <MessageSquare className="h-6 w-6 text-brand-primary" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Messaging App Integrations</h1>

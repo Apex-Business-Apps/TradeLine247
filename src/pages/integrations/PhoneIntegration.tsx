@@ -19,7 +19,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'iOS',
     features: ['Call forwarding', 'Voicemail transcription', 'Contact sync', 'Call history'],
-    color: 'bg-blue-700/10 text-blue-900 border-blue-700/20'
+    color: 'bg-blue-500/10 text-info border-info'
   },
   {
     id: 'android-phone',
@@ -39,7 +39,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'iOS',
     features: ['Auto-reply', 'Business chat', 'Rich messages', 'Read receipts'],
-    color: 'bg-blue-700/10 text-blue-900 border-blue-700/20'
+    color: 'bg-blue-500/10 text-info border-info'
   },
   {
     id: 'android-messages',
@@ -125,7 +125,7 @@ const PhoneIntegration = () => {
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-500/5">
-              <Phone className="h-6 w-6 text-purple-700" />
+              <Phone className="h-6 w-6 text-neutral" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Phone & SMS Integration</h1>

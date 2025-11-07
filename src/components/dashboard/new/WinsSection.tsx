@@ -108,7 +108,7 @@ export const WinsSection: React.FC = () => {
                   className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent/50 transition-colors"
                 >
                   <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-                    <Icon className="h-4 w-4 text-green-700 dark:text-green-400" />
+                    <Icon className="h-4 w-4 text-success dark:text-green-400" />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">{getWinLabel(win.event_type)}</p>

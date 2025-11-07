@@ -48,10 +48,10 @@ const ERROR_CODE_DESCRIPTIONS: Record<string, string> = {
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'delivered':
-      return <CheckCircle className="h-4 w-4 text-green-700" />;
+      return <CheckCircle className="h-4 w-4 text-success" />;
     case 'failed':
     case 'undelivered':
-      return <XCircle className="h-4 w-4 text-red-700" />;
+      return <XCircle className="h-4 w-4 text-error" />;
     case 'sent':
     case 'sending':
     case 'queued':
@@ -168,12 +168,12 @@ export default function SMSDeliveryDashboard() {
         
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Delivered</div>
-          <div className="text-2xl font-bold text-green-700">{stats?.delivered || 0}</div>
+          <div className="text-2xl font-bold text-success">{stats?.delivered || 0}</div>
         </Card>
         
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Failed</div>
-          <div className="text-2xl font-bold text-red-700">{stats?.failed || 0}</div>
+          <div className="text-2xl font-bold text-error">{stats?.failed || 0}</div>
         </Card>
         
         <Card className="p-4">
@@ -241,7 +241,7 @@ export default function SMSDeliveryDashboard() {
                     <TableCell>
                       {log.error_code ? (
                         <div className="space-y-1">
-                          <Badge variant="outline" className="text-red-700">
+                          <Badge variant="outline" className="text-error">
                             {log.error_code}
                           </Badge>
                           <div className="text-xs text-muted-foreground">
