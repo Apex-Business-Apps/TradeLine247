@@ -1,11 +1,65 @@
 /**
- * DMS Connector SDK Types
+ * @fileoverview DMS Connector SDK Type Definitions
  *
- * Provides standardized interfaces for integrating with Dealer Management Systems
- * like Autovance and Dealertrack.
+ * Comprehensive type system for integrating with Dealer Management Systems (DMS).
+ * Provides standardized interfaces for Autovance, Dealertrack, and custom connectors.
+ *
+ * @module lib/connectors/types
+ * @author AutoRepAi
+ * @version 1.0.0
+ *
+ * @description
+ * This module defines the complete type system for DMS integrations, including:
+ * - External API response types (vendor-specific formats)
+ * - Internal data models (standardized across all vendors)
+ * - Connector configuration interfaces
+ * - Sync operation types
+ *
+ * The connector architecture follows the Adapter pattern to normalize different
+ * DMS APIs into a consistent interface for the application.
+ *
+ * @example Basic Connector Setup
+ * ```typescript
+ * import type { ConnectorConfig, DMSConnector } from './types';
+ * import { AutovanceConnector } from './autovance';
+ *
+ * const config: ConnectorConfig = {
+ *   provider: 'autovance',
+ *   baseUrl: 'https://api.autovance.com/v2',
+ *   apiKey: process.env.AUTOVANCE_API_KEY,
+ *   environment: 'production',
+ *   enabled: true
+ * };
+ *
+ * const connector: DMSConnector = new AutovanceConnector();
+ * await connector.connect(config);
+ * ```
+ *
+ * @example Type-Safe Response Mapping
+ * ```typescript
+ * import type { AutovanceVehicleResponse, Vehicle } from './types';
+ *
+ * function mapAutovanceVehicle(data: AutovanceVehicleResponse): Vehicle {
+ *   return {
+ *     vin: data.vin,
+ *     year: data.year,
+ *     make: data.make,
+ *     model: data.model,
+ *     status: data.status as 'available' | 'sold' | 'pending' | 'archived',
+ *     // ... other fields
+ *   };
+ * }
+ * ```
  */
 
-// External DMS API response types
+// ============================================================================
+// EXTERNAL DMS API RESPONSE TYPES
+// ============================================================================
+
+/**
+ * External API response types represent the raw data structures returned by
+ * DMS vendor APIs. These are mapped to internal types for use in the application.
+ */
 export interface AutovanceVehicleResponse {
   vin: string;
   stockNumber?: string;
