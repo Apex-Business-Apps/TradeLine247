@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import officialLogo from '@/assets/official-logo.svg';
+import officialLogo from '@/assets/official-logo.png';
 
 export const HeroSection = () => {
   return (

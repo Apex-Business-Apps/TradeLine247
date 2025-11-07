@@ -1,6 +1,6 @@
 import RoiCalculator from "@/components/RoiCalculator";
 import { LeadCaptureCard } from "@/components/sections/LeadCaptureCard";
-import officialLogo from '@/assets/official-logo.svg';
+import officialLogo from '@/assets/official-logo.png';
 export const PricingHero = () => {
   return <section className="py-20 bg-gradient-orange-subtle section-heavy">
       <div className="container">

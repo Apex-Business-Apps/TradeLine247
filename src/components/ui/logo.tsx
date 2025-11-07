@@ -1,5 +1,5 @@
 import React from 'react';
-import officialLogo from '@/assets/official-logo.svg';
+import officialLogo from '@/assets/official-logo.png';
 import { cn } from '@/lib/utils';
 interface LogoProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'full' | 'icon' | 'text';
