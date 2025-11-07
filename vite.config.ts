@@ -70,6 +70,10 @@ export default defineConfig(({ mode }) => ({
     headers: securityHeaders,
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  esbuild: {
+    // Remove console statements in production builds
+    drop: mode === 'production' ? ['console', 'debugger'] : [],
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
