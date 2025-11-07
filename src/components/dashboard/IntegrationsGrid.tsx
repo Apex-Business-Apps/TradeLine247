@@ -22,7 +22,7 @@ const integrations = [
     icon: Database,
     status: 'available',
     route: '/dashboard/integrations/crm',
-    color: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+    color: 'bg-blue-500/10 text-info border-info'
   },
   {
     id: 'email',
@@ -40,7 +40,7 @@ const integrations = [
     icon: Phone,
     status: 'available',
     route: '/dashboard/integrations/phone',
-    color: 'bg-purple-500/10 text-purple-600 border-purple-500/20'
+    color: 'bg-purple-500/10 text-neutral border-neutral'
   },
   {
     id: 'messaging',
@@ -49,7 +49,7 @@ const integrations = [
     icon: MessageSquare,
     status: 'available',
     route: '/dashboard/integrations/messaging',
-    color: 'bg-orange-500/10 text-orange-600 border-orange-500/20'
+    color: 'bg-orange-500/10 text-brand-primary border-brand-primary'
   },
   {
     id: 'mobile',
@@ -58,7 +58,7 @@ const integrations = [
     icon: Smartphone,
     status: 'available',
     route: '/dashboard/integrations/mobile',
-    color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20'
+    color: 'bg-indigo-500/10 text-info border-indigo-500/20'
   },
   {
     id: 'automation',
@@ -76,7 +76,7 @@ const getStatusBadge = (status: string) => {
     case 'connected':
       return <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">Connected</Badge>;
     case 'available':
-      return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">Available</Badge>;
+      return <Badge className="bg-blue-500/10 text-info border-info">Available</Badge>;
     case 'coming-soon':
       return <Badge className="bg-gray-500/10 text-gray-600 border-gray-500/20">Coming Soon</Badge>;
     default:

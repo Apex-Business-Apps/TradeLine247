@@ -175,7 +175,7 @@ export function getConnectionColorClass(connection: ConnectionType, property: Co
  */
 export const ColorMigrationMap = {
   // Old hardcoded green → New success token
-  'text-green-600': 'text-[hsl(var(--status-success))]',
+  'text-success': 'text-[hsl(var(--status-success))]',
   'text-green-400': 'text-[hsl(var(--status-success-light))]',
   'bg-green-50': 'bg-[hsl(var(--status-success-bg))]',
   'bg-green-100': 'bg-[hsl(var(--status-success-bg))]',
@@ -192,14 +192,14 @@ export const ColorMigrationMap = {
 
   // Old hardcoded red → New error token
   'text-red-700': 'text-[hsl(var(--status-error))]',
-  'text-red-600': 'text-[hsl(var(--status-error))]',
+  'text-error': 'text-[hsl(var(--status-error))]',
   'text-red-400': 'text-[hsl(var(--status-error-light))]',
   'bg-red-50': 'bg-[hsl(var(--status-error-bg))]',
   'bg-red-700': 'bg-[hsl(var(--status-error))]',
   'border-red-200': 'border-[hsl(var(--status-error))]',
 
   // Old hardcoded blue → New info token
-  'text-blue-600': 'text-[hsl(var(--status-info))]',
+  'text-info': 'text-[hsl(var(--status-info))]',
   'text-blue-400': 'text-[hsl(var(--status-info-light))]',
   'bg-blue-50': 'bg-[hsl(var(--status-info-bg))]',
   'bg-blue-500': 'bg-[hsl(var(--status-info))]',

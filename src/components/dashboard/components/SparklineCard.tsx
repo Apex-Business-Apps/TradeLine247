@@ -43,8 +43,8 @@ export const SparklineCard: React.FC<SparklineCardProps> = ({
   };
 
   const trendColor = {
-    positive: 'text-green-600 dark:text-green-400',
-    negative: 'text-red-600 dark:text-red-400', 
+    positive: 'text-success dark:text-green-400',
+    negative: 'text-error dark:text-red-400', 
     neutral: 'text-muted-foreground'
   }[trendType];
 

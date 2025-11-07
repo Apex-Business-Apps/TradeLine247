@@ -77,7 +77,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsProps> = ({
             <CardContent>
               <div className="text-2xl font-bold">{metric.value}</div>
               <p className="text-xs text-muted-foreground">
-                <span className="text-green-600">{metric.change}</span> from last period
+                <span className="text-success">{metric.change}</span> from last period
               </p>
             </CardContent>
           </Card>
@@ -145,7 +145,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsProps> = ({
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-red-600">8</div>
+              <div className="text-2xl font-bold text-error">8</div>
               <p className="text-sm text-muted-foreground">High Priority</p>
               <p className="text-xs">Score: 70-100</p>
             </div>
@@ -155,7 +155,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsProps> = ({
               <p className="text-xs">Score: 40-69</p>
             </div>
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-green-600">3</div>
+              <div className="text-2xl font-bold text-success">3</div>
               <p className="text-sm text-muted-foreground">Low Priority</p>
               <p className="text-xs">Score: 0-39</p>
             </div>

@@ -610,3 +610,134 @@ textarea:focus-visible {
 :where(.text-primary\/70, .text-primary\/80, .text-primary\/90) {
   color: hsl(var(--primary)) !important;
 }
+
+/* ============================================================================
+ * Semantic Color Utility Classes - Using Canonical HSL Tokens
+ * ============================================================================
+ * These classes map to the design system tokens defined above
+ * All colors follow WCAG AA compliance requirements
+ * ============================================================================ */
+
+/* Success/Positive Colors - Green */
+.text-success {
+  color: hsl(var(--status-success)) !important;
+}
+
+.bg-success {
+  background-color: hsl(var(--status-success)) !important;
+}
+
+.bg-success-light {
+  background-color: hsl(var(--status-success-bg)) !important;
+}
+
+.border-success {
+  border-color: hsl(var(--status-success)) !important;
+}
+
+/* Info Colors - Blue */
+.text-info {
+  color: hsl(var(--status-info)) !important;
+}
+
+.bg-info {
+  background-color: hsl(var(--status-info)) !important;
+}
+
+.bg-info-light {
+  background-color: hsl(var(--status-info-bg)) !important;
+}
+
+.border-info {
+  border-color: hsl(var(--status-info)) !important;
+}
+
+/* Warning Colors - Amber */
+.text-warning {
+  color: hsl(var(--status-warning)) !important;
+}
+
+.bg-warning {
+  background-color: hsl(var(--status-warning)) !important;
+}
+
+.bg-warning-light {
+  background-color: hsl(var(--status-warning-bg)) !important;
+}
+
+.border-warning {
+  border-color: hsl(var(--status-warning)) !important;
+}
+
+/* Error/Destructive Colors - Red */
+.text-error {
+  color: hsl(var(--status-error)) !important;
+}
+
+.bg-error {
+  background-color: hsl(var(--status-error)) !important;
+}
+
+.bg-error-light {
+  background-color: hsl(var(--status-error-bg)) !important;
+}
+
+.border-error {
+  border-color: hsl(var(--status-error)) !important;
+}
+
+/* Brand Colors - Orange */
+.text-brand-primary {
+  color: hsl(var(--brand-orange-primary)) !important;
+}
+
+.text-brand-dark {
+  color: hsl(var(--brand-orange-dark)) !important;
+}
+
+.bg-brand-primary {
+  background-color: hsl(var(--brand-orange-primary)) !important;
+}
+
+.bg-brand-light {
+  background-color: hsl(var(--brand-orange-light) / 0.1) !important;
+}
+
+.border-brand-primary {
+  border-color: hsl(var(--brand-orange-primary) / 0.3) !important;
+}
+
+/* Brand Green Colors */
+.text-brand-green {
+  color: hsl(var(--brand-green-primary)) !important;
+}
+
+.text-brand-green-dark {
+  color: hsl(var(--brand-green-dark)) !important;
+}
+
+/* Neutral/Purple Colors - Using muted tokens for neutral states */
+.text-neutral {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.bg-neutral-light {
+  background-color: hsl(var(--muted)) !important;
+}
+
+/* Dark mode automatic adjustments */
+.dark .text-success {
+  color: hsl(var(--status-success)) !important; /* Auto-switches to lighter variant */
+}
+
+.dark .text-info {
+  color: hsl(var(--status-info)) !important;
+}
+
+.dark .text-warning {
+  color: hsl(var(--status-warning)) !important;
+}
+
+.dark .text-error {
+  color: hsl(var(--status-error)) !important;
+}

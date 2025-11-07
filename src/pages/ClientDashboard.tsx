@@ -65,7 +65,7 @@ const ClientDashboard = () => {
         )}
 
         {/* Dashboard with lazy loading and comprehensive skeleton fallback */}
-        <Suspense fallback={<DashboardSkeletons layout={dashboardLayout} />}>
+        <Suspense fallback={<DashboardSkeletons layout={dashboardLayout || 'comfortable'} />}>
           <NewDashboard />
         </Suspense>
       </main>
