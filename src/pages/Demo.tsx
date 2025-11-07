@@ -46,15 +46,15 @@ const Demo = () => {
                 <CardContent>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Live call demonstrations
                     </li>
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Dashboard walkthrough
                     </li>
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Integration examples
                     </li>
                   </ul>
@@ -78,15 +78,15 @@ const Demo = () => {
                 <CardContent>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       30-minute one-on-one session
                     </li>
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Tailored to your business
                     </li>
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Q&A with our experts
                     </li>
                   </ul>

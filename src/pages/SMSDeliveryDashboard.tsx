@@ -55,7 +55,7 @@ const getStatusIcon = (status: string) => {
     case 'sent':
     case 'sending':
     case 'queued':
-      return <Clock className="h-4 w-4 text-yellow-600" />;
+      return <Clock className="h-4 w-4 text-amber-800" />;
     default:
       return <AlertCircle className="h-4 w-4 text-gray-600" />;
   }
@@ -178,7 +178,7 @@ export default function SMSDeliveryDashboard() {
         
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Pending</div>
-          <div className="text-2xl font-bold text-yellow-600">{stats?.pending || 0}</div>
+          <div className="text-2xl font-bold text-amber-800">{stats?.pending || 0}</div>
         </Card>
         
         <Card className="p-4">

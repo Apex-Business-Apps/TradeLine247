@@ -98,7 +98,7 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
         title: 'Getting Started',
         description: 'Explore the Quick Actions menu to see what your AI receptionist can do.',
         action: 'Explore Features',
-        color: 'text-yellow-600 dark:text-yellow-400',
+        color: 'text-amber-800 dark:text-yellow-400',
         bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
       });
     }
@@ -132,7 +132,7 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-yellow-500" />
+          <Lightbulb className="h-5 w-5 text-amber-700" />
           <CardTitle className="text-lg">Tips for You</CardTitle>
         </div>
       </CardHeader>

@@ -138,7 +138,7 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
             {showError ? (
               <AlertCircle className="w-5 h-5 text-destructive animate-in fade-in" />
             ) : isValid ? (
-              <CheckCircle2 className="w-5 h-5 text-green-500 animate-in fade-in" />
+              <CheckCircle2 className="w-5 h-5 text-[hsl(142,85%,25%)] animate-in fade-in" />
             ) : null}
           </div>
         ) : null}

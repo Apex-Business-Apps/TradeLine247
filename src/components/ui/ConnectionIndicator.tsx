@@ -89,9 +89,9 @@ function getStatusColor(quality: string): string {
     case 'good':
       return 'text-blue-600 dark:text-blue-400';
     case 'slow':
-      return 'text-yellow-600 dark:text-yellow-400';
+      return 'text-amber-800 dark:text-yellow-400';
     case 'offline':
-      return 'text-red-600 dark:text-red-400';
+      return 'text-red-700 dark:text-red-400';
     default:
       return 'text-muted-foreground';
   }

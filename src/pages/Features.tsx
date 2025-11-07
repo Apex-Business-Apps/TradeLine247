@@ -108,7 +108,7 @@ const Features = () => {
                     <ul className="space-y-2">
                       {feature.benefits.map((benefit, idx) => (
                         <li key={idx} className="flex items-center gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)] flex-shrink-0" aria-hidden="true" />
                           <span>{benefit}</span>
                         </li>
                       ))}

@@ -67,7 +67,7 @@ const integrations = [
     icon: Zap,
     status: 'available',
     route: '/dashboard/integrations/automation',
-    color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
+    color: 'bg-amber-600/10 text-amber-800 border-amber-600/20'
   }
 ];
 

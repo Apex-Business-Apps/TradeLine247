@@ -157,7 +157,7 @@ const AutomationIntegration = () => {
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
-              <Zap className="h-6 w-6 text-yellow-600" />
+              <Zap className="h-6 w-6 text-amber-800" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Automation Integrations</h1>
@@ -209,7 +209,7 @@ const AutomationIntegration = () => {
                   <div className="grid grid-cols-1 gap-1">
                     {provider.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
-                        <CheckCircle className="h-3 w-3 text-green-500" />
+                        <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}
@@ -341,7 +341,7 @@ const AutomationIntegration = () => {
                       <Badge className={`text-xs ${
                         template.difficulty === 'Easy' 
                           ? 'bg-green-500/10 text-green-600 border-green-500/20'
-                          : 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
+                          : 'bg-amber-600/10 text-amber-800 border-amber-600/20'
                       }`}>
                         {template.difficulty}
                       </Badge>

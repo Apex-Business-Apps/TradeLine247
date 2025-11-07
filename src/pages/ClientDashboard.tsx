@@ -36,7 +36,7 @@ const ClientDashboard = () => {
         {/* Error Banner */}
         {error && (
           <Alert className="mb-6 border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20">
-            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+            <AlertTriangle className="h-4 w-4 text-amber-800 dark:text-yellow-400" />
             <AlertDescription className="flex items-center justify-between">
               <span className="text-yellow-800 dark:text-yellow-300">{error}</span>
               <Button 

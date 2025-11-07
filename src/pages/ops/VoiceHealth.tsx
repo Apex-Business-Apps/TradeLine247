@@ -301,7 +301,7 @@ export default function VoiceHealth() {
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Client Errors (4xx)</div>
-                  <div className="text-2xl font-bold text-yellow-600">
+                  <div className="text-2xl font-bold text-amber-800">
                     {health.webhookStats.error_4xx}
                   </div>
                 </div>
@@ -343,7 +343,7 @@ export default function VoiceHealth() {
                       key={idx}
                       className="flex items-start gap-3 p-3 bg-white rounded-lg border border-red-200"
                     >
-                      <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+                      <AlertTriangle className="h-5 w-5 text-red-700 mt-0.5" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold">{alert.metric}</span>
@@ -513,7 +513,7 @@ export default function VoiceHealth() {
               {sloData && sloData.alerts.length === 0 ? (
                 <CheckCircle className="h-5 w-5 text-green-600" />
               ) : (
-                <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                <AlertTriangle className="h-5 w-5 text-amber-800" />
               )}
               <span>V-9: All SLOs within thresholds</span>
             </div>

@@ -161,9 +161,9 @@ export default function TwilioEvidence() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Inbound Calls</CardTitle>
             {voiceHealthy ? (
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <CheckCircle2 className="h-5 w-5 text-[hsl(142,85%,25%)]" />
             ) : (
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              <AlertTriangle className="h-5 w-5 text-amber-700" />
             )}
           </CardHeader>
           <CardContent className="space-y-2">
@@ -175,11 +175,11 @@ export default function TwilioEvidence() {
               </div>
               <div className="flex justify-between">
                 <span>Failed:</span>
-                <span className="font-mono text-red-500">{metrics?.voice.failedCount}</span>
+                <span className="font-mono text-red-700">{metrics?.voice.failedCount}</span>
               </div>
               <div className="flex justify-between">
                 <span>Stream Fallback:</span>
-                <span className="font-mono text-yellow-600">{metrics?.voice.streamFallbackCount}</span>
+                <span className="font-mono text-amber-800">{metrics?.voice.streamFallbackCount}</span>
               </div>
             </div>
             <Button 
@@ -229,9 +229,9 @@ export default function TwilioEvidence() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">SMS</CardTitle>
             {smsHealthy ? (
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <CheckCircle2 className="h-5 w-5 text-[hsl(142,85%,25%)]" />
             ) : (
-              <XCircle className="h-5 w-5 text-red-500" />
+              <XCircle className="h-5 w-5 text-red-700" />
             )}
           </CardHeader>
           <CardContent className="space-y-2">

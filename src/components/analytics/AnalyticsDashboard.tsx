@@ -150,7 +150,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsProps> = ({
               <p className="text-xs">Score: 70-100</p>
             </div>
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600">12</div>
+              <div className="text-2xl font-bold text-amber-800">12</div>
               <p className="text-sm text-muted-foreground">Medium Priority</p>
               <p className="text-xs">Score: 40-69</p>
             </div>
