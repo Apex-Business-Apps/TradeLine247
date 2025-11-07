@@ -18,7 +18,7 @@ export interface SensitiveFields {
 }
 
 export interface EncryptedCreditData {
-  applicant_data: any;
+  applicant_data: Record<string, unknown>;
   encrypted_fields: string[];
   encryption_key_id: string;
 }
