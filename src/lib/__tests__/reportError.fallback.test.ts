@@ -74,12 +74,8 @@ describe('Report Error - P0 Fix: Silent Error Suppression', () => {
 
       const existing = JSON.parse(localStorage.getItem(fallbackKey) || '[]');
       existing.push({
-        originalError: typeof testError === 'object' && testError !== null && 'message' in testError
-          ? (testError as any).message
-          : String(testError),
-        reportingError: typeof reportingError === 'object' && reportingError !== null && 'message' in reportingError
-          ? (reportingError as any).message
-          : String(reportingError),
+        originalError: (testError instanceof Error) ? testError.message : String(testError),
+        reportingError: (reportingError instanceof Error) ? reportingError.message : String(reportingError),
         timestamp: new Date().toISOString(),
         userAgent: 'test-agent'
       });
