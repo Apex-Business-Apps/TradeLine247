@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Home } from 'lucide-react';
-import { NewDashboard } from '@/components/dashboard/NewDashboard';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Loader2 } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+
+// Lazy load dashboard components for better performance
+const NewDashboard = lazy(() => import('@/components/dashboard/NewDashboard').then(module => ({ default: module.NewDashboard })));
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -59,7 +61,15 @@ const ClientDashboard = () => {
           </div>
         )}
 
-        <NewDashboard />
+        {/* Dashboard with lazy loading and fallback */}
+        <Suspense fallback={
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-3 text-muted-foreground">Loading dashboard...</span>
+          </div>
+        }>
+          <NewDashboard />
+        </Suspense>
       </main>
 
       <Footer />
