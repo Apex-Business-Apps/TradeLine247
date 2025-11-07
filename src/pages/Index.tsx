@@ -11,8 +11,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <main role="main">
       {/* Bold Hero Section with Red Accent */}
-      <div className="relative overflow-hidden bg-black text-white">
+      <section className="relative overflow-hidden bg-black text-white" aria-label="Hero">
         {/* Red accent stripe */}
         <div className="absolute top-0 left-0 right-0 h-2 bg-primary" />
         
@@ -65,10 +66,10 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Social Proof Stats */}
-      <div className="border-y border-border bg-white">
+      <section className="border-y border-border bg-white" aria-label="Statistics">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="animate-fade-in">
@@ -89,10 +90,10 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Features Section with Cards */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 bg-white">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 bg-white" aria-label="Features">
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-bold mb-4 text-black">
             Everything You Need to <span className="text-primary">Scale</span>
@@ -155,7 +156,7 @@ const Index = () => {
             </Link>
           </Card>
         </div>
-      </div>
+      </section>
 
       {/* ROI Calculator Section */}
       <div className="bg-gradient-to-b from-white to-muted/30 py-24">
@@ -241,6 +242,7 @@ const Index = () => {
           </p>
         </div>
       </div>
+      </main>
     </div>
   );
 };
