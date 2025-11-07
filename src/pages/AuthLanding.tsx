@@ -56,7 +56,7 @@ export default function AuthLanding() {
         .from('profiles')
         .select('id')
         .eq('email', email.toLowerCase())
-        .maybeSingle() as { data: { id: string } | null; error: any };
+        .single() as { data: { id: string } | null; error: any };
 
       if (existingUser) {
         setError('An account with this email already exists. Please sign in instead.');
