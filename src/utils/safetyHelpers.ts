@@ -10,8 +10,20 @@
 import { errorReporter } from '@/lib/errorReporter';
 
 /**
+ * List of dangerous URL protocols that can execute code
+ * These are blocked regardless of allowedProtocols configuration
+ */
+const DANGEROUS_PROTOCOLS = [
+  'javascript:',
+  'data:',
+  'vbscript:',
+  'file:',
+  'about:',
+];
+
+/**
  * Validates a URL before opening it
- * Prevents XSS via javascript: and data: URLs
+ * Prevents XSS via dangerous protocols (javascript:, data:, vbscript:, etc.)
  *
  * @param url - URL to validate
  * @param allowedProtocols - Allowed protocols (default: http, https, mailto, tel)
@@ -25,33 +37,68 @@ export function isValidURL(
     return false;
   }
 
-  try {
-    const parsed = new URL(url, window.location.href);
+  // Normalize URL for checking
+  const normalizedUrl = url.toLowerCase().trim();
 
-    // Check protocol
-    if (!allowedProtocols.includes(parsed.protocol)) {
+  // Block dangerous protocols explicitly (defense in depth)
+  // Check before parsing to catch malformed URLs that might bypass URL constructor
+  for (const dangerousProtocol of DANGEROUS_PROTOCOLS) {
+    if (normalizedUrl.startsWith(dangerousProtocol)) {
       errorReporter.report({
         type: 'error',
-        message: `Blocked navigation to unsafe URL protocol: ${parsed.protocol}`,
+        message: `Blocked XSS attempt via dangerous URL protocol: ${dangerousProtocol}`,
         timestamp: new Date().toISOString(),
         url: window.location.href,
         userAgent: navigator.userAgent,
         environment: errorReporter['getEnvironment'](),
-        metadata: { blockedUrl: url, protocol: parsed.protocol }
+        metadata: {
+          blockedUrl: url.substring(0, 100),
+          detectedProtocol: dangerousProtocol
+        }
       });
       return false;
     }
+  }
 
-    // Block javascript: and data: protocols explicitly
-    if (url.toLowerCase().startsWith('javascript:') || url.toLowerCase().startsWith('data:')) {
+  try {
+    const parsed = new URL(url, window.location.href);
+
+    // Double-check protocol after parsing (defense in depth)
+    const protocol = parsed.protocol.toLowerCase();
+
+    // Block dangerous protocols from parsed URL
+    for (const dangerousProtocol of DANGEROUS_PROTOCOLS) {
+      if (protocol === dangerousProtocol) {
+        errorReporter.report({
+          type: 'error',
+          message: `Blocked XSS attempt via dangerous URL protocol after parsing: ${protocol}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: {
+            blockedUrl: url.substring(0, 100),
+            parsedProtocol: protocol
+          }
+        });
+        return false;
+      }
+    }
+
+    // Check if protocol is in allowed list
+    if (!allowedProtocols.includes(protocol)) {
       errorReporter.report({
         type: 'error',
-        message: `Blocked XSS attempt via dangerous URL: ${url.substring(0, 50)}...`,
+        message: `Blocked navigation to disallowed URL protocol: ${protocol}`,
         timestamp: new Date().toISOString(),
         url: window.location.href,
         userAgent: navigator.userAgent,
         environment: errorReporter['getEnvironment'](),
-        metadata: { blockedUrl: url.substring(0, 100) }
+        metadata: {
+          blockedUrl: url,
+          protocol,
+          allowedProtocols: allowedProtocols.join(', ')
+        }
       });
       return false;
     }
