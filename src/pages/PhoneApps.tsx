@@ -11,7 +11,7 @@ const phoneApps = [
     icon: Phone,
     action: (number: string) => `tel:${number}`,
     defaultNumber: '+14319900222',
-    color: 'text-green-600'
+    color: 'text-green-700'
   },
   {
     id: 'sms',
@@ -20,7 +20,7 @@ const phoneApps = [
     icon: MessageSquare,
     action: (number: string) => `sms:${number}`,
     defaultNumber: '+14319900222',
-    color: 'text-blue-600'
+    color: 'text-blue-700'
   },
   {
     id: 'email',
@@ -29,7 +29,7 @@ const phoneApps = [
     icon: Mail,
     action: (email: string) => `mailto:${email}`,
     defaultNumber: 'support@tradeline247.ai',
-    color: 'text-purple-600'
+    color: 'text-purple-700'
   },
   {
     id: 'contacts',
@@ -37,7 +37,7 @@ const phoneApps = [
     description: 'Download contact card',
     icon: User,
     action: () => '/api/vcard/download',
-    color: 'text-orange-600'
+    color: 'text-orange-700'
   },
   {
     id: 'calendar',
@@ -54,7 +54,7 @@ const phoneApps = [
     icon: MapPin,
     action: (coords: string) => `geo:${coords}`,
     defaultNumber: '51.0447,-114.0719', // Calgary coordinates
-    color: 'text-red-600'
+    color: 'text-red-700'
   }
 ];
 

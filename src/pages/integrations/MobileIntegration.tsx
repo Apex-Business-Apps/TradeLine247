@@ -251,7 +251,7 @@ const MobileIntegration = () => {
                         {feature.platforms.map((platform) => (
                           <Badge 
                             key={platform}
-                            className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs"
+                            className="bg-blue-700/10 text-blue-900 border-blue-700/20 text-xs"
                           >
                             {platform}
                           </Badge>
