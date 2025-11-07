@@ -1,9 +1,54 @@
 /**
  * DMS Connector SDK Types
- * 
+ *
  * Provides standardized interfaces for integrating with Dealer Management Systems
  * like Autovance and Dealertrack.
  */
+
+// External DMS API response types
+export interface AutovanceVehicleResponse {
+  vin: string;
+  stockNumber?: string;
+  year: number;
+  make: string;
+  model: string;
+  trim?: string;
+  odometer?: number;
+  sellingPrice?: number;
+  msrp?: number;
+  cost?: number;
+  status: string;
+  photos?: string[];
+  features?: string[];
+}
+
+export interface AutovanceLeadResponse {
+  id: string;
+  customerId: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  source?: string;
+  status?: string;
+  notes?: string;
+}
+
+export interface AutovanceQuoteResponse {
+  id: string;
+  deskingId: string;
+  customerId: string;
+  vehicleVin: string;
+  sellingPrice: number;
+  downPayment?: number;
+  tradeAllowance?: number;
+  financeRate?: number;
+  financeTerm?: number;
+  monthlyPayment?: number;
+  totalPrice: number;
+  taxes?: number;
+  fees?: number;
+}
 
 export interface ConnectorConfig {
   provider: 'autovance' | 'dealertrack' | 'other';
@@ -42,7 +87,7 @@ export interface Lead {
   source: string;
   status: string;
   vehicleInterest?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean>;
 }
 
 export interface Quote {
@@ -65,9 +110,9 @@ export interface CreditApplication {
   id?: string;
   externalId?: string;
   leadId?: string;
-  applicantData: Record<string, any>;
-  coApplicantData?: Record<string, any>;
-  employmentData?: Record<string, any>;
+  applicantData: Record<string, unknown>;
+  coApplicantData?: Record<string, unknown>;
+  employmentData?: Record<string, unknown>;
   status: 'draft' | 'submitted' | 'approved' | 'declined';
   softPull: boolean;
   creditScore?: number;
