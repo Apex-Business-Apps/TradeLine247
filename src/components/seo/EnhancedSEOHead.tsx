@@ -129,7 +129,7 @@ export const EnhancedSEOHead: React.FC<EnhancedSEOHeadProps> = ({
     url: baseUrl,
     logo: {
       '@type': 'ImageObject',
-      url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.svg`,
+      url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.png`,
       width: 512,
       height: 512,
     },
@@ -216,7 +216,7 @@ export const EnhancedSEOHead: React.FC<EnhancedSEOHeadProps> = ({
         name: 'TradeLine 24/7',
         logo: {
           '@type': 'ImageObject',
-          url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.svg`,
+          url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.png`,
         },
       },
       articleSection: article.section,

@@ -27,7 +27,7 @@ import React from "react";
 import "../styles/hero-roi.css";
 import { LeadCaptureCard } from "../components/sections/LeadCaptureCard";
 import RoiCalculator from "../components/RoiCalculator";
-import officialLogo from '@/assets/official-logo.svg';
+import officialLogo from '@/assets/official-logo.png';
 export default function HeroRoiDuo() {
   return <section className="bg-gradient-orange-subtle section-heavy" style={{
     paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',

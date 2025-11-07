@@ -114,7 +114,7 @@ export const AISEOHead: React.FC<AISEOHeadProps> = ({
     url: baseUrl,
     logo: {
       '@type': 'ImageObject',
-      url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.svg`,
+      url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.png`,
       width: 512,
       height: 512,
     },
