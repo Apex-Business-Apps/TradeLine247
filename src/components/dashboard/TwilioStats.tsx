@@ -11,7 +11,7 @@ export const TwilioStats: React.FC = () => {
       title: 'Total Calls',
       value: stats.totalCalls.toString(),
       icon: Phone,
-      color: 'text-blue-600',
+      color: 'text-blue-700',
       bgColor: 'bg-blue-100 dark:bg-blue-900',
       description: 'All incoming calls'
     },
@@ -27,7 +27,7 @@ export const TwilioStats: React.FC = () => {
       title: 'Missed',
       value: stats.missedCalls.toString(),
       icon: PhoneMissed,
-      color: 'text-red-600',
+      color: 'text-red-700',
       bgColor: 'bg-red-100 dark:bg-red-900',
       description: 'No answer or busy'
     },
@@ -35,7 +35,7 @@ export const TwilioStats: React.FC = () => {
       title: 'Avg Duration',
       value: `${Math.floor(stats.averageDuration / 60)}:${(stats.averageDuration % 60).toString().padStart(2, '0')}`,
       icon: Clock,
-      color: 'text-purple-600',
+      color: 'text-purple-700',
       bgColor: 'bg-purple-100 dark:bg-purple-900',
       description: 'Average call time'
     }

@@ -131,7 +131,7 @@ export default function Activation() {
           </Card>
         ) : (
           <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <CheckCircle2 className="h-4 w-4 text-green-700" />
             <AlertDescription>
               <div className="space-y-3">
                 <p className="font-semibold text-green-900 dark:text-green-100">

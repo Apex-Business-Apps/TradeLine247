@@ -60,7 +60,7 @@ export class AppErrorBoundary extends Component<Props, State> {
           <Card className="max-w-lg w-full shadow-xl">
             <CardHeader className="text-center">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="w-8 h-8 text-red-600" />
+                <AlertTriangle className="w-8 h-8 text-red-700" />
               </div>
               <CardTitle className="text-2xl">Something Went Wrong</CardTitle>
               <CardDescription>

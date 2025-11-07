@@ -14,12 +14,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 interface DashboardSkeletonsProps {
   /**
    * Dashboard layout style from user preferences
-   * @default 'default'
+   * @default 'comfortable'
    */
-  layout?: 'compact' | 'default' | 'spacious';
+  layout?: 'compact' | 'comfortable' | 'spacious';
 }
 
-export const DashboardSkeletons: React.FC<DashboardSkeletonsProps> = ({ layout = 'default' }) => {
+export const DashboardSkeletons: React.FC<DashboardSkeletonsProps> = ({ layout = 'comfortable' }) => {
   // Calculate spacing based on layout preference
   const spacingClass = layout === 'compact' ? 'space-y-4' : layout === 'spacious' ? 'space-y-8' : 'space-y-6';
   const gridGapClass = layout === 'compact' ? 'gap-3' : layout === 'spacious' ? 'gap-6' : 'gap-4';

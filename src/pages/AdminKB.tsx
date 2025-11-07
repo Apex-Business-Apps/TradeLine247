@@ -11,7 +11,7 @@ export default function AdminKB() {
       </div>
 
       <Card className="p-6">
-        <div className="flex items-center space-x-3 text-orange-600">
+        <div className="flex items-center space-x-3 text-orange-700">
           <AlertTriangle className="h-6 w-6" />
           <h2 className="text-lg font-semibold">Knowledge Base Not Available</h2>
         </div>
