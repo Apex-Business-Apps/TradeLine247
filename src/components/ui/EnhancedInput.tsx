@@ -168,7 +168,7 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
 
       {/* Success Message */}
       {isValid && !showError && (
-        <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1 animate-in fade-in">
+        <p className="text-xs text-green-700 dark:text-green-400 flex items-center gap-1 animate-in fade-in">
           <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
           <span>Looks good!</span>
         </p>

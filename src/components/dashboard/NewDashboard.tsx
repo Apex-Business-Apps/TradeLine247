@@ -49,7 +49,7 @@ export const NewDashboard = () => {
         title: 'Bookings this week',
         subtitle: 'New appointments scheduled',
         icon: Calendar,
-        color: 'text-blue-600 dark:text-blue-400',
+        color: 'text-blue-700 dark:text-blue-400',
         bgColor: 'bg-blue-100 dark:bg-blue-900/30',
         ariaLabel: 'Weekly bookings performance'
       },
@@ -57,7 +57,7 @@ export const NewDashboard = () => {
         title: 'Expected payout',
         subtitle: 'Revenue from active calls',
         icon: DollarSign,
-        color: 'text-green-600 dark:text-green-400',
+        color: 'text-green-700 dark:text-green-400',
         bgColor: 'bg-green-100 dark:bg-green-900/30',
         ariaLabel: 'Expected revenue payout'
       },
@@ -65,7 +65,7 @@ export const NewDashboard = () => {
         title: 'Calls we caught',
         subtitle: 'Answer rate this period',
         icon: Phone,
-        color: 'text-purple-600 dark:text-purple-400',
+        color: 'text-purple-700 dark:text-purple-400',
         bgColor: 'bg-purple-100 dark:bg-purple-900/30',
         ariaLabel: 'Call answer rate performance'
       },
@@ -73,7 +73,7 @@ export const NewDashboard = () => {
         title: 'Missed but saved',
         subtitle: 'Calls recovered by AI',
         icon: Shield,
-        color: 'text-orange-600 dark:text-orange-400',
+        color: 'text-orange-700 dark:text-orange-400',
         bgColor: 'bg-orange-100 dark:bg-orange-900/30',
         ariaLabel: 'Calls rescued from being missed'
       }
@@ -185,7 +185,7 @@ export const NewDashboard = () => {
                             </div>
                             <p className="text-sm text-muted-foreground line-clamp-2">{transcript.summary}</p>
                             {transcript.needsReply && (
-                              <div className="text-xs text-orange-600 dark:text-orange-400 font-medium">
+                              <div className="text-xs text-orange-700 dark:text-orange-400 font-medium">
                                 Needs reply
                               </div>
                             )}

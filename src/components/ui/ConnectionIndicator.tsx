@@ -85,9 +85,9 @@ function getStatusMessage(type: string, quality: string, online: boolean): strin
 function getStatusColor(quality: string): string {
   switch (quality) {
     case 'excellent':
-      return 'text-green-600 dark:text-green-400';
+      return 'text-green-700 dark:text-green-400';
     case 'good':
-      return 'text-blue-600 dark:text-blue-400';
+      return 'text-blue-700 dark:text-blue-400';
     case 'slow':
       return 'text-amber-800 dark:text-yellow-400';
     case 'offline':
