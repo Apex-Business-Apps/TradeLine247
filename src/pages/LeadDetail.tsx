@@ -10,6 +10,7 @@ import { LeadTimeline } from '@/components/Lead/LeadTimeline';
 import { ArrowLeft, Mail, Phone, MessageSquare, Edit, MoreVertical } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import type { LeadMetadata, TradeInData } from '@/types/database';
 
 interface Lead {
   id: string;
@@ -23,8 +24,8 @@ interface Lead {
   preferred_contact?: string;
   created_at: string;
   updated_at: string;
-  metadata?: any;
-  trade_in?: any;
+  metadata?: LeadMetadata;
+  trade_in?: TradeInData;
   notes?: string;
 }
 

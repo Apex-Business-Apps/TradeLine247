@@ -7,9 +7,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { persistentQueue } from '@/lib/resilience/persistentQueue';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Type helper for new tables until types are regenerated
-const db = supabase as any;
+const db = supabase as SupabaseClient;
 
 interface SyncState {
   isSyncing: boolean;
@@ -127,7 +128,7 @@ export function useOfflineSync() {
    */
   const updateSyncState = useCallback(async (
     tableName: string,
-    metadata?: any
+    metadata?: Record<string, unknown>
   ) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');

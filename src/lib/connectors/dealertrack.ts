@@ -34,14 +34,17 @@
  * - Some features require additional Dealertrack products (DMS, F&I)
  */
 
-import type { 
-  DMSConnector, 
-  ConnectorConfig, 
-  Vehicle, 
-  Lead, 
-  Quote, 
-  CreditApplication, 
-  SyncResult 
+import type {
+  DMSConnector,
+  ConnectorConfig,
+  Vehicle,
+  Lead,
+  Quote,
+  CreditApplication,
+  SyncResult,
+  DealertrackVehicleResponse,
+  DealertrackLeadResponse,
+  DealertrackQuoteResponse
 } from './types';
 
 export class DealertrackConnector implements DMSConnector {
@@ -361,7 +364,7 @@ export class DealertrackConnector implements DMSConnector {
     };
   }
 
-  private mapDealertrackVehicle(data: any): Vehicle {
+  private mapDealertrackVehicle(data: DealertrackVehicleResponse): Vehicle {
     return {
       vin: data.vin,
       stockNumber: data.stockNumber,
@@ -373,13 +376,13 @@ export class DealertrackConnector implements DMSConnector {
       price: data.price,
       msrp: data.msrp,
       cost: data.cost,
-      status: data.status,
+      status: data.status as 'available' | 'sold' | 'pending' | 'archived',
       images: data.images || [],
       features: data.options || []
     };
   }
 
-  private mapDealertrackLead(data: any): Lead {
+  private mapDealertrackLead(data: DealertrackLeadResponse): Lead {
     return {
       id: data.id,
       externalId: data.prospectId,
@@ -395,7 +398,7 @@ export class DealertrackConnector implements DMSConnector {
     };
   }
 
-  private mapDealertrackQuote(data: any): Quote {
+  private mapDealertrackQuote(data: DealertrackQuoteResponse): Quote {
     return {
       id: data.id,
       externalId: data.dealId,

@@ -1,4 +1,80 @@
-// Canadian Provincial Tax Rates (2025)
+/**
+ * @fileoverview Canadian Vehicle Tax Calculator
+ *
+ * Comprehensive tax calculation engine for automotive sales in Canada.
+ * Handles all provincial tax variations (GST, PST, HST, QST), trade-ins,
+ * financing calculations, and quote generation with full tax compliance.
+ *
+ * @module lib/taxCalculator
+ * @author AutoRepAi
+ * @version 1.0.0
+ *
+ * @description
+ * This module provides accurate tax calculations for vehicle sales across all
+ * Canadian provinces and territories. It correctly handles:
+ * - Provincial tax variations (5 provinces with HST, 8 with GST+PST)
+ * - Trade-in equity tax benefits
+ * - Manufacturer and dealer incentives
+ * - Dealer fees and optional add-ons
+ * - Finance calculations with compound interest
+ * - Currency and percentage formatting
+ *
+ * @example Basic Quote Calculation
+ * ```typescript
+ * import { calculateQuote, formatCurrency } from './taxCalculator';
+ *
+ * const quote = calculateQuote({
+ *   vehiclePrice: 30000,
+ *   province: 'ON'
+ * });
+ *
+ * console.log(formatCurrency(quote.totalPrice)); // "$33,900.00"
+ * console.log(formatCurrency(quote.totalTaxes)); // "$3,900.00"
+ * ```
+ *
+ * @example Complete Quote with Trade-In and Financing
+ * ```typescript
+ * import { calculateQuote, calculateFinancePayment, formatCurrency } from './taxCalculator';
+ *
+ * // Step 1: Calculate quote
+ * const quote = calculateQuote({
+ *   vehiclePrice: 35000,
+ *   downPayment: 7000,
+ *   tradeInValue: 8000,
+ *   tradeInPayoff: 3000,
+ *   dealerFees: 500,
+ *   incentives: 1000,
+ *   province: 'ON'
+ * });
+ *
+ * // Step 2: Calculate financing
+ * const financing = calculateFinancePayment({
+ *   quote,
+ *   financeTerm: 60,
+ *   financeRate: 6.99
+ * });
+ *
+ * console.log(formatCurrency(financing.paymentAmount)); // Monthly payment
+ * console.log(formatCurrency(financing.totalInterest)); // Total interest paid
+ * ```
+ */
+
+/**
+ * Canadian Provincial Tax Rates (2025)
+ *
+ * Comprehensive tax rates for all Canadian provinces and territories.
+ * Includes GST (Goods and Services Tax), PST (Provincial Sales Tax), and HST (Harmonized Sales Tax).
+ *
+ * @constant
+ * @type {Record<string, {gst: number, pst: number, hst: number, total: number, name: string}>}
+ *
+ * @example
+ * ```typescript
+ * const ontarioRate = PROVINCIAL_TAX_RATES.ON;
+ * console.log(ontarioRate.total); // 0.13 (13% HST)
+ * console.log(ontarioRate.name);  // "Ontario"
+ * ```
+ */
 export const PROVINCIAL_TAX_RATES = {
   AB: { gst: 0.05, pst: 0, hst: 0, total: 0.05, name: 'Alberta' },
   BC: { gst: 0.05, pst: 0.07, hst: 0, total: 0.12, name: 'British Columbia' },
@@ -47,6 +123,50 @@ export interface FinanceCalculation extends QuoteCalculation {
   totalFinanced: number;
 }
 
+/**
+ * Calculate Complete Vehicle Quote with Canadian Tax Compliance
+ *
+ * Performs comprehensive quote calculation including all fees, taxes, trade-ins,
+ * and incentives according to Canadian provincial tax regulations.
+ *
+ * @param {Object} params - Quote calculation parameters
+ * @param {number} params.vehiclePrice - Base vehicle price before taxes and fees
+ * @param {number} [params.tradeInValue=0] - Appraised value of trade-in vehicle
+ * @param {number} [params.tradeInPayoff=0] - Outstanding loan balance on trade-in
+ * @param {number} [params.downPayment=0] - Customer down payment amount
+ * @param {number} [params.dealerFees=0] - Documentation and administrative fees
+ * @param {number} [params.incentives=0] - Manufacturer and dealer incentives/rebates
+ * @param {number} [params.addons=0] - Optional add-ons (warranty, protection, etc.)
+ * @param {Province} params.province - Canadian province code (ON, BC, AB, etc.)
+ *
+ * @returns {QuoteCalculation} Complete quote breakdown with all calculated fields
+ *
+ * @example
+ * ```typescript
+ * const quote = calculateQuote({
+ *   vehiclePrice: 35000,
+ *   downPayment: 7000,
+ *   tradeInValue: 5000,
+ *   province: 'ON',
+ *   dealerFees: 500,
+ *   incentives: 1000
+ * });
+ *
+ * console.log(quote.totalPrice);      // $38,335 (price + taxes)
+ * console.log(quote.totalTaxes);      // $3,835 (13% HST on $29,500)
+ * console.log(quote.amountToFinance); // $26,335 (after down payment and trade-in)
+ * ```
+ *
+ * @remarks
+ * Tax Calculation Rules:
+ * - Trade-in equity reduces taxable amount in most provinces
+ * - Incentives are subtracted before tax calculation
+ * - Dealer fees and add-ons are included in taxable amount
+ * - Quebec uses compound tax calculation (GST + QST on GST-inclusive price)
+ *
+ * @see {@link PROVINCIAL_TAX_RATES} for current tax rates by province
+ * @see {@link calculateFinancePayment} to calculate monthly payments
+ */
 export function calculateQuote(params: {
   vehiclePrice: number;
   tradeInValue?: number;
@@ -114,6 +234,21 @@ export function calculateQuote(params: {
   };
 }
 
+/**
+ * Format Currency in Canadian Dollars
+ *
+ * Formats a numeric amount as Canadian currency with proper symbols and separators.
+ *
+ * @param {number} amount - The amount to format
+ * @returns {string} Formatted currency string (e.g., "$1,234.56")
+ *
+ * @example
+ * ```typescript
+ * formatCurrency(1234.56);  // "$1,234.56"
+ * formatCurrency(999999.99); // "$999,999.99"
+ * formatCurrency(0);        // "$0.00"
+ * ```
+ */
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-CA', {
     style: 'currency',
@@ -123,6 +258,21 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+/**
+ * Format Percentage Rate
+ *
+ * Formats a numeric rate as a percentage string with 2 decimal places.
+ *
+ * @param {number} rate - The rate to format (e.g., 5.99)
+ * @returns {string} Formatted percentage string (e.g., "5.99%")
+ *
+ * @example
+ * ```typescript
+ * formatPercent(5.99);   // "5.99%"
+ * formatPercent(0);      // "0.00%"
+ * formatPercent(19.995); // "20.00%"
+ * ```
+ */
 export function formatPercent(rate: number): string {
   return `${rate.toFixed(2)}%`;
 }

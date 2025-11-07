@@ -6,16 +6,17 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { safeStorage } from '@/lib/storage/safeStorage';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Type helper for new tables until types are regenerated
-const db = supabase as any;
+const db = supabase as SupabaseClient;
 
 export interface PersistentOperation {
   id: string;
   operation_id: string;
   connector: string;
   operation: string;
-  payload: any;
+  payload: Record<string, unknown>;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   retries: number;
   max_retries: number;
@@ -42,7 +43,7 @@ export class PersistentQueue {
   /**
    * Enqueue an operation
    */
-  async enqueue(connector: string, operation: string, payload: any): Promise<string> {
+  async enqueue(connector: string, operation: string, payload: Record<string, unknown>): Promise<string> {
     const operationId = `${connector}-${operation}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     const op: PersistentOperation = {

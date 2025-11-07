@@ -18,7 +18,7 @@ export interface SensitiveFields {
 }
 
 export interface EncryptedCreditData {
-  applicant_data: any;
+  applicant_data: Record<string, unknown>;
   encrypted_fields: string[];
   encryption_key_id: string;
 }
@@ -27,16 +27,16 @@ export interface EncryptedCreditData {
  * Encrypt sensitive fields in credit application
  */
 export async function encryptCreditApplication(
-  applicantData: any,
+  applicantData: Record<string, unknown>,
   sensitiveFields: string[] = ['ssn', 'creditScore', 'monthlyIncome', 'bankAccountNumber', 'routingNumber', 'driverLicense']
 ): Promise<EncryptedCreditData> {
-  const encryptedData = { ...applicantData };
+  const encryptedData: Record<string, unknown> = { ...applicantData };
   const encryptedFieldNames: string[] = [];
   const fieldEncryptionData: Record<string, { iv: string; key: string }> = {};
 
   // Encrypt each sensitive field with its own key and IV
   for (const field of sensitiveFields) {
-    if (applicantData[field]) {
+    if (applicantData[field] !== undefined && applicantData[field] !== null) {
       const { data: encrypted, key, iv } = await encryptText(
         String(applicantData[field])
       );
@@ -69,10 +69,10 @@ export async function encryptCreditApplication(
  * Decrypt credit application sensitive fields
  */
 export async function decryptCreditApplication(
-  encryptedData: any,
+  encryptedData: Record<string, unknown>,
   encryptedFields: string[],
   keyId: string
-): Promise<any> {
+): Promise<Record<string, unknown>> {
   if (!encryptedFields.length || !keyId) {
     return encryptedData;
   }
@@ -80,7 +80,7 @@ export async function decryptCreditApplication(
   // Retrieve field-specific keys and IVs from storage
   const fieldEncryptionData = await retrieveEncryptionKey(keyId);
 
-  const decryptedData = { ...encryptedData };
+  const decryptedData: Record<string, unknown> = { ...encryptedData };
 
   for (const field of encryptedFields) {
     if (encryptedData[field] && fieldEncryptionData[field]) {
@@ -151,10 +151,10 @@ export async function hashSensitiveField(value: string): Promise<string> {
 /**
  * Redact sensitive fields for logging
  */
-export function redactSensitiveData(data: any, fields: string[]): any {
-  const redacted = { ...data };
+export function redactSensitiveData(data: Record<string, unknown>, fields: string[]): Record<string, unknown> {
+  const redacted: Record<string, unknown> = { ...data };
   for (const field of fields) {
-    if (redacted[field]) {
+    if (redacted[field] !== undefined) {
       redacted[field] = '[REDACTED]';
     }
   }

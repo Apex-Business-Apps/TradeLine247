@@ -6,8 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Search, Filter, FileText } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
+import { QuotesErrorBoundary } from '@/components/ErrorBoundary/QuotesErrorBoundary';
 
-const Quotes = memo(function Quotes() {
+const QuotesContent = memo(function QuotesContent() {
   const mockQuotes = [
     {
       id: '1',
@@ -108,5 +109,12 @@ const Quotes = memo(function Quotes() {
     </AppLayout>
   );
 });
+
+// Wrap with error boundary for graceful error handling
+const Quotes = () => (
+  <QuotesErrorBoundary>
+    <QuotesContent />
+  </QuotesErrorBoundary>
+);
 
 export default Quotes;

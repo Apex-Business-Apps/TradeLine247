@@ -338,8 +338,8 @@ export function QuoteCalculator() {
                       finance,
                     };
                     // Lazy load PDF generator (543 kB) only when user clicks download
-                    import('./QuotePDFGenerator').then(({ downloadQuotePDF }) => {
-                      downloadQuotePDF(pdfData, pdfLanguage);
+                    import('./QuotePDFGenerator').then(async ({ downloadQuotePDF }) => {
+                      await downloadQuotePDF(pdfData, pdfLanguage);
                       toast.success(`PDF downloaded in ${pdfLanguage === 'en' ? 'English' : 'French'}`);
                     }).catch((error) => {
                       console.error('Failed to load PDF generator:', error);

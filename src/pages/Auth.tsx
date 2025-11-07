@@ -51,10 +51,10 @@ export default function Auth() {
         title: 'Success',
         description: 'Signed in successfully',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to sign in',
+        description: error instanceof Error ? error.message : 'Failed to sign in',
         variant: 'destructive',
       });
     } finally {
@@ -84,10 +84,10 @@ export default function Auth() {
         title: 'Success',
         description: 'Account created! Please check your email to verify.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to create account',
+        description: error instanceof Error ? error.message : 'Failed to create account',
         variant: 'destructive',
       });
     } finally {

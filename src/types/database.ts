@@ -86,6 +86,29 @@ export interface Vehicle {
   updated_at: string;
 }
 
+export interface TradeInData {
+  year?: number;
+  make?: string;
+  model?: string;
+  trim?: string;
+  mileage?: number;
+  condition?: string;
+  vin?: string;
+  estimated_value?: number;
+  payoff_amount?: number;
+}
+
+export interface LeadMetadata {
+  source_url?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  referrer?: string;
+  ip_address?: string;
+  user_agent?: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
 export interface Lead {
   id: string;
   dealership_id: string;
@@ -99,11 +122,21 @@ export interface Lead {
   phone?: string;
   preferred_contact?: string;
   vehicle_interest?: string;
-  trade_in?: any;
+  trade_in?: TradeInData;
   notes?: string;
-  metadata?: any;
+  metadata?: LeadMetadata;
   created_at: string;
   updated_at: string;
+}
+
+export interface InteractionMetadata {
+  channel?: string;
+  duration_seconds?: number;
+  recording_url?: string;
+  sentiment?: 'positive' | 'neutral' | 'negative';
+  ai_confidence?: number;
+  tags?: string[];
+  [key: string]: string | number | boolean | string[] | undefined;
 }
 
 export interface Interaction {
@@ -114,9 +147,25 @@ export interface Interaction {
   direction: 'inbound' | 'outbound';
   subject?: string;
   body?: string;
-  metadata?: any;
+  metadata?: InteractionMetadata;
   ai_generated: boolean;
   created_at: string;
+}
+
+export interface Incentive {
+  name: string;
+  amount: number;
+  type: 'manufacturer' | 'dealer' | 'loyalty' | 'trade-in' | 'cash-back' | 'financing';
+  description?: string;
+  expiry_date?: string;
+}
+
+export interface Addon {
+  name: string;
+  price: number;
+  category: 'protection' | 'warranty' | 'maintenance' | 'accessories' | 'insurance';
+  description?: string;
+  taxable: boolean;
 }
 
 export interface Quote {
@@ -134,8 +183,8 @@ export interface Quote {
   tax_rate?: number;
   taxes?: number;
   dealer_fees?: number;
-  incentives?: any;
-  addons?: any;
+  incentives?: Incentive[];
+  addons?: Addon[];
   finance_term?: number;
   finance_rate?: number;
   payment_amount?: number;
@@ -149,15 +198,43 @@ export interface Quote {
   updated_at: string;
 }
 
+export interface ApplicantData {
+  first_name: string;
+  last_name: string;
+  date_of_birth: string;
+  ssn?: string; // Encrypted
+  sin?: string; // Encrypted (Canadian)
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  province: string;
+  postal_code: string;
+  residence_type?: 'own' | 'rent' | 'other';
+  monthly_rent?: number;
+  years_at_address?: number;
+}
+
+export interface EmploymentData {
+  status: 'employed' | 'self-employed' | 'retired' | 'unemployed' | 'other';
+  employer_name?: string;
+  occupation?: string;
+  job_title?: string;
+  monthly_income: number;
+  years_employed?: number;
+  supervisor_name?: string;
+  supervisor_phone?: string;
+}
+
 export interface CreditApplication {
   id: string;
   dealership_id: string;
   lead_id: string;
   submitted_by?: string;
   status: CreditAppStatus;
-  applicant_data: any;
-  co_applicant_data?: any;
-  employment_data?: any;
+  applicant_data: ApplicantData;
+  co_applicant_data?: ApplicantData;
+  employment_data?: EmploymentData;
   consent_timestamp?: string;
   consent_ip?: string;
   soft_pull: boolean;

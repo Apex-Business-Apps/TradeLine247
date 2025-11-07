@@ -25,14 +25,17 @@
  * - [ ] Initial inventory sync completed
  */
 
-import type { 
-  DMSConnector, 
-  ConnectorConfig, 
-  Vehicle, 
-  Lead, 
-  Quote, 
-  CreditApplication, 
-  SyncResult 
+import type {
+  DMSConnector,
+  ConnectorConfig,
+  Vehicle,
+  Lead,
+  Quote,
+  CreditApplication,
+  SyncResult,
+  AutovanceVehicleResponse,
+  AutovanceLeadResponse,
+  AutovanceQuoteResponse
 } from './types';
 
 export class AutovanceConnector implements DMSConnector {
@@ -293,7 +296,7 @@ export class AutovanceConnector implements DMSConnector {
   }
 
   // Helper methods to map Autovance data structures
-  private mapAutovanceVehicle(data: any): Vehicle {
+  private mapAutovanceVehicle(data: AutovanceVehicleResponse): Vehicle {
     return {
       vin: data.vin,
       stockNumber: data.stockNumber,
@@ -305,13 +308,13 @@ export class AutovanceConnector implements DMSConnector {
       price: data.sellingPrice,
       msrp: data.msrp,
       cost: data.cost,
-      status: data.status,
+      status: data.status as 'available' | 'sold' | 'pending' | 'archived',
       images: data.photos || [],
       features: data.features || []
     };
   }
 
-  private mapAutovanceLead(data: any): Lead {
+  private mapAutovanceLead(data: AutovanceLeadResponse): Lead {
     return {
       id: data.id,
       externalId: data.customerId,
@@ -322,13 +325,13 @@ export class AutovanceConnector implements DMSConnector {
       source: data.source || 'unknown',
       status: data.status || 'new',
       metadata: {
-        notes: data.notes,
+        notes: data.notes || '',
         autovanceId: data.id
       }
     };
   }
 
-  private mapAutovanceQuote(data: any): Quote {
+  private mapAutovanceQuote(data: AutovanceQuoteResponse): Quote {
     return {
       id: data.id,
       externalId: data.deskingId,

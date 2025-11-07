@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Phone, Mail, MessageSquare, FileText, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import type { InteractionMetadata } from '@/types/database';
 
 interface Interaction {
   id: string;
@@ -16,7 +17,7 @@ interface Interaction {
   ai_generated: boolean;
   created_at: string;
   user_id?: string;
-  metadata?: any;
+  metadata?: InteractionMetadata;
 }
 
 interface LeadTimelineProps {

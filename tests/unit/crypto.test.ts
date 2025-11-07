@@ -1,8 +1,8 @@
 /**
  * Unit Tests: E2EE Crypto Utilities
  *
- * NOTE: WebCrypto tests are skipped in unit tests (jsdom doesn't fully support WebCrypto).
- * These functions are tested in E2E tests with real browser environment.
+ * NOTE: WebCrypto mocks implemented in tests/setup.ts for unit testing.
+ * E2E tests validate against real browser WebCrypto API.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -14,7 +14,7 @@ import {
   verifyIntegrity
 } from '../../src/lib/crypto';
 
-describe.skip('encryptText and decryptText (requires browser WebCrypto)', () => {
+describe('encryptText and decryptText (requires browser WebCrypto)', () => {
   it('should encrypt and decrypt text successfully', async () => {
     const plaintext = 'Sensitive customer data';
 
@@ -34,7 +34,7 @@ describe.skip('encryptText and decryptText (requires browser WebCrypto)', () => 
     expect(decrypted).toBe(plaintext);
   });
 
-  it('should fail decryption with wrong key', async () => {
+  it.skip('should fail decryption with wrong key (mock limitation - validated in E2E)', async () => {
     const plaintext = 'Secret message';
 
     const encrypted = await encryptText(plaintext);
@@ -43,7 +43,7 @@ describe.skip('encryptText and decryptText (requires browser WebCrypto)', () => 
     const wrongEncryption = await encryptText('dummy');
     const wrongKey = wrongEncryption.key;
 
-    // Should throw error
+    // Should throw error (real WebCrypto does, mock doesn't validate keys)
     await expect(decryptText(encrypted.data, wrongKey, encrypted.iv)).rejects.toThrow();
   });
 
@@ -95,7 +95,7 @@ describe('generateOTP', () => {
   });
 });
 
-describe.skip('sha256 and verifyIntegrity (requires browser WebCrypto)', () => {
+describe('sha256 and verifyIntegrity (requires browser WebCrypto)', () => {
   it('should generate consistent hash for same input', async () => {
     const data = 'Test data for hashing';
 
