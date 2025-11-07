@@ -6,20 +6,20 @@ export const BenefitsGrid = () => {
     icon: Zap,
     title: "Lightning Speed",
     description: "We pick up in 2-3 rings. No one likes waiting.",
-    color: "text-brand-orange",
-    gradient: "from-orange-500/20 to-orange-600/10"
+    color: "text-[hsl(var(--brand-orange-dark))]",
+    gradient: "from-primary/20 to-primary/10"
   }, {
     icon: User,
-    title: "Personal Touch", 
+    title: "Personal Touch",
     description: "We match your vibe. Friendly, on-brand, and sounds just like you.",
     color: "text-primary",
-    gradient: "from-blue-500/20 to-blue-600/10"
+    gradient: "from-primary/20 to-primary/10"
   }, {
     icon: Target,
     title: "Cleaner Follow-through",
     description: "Quick summary + next steps, straight to your inbox.",
-    color: "text-accent-foreground", 
-    gradient: "from-green-500/20 to-green-600/10"
+    color: "text-[hsl(var(--status-success))]",
+    gradient: "from-[hsl(var(--status-success))]/20 to-[hsl(var(--status-success))]/10"
   }];
 
   return (
