@@ -754,51 +754,25 @@ textarea:focus-visible {
   color: hsl(var(--status-error)) !important;
 }
 
-/* --- A11Y: WCAG AA color-contrast - COMPREHENSIVE FIX for home page --- */
-/* Fixes all 11 failing elements detected by Playwright axe-core tests */
-/* Scoped to #app-home to avoid breaking other pages */
+/* --- A11Y: WCAG AA color-contrast - ROOT CAUSE FIX via CSS variables --- */
+/*
+ * Problem: Primary color #ff5900 (HSL 21 100% 50%) = 3.14:1 contrast ❌
+ * Solution: Override --primary to darker orange (HSL 21 100% 35%) = 5.2:1 contrast ✅
+ *
+ * This fixes ALL usages of primary color on home page automatically:
+ * - .text-primary → darker text
+ * - .border-primary → darker border
+ * - .bg-primary → darker background
+ *
+ * Scoped to #app-home only - other pages unaffected.
+ */
 @layer components {
-  #app-home { color: #111827 !important; } /* slate-900 on light bg */
+  #app-home {
+    /* Override primary color variable for WCAG AA compliance */
+    --primary: 21 100% 35%; /* Darker orange: #b33f00, 5.2:1 contrast ratio */
 
-  /* Auth plan links - was #ff5900 (3.14:1) → now #1f2937 (12.6:1) */
-  #app-home a[href="/auth?plan=commission"],
-  #app-home a[href="/auth?plan=core"] {
-    color: #1f2937 !important; /* slate-800 */
-    text-decoration: underline;
-  }
-
-  #app-home a:visited { color: #1e40af !important; } /* blue-800 */
-
-  /* All button/shadow elements - was text-primary → now slate-900 */
-  #app-home .hover\:shadow-xl.min-h-\[44px\].shadow-lg,
-  #app-home .hover\:shadow-xl.shadow-lg[type="submit"],
-  #app-home .shadow-md,
-  #app-home button[data-testid="quick-action-view-calls"] > span,
-  #app-home .px-2\.5,
-  #app-home .text-muted-foreground,
-  #app-home .text-secondary-foreground,
-  #app-home .muted,
-  #app-home .subtle {
-    color: #111827 !important; /* slate-900 */
-  }
-
-  /* Border-primary elements without bg-primary */
-  #app-home .border-primary:not(.bg-primary) {
-    color: #111827 !important;
-  }
-
-  /* Badge overlays on cards */
-  #app-home .bg-card.hover\:shadow-lg.relative > .-top-4.left-1\/2.-translate-x-1\/2 {
-    color: #111827 !important;
-    background-color: rgba(255,255,255,0.85) !important;
-    padding: 0 .25rem;
-    border-radius: .25rem;
-  }
-
-  /* Placeholder text contrast */
-  #app-home ::placeholder {
-    color: #475569 !important; /* slate-600 */
-    opacity: 1 !important;
+    /* Also darken foreground text for better readability */
+    --foreground: 222 47% 11%; /* slate-900 equivalent */
   }
 
   /* Sticky header positioning */
@@ -808,6 +782,6 @@ textarea:focus-visible {
     z-index: 50;
   }
 }
-/* --- end WCAG AA comprehensive fix --- */
+/* --- end WCAG AA root cause fix --- */
 
 
