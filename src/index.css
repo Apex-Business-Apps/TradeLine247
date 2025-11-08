@@ -165,6 +165,7 @@ All colors MUST be HSL.
 
     --primary: var(--brand-orange-primary); /* Vibrant brand orange for visual impact */
     --primary-foreground: 0 0% 100%; /* White text on primary surfaces */
+    --primary-text-accessible: 21 100% 35%; /* WCAG AA compliant text color: 5.2:1 contrast on white */
 
     --secondary: 30 100% 96%;
     --secondary-foreground: var(--brand-orange-dark);
@@ -287,6 +288,7 @@ All colors MUST be HSL.
 
     --primary: var(--brand-orange-primary); /* Vibrant brand orange */
     --primary-foreground: 0 0% 100%; /* White text on primary surfaces */
+    --primary-text-accessible: 21 100% 55%; /* WCAG AA compliant text color for dark mode */
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: var(--brand-orange-light);
@@ -754,88 +756,40 @@ textarea:focus-visible {
   color: hsl(var(--status-error)) !important;
 }
 
-/* --- A11Y: axe color-contrast hardening (HOME ONLY) --- */
+/* --- A11Y: WCAG AA color-contrast compliance (GLOBAL) --- */
 @layer components {
-  /* Global home defaults: readable on light surfaces */
-  #app-home { color: hsl(var(--foreground)); }
+  /* CRITICAL FIX: .text-primary on light backgrounds must use accessible color */
+  /* Brand orange (#ff5900) = 3.14:1 on white (FAILS WCAG AA) */
+  /* Accessible orange (#b33f00) = 5.2:1 on white (PASSES WCAG AA) */
 
-  /* Anchors the test flagged */
-  #app-home a[href="/auth?plan=commission"],
-  #app-home a[href="/auth?plan=core"] {
-    color: #1f2937 !important;              /* slate-800 on white => >=4.5:1 */
-    text-decoration: underline;
+  /* Light mode: Use accessible darker orange for text */
+  .text-primary {
+    color: hsl(var(--primary-text-accessible)) !important;
   }
 
-  /* Buttons / pills the test flagged */
-  #app-home .hover\:shadow-xl.min-h-\[44px\].shadow-lg,
-  #app-home .hover\:shadow-xl.shadow-lg[type="submit"],
-  #app-home button[data-testid="quick-action-view-calls"] > span,
-  #app-home .px-2\.5 {
-    color: hsl(var(--foreground)) !important; /* force dark readable text */
+  /* Dark mode: Can use brighter orange since background is dark */
+  .dark .text-primary {
+    color: hsl(var(--primary)) !important;
   }
 
-  /* Outline/ghost primary button at rest (was green text on white = fails) */
-  #app-home .border-primary:not(.bg-primary) {
-    color: hsl(var(--foreground)) !important; /* readable at rest */
-  }
-  /* On hover it already becomes bg-primary + text-primary-foreground (OK) */
-
-  /* Card badges the test flagged (floating labels centered on cards) */
-  #app-home .bg-card.hover\:shadow-lg.relative > .-top-4.left-1\/2.-translate-x-1\/2 {
-    color: hsl(var(--foreground)) !important;
-    background-color: rgba(255, 255, 255, 0.85); /* lift contrast over gradient/image */
-    padding: 0 .25rem;
-    border-radius: .25rem;
+  /* When .text-primary is on a colored background (like .bg-primary), use white */
+  .bg-primary .text-primary,
+  .bg-primary-foreground .text-primary {
+    color: hsl(var(--primary-foreground)) !important;
   }
 
-  /* Placeholders often trip axe due to low opacity */
-  #app-home ::placeholder {
-    color: #475569 !important;  /* slate-600 */
-    opacity: 1 !important;
+  /* Border-only buttons with primary color text */
+  .border-primary:not([class*="bg-primary"]) .text-primary,
+  .border-primary:not([class*="bg-primary"]).text-primary {
+    color: hsl(var(--primary-text-accessible)) !important;
+  }
+
+  /* On hover when background becomes primary, text should be white */
+  .border-primary.hover\:bg-primary:hover .text-primary,
+  .border-primary.hover\:bg-primary:hover.text-primary {
+    color: hsl(var(--primary-foreground)) !important;
   }
 }
-
-  /* --- A11Y: axe color-contrast hardening (HOME ONLY) — final pass --- */
-@layer components {
-  /* Make the page default clearly dark on light surfaces */
-  #app-home { color: #111827 !important; } /* slate-900 */
-
-  /* Links (visited too) */
-  #app-home a[href="/auth?plan=commission"],
-  #app-home a[href="/auth?plan=core"] {
-    color: #1f2937 !important;         /* slate-800 */
-    text-decoration: underline;
-  }
-  #app-home a:visited { color: #1e40af !important; } /* blue-800, AA on white */
-
-  /* Buttons / pills / shadows the test called out */
-  #app-home .hover\:shadow-xl.min-h-\[44px\].shadow-lg,
-  #app-home .hover\:shadow-xl.shadow-lg[type="submit"],
-  #app-home .shadow-md,
-  #app-home button[data-testid="quick-action-view-calls"] > span,
-  #app-home .px-2\.5,
-  #app-home .text-muted-foreground,
-  #app-home .text-secondary-foreground,
-  #app-home .muted,
-  #app-home .subtle {
-    color: #111827 !important;         /* slate-900 */
-  }
-
-  /* Outline/ghost primary at rest (hover stays bg-primary + white text) */
-  #app-home .border-primary:not(.bg-primary) {
-    color: #111827 !important;
-  }
-
-  /* Floating badges: add a small white chip behind text */
-  #app-home .bg-card.hover\:shadow-lg.relative > .-top-4.left-1\/2.-translate-x-1\/2 {
-    color: #111827 !important;
-    background-color: rgba(255,255,255,0.85) !important;
-    padding: 0 .25rem; border-radius: .25rem;
-  }
-
-  /* Placeholders */
-  #app-home ::placeholder { color: #475569 !important; opacity: 1 !important; } /* slate-600 */
-}
-/* --- end HOME A11Y hardening --- */
+/* --- end WCAG AA color-contrast hardening --- */
 
 
