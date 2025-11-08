@@ -754,88 +754,30 @@ textarea:focus-visible {
   color: hsl(var(--status-error)) !important;
 }
 
-/* --- A11Y: axe color-contrast hardening (HOME ONLY) --- */
+/* --- A11Y: WCAG AA color-contrast - SURGICAL FIX for 2 failing elements --- */
 @layer components {
-  /* Global home defaults: readable on light surfaces */
-  #app-home { color: hsl(var(--foreground)); }
+  /* EXACT SELECTORS from Playwright axe violations */
+  /* Issue: Primary orange #ff5900 = 3.14:1 contrast on white (needs 4.5:1) */
+  /* Fix: Use darker orange #b33f00 = 5.2:1 contrast (WCAG AA compliant) */
 
-  /* Anchors the test flagged */
-  #app-home a[href="/auth?plan=commission"],
-  #app-home a[href="/auth?plan=core"] {
-    color: #1f2937 !important;              /* slate-800 on white => >=4.5:1 */
-    text-decoration: underline;
+  /* Failing element 1: Auth plan link */
+  a[href="/auth?plan=core"],
+  a[href="/auth?plan=commission"] {
+    color: #b33f00 !important;  /* HSL(21, 100%, 35%) - 5.2:1 contrast */
   }
 
-  /* Buttons / pills the test flagged */
-  #app-home .hover\:shadow-xl.min-h-\[44px\].shadow-lg,
-  #app-home .hover\:shadow-xl.shadow-lg[type="submit"],
-  #app-home button[data-testid="quick-action-view-calls"] > span,
-  #app-home .px-2\.5 {
-    color: hsl(var(--foreground)) !important; /* force dark readable text */
+  /* Failing element 2: Contact form button with .text-primary on .border-primary */
+  /* This catches buttons with border-primary that use text-primary color */
+  .border-primary.text-primary:not(.bg-primary):not([class*="bg-primary"]) {
+    color: #b33f00 !important;  /* HSL(21, 100%, 35%) - 5.2:1 contrast */
   }
 
-  /* Outline/ghost primary button at rest (was green text on white = fails) */
-  #app-home .border-primary:not(.bg-primary) {
-    color: hsl(var(--foreground)) !important; /* readable at rest */
-  }
-  /* On hover it already becomes bg-primary + text-primary-foreground (OK) */
-
-  /* Card badges the test flagged (floating labels centered on cards) */
-  #app-home .bg-card.hover\:shadow-lg.relative > .-top-4.left-1\/2.-translate-x-1\/2 {
-    color: hsl(var(--foreground)) !important;
-    background-color: rgba(255, 255, 255, 0.85); /* lift contrast over gradient/image */
-    padding: 0 .25rem;
-    border-radius: .25rem;
-  }
-
-  /* Placeholders often trip axe due to low opacity */
-  #app-home ::placeholder {
-    color: #475569 !important;  /* slate-600 */
-    opacity: 1 !important;
+  /* Preserve white text when hovering (background becomes primary orange) */
+  .border-primary.text-primary.hover\:bg-primary:hover,
+  .border-primary.text-primary.hover\:bg-primary\/90:hover {
+    color: white !important;
   }
 }
-
-  /* --- A11Y: axe color-contrast hardening (HOME ONLY) — final pass --- */
-@layer components {
-  /* Make the page default clearly dark on light surfaces */
-  #app-home { color: #111827 !important; } /* slate-900 */
-
-  /* Links (visited too) */
-  #app-home a[href="/auth?plan=commission"],
-  #app-home a[href="/auth?plan=core"] {
-    color: #1f2937 !important;         /* slate-800 */
-    text-decoration: underline;
-  }
-  #app-home a:visited { color: #1e40af !important; } /* blue-800, AA on white */
-
-  /* Buttons / pills / shadows the test called out */
-  #app-home .hover\:shadow-xl.min-h-\[44px\].shadow-lg,
-  #app-home .hover\:shadow-xl.shadow-lg[type="submit"],
-  #app-home .shadow-md,
-  #app-home button[data-testid="quick-action-view-calls"] > span,
-  #app-home .px-2\.5,
-  #app-home .text-muted-foreground,
-  #app-home .text-secondary-foreground,
-  #app-home .muted,
-  #app-home .subtle {
-    color: #111827 !important;         /* slate-900 */
-  }
-
-  /* Outline/ghost primary at rest (hover stays bg-primary + white text) */
-  #app-home .border-primary:not(.bg-primary) {
-    color: #111827 !important;
-  }
-
-  /* Floating badges: add a small white chip behind text */
-  #app-home .bg-card.hover\:shadow-lg.relative > .-top-4.left-1\/2.-translate-x-1\/2 {
-    color: #111827 !important;
-    background-color: rgba(255,255,255,0.85) !important;
-    padding: 0 .25rem; border-radius: .25rem;
-  }
-
-  /* Placeholders */
-  #app-home ::placeholder { color: #475569 !important; opacity: 1 !important; } /* slate-600 */
-}
-/* --- end HOME A11Y hardening --- */
+/* --- end WCAG AA surgical fix --- */
 
 
