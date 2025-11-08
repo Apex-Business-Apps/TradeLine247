@@ -801,17 +801,17 @@ header {
   .btn-aa,
   button.btn-aa,
   [data-variant="default"].btn-aa {
-    background-color: hsl(var(--a11y-cta-bg));
-    color: hsl(var(--a11y-cta-fg));
+    background-color: hsl(var(--a11y-cta-bg)) !important;
+    color: hsl(var(--a11y-cta-fg)) !important;
   }
 
   .btn-aa:hover:not(:disabled) {
-    background-color: hsl(var(--a11y-cta-hover));
+    background-color: hsl(var(--a11y-cta-hover)) !important;
   }
 
   /* Ensure disabled state maintains proper opacity without color override */
   .btn-aa:disabled {
-    background-color: hsl(var(--a11y-cta-bg));
+    background-color: hsl(var(--a11y-cta-bg)) !important;
     opacity: 0.5;
   }
 }
