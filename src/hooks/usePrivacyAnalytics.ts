@@ -68,8 +68,6 @@ export const usePrivacyAnalytics = () => {
           userAgent: navigator.userAgent,
           environment: errorReporter['getEnvironment']()
         });
-      } else {
-        console.log('Privacy analytics event tracked:', event.event_type);
       }
     } catch (error) {
       errorReporter.report({
