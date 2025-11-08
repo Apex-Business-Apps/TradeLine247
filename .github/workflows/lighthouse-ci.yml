@@ -37,7 +37,6 @@ jobs:
       - name: Run Lighthouse CI against built dist
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           lhci autorun --config=.lighthouserc.cjs
 
