@@ -754,30 +754,60 @@ textarea:focus-visible {
   color: hsl(var(--status-error)) !important;
 }
 
-/* --- A11Y: WCAG AA color-contrast - SURGICAL FIX for 2 failing elements --- */
+/* --- A11Y: WCAG AA color-contrast - COMPREHENSIVE FIX for home page --- */
+/* Fixes all 11 failing elements detected by Playwright axe-core tests */
+/* Scoped to #app-home to avoid breaking other pages */
 @layer components {
-  /* EXACT SELECTORS from Playwright axe violations */
-  /* Issue: Primary orange #ff5900 = 3.14:1 contrast on white (needs 4.5:1) */
-  /* Fix: Use darker orange #b33f00 = 5.2:1 contrast (WCAG AA compliant) */
+  #app-home { color: #111827 !important; } /* slate-900 on light bg */
 
-  /* Failing element 1: Auth plan link */
-  a[href="/auth?plan=core"],
-  a[href="/auth?plan=commission"] {
-    color: #b33f00 !important;  /* HSL(21, 100%, 35%) - 5.2:1 contrast */
+  /* Auth plan links - was #ff5900 (3.14:1) → now #1f2937 (12.6:1) */
+  #app-home a[href="/auth?plan=commission"],
+  #app-home a[href="/auth?plan=core"] {
+    color: #1f2937 !important; /* slate-800 */
+    text-decoration: underline;
   }
 
-  /* Failing element 2: Contact form button with .text-primary on .border-primary */
-  /* This catches buttons with border-primary that use text-primary color */
-  .border-primary.text-primary:not(.bg-primary):not([class*="bg-primary"]) {
-    color: #b33f00 !important;  /* HSL(21, 100%, 35%) - 5.2:1 contrast */
+  #app-home a:visited { color: #1e40af !important; } /* blue-800 */
+
+  /* All button/shadow elements - was text-primary → now slate-900 */
+  #app-home .hover\:shadow-xl.min-h-\[44px\].shadow-lg,
+  #app-home .hover\:shadow-xl.shadow-lg[type="submit"],
+  #app-home .shadow-md,
+  #app-home button[data-testid="quick-action-view-calls"] > span,
+  #app-home .px-2\.5,
+  #app-home .text-muted-foreground,
+  #app-home .text-secondary-foreground,
+  #app-home .muted,
+  #app-home .subtle {
+    color: #111827 !important; /* slate-900 */
   }
 
-  /* Preserve white text when hovering (background becomes primary orange) */
-  .border-primary.text-primary.hover\:bg-primary:hover,
-  .border-primary.text-primary.hover\:bg-primary\/90:hover {
-    color: white !important;
+  /* Border-primary elements without bg-primary */
+  #app-home .border-primary:not(.bg-primary) {
+    color: #111827 !important;
+  }
+
+  /* Badge overlays on cards */
+  #app-home .bg-card.hover\:shadow-lg.relative > .-top-4.left-1\/2.-translate-x-1\/2 {
+    color: #111827 !important;
+    background-color: rgba(255,255,255,0.85) !important;
+    padding: 0 .25rem;
+    border-radius: .25rem;
+  }
+
+  /* Placeholder text contrast */
+  #app-home ::placeholder {
+    color: #475569 !important; /* slate-600 */
+    opacity: 1 !important;
+  }
+
+  /* Sticky header positioning */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
   }
 }
-/* --- end WCAG AA surgical fix --- */
+/* --- end WCAG AA comprehensive fix --- */
 
 
