@@ -163,7 +163,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: var(--brand-orange-primary); /* Vibrant brand orange for visual impact */
+    --primary: var(--brand-orange-dark); /* WCAG AA compliant: darker orange 5.18:1 contrast with white */
     --primary-foreground: 0 0% 100%; /* White text on primary surfaces */
 
     --secondary: 30 100% 96%;
@@ -180,7 +180,7 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: var(--brand-orange-primary);
+    --ring: var(--brand-orange-dark); /* WCAG AA compliant focus ring */
 
     --radius: 0.5rem;
 
@@ -285,7 +285,7 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: var(--brand-orange-primary); /* Vibrant brand orange */
+    --primary: var(--brand-orange-dark); /* WCAG AA compliant dark mode */
     --primary-foreground: 0 0% 100%; /* White text on primary surfaces */
 
     --secondary: 217.2 32.6% 17.5%;
@@ -754,34 +754,11 @@ textarea:focus-visible {
   color: hsl(var(--status-error)) !important;
 }
 
-/* --- A11Y: WCAG AA color-contrast - ROOT CAUSE FIX via CSS variables --- */
-/*
- * Problem: Primary color #ff5900 (HSL 21 100% 50%) = 3.14:1 contrast ❌
- * Solution: Override --primary to darker orange (HSL 21 100% 35%) = 5.2:1 contrast ✅
- *
- * This fixes ALL usages of primary color on home page automatically:
- * - .text-primary → darker text
- * - .border-primary → darker border
- * - .bg-primary → darker background
- *
- * Scoped to #app-home only - other pages unaffected.
- */
-@layer components {
-  #app-home {
-    /* Override primary color variable for WCAG AA compliance */
-    --primary: 21 100% 35%; /* Darker orange: #b33f00, 5.2:1 contrast ratio */
-
-    /* Also darken foreground text for better readability */
-    --foreground: 222 47% 11%; /* slate-900 equivalent */
-  }
-
-  /* Sticky header positioning */
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-  }
+/* Sticky header positioning */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
-/* --- end WCAG AA root cause fix --- */
 
 
