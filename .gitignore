@@ -39,3 +39,8 @@ android/
 *.njsproj
 *.sln
 *.sw?
+
+# Local backups
+*.bak
+# Supabase temp
+supabase/.temp/

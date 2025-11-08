@@ -297,3 +297,37 @@ body.session-warning::before {
     scroll-behavior: auto !important;
   }
 }
+ /* --- a11y/lighthouse hotfix (scoped) --- */
+ :root{ --muted-foreground: 215 27% 18%; } /* small-text contrast up */
+ .bg-primary,[class*="bg-primary/"],.bg-\[\#FF6A00\],[class*="bg-\[\#FF6A00\]"]{ color: rgb(17 24 39) !important; } /* dark text on brand/orange */
+ a,button{ color: currentColor; } /* avoid accidental low-contrast overrides */
+/* --- A11Y: axe color-contrast hardening (HOME ONLY) — final pass --- */
+@layer components {
+  #app-home { color: #111827 !important; } /* slate-900 on light bg */
+
+  #app-home a[href="/auth?plan=commission"],
+  #app-home a[href="/auth?plan=core"] { color: #1f2937 !important; text-decoration: underline; } /* slate-800 */
+  #app-home a:visited { color: #1e40af !important; } /* blue-800 */
+
+  #app-home .hover\:shadow-xl.min-h-\[44px\].shadow-lg,
+  #app-home .hover\:shadow-xl.shadow-lg[type="submit"],
+  #app-home .shadow-md,
+  #app-home button[data-testid="quick-action-view-calls"] > span,
+  #app-home .px-2\.5,
+  #app-home .text-muted-foreground,
+  #app-home .text-secondary-foreground,
+  #app-home .muted,
+  #app-home .subtle { color: #111827 !important; } /* slate-900 */
+
+  #app-home .border-primary:not(.bg-primary) { color: #111827 !important; }
+
+  #app-home .bg-card.hover\:shadow-lg.relative > .-top-4.left-1\/2.-translate-x-1\/2 {
+    color: #111827 !important;
+    background-color: rgba(255,255,255,0.85) !important;
+    padding: 0 .25rem; border-radius: .25rem;
+  }
+
+  #app-home ::placeholder { color: #475569 !important; opacity: 1 !important; } /* slate-600 */
+  header { position: sticky; top: 0; z-index: 50; }
+}
+/* --- end HOME A11Y hardening --- */
