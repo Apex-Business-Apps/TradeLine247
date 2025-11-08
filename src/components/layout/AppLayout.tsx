@@ -1,5 +1,5 @@
 import { HelmetProvider } from "react-helmet-async";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { ThemeProvider, useTheme } from "next-themes";
 import { lazy, Suspense, useEffect } from "react";
@@ -51,13 +51,9 @@ const ThemeSync = () => {
 
 export const AppLayout = () => {
   const { theme } = useUserPreferencesStore();
-  const location = useLocation();
 
   // Initialize Klaviyo analytics tracking
   useKlaviyoAnalytics();
-
-  // Apply WCAG AA fix to home page (includes Header + page content)
-  const isHomePage = location.pathname === '/';
 
   return (
     <HelmetProvider>
@@ -69,7 +65,7 @@ export const AppLayout = () => {
       >
         <ThemeSync />
         <MotionPreferenceSync />
-        <div className="flex min-h-screen flex-col" data-route-home={isHomePage || undefined}>
+        <div className="flex min-h-screen flex-col">
           <Header />
           <main className="flex-1" id="main">
             <Outlet />
