@@ -135,12 +135,11 @@ export const Header: React.FC = () => {
           data-slot="left" 
           className="flex items-center gap-3"
         >
-          <Button 
-            id="app-home"
-            variant="default" 
+          <Button
+            variant="default"
             size={isScrolled ? 'sm' : 'default'}
-            onClick={() => handleNavigation(paths.home, 'Home')} 
-            className="hover-scale transition-all duration-300" 
+            onClick={() => handleNavigation(paths.home, 'Home')}
+            className="hover-scale transition-all duration-300"
             aria-label="Go to homepage"
           >
             Home
