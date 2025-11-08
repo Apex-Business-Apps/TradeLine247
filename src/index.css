@@ -760,14 +760,14 @@ textarea:focus-visible {
  * Solution: Override --primary to darker orange (HSL 21 100% 35%) = 5.2:1 contrast ✅
  *
  * This fixes ALL usages of primary color on home page automatically:
- * - .text-primary → darker text
+ * - .text-primary → darker text (Header + page content)
  * - .border-primary → darker border
  * - .bg-primary → darker background
  *
- * Scoped to #app-home only - other pages unaffected.
+ * Scoped to [data-route-home] - includes Header + page content on home route only
  */
 @layer components {
-  #app-home {
+  [data-route-home] {
     /* Override primary color variable for WCAG AA compliance */
     --primary: 21 100% 35%; /* Darker orange: #b33f00, 5.2:1 contrast ratio */
 
