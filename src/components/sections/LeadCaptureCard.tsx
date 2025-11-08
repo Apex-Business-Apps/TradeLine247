@@ -381,7 +381,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 active:scale-[0.98] font-medium"
+                      className="w-full border-[hsl(17,90%,38%)] text-[hsl(17,90%,38%)] hover:bg-[hsl(17,90%,38%)] hover:text-primary-foreground transition-all duration-200 active:scale-[0.98] font-medium"
                       type="button"
                       asChild
                     >
