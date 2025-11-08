@@ -19,7 +19,7 @@ const Demo = () => {
         {/* Hero Section */}
         <section className="py-20 bg-gradient-to-br from-background to-secondary/20">
           <div className="container text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
               See TradeLine 24/7 in Action
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
