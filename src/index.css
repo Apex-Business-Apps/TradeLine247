@@ -84,10 +84,16 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Brand Orange Colors from Logo - Primary Brand Color */
-    --brand-orange-primary: 21 100% 50%;
+    /* --- Brand AA palette (global) --- */
+    /* Brand oranges */
+    --brand-orange-500: 21 100% 50%; /* #FF5900 (accent only, NOT for text on white) */
+    --brand-orange-600: 18 100% 46%; /* #E65500 */
+    --brand-orange-700: 17 90% 38%;  /* ~#C2410C : passes with white */
+
+    /* Legacy aliases for compatibility */
+    --brand-orange-primary: var(--brand-orange-500);
     --brand-orange-light: 29 100% 75%;
-    --brand-orange-dark: 15 100% 35%;
+    --brand-orange-dark: var(--brand-orange-700);
     
     /* Green Colors for Login/Success Actions */
     --brand-green-primary: 142 76% 36%;
@@ -154,23 +160,24 @@ All colors MUST be HSL.
     --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.1) 0%, hsl(0 0% 100% / 0.05) 100%);
     --overlay-orange: hsl(var(--brand-orange-primary) / 0.30);
 
+    /* System colors */
+    --foreground: 222.2 47.4% 11.2%;   /* slate-900 */
+    --muted-foreground: 215 16% 47%;   /* slate-600 */
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: var(--brand-orange-primary); /* Vibrant brand orange for visual impact */
-    --primary-foreground: 0 0% 100%; /* White text on primary surfaces */
+    /* Use 700 for bg so white text passes 4.5:1 comfortably */
+    --primary: var(--brand-orange-700);
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 30 100% 96%;
     --secondary-foreground: var(--brand-orange-dark);
 
     --muted: 210 40% 96.1%;
-    --muted-foreground: 215 28% 27%;
 
     --accent: var(--brand-orange-dark);
     --accent-foreground: 0 0% 100%;
@@ -180,7 +187,12 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: var(--brand-orange-primary);
+
+    /* Focus ring matches accessible CTA color */
+    --ring: var(--brand-orange-700);
+
+    /* Links on light backgrounds: accessible blue */
+    --link: 221 83% 53%; /* #2563EB (blue-600) */
 
     --radius: 0.5rem;
 
