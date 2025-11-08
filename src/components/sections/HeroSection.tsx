@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import officialLogo from '@/assets/official-logo.svg';
+import officialLogo from '@/assets/official-logo.png';
 
 export const HeroSection = () => {
   return (
@@ -17,6 +17,8 @@ export const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-background/72 via-transparent to-background/67"></div>
       {/* Saturated orange wash (top of background layers) */}
       <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/100 via-brand-orange-light/100 to-brand-orange/89"></div>
+      {/* Unified overlay ensures WCAG contrast */}
+      <div className="absolute inset-0 bg-black/40 pointer-events-none" aria-hidden="true"></div>
       
       {/* Enhanced Glowing Orbs with Animation */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-orange/40 rounded-full blur-3xl animate-pulse"></div>
@@ -34,7 +36,7 @@ export const HeroSection = () => {
             className="h-55 md:h-[20.625rem] lg:h-[24.75rem] w-auto mx-auto drop-shadow-2xl hover-scale transition-all duration-500"
             decoding="async"
             loading="eager"
-            fetchPriority="high"
+            fetchpriority="high"
             style={{filter: 'var(--premium-glow)'}}
           />
         </div>
@@ -45,7 +47,7 @@ export const HeroSection = () => {
         </h1>
         
         {/* Value Proposition with Delayed Animation */}
-        <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
+        <p className="text-lg md:text-xl text-foreground mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
           We pick up when you can't, so customers aren't kept waiting.
         </p>
         

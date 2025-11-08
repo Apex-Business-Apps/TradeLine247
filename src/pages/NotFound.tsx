@@ -1,10 +1,10 @@
 import React from 'react';
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Home, AlertTriangle, Bot } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { paths } from '@/routes/paths';
 import { SEOHead } from "@/components/seo/SEOHead";
 
 const NotFound = () => {
@@ -18,8 +18,6 @@ const NotFound = () => {
         canonical="https://www.tradeline247ai.com/404"
         noIndex={true}
       />
-      
-      <Header />
       
       <main className="flex-1 flex items-center justify-center py-20">
         <div className="container text-center">
@@ -53,7 +51,7 @@ const NotFound = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate(paths.home)}
                   className="flex items-center gap-2"
                   size="lg"
                 >
@@ -78,7 +76,7 @@ const NotFound = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => navigate('/features')}
+                    onClick={() => navigate(paths.features)}
                     className="h-10 justify-start hover:bg-primary/5"
                   >
                     Features
@@ -86,7 +84,7 @@ const NotFound = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => navigate('/pricing')}
+                    onClick={() => navigate(paths.pricing)}
                     className="h-10 justify-start hover:bg-primary/5"
                   >
                     Pricing
@@ -94,7 +92,7 @@ const NotFound = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => navigate('/faq')}
+                    onClick={() => navigate(paths.faq)}
                     className="h-10 justify-start hover:bg-primary/5"
                   >
                     FAQ
@@ -102,7 +100,7 @@ const NotFound = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    onClick={() => navigate('/contact')}
+                    onClick={() => navigate(paths.contact)}
                     className="h-10 justify-start hover:bg-primary/5"
                   >
                     Contact

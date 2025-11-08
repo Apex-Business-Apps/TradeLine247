@@ -1,17 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Resend } from "npm:resend@2.0.0";
-import { 
-  sanitizeText, 
-  sanitizeEmail, 
-  sanitizePhone, 
-  validateSecurity 
-} from "../_shared/sanitizer.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { Resend } from "https://esm.sh/resend@2.0.0";
+import {
+  sanitizeText,
+  sanitizeEmail,
+  sanitizePhone,
+  validateSecurity
+} from "../_shared/advancedSanitizer.ts";
+import { preflight, corsHeaders } from "../_shared/cors.ts";
+import { secureHeaders, mergeHeaders } from "../_shared/secure_headers.ts";
 
 // Simple in-memory rate limiter (production would use Redis)
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -36,10 +33,8 @@ function checkRateLimit(identifier: string): { allowed: boolean; remaining: numb
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const supabaseClient = createClient(
@@ -63,7 +58,7 @@ serve(async (req) => {
         }),
         { 
           status: 429, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
         }
       );
     }
@@ -76,7 +71,7 @@ serve(async (req) => {
     if (!name || !email || !message) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -102,7 +97,7 @@ serve(async (req) => {
       console.error('Input validation failed:', sanitizeError.message);
       return new Response(
         JSON.stringify({ error: 'Invalid input detected. Please check your information and try again.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -116,6 +111,10 @@ serve(async (req) => {
     if (dbError) {
       console.error('Database error:', dbError);
       throw new Error('Failed to save contact message');
+    }
+
+    if (!contactRecord || typeof contactRecord.id !== 'string') {
+      throw new Error('Contact message saved without identifier');
     }
 
     console.log(`Contact message saved: ${contactRecord.id}`);
@@ -138,7 +137,7 @@ serve(async (req) => {
         `
       });
 
-      console.log('Notification email sent:', notifyEmail.id);
+      console.log('Notification email sent:', notifyEmail);
 
       // Send auto-reply to customer
       const autoReply = await resend.emails.send({
@@ -154,7 +153,7 @@ serve(async (req) => {
         `
       });
 
-      console.log('Auto-reply sent:', autoReply.id);
+      console.log('Auto-reply sent:', autoReply);
     } catch (emailError) {
       console.error('Email error:', emailError);
       // Don't fail the request if email fails - message is saved
@@ -168,7 +167,7 @@ serve(async (req) => {
       }),
       { 
         status: 202, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
       }
     );
 
@@ -181,7 +180,7 @@ serve(async (req) => {
       }),
       { 
         status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
       }
     );
   }

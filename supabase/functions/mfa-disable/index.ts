@@ -4,7 +4,7 @@
  * Backend only - no UI changes
  */
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { createRequestContext, logWithContext } from '../_shared/requestId.ts';
 
 const corsHeaders = {
@@ -113,7 +113,8 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    logWithContext(ctx, 'error', 'MFA disable error', { error: error.message });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logWithContext(ctx, 'error', 'MFA disable error', { error: errorMessage });
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

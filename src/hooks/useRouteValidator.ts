@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { errorReporter } from '@/lib/errorReporter';
 
 // All valid routes in the application
 export const VALID_ROUTES = [
@@ -12,6 +13,16 @@ export const VALID_ROUTES = [
   '/terms',
   '/auth',
   '/dashboard',
+  '/calls',
+  '/call-center',
+  '/call-logs',
+  '/numbers/new',
+  '/ops/number-onboarding',
+  '/team/invite',
+  '/integrations',
+  '/phone-apps',
+  '/ops/forwarding',
+  '/ops/voice',
   '/dashboard/integrations/crm',
   '/dashboard/integrations/email',
   '/dashboard/integrations/phone',
@@ -20,7 +31,6 @@ export const VALID_ROUTES = [
   '/dashboard/integrations/automation',
   '/design-tokens',
   '/components',
-  '/call-center',
   '/admin/kb'
 ] as const;
 
@@ -71,7 +81,15 @@ export function useRouteValidator() {
 
     // Log invalid routes in development
     if (!isValid && process.env.NODE_ENV === 'development') {
-      console.warn(`Invalid route accessed: ${currentPath}. Suggested: ${suggestedRedirect}`);
+      errorReporter.report({
+        type: 'error',
+        message: `Invalid route accessed: ${currentPath}. Suggested: ${suggestedRedirect}`,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { currentPath, suggestedRedirect }
+      });
     }
   }, [location.pathname]);
 

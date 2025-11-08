@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface CreateTicketParams {
   email: string;
@@ -24,7 +25,19 @@ export const useSupportTickets = () => {
     
     try {
       // Get current session to determine if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      // If there's a JWT error, proceed without user_id (anonymous ticket)
+      if (sessionError?.message?.includes('malformed') || sessionError?.message?.includes('invalid')) {
+        errorReporter.report({
+          type: 'error',
+          message: '[SupportTicket] Detected malformed token, creating anonymous ticket',
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
+      }
       
       const ticketData: any = {
         email,
@@ -34,7 +47,7 @@ export const useSupportTickets = () => {
       };
 
       // Only add user_id if authenticated (enforced by RLS)
-      if (session?.user) {
+      if (session?.user && !sessionError) {
         ticketData.user_id = session.user.id;
       }
 
@@ -53,7 +66,15 @@ export const useSupportTickets = () => {
 
       return { success: true };
     } catch (error: any) {
-      console.error('Error creating support ticket:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Error creating support ticket: ${error?.message || String(error)}`,
+        stack: error?.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       
       toast({
         title: 'Error',
@@ -79,7 +100,15 @@ export const useSupportTickets = () => {
       
       return { tickets: data, error: null };
     } catch (error: any) {
-      console.error('Error fetching support tickets:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Error fetching support tickets: ${error?.message || String(error)}`,
+        stack: error?.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       return { tickets: null, error };
     }
   };

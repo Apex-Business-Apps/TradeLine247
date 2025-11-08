@@ -11,7 +11,10 @@ SELECT cron.schedule(
   SELECT
     net.http_post(
       url := 'https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1/prewarm-cron',
-      headers := '{"Content-Type": "application/json", "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo"}'::jsonb,
+      headers := jsonb_build_object(
+        'Content-Type', 'application/json',
+        'Authorization', 'Bearer ' || vault.decrypted_secret('supabase_anon_key')::text
+      ),
       body := jsonb_build_object('timestamp', now()::text, 'trigger', 'cron')
     ) as request_id;
   $$

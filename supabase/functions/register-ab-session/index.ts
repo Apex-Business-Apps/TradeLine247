@@ -1,16 +1,11 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { preflight, corsHeaders } from '../_shared/cors.ts';
+import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const supabase = createClient(
@@ -23,7 +18,7 @@ serve(async (req) => {
     if (!sessionId) {
       return new Response(
         JSON.stringify({ error: 'Session ID required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -59,7 +54,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
     );
 
   } catch (error) {

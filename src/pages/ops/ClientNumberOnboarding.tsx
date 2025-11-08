@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, Phone, MessageSquare, RefreshCw, DollarSign } from "lucide-react";
+import { Loader2, Phone, MessageSquare, RefreshCw, DollarSign, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { safeWindowOpen } from "@/utils/safetyHelpers";
 
 export default function ClientNumberOnboarding() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function ClientNumberOnboarding() {
   const initializeClient = async () => {
     setLoading(true);
     setEvidence([]);
-    
+
     try {
       addEvidence("Initializing client onboarding...");
       
@@ -55,7 +56,12 @@ export default function ClientNumberOnboarding() {
         }
       );
 
-      if (subaccountError) throw subaccountError;
+      if (subaccountError) {
+        if (subaccountError.message?.includes('Missing Twilio credentials')) {
+          throw new Error('Twilio credentials not configured. Please add TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN to edge function secrets.');
+        }
+        throw subaccountError;
+      }
       addEvidence(`✓ Subaccount ready: ${subaccountData.subaccount_sid}`);
 
       // Step 2: Create/retrieve Messaging Service
@@ -83,6 +89,58 @@ export default function ClientNumberOnboarding() {
       console.error("Initialization error:", error);
       addEvidence(`✗ Error: ${error.message}`);
       toast.error("Failed to initialize client");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOneClickProvision = async () => {
+    if (!formData.tenant_id || !formData.business_name) {
+      toast.error("Tenant ID and business name are required for one-click provisioning");
+      return;
+    }
+
+    setLoading(true);
+    setEvidence([]);
+
+    try {
+      addEvidence("Provisioning telephony subaccount and number (one-click)...");
+
+      const normalizedFallback = formData.fallback_e164?.replace(/[^0-9]/g, "");
+      const areaCode = normalizedFallback && normalizedFallback.length >= 10
+        ? normalizedFallback.slice(-10, -7)
+        : undefined;
+
+      const { data, error } = await supabase.functions.invoke(
+        "telephony-onboard",
+        {
+          body: {
+            org_id: formData.tenant_id,
+            business_name: formData.business_name,
+            area_code: areaCode,
+            country: "CA",
+          },
+        }
+      );
+
+      if (error) {
+        throw new Error(error.message || "Failed to complete one-click provisioning");
+      }
+
+      addEvidence(`✅ Subaccount ready: ${data?.subaccount_sid}`);
+      addEvidence(`✅ Number live: ${data?.phone_number}`);
+      if (data?.voice_url) {
+        addEvidence(`🔔 Voice webhook: ${data.voice_url}`);
+      }
+      if (data?.sms_url) {
+        addEvidence(`💬 SMS webhook: ${data.sms_url}`);
+      }
+
+      toast.success(data?.phone_number ? `Number ${data.phone_number} is live` : "Number is live");
+    } catch (error: any) {
+      console.error("One-click onboarding error:", error);
+      addEvidence(`✗ Error: ${error.message}`);
+      toast.error(error.message || "Failed to complete one-click provisioning");
     } finally {
       setLoading(false);
     }
@@ -137,10 +195,13 @@ export default function ClientNumberOnboarding() {
       }
       
       toast.success("Quick-Start Forward complete!");
-      
-      // Open forwarding kit in new tab
+
+      // Open forwarding kit in new tab with URL validation
       if (data.forwarding_kit_url) {
-        window.open(data.forwarding_kit_url, '_blank');
+        const urlValid = safeWindowOpen(data.forwarding_kit_url);
+        if (!urlValid) {
+          toast.error('Invalid forwarding kit URL. Please contact support.');
+        }
       }
 
     } catch (error: any) {
@@ -512,9 +573,13 @@ export default function ClientNumberOnboarding() {
 
   return (
     <div className="container mx-auto p-6 max-w-5xl">
+      <div className="mb-6 text-center sm:text-left">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Add Number</h1>
+        <p className="text-muted-foreground">Provision or port a new number into the TradeLine 24/7 platform.</p>
+      </div>
       <Card>
         <CardHeader>
-          <CardTitle>Client Number Onboarding</CardTitle>
+          <CardTitle>Add Number</CardTitle>
           <CardDescription>
             Initialize client account and select onboarding track
           </CardDescription>
@@ -595,6 +660,26 @@ export default function ClientNumberOnboarding() {
                 Enable SMS on existing numbers
               </Label>
             </div>
+          </div>
+
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between rounded-lg border border-dashed border-muted-foreground/40 bg-muted/40 p-4">
+            <div className="space-y-1">
+              <h3 className="text-base font-semibold flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                One-Click Number Onboarding
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Instantly provisions a Twilio subaccount, purchases a local number, and wires default voice/SMS webhooks.
+              </p>
+            </div>
+            <Button
+              onClick={handleOneClickProvision}
+              disabled={loading || !formData.tenant_id || !formData.business_name}
+              className="md:w-auto"
+            >
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              Add Number (One-Click)
+            </Button>
           </div>
 
           {/* Action Buttons */}

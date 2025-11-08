@@ -13,9 +13,9 @@ const buttonVariants = cva(
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghost: "bg-transparent text-foreground hover:bg-muted",
         link: "text-primary underline-offset-4 hover:underline",
-        success: "bg-green-600 text-white hover:bg-green-700",
+        success: "bg-[hsl(142_85%_25%)] text-white hover:bg-[hsl(142_90%_20%)]", // WCAG AA: brand-green-dark (5.76:1 contrast)
       },
       size: {
         default: "h-10 px-4 py-2",

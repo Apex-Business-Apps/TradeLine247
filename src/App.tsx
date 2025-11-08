@@ -1,170 +1,90 @@
-import React, { useState, useEffect } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { useSessionSecurity } from "@/hooks/useSessionSecurity";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AnalyticsTracker } from "@/components/sections/AnalyticsTracker";
-import { WebVitalsTracker } from "@/components/monitoring/WebVitalsTracker";
-import { WebVitalsReporter } from "@/components/monitoring/WebVitalsReporter";
-import { InstallPrompt } from "@/components/pwa/InstallPrompt";
-import { HelmetProvider } from 'react-helmet-async';
-import { SecurityMonitor } from "@/components/security/SecurityMonitor";
-import { MiniChat } from "@/components/ui/MiniChat";
-import { AppErrorBoundary } from '@/components/errors/ErrorBoundary';
-import { SmokeChecks } from '@/components/testing/SmokeChecks';
-import { RagSearchFab } from "@/components/rag/RagSearchFab";
-import { RagSearchDrawer } from "@/components/rag/RagSearchDrawer";
-import { TwilioLinkGuard } from "@/components/TwilioLinkGuard";
-import { CanonicalRedirect } from "@/components/CanonicalRedirect";
-import { PreviewDiagnostics } from "@/components/dev/PreviewDiagnostics";
-import "@/lib/errorReporter"; // Initialize global error tracking
+// FILE: src/App.tsx
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import "@/utils/keyboardNavigation"; // Initialize keyboard navigation utilities
-import StartupSplash from "@/components/StartupSplash";
-import LayoutCanon from "@/components/LayoutCanon";
+import AppLayout from "./components/layout/AppLayout";
+import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
+// CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
-import DesignTokens from "./pages/DesignTokens";
-import ClientDashboard from "./pages/ClientDashboard";
-import Auth from "./pages/Auth";
-import ThankYou from "./pages/ThankYou";
-import NotFound from "./pages/NotFound";
-import Features from "./pages/Features";
-import Pricing from "./pages/Pricing";
-import FAQ from "./pages/FAQ";
-import Contact from "./pages/Contact";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Demo from "./pages/Demo";
-import Compare from "./pages/Compare";
-import CRMIntegration from "./pages/integrations/CRMIntegration";
-import EmailIntegration from "./pages/integrations/EmailIntegration";
-import PhoneIntegration from "./pages/integrations/PhoneIntegration";
-import MessagingIntegration from "./pages/integrations/MessagingIntegration";
-import MobileIntegration from "./pages/integrations/MobileIntegration";
-import AutomationIntegration from "./pages/integrations/AutomationIntegration";
-import CallCenter from "./pages/CallCenter";
-import SMSDeliveryDashboard from "./pages/SMSDeliveryDashboard";
-import AdminKB from "./pages/AdminKB";
-import CampaignManager from "./pages/CampaignManager";
-import CryptoInit from "./pages/ops/CryptoInit";
-import Activation from "./pages/ops/Activation";
-import VoiceSettings from "./pages/ops/VoiceSettings";
-import TwilioWire from "./pages/ops/TwilioWire";
-import StagingTest from "./pages/ops/StagingTest";
-import VoiceHealth from "./pages/ops/VoiceHealth";
-import CallLogs from "./pages/CallLogs";
-import PhoneApps from "./pages/PhoneApps";
-import ClientNumberOnboarding from "./pages/ops/ClientNumberOnboarding";
-import TwilioEvidence from "./pages/ops/TwilioEvidence";
-import MessagingHealth from "./pages/ops/MessagingHealth";
+import { paths } from "./routes/paths";
 
+// PERFORMANCE: Route-based code splitting - lazy load all routes except Index (critical)
+const Pricing = lazy(() => import("./pages/Pricing"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Features = lazy(() => import("./pages/Features"));
+const Compare = lazy(() => import("./pages/Compare"));
+const Security = lazy(() => import("./pages/Security"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Auth = lazy(() => import("./pages/Auth"));
+const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
+const CallCenter = lazy(() => import("./pages/CallCenter"));
+const CallLogs = lazy(() => import("./pages/CallLogs"));
+const Integrations = lazy(() => import("./pages/Integrations"));
+const ClientNumberOnboarding = lazy(() => import("./pages/ops/ClientNumberOnboarding"));
+const VoiceSettings = lazy(() => import("./pages/ops/VoiceSettings"));
+const TeamInvite = lazy(() => import("./pages/TeamInvite"));
+const PhoneApps = lazy(() => import("./pages/PhoneApps"));
+const ForwardingWizard = lazy(() => import("./routes/ForwardingWizard"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
+  { path: paths.home, element: <Index /> },
+  { path: paths.pricing, element: <Pricing /> },
+  { path: paths.faq, element: <FAQ /> },
+  { path: paths.features, element: <Features /> },
+  { path: paths.compare, element: <Compare /> },
+  { path: paths.security, element: <Security /> },
+  { path: paths.contact, element: <Contact /> },
+  { path: paths.auth, element: <Auth /> },
+  { path: paths.dashboard, element: <ClientDashboard /> },
+  { path: paths.calls, element: <CallCenter /> },
+  { path: paths.callCenterLegacy, element: <CallCenter /> },
+  { path: paths.callLogs, element: <CallLogs /> },
+  { path: paths.addNumber, element: <ClientNumberOnboarding /> },
+  { path: paths.numbersLegacy, element: <ClientNumberOnboarding /> },
+  { path: paths.voiceSettings, element: <VoiceSettings /> },
+  { path: paths.teamInvite, element: <TeamInvite /> },
+  { path: paths.integrations, element: <Integrations /> },
+  { path: paths.phoneApps, element: <PhoneApps /> },
+  { path: paths.forwardingWizard, element: <ForwardingWizard /> },
+  { path: paths.notFound, element: <NotFound /> },
+];
 
-// App monitoring wrapper component
-const AppWithMonitoring = () => {
-  // Initialize session security monitoring
-  useSessionSecurity();
+export const appRoutePaths = new Set(routeEntries.map(({ path }) => path));
 
+// Loading fallback component for better UX during lazy loading
+const LoadingFallback = () => (
+  <div
+    style={{
+      minHeight: "50vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "1.125rem",
+      color: "hsl(var(--muted-foreground))",
+    }}
+  >
+    Loading...
+  </div>
+);
+
+export default function App() {
   return (
-    <>
-      <CanonicalRedirect />
-      <AnalyticsTracker />
-      <WebVitalsTracker />
-      <WebVitalsReporter />
-      <LayoutCanon />
-      <SmokeChecks />
-      <TwilioLinkGuard />
-      <Routes>
-        <Route path="/" element={<main id="main"><Index /></main>} />
-        <Route path="/auth" element={<main id="main"><Auth /></main>} />
-        <Route path="/thank-you" element={<main id="main"><ThankYou /></main>} />
-        <Route path="/signup" element={<Navigate to="/auth" replace />} />
-        <Route path="/features" element={<main id="main"><Features /></main>} />
-        <Route path="/pricing" element={<main id="main"><Pricing /></main>} />
-        <Route path="/faq" element={<main id="main"><FAQ /></main>} />
-        <Route path="/contact" element={<main id="main"><Contact /></main>} />
-        <Route path="/demo" element={<main id="main"><Demo /></main>} />
-        <Route path="/security" element={<main id="main"><Security /></main>} />
-        <Route path="/compare" element={<main id="main"><Compare /></main>} />
-        <Route path="/privacy" element={<main id="main"><Privacy /></main>} />
-        <Route path="/terms" element={<main id="main"><Terms /></main>} />
-        <Route path="/design-tokens" element={<main id="main"><DesignTokens /></main>} />
-        <Route path="/dashboard" element={<main id="main"><ClientDashboard /></main>} />
-        <Route path="/dashboard/integrations/crm" element={<main id="main"><CRMIntegration /></main>} />
-        <Route path="/dashboard/integrations/email" element={<main id="main"><EmailIntegration /></main>} />
-        <Route path="/dashboard/integrations/phone" element={<main id="main"><PhoneIntegration /></main>} />
-        <Route path="/dashboard/integrations/messaging" element={<main id="main"><MessagingIntegration /></main>} />
-        <Route path="/dashboard/integrations/mobile" element={<main id="main"><MobileIntegration /></main>} />
-        <Route path="/dashboard/integrations/automation" element={<main id="main"><AutomationIntegration /></main>} />
-        <Route path="/call-center" element={<main id="main"><CallCenter /></main>} />
-        <Route path="/calls" element={<main id="main"><CallLogs /></main>} />
-        <Route path="/phone-apps" element={<main id="main"><PhoneApps /></main>} />
-        <Route path="/sms-delivery" element={<main id="main"><SMSDeliveryDashboard /></main>} />
-        <Route path="/admin/kb" element={<main id="main"><AdminKB /></main>} />
-        <Route path="/admin/campaigns" element={<main id="main"><CampaignManager /></main>} />
-        <Route path="/ops/crypto/init" element={<main id="main"><CryptoInit /></main>} />
-        <Route path="/ops/activation" element={<main id="main"><Activation /></main>} />
-        <Route path="/ops/voice" element={<main id="main"><VoiceSettings /></main>} />
-        <Route path="/ops/twilio/wire" element={<main id="main"><TwilioWire /></main>} />
-        <Route path="/ops/staging-test" element={<main id="main"><StagingTest /></main>} />
-        <Route path="/ops/voice-health" element={<main id="main"><VoiceHealth /></main>} />
-        <Route path="/ops/messaging-health" element={<main id="main"><MessagingHealth /></main>} />
-        <Route path="/ops/numbers/onboard" element={<main id="main"><ClientNumberOnboarding /></main>} />
-        <Route path="/ops/twilio-evidence" element={<main id="main"><TwilioEvidence /></main>} />
-        
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<main id="main"><NotFound /></main>} />
-      </Routes>
-    </>
+    <SafeErrorBoundary>
+      <div className="min-h-screen bg-background text-foreground antialiased">
+        <BrowserRouter>
+          {/* Suspense prevents a white screen if any child is lazy elsewhere */}
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route element={<AppLayout />}>
+                {routeEntries.map(({ path, element }) => (
+                  <Route key={path} path={path} element={element} />
+                ))}
+              </Route>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </div>
+    </SafeErrorBoundary>
   );
-};
-
-
-const App = () => {
-  const [ragDrawerOpen, setRagDrawerOpen] = useState(false);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setRagDrawerOpen(prev => !prev);
-      }
-      if (e.key === 'Escape' && ragDrawerOpen) {
-        setRagDrawerOpen(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [ragDrawerOpen]);
-
-  return (
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          {import.meta.env.VITE_SPLASH_ENABLED !== "false" && <StartupSplash />}
-          <AppErrorBoundary>
-            <BrowserRouter basename="/">
-              <AppWithMonitoring />
-              <InstallPrompt />
-              <MiniChat />
-              <RagSearchFab onClick={() => setRagDrawerOpen(true)} />
-              <RagSearchDrawer open={ragDrawerOpen} onOpenChange={setRagDrawerOpen} />
-              <PreviewDiagnostics />
-            </BrowserRouter>
-          </AppErrorBoundary>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
-  );
-};
-
-export default App;
-
-
-
+}

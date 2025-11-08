@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 interface A2PStatus {
@@ -69,22 +68,21 @@ const MessagingHealth = () => {
 
   const getDeliveryRateBadge = (rate: number | undefined) => {
     if (!rate) return <Badge variant="secondary">No Data</Badge>;
-    if (rate >= 98) return <Badge className="bg-green-500">{rate}%</Badge>;
-    if (rate >= 95) return <Badge variant="outline" className="border-yellow-500 text-yellow-600">{rate}%</Badge>;
+    if (rate >= 98) return <Badge className="bg-[hsl(142,85%,25%)] text-white">{rate}%</Badge>;
+    if (rate >= 95) return <Badge variant="outline" className="border-amber-600 text-amber-800">{rate}%</Badge>;
     return <Badge variant="destructive">{rate}%</Badge>;
   };
 
   const getCallbackTimeBadge = (ms: number | undefined) => {
     if (!ms) return <Badge variant="secondary">No Data</Badge>;
-    if (ms < 500) return <Badge className="bg-green-500">{ms}ms</Badge>;
-    if (ms < 1000) return <Badge variant="outline" className="border-yellow-500 text-yellow-600">{ms}ms</Badge>;
+    if (ms < 500) return <Badge className="bg-[hsl(142,85%,25%)] text-white">{ms}ms</Badge>;
+    if (ms < 1000) return <Badge variant="outline" className="border-amber-600 text-amber-800">{ms}ms</Badge>;
     return <Badge variant="destructive">{ms}ms</Badge>;
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
         <main className="flex-1 container py-8">
           <div className="flex items-center justify-center h-64">
             <p className="text-muted-foreground">Loading messaging health data...</p>
@@ -97,7 +95,6 @@ const MessagingHealth = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 container py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Messaging Health</h1>

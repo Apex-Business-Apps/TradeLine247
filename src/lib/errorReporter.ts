@@ -14,11 +14,45 @@ interface ErrorReport {
   metadata?: Record<string, any>;
 }
 
+/**
+ * Type guard to check if value is an Error object
+ */
+function isError(value: unknown): value is Error {
+  return value instanceof Error;
+}
+
+/**
+ * Normalizes any value to an Error object with proper stack trace
+ */
+function normalizeError(value: unknown): Error {
+  if (isError(value)) {
+    return value;
+  }
+
+  // Convert non-Error values to Error objects
+  if (typeof value === 'string') {
+    return new Error(value);
+  }
+
+  if (value && typeof value === 'object') {
+    // Try to extract message from object
+    const message = (value as any).message || (value as any).error || JSON.stringify(value);
+    const error = new Error(message);
+    // Preserve original stack if available
+    if ((value as any).stack) {
+      error.stack = (value as any).stack;
+    }
+    return error;
+  }
+
+  // Fallback for primitives
+  return new Error(String(value));
+}
+
 class ErrorReporter {
   private errors: ErrorReport[] = [];
   private maxErrors = 50;
-  private reportEndpoint = '/api/errors'; // Could be Supabase function
-
+  
   constructor() {
     if (typeof window !== 'undefined') {
       this.setupGlobalHandlers();
@@ -46,16 +80,18 @@ class ErrorReporter {
 
     // Catch unhandled promise rejections
     window.addEventListener('unhandledrejection', (event) => {
+      const normalizedError = normalizeError(event.reason);
       this.report({
         type: 'unhandledRejection',
-        message: event.reason?.message || String(event.reason),
-        stack: event.reason?.stack,
+        message: normalizedError.message,
+        stack: normalizedError.stack,
         timestamp: new Date().toISOString(),
         url: window.location.href,
         userAgent: navigator.userAgent,
         environment: this.getEnvironment(),
         metadata: {
-          reason: event.reason
+          reason: event.reason,
+          wasNormalized: !isError(event.reason)
         }
       });
     });
@@ -82,27 +118,34 @@ class ErrorReporter {
         }
         return response;
       } catch (error) {
+        const normalizedError = normalizeError(error);
         this.report({
           type: 'network',
-          message: `Fetch failed: ${error}`,
-          stack: error instanceof Error ? error.stack : undefined,
+          message: `Fetch failed: ${normalizedError.message}`,
+          stack: normalizedError.stack,
           timestamp: new Date().toISOString(),
           url: window.location.href,
           userAgent: navigator.userAgent,
           environment: this.getEnvironment(),
           metadata: {
             fetchUrl: args[0],
-            error: String(error)
+            error: String(error),
+            wasNormalized: !isError(error)
           }
         });
-        throw error;
+        throw normalizedError; // Re-throw normalized error with stack
       }
     };
   }
 
   private getEnvironment(): string {
-    const hostname = window.location.hostname;
-    if (hostname.includes('lovableproject.com') || hostname.includes('https://tradeline247aicom.lovable.app/')) {
+    const hostname = window.location.hostname.toLowerCase();
+    const previewDomains = ['lovableproject.com', 'lovable.app', 'lovable.dev', 'gptengineer.app'];
+    const isPreviewHost =
+      hostname.includes('.lovable.') ||
+      previewDomains.some(domain => hostname === domain || hostname.endsWith(`.${domain}`));
+
+    if (isPreviewHost) {
       return 'preview';
     }
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
@@ -149,13 +192,43 @@ class ErrorReporter {
     // Only send critical errors to avoid spam
     if (error.type === 'error' || error.type === 'unhandledRejection') {
       try {
-        await fetch(this.reportEndpoint, {
+        // Use centralized Supabase config (secure, DRY principle)
+        let base = (import.meta as any)?.env?.VITE_FUNCTIONS_BASE;
+
+        // Fallback for production if env var not set (maintains backward compatibility)
+        if (!base && typeof window !== 'undefined' && window.location.hostname === 'tradeline247ai.com') {
+          base = 'https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1';
+        }
+
+        if (!base) {
+          console.debug('[errorReporter] VITE_FUNCTIONS_BASE not configured, skipping backend send');
+          return;
+        }
+
+        const endpoint = `${base}/ops-error-intake`;
+
+        await fetch(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(error)
+          headers: {
+            'Content-Type': 'application/json'
+            // Note: anon key handled by Supabase client config, RLS-protected
+          },
+          body: JSON.stringify({
+            error_id: crypto.randomUUID(),
+            error_type: error.type,
+            payload: {
+              message: error.message,
+              stack: error.stack,
+              url: error.url,
+              metadata: error.metadata
+            },
+            user_agent: error.userAgent,
+            org_id: null
+          })
         });
       } catch (e) {
         // Silent fail - don't want to create error loops
+        console.debug('[errorReporter] Failed to send error to backend:', e);
       }
     }
   }
@@ -177,17 +250,21 @@ class ErrorReporter {
 export const errorReporter = new ErrorReporter();
 
 // Export for React Error Boundaries
-export function reportReactError(error: Error, errorInfo: any) {
+export function reportReactError(error: unknown, errorInfo?: { componentStack?: string }) {
+  // Normalize error to ensure we have proper Error object with stack
+  const normalizedError = normalizeError(error);
+
   errorReporter.report({
     type: 'react',
-    message: error.message,
-    stack: error.stack,
+    message: normalizedError.message,
+    stack: normalizedError.stack,
     timestamp: new Date().toISOString(),
     url: window.location.href,
     userAgent: navigator.userAgent,
     environment: errorReporter['getEnvironment'](),
     metadata: {
-      componentStack: errorInfo.componentStack
+      componentStack: errorInfo?.componentStack,
+      wasNormalized: !isError(error)
     }
   });
 }

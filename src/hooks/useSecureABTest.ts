@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSecureAnalytics } from './useSecureAnalytics';
 import { featureFlags } from '@/config/featureFlags';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface ABTestVariant {
   [key: string]: any;
@@ -61,14 +62,29 @@ export const useSecureABTest = (testName: string) => {
       });
 
       if (error) {
-        console.error('Error getting secure A/B assignment:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Error getting secure A/B assignment: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         return { variant: 'A', variantData: { text: 'Grow Now', color: 'primary' } };
       }
 
       return data || { variant: 'A', variantData: { text: 'Grow Now', color: 'primary' } };
 
     } catch (error) {
-      console.error('Error in secure A/B test assignment:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Error in secure A/B test assignment: ${error instanceof Error ? error.message : String(error)}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       return { variant: 'A', variantData: { text: 'Grow Now', color: 'primary' } };
     }
   }, [testName]);
@@ -91,7 +107,15 @@ export const useSecureABTest = (testName: string) => {
           setVariantData({ text: 'Grow Now', color: 'primary' });
         }
       } catch (error) {
-        console.error('Error loading secure A/B test:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Error loading secure A/B test: ${error instanceof Error ? error.message : String(error)}`,
+          stack: error instanceof Error ? error.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         // Set fallback values
         setVariant('A');
         setVariantData({ text: 'Grow Now', color: 'primary' });
@@ -119,7 +143,14 @@ export const useSecureABTest = (testName: string) => {
       });
 
       if (error) {
-        console.error('Secure conversion error:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Secure conversion error: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
       } else {
         // Track conversion via privacy-first analytics
         analytics.trackConversion('ab_test_conversion', conversionValue, {
@@ -129,7 +160,15 @@ export const useSecureABTest = (testName: string) => {
         });
       }
     } catch (error) {
-      console.error('Error tracking secure A/B test conversion:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Error tracking secure A/B test conversion: ${error instanceof Error ? error.message : String(error)}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
   }, [testName, variant]);
 

@@ -1,21 +1,55 @@
 import { test, expect } from '@playwright/test';
+import { gotoAndWait } from './helpers';
 
 test.describe('Header Position', () => {
   const widths = [360, 768, 1024];
 
   for (const width of widths) {
     test(`header left elements should be positioned near left edge at ${width}px width`, async ({ page }) => {
+      // Set viewport size before navigation
       await page.setViewportSize({ width, height: 800 });
-      await page.goto('/app/dashboard');
+
+      // Navigate and wait for React hydration with animations disabled
+      await gotoAndWait(page, '/');
+
+      // Wait for React ready signal explicitly
+      await page.waitForFunction(() => (window as any).__REACT_READY__ === true, { timeout: 30000 });
+
+      // Wait for header element to exist in DOM
+      await page.waitForSelector('header[data-site-header]', { state: 'attached', timeout: 10000 });
       
+      // Wait for header left section to exist
+      await page.waitForSelector('#app-header-left', { state: 'attached', timeout: 10000 });
+
+      // Get the element and check if it's actually in the DOM
       const headerLeft = page.locator('#app-header-left');
-      await expect(headerLeft).toBeVisible();
       
+      // Wait for element to have non-zero dimensions (proves it's rendered)
+      await page.waitForFunction(
+        () => {
+          const el = document.getElementById('app-header-left');
+          if (!el) return false;
+          const rect = el.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        },
+        { timeout: 15000 }
+      );
+
+      // Ensure element is scrolled into view
+      await headerLeft.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(300); // Wait for layout to stabilize
+
       const boundingBox = await headerLeft.boundingBox();
       expect(boundingBox).not.toBeNull();
       
       if (boundingBox) {
-        expect(boundingBox.x).toBeLessThanOrEqual(16);
+        // Header should be positioned near left edge (within container padding)
+        // Account for container padding: max(1rem, min(2rem, 4vw))
+        // At 360px: 4vw = 14.4px, so padding is 16px (1rem)
+        // At 768px: 4vw = 30.7px, so padding is 30.7px
+        // At 1024px: 2rem = 32px, so padding is 32px
+        const maxPadding = width <= 360 ? 16 : width <= 768 ? 32 : 32;
+        expect(boundingBox.x).toBeLessThanOrEqual(maxPadding);
       }
     });
   }

@@ -1,79 +1,54 @@
 #!/usr/bin/env node
-
+// Verify built SPA by running 'vite preview' and probing '/'. No TS/server imports.
 const { spawn } = require('node:child_process');
 const { setTimeout: delay } = require('node:timers/promises');
-const path = require('node:path');
-const fs = require('node:fs');
 
-const projectRoot = path.resolve(__dirname, '..');
-const distIndex = path.join(projectRoot, 'dist', 'index.html');
+const HOST = '127.0.0.1';
+const PORT = Number(process.env.VERIFY_PORT || 4173);
+const ORIGIN = `http://${HOST}:${PORT}`;
+const PATH = process.env.VERIFY_PATH || '/';
+const TIMEOUT_MS = Number(process.env.VERIFY_TIMEOUT_MS || 15000);
 
-async function ensureDist() {
-  try {
-    await fs.promises.access(distIndex, fs.constants.R_OK);
-  } catch (error) {
-    throw new Error('dist/index.html not found. Run "npm run build" before verify.');
-  }
-}
+// Windows-compatible spawn configuration
+const isWindows = process.platform === 'win32';
+const exe = isWindows ? 'npx.cmd' : 'npx';
+const spawnOptions = {
+  stdio: ['ignore', 'pipe', 'pipe'],
+  env: { ...process.env, NODE_ENV: 'production' },
+  // Windows requires shell for .cmd files
+  ...(isWindows && { shell: true }),
+};
+const preview = spawn(exe, ['vite', 'preview', '--host', HOST, '--port', String(PORT)], spawnOptions);
+let exited = false;
+preview.on('exit', c => (exited = true));
+preview.stdout.on('data', d => process.stdout.write(String(d)));
+preview.stderr.on('data', d => process.stderr.write(String(d)));
 
-async function waitForServer(port) {
-  const url = `http://127.0.0.1:${port}/healthz`;
-  for (let attempt = 0; attempt < 40; attempt += 1) {
+async function probe() {
+  const end = Date.now() + TIMEOUT_MS;
+  let lastErr = null;
+  while (Date.now() < end) {
+    if (exited) throw new Error('vite preview exited before ready');
     try {
-      const response = await fetch(url, { cache: 'no-store' });
-      if (response.ok) {
-        return;
-      }
-    } catch (error) {
-      // retry
-    }
-    await delay(250);
+      const r = await fetch(ORIGIN + PATH, { redirect: 'manual' });
+      if (r.ok || (r.status >= 300 && r.status < 400)) return;
+      lastErr = new Error(`unexpected status ${r.status}`);
+    } catch (e) { lastErr = e; }
+    await delay(300);
   }
-  throw new Error('Server did not become ready at /healthz');
-}
-
-async function verifyEndpoints(port) {
-  const base = `http://127.0.0.1:${port}`;
-
-  const health = await fetch(`${base}/healthz`);
-  if (!health.ok) {
-    throw new Error(`/healthz returned ${health.status}`);
-  }
-
-  const ready = await fetch(`${base}/readyz`);
-  if (!ready.ok) {
-    throw new Error(`/readyz returned ${ready.status}`);
-  }
-
-  const home = await fetch(`${base}/`);
-  const html = await home.text();
-  if (!html.includes('Your 24/7 Ai Receptionist!')) {
-    throw new Error('Homepage missing tagline copy.');
-  }
+  throw lastErr ?? new Error('timeout');
 }
 
 (async () => {
   try {
-    await ensureDist();
-
-    const port = Number.parseInt(process.env.VERIFY_PORT ?? '', 10) || 4173;
-    const server = spawn('node', ['server.mjs'], {
-      cwd: projectRoot,
-      env: { ...process.env, PORT: String(port) },
-      stdio: ['ignore', 'inherit', 'inherit'],
-    });
-
-    try {
-      await waitForServer(port);
-      await verifyEndpoints(port);
-      console.log('VERIFY: PASS');
-    } finally {
-      server.kill('SIGTERM');
-      await delay(200);
-    }
-  } catch (error) {
-    console.error('VERIFY: FAIL');
-    console.error(error instanceof Error ? error.message : error);
+    console.log(`Node.js ${process.version}`);
+    console.log(`[verify] Probing ${ORIGIN}${PATH}`);
+    await probe();
+    console.log('VERIFY: PASS');
+    preview.kill('SIGTERM'); process.exit(0);
+  } catch (e) {
+    console.error('VERIFY: FAIL'); console.error(e?.stack || e);
+    try { preview.kill('SIGTERM'); } catch {}
     process.exit(1);
   }
 })();

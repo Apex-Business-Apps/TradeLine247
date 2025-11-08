@@ -1,10 +1,7 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { preflight, corsHeaders } from '../_shared/cors.ts';
+import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
 
 interface ValidateSessionRequest {
   user_id: string;
@@ -12,16 +9,14 @@ interface ValidateSessionRequest {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     if (req.method !== 'POST') {
       return new Response(
         JSON.stringify({ error: 'Method not allowed' }),
-        { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 405, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -34,7 +29,7 @@ serve(async (req) => {
     if (!user_id || !session_token) {
       return new Response(
         JSON.stringify({ error: 'Missing user_id or session_token' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -52,7 +47,7 @@ serve(async (req) => {
           error: 'Validation failed',
           details: error.message 
         }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 500, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -71,7 +66,7 @@ serve(async (req) => {
           valid: false,
           reason: result.reason || 'unknown'
         }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 401, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -85,7 +80,7 @@ serve(async (req) => {
         concurrent_sessions: result.concurrent_sessions,
         last_activity: result.last_activity
       }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
     );
 
   } catch (error) {
@@ -95,7 +90,7 @@ serve(async (req) => {
         valid: false,
         error: 'Internal server error' 
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
     );
   }
 });

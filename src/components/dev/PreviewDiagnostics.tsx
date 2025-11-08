@@ -11,6 +11,16 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CheckCircle, AlertCircle, XCircle, ChevronDown, RefreshCw } from 'lucide-react';
 
+const LOVABLE_PREVIEW_DOMAINS = ['lovableproject.com', 'lovable.app', 'lovable.dev', 'gptengineer.app'];
+
+function isLovablePreviewHost(hostname: string): boolean {
+  const normalized = hostname.toLowerCase();
+  return (
+    normalized.includes('.lovable.') ||
+    LOVABLE_PREVIEW_DOMAINS.some(domain => normalized === domain || normalized.endsWith(`.${domain}`))
+  );
+}
+
 export function PreviewDiagnostics() {
   const [healthCheck, setHealthCheck] = useState<HealthCheckResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -19,10 +29,7 @@ export function PreviewDiagnostics() {
   useEffect(() => {
     // Auto-run on mount in preview/dev
     const hostname = window.location.hostname;
-    const isPreview = hostname.includes('lovableproject.com') || 
-                      hostname.includes('https://tradeline247aicom.lovable.app/') || 
-                      hostname.includes('lovable.dev') ||
-                      import.meta.env.DEV;
+    const isPreview = isLovablePreviewHost(hostname) || import.meta.env.DEV;
     
     if (isPreview) {
       runCheck();
@@ -45,22 +52,22 @@ export function PreviewDiagnostics() {
   };
 
   // Don't show in production
-  if (!import.meta.env.DEV && !window.location.hostname.includes('lovable')) {
+  if (!import.meta.env.DEV && !isLovablePreviewHost(window.location.hostname)) {
     return null;
   }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pass': return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'warn': return <AlertCircle className="w-4 h-4 text-yellow-600" />;
-      case 'fail': return <XCircle className="w-4 h-4 text-red-600" />;
+      case 'pass': return <CheckCircle className="w-4 h-4 text-success" />;
+      case 'warn': return <AlertCircle className="w-4 h-4 text-amber-800" />;
+      case 'fail': return <XCircle className="w-4 h-4 text-error" />;
       default: return null;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'healthy': return <Badge className="bg-green-600">Healthy</Badge>;
+      case 'healthy': return <Badge className="bg-green-700">Healthy</Badge>;
       case 'warning': return <Badge className="bg-yellow-600">Warning</Badge>;
       case 'error': return <Badge className="bg-red-600">Error</Badge>;
       default: return <Badge>Unknown</Badge>;
@@ -87,18 +94,20 @@ export function PreviewDiagnostics() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Preview Diagnostics</CardTitle>
             <div className="flex items-center gap-2">
-              <Button 
-                onClick={runCheck} 
+              <Button
+                onClick={runCheck}
                 disabled={loading}
                 size="sm"
                 variant="ghost"
+                aria-label="Refresh diagnostics"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               </Button>
-              <Button 
+              <Button
                 onClick={() => setVisible(false)}
                 size="sm"
                 variant="ghost"
+                aria-label="Close diagnostics panel"
               >
                 ✕
               </Button>

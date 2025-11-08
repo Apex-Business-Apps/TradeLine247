@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CheckCircle, Phone, MessageSquare, Brain, Zap, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -66,8 +65,6 @@ const Features = () => {
         canonical="https://www.tradeline247ai.com/features"
       />
       
-      <Header />
-      
       <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-background to-secondary/20" style={{
@@ -111,7 +108,7 @@ const Features = () => {
                     <ul className="space-y-2">
                       {feature.benefits.map((benefit, idx) => (
                         <li key={idx} className="flex items-center gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)] flex-shrink-0" aria-hidden="true" />
                           <span>{benefit}</span>
                         </li>
                       ))}

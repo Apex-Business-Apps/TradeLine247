@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { ArrowLeft, Database, ExternalLink, Settings, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -79,7 +79,6 @@ const CRMIntegration = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       
       <main className="flex-1 container py-6 space-y-6">
         {/* Header */}
@@ -87,7 +86,7 @@ const CRMIntegration = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(paths.dashboard)}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -96,7 +95,7 @@ const CRMIntegration = () => {
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-              <Database className="h-6 w-6 text-blue-600" />
+              <Database className="h-6 w-6 text-info" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">CRM Integrations</h1>
@@ -128,7 +127,7 @@ const CRMIntegration = () => {
                       <p className="text-sm text-muted-foreground mt-1">{provider.description}</p>
                     </div>
                   </div>
-                  <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                  <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">
                     {provider.status === 'available' ? 'Available' : 'Coming Soon'}
                   </Badge>
                 </div>
@@ -140,7 +139,7 @@ const CRMIntegration = () => {
                   <div className="grid grid-cols-2 gap-2">
                     {provider.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
-                        <CheckCircle className="h-3 w-3 text-green-500" />
+                        <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}

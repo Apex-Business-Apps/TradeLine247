@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,8 +57,6 @@ const FAQ = () => {
         keywords="AI receptionist FAQ, customer service automation questions, business phone answering help"
         canonical="https://www.tradeline247ai.com/faq"
       />
-      
-      <Header />
       
       <main className="flex-1">
         {/* Hero Section */}

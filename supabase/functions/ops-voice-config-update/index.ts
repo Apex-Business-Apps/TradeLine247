@@ -1,72 +1,57 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Authenticated update of org voice settings. Non-critical audit logging.
+// Requires standard JWT auth via supabase-js when invoked from the app (token forwarded automatically).
+import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { preflight, corsHeaders } from '../_shared/cors.ts';
+import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
-    const config = await req.json();
-    const authHeader = req.headers.get('Authorization')!;
-    const token = authHeader.replace('Bearer ', '');
-    
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
+    const auth = req.headers.get('authorization') ?? ''
+    if (!auth?.toLowerCase().startsWith('bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+      )
+    }
 
-    const { data: { user } } = await supabase.auth.getUser(token);
-    if (!user) throw new Error('Unauthorized');
+    const { SUPABASE_URL, SUPABASE_ANON_KEY } = Deno.env.toObject()
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, { global: { headers: { Authorization: auth } } })
 
-    // Get user's org
-    const { data: membership } = await supabase
-      .from('organization_members')
-      .select('org_id')
-      .eq('user_id', user.id)
-      .single();
+    const payload = await req.json().catch(() => ({}))
+    // Accept minimal shape; extend to your schema
+    const { org_id, config } = payload || {}
+    if (!org_id || typeof config !== 'object') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid payload' }),
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+      )
+    }
 
-    if (!membership) throw new Error('No organization found');
+    // Upsert/update settings (adjust table/columns as needed)
+    const { error } = await supabase.from('voice_settings').upsert({ org_id, config }, { onConflict: 'org_id' })
+    if (error) throw error
 
-    // Upsert voice config
-    const { error } = await supabase
-      .from('voice_config')
-      .upsert({
-        organization_id: membership.org_id,
-        ...config,
-        updated_at: new Date().toISOString()
-      });
+    // Non-blocking audit (best effort)
+    try {
+      await supabase.from('audit_logs').insert({
+        org_id,
+        action: 'ops-voice-config-update',
+        meta: { ok: true },
+      })
+    } catch (_) {}
 
-    if (error) throw error;
-
-    // Determine action type for audit
-    const action = config.active_preset_id 
-      ? `preset_applied:${config.active_preset_id}`
-      : 'config_update';
-
-    // Audit log
-    await supabase.from('voice_config_audit').insert({
-      organization_id: membership.org_id,
-      user_id: user.id,
-      action: action,
-      changes: config,
-      reason: config.active_preset_id 
-        ? `Applied preset: ${config.active_preset_id}`
-        : undefined
-    });
-
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({ ok: true }),
+      { status: 200, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+    )
+  } catch (e) {
+    return new Response(
+      JSON.stringify({ error: String(e?.message || e) }),
+      { status: 500, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
+    )
   }
-});
-
+})

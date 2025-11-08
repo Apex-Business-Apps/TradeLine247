@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { ArrowLeft, MessageSquare, ExternalLink, Settings, CheckCircle, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,7 +19,7 @@ const messagingApps = [
     status: 'available',
     features: ['Business API', 'Auto-replies', 'Rich media support', 'Broadcast lists'],
     setupType: 'oauth',
-    color: 'bg-green-500/10 text-green-600 border-green-500/20'
+    color: 'bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]'
   },
   {
     id: 'telegram',
@@ -29,7 +29,7 @@ const messagingApps = [
     status: 'available',
     features: ['Bot API', 'Inline queries', 'File sharing', 'Channel broadcasts'],
     setupType: 'bot-token',
-    color: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+    color: 'bg-blue-500/10 text-info border-info'
   },
   {
     id: 'slack',
@@ -39,7 +39,7 @@ const messagingApps = [
     status: 'available',
     features: ['Slack app', 'Workflow automation', 'Custom commands', 'Thread replies'],
     setupType: 'oauth',
-    color: 'bg-purple-500/10 text-purple-600 border-purple-500/20'
+    color: 'bg-purple-500/10 text-neutral border-neutral'
   },
   {
     id: 'teams',
@@ -49,7 +49,7 @@ const messagingApps = [
     status: 'available',
     features: ['Teams bot', 'Meeting integration', 'File collaboration', 'Power Automate'],
     setupType: 'oauth',
-    color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20'
+    color: 'bg-indigo-500/10 text-info border-indigo-500/20'
   },
   {
     id: 'discord',
@@ -69,7 +69,7 @@ const messagingApps = [
     status: 'coming-soon',
     features: ['Messenger API', 'Rich cards', 'Quick replies', 'Persistent menu'],
     setupType: 'oauth',
-    color: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+    color: 'bg-blue-500/10 text-info border-info'
   }
 ];
 
@@ -101,7 +101,6 @@ const MessagingIntegration = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       
       <main className="flex-1 container py-6 space-y-6">
         {/* Header */}
@@ -109,7 +108,7 @@ const MessagingIntegration = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(paths.dashboard)}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -118,7 +117,7 @@ const MessagingIntegration = () => {
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-orange-500/10 to-orange-500/5">
-              <MessageSquare className="h-6 w-6 text-orange-600" />
+              <MessageSquare className="h-6 w-6 text-brand-primary" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Messaging App Integrations</h1>
@@ -153,7 +152,7 @@ const MessagingIntegration = () => {
                     </div>
                   </div>
                   <Badge className={app.status === 'available' 
-                    ? "bg-green-500/10 text-green-600 border-green-500/20"
+                    ? "bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]"
                     : "bg-gray-500/10 text-gray-600 border-gray-500/20"
                   }>
                     {app.status === 'available' ? 'Available' : 'Coming Soon'}
@@ -167,7 +166,7 @@ const MessagingIntegration = () => {
                   <div className="space-y-1">
                     {app.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
-                        <CheckCircle className="h-3 w-3 text-green-500" />
+                        <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}

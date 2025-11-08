@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { paths } from '@/routes/paths';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSecureABTest } from "@/hooks/useSecureABTest";
 import { useSecureFormSubmission } from "@/hooks/useSecureFormSubmission";
 import { FormErrorFallback } from "@/components/errors/FormErrorFallback";
+import { errorReporter } from "@/lib/errorReporter";
 import { z } from "zod";
 // Client-side validation schema matching server-side
 const leadFormSchema = z.object({
@@ -132,10 +134,19 @@ export const LeadCaptureForm = () => {
 
       // Redirect to auth page after 3 seconds
       setTimeout(() => {
-        navigate('/auth');
+        navigate(paths.auth);
       }, 3000);
     } catch (error: any) {
-      console.error("Lead submission error:", error);
+      errorReporter.report({
+        type: 'error',
+        message: `Lead submission error: ${error.message || 'Unknown error'}`,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { formData: { name: formData.name, company: formData.company }, variant }
+      });
       
       // Set error for FormErrorFallback
       setSubmitError(error?.message || 'Something went wrong. Mind trying again?');
@@ -161,9 +172,9 @@ export const LeadCaptureForm = () => {
   if (isSuccess) {
     return <section className="py-20 bg-gradient-to-br from-primary/10 to-accent/10">
         <div className="container">
-          <Card className="max-w-md mx-auto text-center shadow-2xl border-0 bg-gradient-to-br from-green-50/80 to-emerald-50/80 backdrop-blur-sm animate-scale-in">
+          <Card className="max-w-md mx-auto text-center shadow-2xl border-0 bg-gradient-to-br from-[hsl(142_85%_95%)] to-[hsl(142_69%_95%)] backdrop-blur-sm animate-scale-in">
             <CardHeader>
-              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <div className="w-16 h-16 bg-gradient-to-br from-[hsl(var(--status-success))] to-[hsl(var(--status-success-light))] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
               <CardTitle className="text-2xl animate-fade-in">Got it!</CardTitle>
@@ -184,7 +195,7 @@ export const LeadCaptureForm = () => {
                 </p>
               </div>
               <Button 
-                onClick={() => navigate('/auth')} 
+                onClick={() => navigate(paths.auth)} 
                 className="w-full hover-scale transition-all duration-300 animate-fade-in" 
                 style={{ animationDelay: '600ms' }}
               >
@@ -201,7 +212,7 @@ export const LeadCaptureForm = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Tell us about your business
           </h2>
-          <p className="text-lg max-w-2xl mx-auto text-[#1e556b]">
+          <p className="text-lg max-w-2xl mx-auto text-foreground/90">
             Start your free trial today.
           </p>
         </div>
@@ -224,7 +235,8 @@ export const LeadCaptureForm = () => {
                 error={submitError} 
                 onRetry={() => {
                   setSubmitError(null);
-                  handleSubmit(new Event('submit') as any);
+                  const syntheticEvent = new Event('submit', { bubbles: true, cancelable: true }) as unknown as React.FormEvent;
+                  handleSubmit(syntheticEvent);
                 }} 
               />
             )}
@@ -295,7 +307,7 @@ export const LeadCaptureForm = () => {
                   <input
                     type="checkbox"
                     required
-                    className="mt-1 rounded border-gray-300 text-primary focus:ring-primary transition-all duration-200"
+                    className="mt-1 rounded border-border text-primary focus:ring-primary transition-all duration-200"
                   />
                   <span>
                 I'm cool with emails about setup and updates. Unsubscribe anytime.

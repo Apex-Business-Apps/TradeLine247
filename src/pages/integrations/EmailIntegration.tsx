@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
 import { ArrowLeft, Mail, ExternalLink, Settings, CheckCircle, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -84,7 +84,6 @@ TradeLine 24/7 Team`);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       
       <main className="flex-1 container py-6 space-y-6">
         {/* Header */}
@@ -92,7 +91,7 @@ TradeLine 24/7 Team`);
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(paths.dashboard)}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -101,7 +100,7 @@ TradeLine 24/7 Team`);
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-green-500/10 to-green-500/5">
-              <Mail className="h-6 w-6 text-green-600" />
+              <Mail className="h-6 w-6 text-[hsl(142,85%,25%)]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Email Integrations</h1>
@@ -137,7 +136,7 @@ TradeLine 24/7 Team`);
                       </div>
                     </div>
                   </div>
-                  <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                  <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">
                     Available
                   </Badge>
                 </div>
@@ -149,7 +148,7 @@ TradeLine 24/7 Team`);
                   <div className="space-y-1">
                     {provider.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
-                        <CheckCircle className="h-3 w-3 text-green-500" />
+                        <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}

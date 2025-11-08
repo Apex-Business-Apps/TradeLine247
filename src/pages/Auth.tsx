@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { paths } from '@/routes/paths';
+import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,9 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { Session, User } from '@supabase/supabase-js';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { usePasswordSecurity } from '@/hooks/usePasswordSecurity';
+import { errorReporter } from '@/lib/errorReporter';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -29,6 +30,11 @@ const Auth = () => {
   const { validatePassword: secureValidatePassword } = usePasswordSecurity();
 
   useEffect(() => {
+    if (!isSupabaseEnabled) {
+      setLoading(false);
+      return () => undefined;
+    }
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -37,20 +43,50 @@ const Auth = () => {
         
         // Redirect authenticated users to dashboard
         if (session?.user) {
-          navigate('/dashboard');
+          navigate(paths.dashboard);
         }
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      // If there's a JWT error, clear the corrupted session
+      if (error?.message?.includes('malformed') || error?.message?.includes('invalid')) {
+        errorReporter.report({
+          type: 'error',
+          message: `Auth: Detected malformed token, clearing session: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
+        supabase.auth.signOut().catch(() => {/* ignore errors during cleanup */});
+        setSession(null);
+        setUser(null);
+        return;
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       // Redirect if already logged in
       if (session?.user) {
-        navigate('/dashboard');
+        navigate(paths.dashboard);
       }
+    }).catch((err) => {
+      // Catch any unhandled JWT errors
+      errorReporter.report({
+        type: 'error',
+        message: `Auth: Session check failed: ${err?.message || err}`,
+        stack: err?.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
+      supabase.auth.signOut().catch(() => {/* ignore */});
+      setSession(null);
+      setUser(null);
     });
 
     return () => subscription.unsubscribe();
@@ -103,7 +139,15 @@ const Auth = () => {
         }
       }
     } catch (error) {
-      console.error('Password validation error:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Password validation error: ${error}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       // Don't block user if validation fails
     } finally {
       setPasswordCheckLoading(false);
@@ -124,6 +168,10 @@ const Auth = () => {
 
     const redirectUrl = `${window.location.origin}/`;
     
+    if (!isSupabaseEnabled) {
+      throw new Error('Supabase is disabled in this environment.');
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -138,6 +186,10 @@ const Auth = () => {
   };
 
   const signIn = async (email: string, password: string) => {
+    if (!isSupabaseEnabled) {
+      throw new Error('Supabase is disabled in this environment.');
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -203,7 +255,7 @@ const Auth = () => {
       } else {
         // Success - redirect will happen via onAuthStateChange listener
         // But also do explicit navigation as backup
-        navigate('/dashboard');
+        navigate(paths.dashboard);
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during sign in');
@@ -213,8 +265,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      
+
       <main className="flex-1 container py-8 px-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
@@ -267,8 +318,9 @@ const Auth = () => {
                     />
                   </div>
                   
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
+                    variant="success"
                     className="w-full"
                     disabled={loading}
                   >
@@ -320,23 +372,23 @@ const Auth = () => {
                           <div>
                             <span className="text-muted-foreground">Strength: </span>
                             <span className={`font-medium ${
-                              passwordStrength === 'Very strong' || passwordStrength === 'Strong' ? 'text-green-600' :
-                              passwordStrength === 'Good' ? 'text-yellow-600' :
-                              'text-red-600'
+                              passwordStrength === 'Very strong' || passwordStrength === 'Strong' ? 'text-[hsl(142,85%,25%)]' :
+                              passwordStrength === 'Good' ? 'text-amber-800' :
+                              'text-red-700'
                             }`}>
                               {passwordStrength}
                               {passwordCheckLoading && <Loader2 className="inline w-3 h-3 ml-1 animate-spin" />}
                             </span>
                           </div>
-                          
+
                           {passwordBreached && (
-                            <div className="text-xs text-red-600 font-medium">
+                            <div className="text-xs text-red-700 font-medium">
                               ⚠️ This password appears in known data breaches. Please choose a different password.
                             </div>
                           )}
-                          
+
                           {password.length >= 8 && !passwordBreached && passwordStrength !== 'Too short' && (
-                            <div className="text-xs text-green-600">
+                            <div className="text-xs text-[hsl(142,85%,25%)]">
                               ✓ Password meets security requirements
                             </div>
                           )}

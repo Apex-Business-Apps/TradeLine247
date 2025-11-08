@@ -1,4 +1,3 @@
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CheckCircle, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -115,8 +114,6 @@ const Pricing = () => {
         }}
       />
       
-      <Header />
-      
       <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-background to-secondary/20" style={{
@@ -160,7 +157,7 @@ const Pricing = () => {
                     <ul className="space-y-3">
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-3">
-                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                          <CheckCircle className="w-5 h-5 text-[hsl(142,85%,25%)] flex-shrink-0 mt-0.5" aria-hidden="true" />
                           <span className="text-sm">{feature}</span>
                         </li>
                       ))}

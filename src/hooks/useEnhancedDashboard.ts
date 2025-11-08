@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useOptimizedData } from './useOptimizedData';
 import { Kpi, NextItem, Transcript } from '@/types/dashboard';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface DashboardSummary {
   kpis: Kpi[];
@@ -26,7 +27,15 @@ const fetchDashboardSummary = async (): Promise<DashboardSummary> => {
     });
 
     if (error) {
-      console.error('Dashboard API error:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Dashboard API error: ${error.message || 'Unknown error'}`,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { error }
+      });
       throw new Error(`Dashboard API failed: ${error.message || 'Unknown error'}`);
     }
 
@@ -36,7 +45,16 @@ const fetchDashboardSummary = async (): Promise<DashboardSummary> => {
 
     return data as DashboardSummary;
   } catch (error) {
-    console.error('Dashboard fetch error:', error);
+    errorReporter.report({
+      type: 'error',
+      message: `Dashboard fetch error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      environment: errorReporter['getEnvironment'](),
+      metadata: { error }
+    });
     throw error;
   }
 };
@@ -79,7 +97,16 @@ export const useEnhancedDashboard = () => {
       const diffDays = Math.floor(diffHours / 24);
       return `${diffDays}d ago`;
     } catch (e) {
-      console.warn('Date parsing error:', e);
+      errorReporter.report({
+        type: 'error',
+        message: `Date parsing error: ${e instanceof Error ? e.message : 'Unknown error'}`,
+        stack: e instanceof Error ? e.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { isoString, error: e }
+      });
       return 'Unknown';
     }
   }, []);

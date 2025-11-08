@@ -1,5 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { requireAdmin, unauthorizedResponse } from '../_shared/authorizationMiddleware.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,6 +9,12 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+
+  // P0 FIX: Require admin authorization
+  const authResult = await requireAdmin(req);
+  if (!authResult.authorized) {
+    return unauthorizedResponse(authResult);
+  }
 
   try {
     const { userId, organizationName, plan, role } = await req.json();

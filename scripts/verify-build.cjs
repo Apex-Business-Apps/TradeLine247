@@ -30,17 +30,56 @@ if (!existsNonEmpty(indexHtml)) {
 info('index.html exists');
 
 // Adjust these if your bundler output names differ:
-const mustHave = [
-  path.join(DIST, 'assets', 'index.css'),
-  path.join(DIST, 'assets', 'index.js'),
-];
-for (const f of mustHave) {
-  if (!existsNonEmpty(f)) {
-    const msg = `${path.basename(f)} missing or empty`;
-    STRICT ? fail(msg) : warn(msg);
+const assetsDir = path.join(DIST, 'assets');
+let hashedCss;
+let hashedJs;
+
+try {
+  const entries = fs.readdirSync(assetsDir);
+  const cssFiles = entries.filter(f => /^index-\w+\.css$/.test(f));
+  const jsFiles = entries.filter(f => /^index-\w+\.js$/.test(f));
+
+  hashedCss = cssFiles.map(f => path.join(assetsDir, f));
+  hashedJs = jsFiles.map(f => path.join(assetsDir, f));
+
+  if (hashedCss.length === 0) {
+    const fallback = path.join(assetsDir, 'index.css');
+    if (existsNonEmpty(fallback)) {
+      info('Main CSS bundle detected: index.css');
+    } else {
+      const msg = 'Main CSS bundle (index-*.css) missing or empty';
+      STRICT ? fail(msg) : warn(msg);
+    }
   } else {
-    info(`${path.basename(f)} exists`);
+    const healthyCss = hashedCss.find(cssPath => existsNonEmpty(cssPath));
+    if (healthyCss) {
+      info(`Main CSS bundle detected: ${path.basename(healthyCss)}`);
+    } else {
+      const msg = 'Main CSS bundle detected but empty (index-*.css)';
+      STRICT ? fail(msg) : warn(msg);
+    }
   }
+
+  if (hashedJs.length === 0) {
+    const fallback = path.join(assetsDir, 'index.js');
+    if (existsNonEmpty(fallback)) {
+      info('Main JS bundle detected: index.js');
+    } else {
+      const msg = 'Main JS bundle (index-*.js) missing or empty';
+      STRICT ? fail(msg) : warn(msg);
+    }
+  } else {
+    const healthyJs = hashedJs.find(jsPath => existsNonEmpty(jsPath));
+    if (healthyJs) {
+      info(`Main JS bundle detected: ${path.basename(healthyJs)}`);
+    } else {
+      const msg = 'Main JS bundle detected but empty (index-*.js)';
+      STRICT ? fail(msg) : warn(msg);
+    }
+  }
+} catch (error) {
+  const msg = `Failed to inspect assets directory: ${error instanceof Error ? error.message : String(error)}`;
+  STRICT ? fail(msg) : warn(msg);
 }
 
 const font = path.join(DIST, 'assets', 'fonts', 'BrandFont.woff2');

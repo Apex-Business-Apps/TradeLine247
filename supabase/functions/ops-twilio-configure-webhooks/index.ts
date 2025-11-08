@@ -1,59 +1,92 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { corsHeaders, preflight } from "../_shared/cors.ts";
+import { withJSON } from "../_shared/secure_headers.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+function assertHttps(label: string, value?: string) {
+  if (!value) return;
+  if (!value.toLowerCase().startsWith("https://")) {
+    throw new Error(`${label} must be HTTPS`);
+  }
+}
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const { phoneNumber, voiceUrl, voiceStatusCallback, smsUrl } = await req.json();
+    if (!phoneNumber || !voiceUrl) {
+      return new Response(JSON.stringify({ error: "phoneNumber and voiceUrl are required" }), {
+        status: 400,
+        headers: withJSON(corsHeaders),
+      });
+    }
+
+    assertHttps("voiceUrl", voiceUrl);
+    assertHttps("voiceStatusCallback", voiceStatusCallback);
+    assertHttps("smsUrl", smsUrl);
+
     const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
     const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
 
-    // Find the phone number SID
+    if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+      throw new Error('Missing Twilio credentials');
+    }
+
+    const authHeader = 'Basic ' + btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
+
     const listResponse = await fetch(
       `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/IncomingPhoneNumbers.json?PhoneNumber=${encodeURIComponent(phoneNumber)}`,
-      {
-        headers: {
-          'Authorization': 'Basic ' + btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)
-        }
-      }
+      { headers: { Authorization: authHeader } },
     );
 
-    const listData = await listResponse.json();
-    const phoneSid = listData.incoming_phone_numbers[0]?.sid;
-    if (!phoneSid) throw new Error('Phone number not found');
+    if (!listResponse.ok) {
+      return new Response(JSON.stringify({ error: `Lookup failed: ${listResponse.status}` }), {
+        status: listResponse.status,
+        headers: withJSON(corsHeaders),
+      });
+    }
 
-    // Update webhooks
+    const listData = await listResponse.json();
+    const phoneSid = listData.incoming_phone_numbers?.[0]?.sid;
+    if (!phoneSid) {
+      return new Response(JSON.stringify({ error: 'Phone number not found' }), {
+        status: 404,
+        headers: withJSON(corsHeaders),
+      });
+    }
+
     const updateResponse = await fetch(
       `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/IncomingPhoneNumbers/${phoneSid}.json`,
       {
         method: 'POST',
         headers: {
-          'Authorization': 'Basic ' + btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`),
-          'Content-Type': 'application/x-www-form-urlencoded'
+          Authorization: authHeader,
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
           VoiceUrl: voiceUrl,
-          VoiceStatusCallback: voiceStatusCallback,
-          SmsUrl: smsUrl
-        })
-      }
+          VoiceStatusCallback: voiceStatusCallback ?? '',
+          SmsUrl: smsUrl ?? '',
+        }),
+      },
     );
 
-    if (!updateResponse.ok) throw new Error('Failed to update webhooks');
+    if (!updateResponse.ok) {
+      const text = await updateResponse.text();
+      return new Response(JSON.stringify({ error: text || 'Failed to update webhooks' }), {
+        status: updateResponse.status,
+        headers: withJSON(corsHeaders),
+      });
+    }
 
     return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: withJSON(corsHeaders),
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error.message ?? String(error) }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: withJSON(corsHeaders),
     });
   }
 });
-

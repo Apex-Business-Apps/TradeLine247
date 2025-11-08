@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSecureABTest } from "@/hooks/useSecureABTest";
 import { useSecureFormSubmission } from "@/hooks/useSecureFormSubmission";
+import { errorReporter } from "@/lib/errorReporter";
 import { z } from "zod";
 
 // Client-side validation schema matching server-side
@@ -141,7 +142,16 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
       }, 5000);
 
     } catch (error: any) {
-      console.error("Lead submission error:", error);
+      errorReporter.report({
+        type: 'error',
+        message: `Lead submission error: ${error.message || 'Unknown error'}`,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { formData: { name: formData.name, company: formData.company }, variant }
+      });
       trackFormSubmission('lead_capture', false, {
         error: error.message || 'unknown_error',
         variant: variant
@@ -206,13 +216,13 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Tell us about your business
           </h2>
-          <p className="text-lg mb-8 text-[#1e556b]">
+          <p className="text-lg mb-8 text-foreground/90">
             Start your free trial today.
           </p>
         </>
       )}
 
-      <Card className="w-full bg-card/95 backdrop-blur-sm border-primary/20">
+      <Card className="w-full bg-card/95 backdrop-blur-sm border-primary/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
         <CardHeader className="text-center pb-2">
           <CardTitle className="text-lg md:text-xl text-foreground mb-1">
             Start Your Free Trial
@@ -240,7 +250,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                       value={formData.name} 
                       onChange={e => handleInputChange("name", e.target.value)} 
                       required 
-                      className="w-full mt-1 px-2 py-1 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-150 hover:border-primary/50"
                     />
                   </div>
 
@@ -251,11 +261,11 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                     <input 
                       id="lead-email" 
                       type="email" 
-                      placeholder="Work email" 
+                      placeholder="your@company.com" 
                       value={formData.email} 
                       onChange={e => handleInputChange("email", e.target.value)} 
                       required 
-                      className="w-full mt-1 px-2 py-1 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-150 hover:border-primary/50"
                     />
                   </div>
 
@@ -265,11 +275,11 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                     </Label>
                     <input 
                       id="lead-company" 
-                      placeholder="Company name" 
+                      placeholder="Your company" 
                       value={formData.company} 
                       onChange={e => handleInputChange("company", e.target.value)} 
                       required 
-                      className="w-full mt-1 px-2 py-1 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-150 hover:border-primary/50"
                     />
                   </div>
 
@@ -279,10 +289,10 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                     </Label>
                     <textarea 
                       id="lead-notes" 
-                      placeholder="What do you want help with?" 
+                      placeholder="Tell us about your needs..." 
                       value={formData.notes} 
                       onChange={e => handleInputChange("notes", e.target.value)} 
-                      className="w-full mt-1 px-2 py-1 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent min-h-[60px]"
+                      className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent min-h-[80px] resize-none transition-all duration-200 hover:border-primary/50 shadow-sm hover:shadow-md"
                     />
                   </div>
 
@@ -291,7 +301,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                       <input
                         type="checkbox"
                         required
-                        className="mt-1 rounded border-gray-300 text-primary focus:ring-primary"
+                        className="mt-1 rounded border-border text-primary focus:ring-primary"
                       />
                       <span>
                         I'm cool with emails about setup and updates. Unsubscribe anytime.
@@ -352,7 +362,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                     <Button 
                       type="submit" 
                       size="lg" 
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" 
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 font-semibold" 
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -361,14 +371,17 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                           Processing...
                         </>
                       ) : (
-                        "Start Free Trial"
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Start Free Trial
+                        </>
                       )}
                     </Button>
                     
                     <Button
                       size="lg"
                       variant="outline"
-                      className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 active:scale-[0.98] font-medium"
                       type="button"
                       asChild
                     >

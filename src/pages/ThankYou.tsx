@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,14 +24,13 @@ const ThankYou = () => {
       />
       
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        
+
         <main className="flex-1 container py-16 px-4">
           <div className="max-w-2xl mx-auto">
             <Card className="border-primary/20 shadow-xl">
               <CardHeader className="text-center pb-4">
                 <div className="mx-auto mb-4 w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                  <CheckCircle2 className="w-10 h-10 text-green-600 dark:text-green-400" />
+                  <CheckCircle2 className="w-10 h-10 text-success dark:text-green-400" />
                 </div>
                 <CardTitle className="text-3xl">Thank You for Signing Up!</CardTitle>
                 <CardDescription className="text-lg mt-2">
