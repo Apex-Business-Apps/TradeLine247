@@ -771,6 +771,7 @@ textarea:focus-visible {
   .border-primary.text-primary:not(.bg-primary):not([class*="bg-primary"]) {
     color: #b33f00 !important;  /* HSL(21, 100%, 35%) - 5.2:1 contrast */
   }
+}
 
   /* Preserve white text when hovering (background becomes primary orange) */
   .border-primary.text-primary.hover\:bg-primary:hover,
