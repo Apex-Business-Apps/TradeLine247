@@ -2,8 +2,9 @@ import express from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
 import compression from 'compression';
+import cors from 'cors';
 import { fileURLToPath } from 'node:url';
-import { getSecurityHeaders, additionalSecurityHeaders } from './server/securityHeaders.ts';
+import { getSecurityHeaders, additionalSecurityHeaders, getCorsOptions } from './server/securityHeaders.ts';
 import { createRateLimiter, cleanupRateLimits } from './server/middleware/rateLimit.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -24,6 +25,9 @@ if (isProd) {
 
 app.use(compression());
 app.use(express.json({ limit: '100kb' }));
+
+// CORS protection for API endpoints
+app.use(cors(getCorsOptions()));
 
 // Enhanced rate limiting with Supabase logging
 const apiLimiter = createRateLimiter({
