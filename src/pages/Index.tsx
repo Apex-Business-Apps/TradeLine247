@@ -40,6 +40,7 @@ const Index = () => {
   return (
     <>
       <div
+        id="app-home"
         className="min-h-screen flex flex-col relative"
         style={{
           backgroundImage: `url(${backgroundImage})`,
