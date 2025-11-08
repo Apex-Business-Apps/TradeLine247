@@ -793,6 +793,7 @@ textarea:focus-visible {
     color: #475569 !important;  /* slate-600 */
     opacity: 1 !important;
   }
+}
 
   /* --- A11Y: axe color-contrast hardening (HOME ONLY) — final pass --- */
 @layer components {
