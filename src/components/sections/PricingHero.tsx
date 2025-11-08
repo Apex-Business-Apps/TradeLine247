@@ -11,8 +11,8 @@ export const PricingHero = () => {
             <img src={officialLogo} alt="TradeLine 24/7 Logo" className="h-[8.75rem] md:h-[11.25rem] w-auto opacity-80" style={{ transform: 'translateY(-0.5cm) scale(1.45) scaleY(1.3225) scaleX(1.3225)' }} />
           </div>
           
-          <h1 id="hero-h1" className="text-4xl md:text-6xl mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent font-extrabold lg:text-7xl">
-            Your 24/7 Ai Receptionist!
+          <h1 id="hero-h1" className="text-4xl md:text-6xl mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60  text-foreground font-extrabold lg:text-7xl">
+            Your 24/7 A<span className="text-primary">i</span> Receptionist
           </h1>
           <p className="text-xl mb-8 max-w-3xl mx-auto font-semibold text-foreground md:text-4xl">
             Never miss a call. Work while you sleep.

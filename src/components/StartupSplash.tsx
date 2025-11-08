@@ -80,7 +80,7 @@ export default function StartupSplash() {
           loading="eager"
           fetchpriority="high"
         />
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground bg-gradient-to-r from-brand-orange-primary to-brand-orange-light bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground bg-gradient-to-r from-brand-orange-primary to-brand-orange-light  text-foreground">
           Your 24/7 AI Receptionist!
         </h1>
         <p className="text-lg text-muted-foreground mb-3 leading-relaxed">
