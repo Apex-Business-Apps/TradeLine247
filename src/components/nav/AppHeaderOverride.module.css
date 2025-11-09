@@ -8,3 +8,10 @@
     margin-left: 4px !important;
   }
 }
+
+/* Extra tight margins for very narrow mobile screens */
+@media (max-width: 480px) {
+  #app-header-left {
+    margin-left: 0px !important;
+  }
+}

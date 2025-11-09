@@ -714,3 +714,106 @@ textarea:focus-visible {
 :where(.text-primary\/70, .text-primary\/80, .text-primary\/90) {
   color: hsl(var(--primary)) !important;
 }
+
+/* ============================================================================
+ * ACCESSIBILITY: WCAG AA Button & Badge Compliance Layer
+ * ============================================================================
+ * Ensures all buttons, badges, and interactive elements meet WCAG AA (4.5:1)
+ * without changing the visual brand. Applied at component level.
+ * ============================================================================ */
+
+@layer accessibility-components {
+  /* PRIMARY BUTTONS: Force white text on orange backgrounds */
+  button.bg-primary,
+  a.bg-primary,
+  .bg-primary > button,
+  .bg-primary > a,
+  button[class*="bg-primary"],
+  a[class*="bg-primary"] {
+    color: white !important;
+  }
+
+  /* OUTLINE BUTTONS: Use darker orange for better contrast */
+  button.border-input,
+  button[class*="border"][class*="bg-background"] {
+    color: hsl(var(--brand-orange-dark)) !important;
+  }
+
+  button.border-input:hover,
+  button[class*="border"][class*="bg-background"]:hover {
+    color: white !important;
+    background-color: hsl(var(--brand-orange-dark)) !important;
+  }
+
+  /* BADGES: White text on colored backgrounds */
+  .bg-primary[class*="-top"],
+  [class*="bg-"][class*="-top-4"],
+  .bg-green-600,
+  .bg-green-700,
+  .bg-orange-600,
+  .bg-orange-700,
+  .bg-blue-600,
+  .bg-blue-700 {
+    color: white !important;
+  }
+
+  /* QUICK ACTION BUTTONS: Ensure span text inherits white */
+  button[data-testid*="quick-action"] > span,
+  button[class*="shadow-"] > span {
+    color: inherit !important;
+  }
+
+  /* EMAIL LINKS: Use darker color for contrast */
+  address a[href^="mailto"],
+  a[href^="mailto"] {
+    color: hsl(var(--brand-orange-dark)) !important;
+  }
+
+  address a[href^="mailto"]:hover,
+  a[href^="mailto"]:hover {
+    color: hsl(15 100% 30%) !important;
+  }
+
+  /* LOGO BUTTON: Ensure proper contrast */
+  button[aria-label*="homepage"],
+  a[aria-label*="homepage"] {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  /* SUBMIT BUTTONS: White text on colored backgrounds */
+  button[type="submit"][class*="shadow"],
+  button[class*="shadow-xl"][type="submit"] {
+    color: white !important;
+  }
+
+  /* HOVER STATES: Inline HSL colors should use white text */
+  button[class*="hover:bg-[hsl"],
+  a[class*="hover:bg-[hsl"] {
+    color: white !important;
+  }
+
+  /* SMALL BUTTONS/BADGES: Ensure minimum contrast */
+  .px-2\.5,
+  .px-2,
+  [class*="px-2"] {
+    color: inherit !important;
+  }
+
+  .bg-primary .px-2\.5,
+  .bg-primary .px-2,
+  .bg-primary [class*="px-2"],
+  button.bg-primary .px-2\.5,
+  button.bg-primary .px-2 {
+    color: white !important;
+  }
+
+  /* SHADOW ELEMENTS: Badges and cards with shadows on colored backgrounds */
+  .shadow-md[class*="bg-green"],
+  .shadow-md[class*="bg-orange"],
+  .shadow-md[class*="bg-blue"],
+  .shadow-lg[class*="bg-green"],
+  .shadow-lg[class*="bg-orange"],
+  .shadow-lg[class*="bg-blue"] {
+    color: white !important;
+  }
+}
