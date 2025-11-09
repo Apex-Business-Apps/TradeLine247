@@ -14,6 +14,9 @@ const safeStorage: Storage | undefined =
     ? window.localStorage
     : undefined;
 
+// Flag to check if Supabase is properly configured
+export const isSupabaseEnabled = !!(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     // Only persist session when running in the browser
