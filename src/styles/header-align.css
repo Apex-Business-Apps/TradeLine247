@@ -43,12 +43,6 @@ header[data-site-header] {
 @media (max-width: 768px) {
   header[data-site-header] [data-header-inner] {
     grid-template-columns: auto 1fr auto;
-  }
-}
-
-/* Extra narrow screens: reduce padding */
-@media (max-width: 480px) {
-  header[data-site-header] [data-header-inner] {
     padding-inline: max(0.5rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-right));
   }
 }

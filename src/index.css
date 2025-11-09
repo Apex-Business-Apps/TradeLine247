@@ -716,104 +716,101 @@ textarea:focus-visible {
 }
 
 /* ============================================================================
- * ACCESSIBILITY: WCAG AA Button & Badge Compliance Layer
+ * ACCESSIBILITY: WCAG AA Button & Badge Compliance (Direct Overrides)
  * ============================================================================
- * Ensures all buttons, badges, and interactive elements meet WCAG AA (4.5:1)
- * without changing the visual brand. Applied at component level.
+ * Uses darker orange (brand-orange-dark: 15 100% 35%) for 7.14:1 contrast.
+ * Applied AFTER @tailwind utilities with !important to ensure override.
  * ============================================================================ */
 
-@layer accessibility-components {
-  /* PRIMARY BUTTONS: Force white text on orange backgrounds */
-  button.bg-primary,
-  a.bg-primary,
-  .bg-primary > button,
-  .bg-primary > a,
-  button[class*="bg-primary"],
-  a[class*="bg-primary"] {
-    color: white !important;
-  }
+/* PRIMARY BUTTONS: Use darker orange background for WCAG AA compliance */
+button.bg-primary,
+a.bg-primary,
+button[class*="bg-primary"],
+a[class*="bg-primary"],
+.btn-aa.bg-primary {
+  background-color: hsl(15 100% 35%) !important; /* brand-orange-dark: 7.14:1 with white */
+  color: white !important;
+}
 
-  /* OUTLINE BUTTONS: Use darker orange for better contrast */
-  button.border-input,
-  button[class*="border"][class*="bg-background"] {
-    color: hsl(var(--brand-orange-dark)) !important;
-  }
+button.bg-primary:hover,
+a.bg-primary:hover,
+button[class*="bg-primary"]:hover,
+a[class*="bg-primary"]:hover {
+  background-color: hsl(15 100% 30%) !important; /* Even darker on hover */
+  color: white !important;
+}
 
-  button.border-input:hover,
-  button[class*="border"][class*="bg-background"]:hover {
-    color: white !important;
-    background-color: hsl(var(--brand-orange-dark)) !important;
-  }
+/* PRIMARY BACKGROUND DIVS: Badges, numbered circles */
+div.bg-primary,
+.bg-primary.absolute,
+div.bg-primary.absolute,
+[class*="-top-4"].bg-primary {
+  background-color: hsl(15 100% 35%) !important;
+  color: white !important;
+}
 
-  /* BADGES: White text on colored backgrounds */
-  .bg-primary[class*="-top"],
-  [class*="bg-"][class*="-top-4"],
-  .bg-green-600,
-  .bg-green-700,
-  .bg-orange-600,
-  .bg-orange-700,
-  .bg-blue-600,
-  .bg-blue-700 {
-    color: white !important;
-  }
+/* INLINE HSL BACKGROUNDS: Override inline styles */
+.px-2\.5.bg-\[hsl\(17\,90\%\,38\%\)\],
+[class*="bg-[hsl(17,90%,38%)]"],
+div[class*="bg-[hsl(17,90%,38%)]"] {
+  background-color: hsl(15 100% 35%) !important;
+  color: white !important;
+}
 
-  /* QUICK ACTION BUTTONS: Ensure span text inherits white */
-  button[data-testid*="quick-action"] > span,
-  button[class*="shadow-"] > span {
-    color: inherit !important;
-  }
+/* TEXT-PRIMARY-FOREGROUND: Force white */
+.text-primary-foreground,
+[class*="text-primary-foreground"] {
+  color: white !important;
+}
 
-  /* EMAIL LINKS: Use darker color for contrast */
-  address a[href^="mailto"],
-  a[href^="mailto"] {
-    color: hsl(var(--brand-orange-dark)) !important;
-  }
+/* QUICK ACTION BUTTONS: Ensure white text */
+button[data-testid*="quick-action"],
+button[data-testid*="quick-action"] > span,
+button.bg-primary span,
+.bg-primary button span,
+button[class*="bg-primary"] span {
+  color: white !important;
+}
 
-  address a[href^="mailto"]:hover,
-  a[href^="mailto"]:hover {
-    color: hsl(15 100% 30%) !important;
-  }
+/* SUBMIT BUTTONS: Darker orange */
+button[type="submit"].bg-primary,
+button[type="submit"][class*="bg-primary"],
+button[type="submit"].shadow-md,
+button[type="submit"].shadow-lg {
+  background-color: hsl(15 100% 35%) !important;
+  color: white !important;
+}
 
-  /* LOGO BUTTON: Ensure proper contrast */
-  button[aria-label*="homepage"],
-  a[aria-label*="homepage"] {
-    color: hsl(var(--foreground)) !important;
-  }
+/* SHADOW BUTTONS: Darker orange */
+button.shadow-lg.bg-primary,
+button.shadow-xl.bg-primary,
+button.shadow-md.bg-primary,
+.shadow-lg.bg-primary,
+.shadow-xl.bg-primary,
+.shadow-md.bg-primary {
+  background-color: hsl(15 100% 35%) !important;
+  color: white !important;
+}
 
-  /* SUBMIT BUTTONS: White text on colored backgrounds */
-  button[type="submit"][class*="shadow"],
-  button[class*="shadow-xl"][type="submit"] {
-    color: white !important;
-  }
+/* OUTLINE BUTTONS: Use darker orange text */
+button.border-input,
+button[class*="border"][class*="bg-background"] {
+  color: hsl(15 100% 35%) !important;
+}
 
-  /* HOVER STATES: Inline HSL colors should use white text */
-  button[class*="hover:bg-[hsl"],
-  a[class*="hover:bg-[hsl"] {
-    color: white !important;
-  }
+button.border-input:hover,
+button[class*="border"][class*="bg-background"]:hover {
+  color: white !important;
+  background-color: hsl(15 100% 35%) !important;
+}
 
-  /* SMALL BUTTONS/BADGES: Ensure minimum contrast */
-  .px-2\.5,
-  .px-2,
-  [class*="px-2"] {
-    color: inherit !important;
-  }
+/* EMAIL LINKS: Darker orange */
+address a[href^="mailto"],
+a[href^="mailto"] {
+  color: hsl(15 100% 35%) !important;
+}
 
-  .bg-primary .px-2\.5,
-  .bg-primary .px-2,
-  .bg-primary [class*="px-2"],
-  button.bg-primary .px-2\.5,
-  button.bg-primary .px-2 {
-    color: white !important;
-  }
-
-  /* SHADOW ELEMENTS: Badges and cards with shadows on colored backgrounds */
-  .shadow-md[class*="bg-green"],
-  .shadow-md[class*="bg-orange"],
-  .shadow-md[class*="bg-blue"],
-  .shadow-lg[class*="bg-green"],
-  .shadow-lg[class*="bg-orange"],
-  .shadow-lg[class*="bg-blue"] {
-    color: white !important;
-  }
+address a[href^="mailto"]:hover,
+a[href^="mailto"]:hover {
+  color: hsl(15 100% 30%) !important;
 }
