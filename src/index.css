@@ -161,7 +161,7 @@ All colors MUST be HSL.
     --overlay-orange: hsl(var(--brand-orange-primary) / 0.30);
 
     /* System colors */
-    --foreground: 222.2 47.4% 11.2%;   /* slate-900 */
+    --foreground: 222.2 84% 4.9%;      /* deep neutral for primary text */
     --muted-foreground: 215 16% 47%;   /* slate-600 */
     --background: 0 0% 100%;
     --card: 0 0% 100%;
@@ -188,7 +188,7 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: var(--brand-orange-primary);
+    --ring: 21 100% 41%;
 
     --radius: 0.5rem;
 
@@ -330,6 +330,21 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* A11Y: outline/ghost controls are neutral at rest */
+@layer components {
+  /* Keep outline controls neutral at rest; show brand only on interaction */
+  .border-primary:not(.bg-primary):not(:hover):not(:focus):not(:focus-visible) {
+    border-color: hsl(var(--border)) !important;
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+  }
+  .border-primary:hover,
+  .border-primary:focus-visible {
+    border-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary)) !important;
   }
 }
 

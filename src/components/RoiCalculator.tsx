@@ -189,7 +189,12 @@ const RoiCalculator = () => {
                   <a href="/auth?plan=commission">Start Zero-Monthly</a>
                 </Button>
 
-                <Button size="lg" variant="outline" className="w-full border-[hsl(17,90%,38%)] text-[hsl(17,90%,38%)] hover:bg-[hsl(17,90%,38%)] hover:text-primary-foreground" asChild>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full transition-all duration-200 hover:bg-primary/10 focus-visible:bg-primary/10"
+                  asChild
+                >
                   <a href="/auth?plan=core">Choose Predictable</a>
                 </Button>
               </div>

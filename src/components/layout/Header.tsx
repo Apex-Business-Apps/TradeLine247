@@ -121,10 +121,10 @@ export const Header: React.FC = () => {
       )}
       style={{ isolation: 'isolate' }}
     >
-      <div 
-        data-header-inner 
-        className="container h-14 items-center gap-4"
-        style={{ 
+      <div
+        data-header-inner
+        className="mx-auto h-14 w-full max-w-[1400px] items-center gap-4 px-4 sm:px-6 lg:px-8"
+        style={{
           maxWidth: '100%'
           /* Padding handled by header-align.css for consistency */
         }}
