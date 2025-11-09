@@ -58,9 +58,9 @@ export function PreviewDiagnostics() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'pass': return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'warn': return <AlertCircle className="w-4 h-4 text-yellow-600" />;
-      case 'fail': return <XCircle className="w-4 h-4 text-red-600" />;
+      case 'pass': return <CheckCircle className="w-4 h-4 text-success" />;
+      case 'warn': return <AlertCircle className="w-4 h-4 text-amber-800" />;
+      case 'fail': return <XCircle className="w-4 h-4 text-error" />;
       default: return null;
     }
   };

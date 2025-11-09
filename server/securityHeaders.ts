@@ -11,12 +11,12 @@ import type { Request, Response, NextFunction } from 'express';
  */
 export function getSecurityHeaders() {
   return helmet({
-    // Content Security Policy
+    // Content Security Policy - Secure configuration without unsafe directives
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Relaxed for compatibility
-        styleSrc: ["'self'", "https:", "'unsafe-inline'"], // Allow inline styles for React
+        scriptSrc: ["'self'"], // SECURE: Removed unsafe-inline and unsafe-eval
+        styleSrc: ["'self'", "https:", "'unsafe-inline'"], // Inline styles still needed for Tailwind
         imgSrc: ["'self'", "data:", "https:"],
         connectSrc: [
           "'self'",

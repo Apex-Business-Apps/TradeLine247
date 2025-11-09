@@ -1,8 +1,8 @@
 export const paths = {
   home: "/",
+  features: "/features",
   pricing: "/pricing",
   faq: "/faq",
-  features: "/features",
   compare: "/compare",
   security: "/security",
   contact: "/contact",
@@ -12,7 +12,7 @@ export const paths = {
   callCenterLegacy: "/call-center",
   callLogs: "/call-logs",
   addNumber: "/numbers/new",
-  numbersLegacy: "/ops/number-onboarding",
+  numbersLegacy: "/numbers",
   teamInvite: "/team/invite",
   integrations: "/integrations",
   phoneApps: "/phone-apps",
@@ -20,6 +20,3 @@ export const paths = {
   voiceSettings: "/ops/voice",
   notFound: "*",
 } as const;
-
-export type AppPathKey = keyof typeof paths;
-export const appPathValues = new Set<string>(Object.values(paths));

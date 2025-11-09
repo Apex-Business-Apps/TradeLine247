@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { errorReporter } from '@/lib/errorReporter';
 
 export const WebVitalsTracker = () => {
   const { track } = useAnalytics();
@@ -23,7 +24,15 @@ export const WebVitalsTracker = () => {
       }
       
       if (!isValid) {
-        console.warn(`Invalid ${name} metric: ${roundedValue} - skipping`);
+        errorReporter.report({
+          type: 'error',
+          message: `Invalid ${name} metric: ${roundedValue} - skipping`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { metric: name, value: roundedValue }
+        });
         return;
       }
       
@@ -121,7 +130,15 @@ export const WebVitalsTracker = () => {
           }
 
         } catch (error) {
-          console.warn('Web Vitals tracking not supported:', error);
+          errorReporter.report({
+            type: 'error',
+            message: `Web Vitals tracking not supported: ${error instanceof Error ? error.message : String(error)}`,
+            stack: error instanceof Error ? error.stack : undefined,
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            environment: errorReporter['getEnvironment']()
+          });
         }
       }
 

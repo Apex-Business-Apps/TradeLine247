@@ -6,20 +6,20 @@ export const BenefitsGrid = () => {
     icon: Zap,
     title: "Lightning Speed",
     description: "We pick up in 2-3 rings. No one likes waiting.",
-    color: "text-brand-orange",
-    gradient: "from-orange-500/20 to-orange-600/10"
+    color: "text-[hsl(var(--brand-orange-dark))]",
+    gradient: "from-primary/20 to-primary/10"
   }, {
     icon: User,
-    title: "Personal Touch", 
+    title: "Personal Touch",
     description: "We match your vibe. Friendly, on-brand, and sounds just like you.",
     color: "text-primary",
-    gradient: "from-blue-500/20 to-blue-600/10"
+    gradient: "from-primary/20 to-primary/10"
   }, {
     icon: Target,
     title: "Cleaner Follow-through",
     description: "Quick summary + next steps, straight to your inbox.",
-    color: "text-accent-foreground", 
-    gradient: "from-green-500/20 to-green-600/10"
+    color: "text-[hsl(var(--status-success))]",
+    gradient: "from-[hsl(var(--status-success))]/20 to-[hsl(var(--status-success))]/10"
   }];
 
   return (
@@ -29,7 +29,7 @@ export const BenefitsGrid = () => {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             The TradeLine 24/7 Difference
           </h2>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-[#1e556b]">
+          <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-foreground/90">
             Three ways we keep your business moving
           </p>
         </div>
@@ -52,7 +52,7 @@ export const BenefitsGrid = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <CardDescription className="text-center leading-relaxed text-base text-[#1e556b] group-hover:text-foreground transition-colors duration-300">
+                  <CardDescription className="text-center leading-relaxed text-base text-foreground/90 group-hover:text-foreground transition-colors duration-300">
                     {benefit.description}
                   </CardDescription>
                 </CardContent>

@@ -1,4 +1,13 @@
 import { useEffect } from 'react';
+import { errorReporter } from '@/lib/errorReporter';
+
+interface PerformanceEntryExtended extends PerformanceEntry {
+  renderTime?: number;
+  loadTime?: number;
+  hadRecentInput?: boolean;
+  value?: number;
+  processingStart?: number;
+}
 
 /**
  * Web Vitals Reporter Component
@@ -22,7 +31,15 @@ export function WebVitalsReporter() {
       const isValidMetric = roundedValue > 0 && roundedValue < 60000; // Must be between 0 and 60s for web vitals
       
       if (!isValidMetric) {
-        console.warn(`❌ Invalid ${name} metric: ${roundedValue}ms - ignoring`);
+        errorReporter.report({
+          type: 'error',
+          message: `Invalid ${name} metric: ${roundedValue}ms - ignoring`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { metric: name, value: roundedValue }
+        });
         return;
       }
 
@@ -67,13 +84,20 @@ export function WebVitalsReporter() {
     try {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1] as any;
-        const value = lastEntry.renderTime || lastEntry.loadTime;
+        const lastEntry = entries[entries.length - 1] as PerformanceEntryExtended;
+        const value = lastEntry.renderTime || lastEntry.loadTime || 0;
         reportMetric('LCP', value, getRating('LCP', value));
       });
       lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
     } catch (e) {
-      console.warn('LCP observer not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'LCP observer not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
     // Observe CLS
@@ -81,35 +105,50 @@ export function WebVitalsReporter() {
       let clsValue = 0;
       const clsObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          if (!(entry as any).hadRecentInput) {
-            clsValue += (entry as any).value;
+          const extendedEntry = entry as PerformanceEntryExtended;
+          if (!extendedEntry.hadRecentInput && extendedEntry.value) {
+            clsValue += extendedEntry.value;
           }
         }
         reportMetric('CLS', clsValue, getRating('CLS', clsValue));
       });
       clsObserver.observe({ type: 'layout-shift', buffered: true });
     } catch (e) {
-      console.warn('CLS observer not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'CLS observer not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
     // Observe FID (First Input Delay) as fallback
     try {
       const fidObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const firstInput = entries[0] as any;
-        const value = firstInput.processingStart - firstInput.startTime;
+        const firstInput = entries[0] as PerformanceEntryExtended;
+        const value = (firstInput.processingStart || 0) - firstInput.startTime;
         reportMetric('FID', value, getRating('INP', value)); // Use INP thresholds
       });
       fidObserver.observe({ type: 'first-input', buffered: true });
     } catch (e) {
-      console.warn('FID observer not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'FID observer not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
     // Observe FCP
     try {
       const fcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const firstPaint = entries.find((e) => e.name === 'first-contentful-paint') as any;
+        const firstPaint = entries.find((e) => e.name === 'first-contentful-paint');
         if (firstPaint) {
           const value = firstPaint.startTime;
           reportMetric('FCP', value, getRating('FCP', value));
@@ -117,7 +156,14 @@ export function WebVitalsReporter() {
       });
       fcpObserver.observe({ type: 'paint', buffered: true });
     } catch (e) {
-      console.warn('FCP observer not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'FCP observer not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
     // Calculate TTFB from Navigation Timing
@@ -128,7 +174,14 @@ export function WebVitalsReporter() {
         reportMetric('TTFB', ttfb, getRating('TTFB', ttfb));
       }
     } catch (e) {
-      console.warn('TTFB calculation not supported');
+      errorReporter.report({
+        type: 'error',
+        message: 'TTFB calculation not supported',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
 
   }, []);

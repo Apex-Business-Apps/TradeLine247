@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { errorReporter } from '@/lib/errorReporter';
 
 // All valid routes in the application
 export const VALID_ROUTES = [
@@ -80,7 +81,15 @@ export function useRouteValidator() {
 
     // Log invalid routes in development
     if (!isValid && process.env.NODE_ENV === 'development') {
-      console.warn(`Invalid route accessed: ${currentPath}. Suggested: ${suggestedRedirect}`);
+      errorReporter.report({
+        type: 'error',
+        message: `Invalid route accessed: ${currentPath}. Suggested: ${suggestedRedirect}`,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { currentPath, suggestedRedirect }
+      });
     }
   }, [location.pathname]);
 

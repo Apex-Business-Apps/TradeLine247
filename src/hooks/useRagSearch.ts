@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface RagSearchFilters {
   source_type?: string;
@@ -90,7 +91,15 @@ export function useRagSearch() {
       setAnswerData(null);
     } catch (err: any) {
       if (err.name !== 'AbortError') {
-        console.error('Search error:', err);
+        errorReporter.report({
+          type: 'error',
+          message: `Search error: ${err.message || String(err)}`,
+          stack: err.stack,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         toast({
           title: 'Search failed',
           description: 'Please try again.',

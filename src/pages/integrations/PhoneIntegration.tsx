@@ -19,7 +19,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'iOS',
     features: ['Call forwarding', 'Voicemail transcription', 'Contact sync', 'Call history'],
-    color: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+    color: 'bg-blue-500/10 text-info border-info'
   },
   {
     id: 'android-phone',
@@ -29,7 +29,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'Android',
     features: ['Call screening', 'Smart replies', 'Contact integration', 'Call recording'],
-    color: 'bg-green-500/10 text-green-600 border-green-500/20'
+    color: 'bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]'
   },
   {
     id: 'imessage',
@@ -39,7 +39,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'iOS',
     features: ['Auto-reply', 'Business chat', 'Rich messages', 'Read receipts'],
-    color: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+    color: 'bg-blue-500/10 text-info border-info'
   },
   {
     id: 'android-messages',
@@ -49,7 +49,7 @@ const phoneIntegrations = [
     status: 'available',
     platform: 'Android',
     features: ['RCS support', 'Smart compose', 'Spam detection', 'Web sync'],
-    color: 'bg-green-500/10 text-green-600 border-green-500/20'
+    color: 'bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]'
   }
 ];
 
@@ -125,7 +125,7 @@ const PhoneIntegration = () => {
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-500/5">
-              <Phone className="h-6 w-6 text-purple-600" />
+              <Phone className="h-6 w-6 text-neutral" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Phone & SMS Integration</h1>
@@ -166,7 +166,7 @@ const PhoneIntegration = () => {
                         </Badge>
                       </div>
                     </div>
-                    <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                    <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">
                       Available
                     </Badge>
                   </div>
@@ -178,7 +178,7 @@ const PhoneIntegration = () => {
                     <div className="grid grid-cols-1 gap-1">
                       {integration.features.map((feature) => (
                         <div key={feature} className="flex items-center gap-2 text-xs">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
+                          <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                           <span className="text-muted-foreground">{feature}</span>
                         </div>
                       ))}
@@ -238,7 +238,7 @@ const PhoneIntegration = () => {
                     <div className="grid grid-cols-2 gap-1">
                       {provider.features.map((feature) => (
                         <div key={feature} className="flex items-center gap-2 text-xs">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
+                          <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                           <span className="text-muted-foreground">{feature}</span>
                         </div>
                       ))}

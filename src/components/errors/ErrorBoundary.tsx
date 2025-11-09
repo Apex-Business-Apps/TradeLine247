@@ -4,6 +4,10 @@ import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { reportReactError } from '@/lib/errorReporter';
 
+interface WindowWithTracking extends Window {
+  trackError?: (category: string, message: string, metadata?: Record<string, any>) => void;
+}
+
 interface Props {
   children: ReactNode;
 }
@@ -25,14 +29,13 @@ export class AppErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
-    // Report to centralized error reporter
+    // Use centralized error reporter (already logs to console in dev)
     reportReactError(error, errorInfo);
     
     // Track error in analytics
-    if (typeof window !== 'undefined' && (window as any).trackError) {
-      (window as any).trackError('app_error_boundary', error.message, {
+    const windowWithTracking = window as WindowWithTracking;
+    if (typeof window !== 'undefined' && windowWithTracking.trackError) {
+      windowWithTracking.trackError('app_error_boundary', error.message, {
         componentStack: errorInfo.componentStack,
         stack: error.stack
       });
@@ -57,7 +60,7 @@ export class AppErrorBoundary extends Component<Props, State> {
           <Card className="max-w-lg w-full shadow-xl">
             <CardHeader className="text-center">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="w-8 h-8 text-red-600" />
+                <AlertTriangle className="w-8 h-8 text-error" />
               </div>
               <CardTitle className="text-2xl">Something Went Wrong</CardTitle>
               <CardDescription>

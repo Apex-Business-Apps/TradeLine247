@@ -5,6 +5,7 @@ import { Phone, UserPlus, PhoneCall, Link as LinkIcon, Loader2 } from 'lucide-re
 import { paths } from '@/routes/paths';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { toast } from 'sonner';
+import { errorReporter } from '@/lib/errorReporter';
 
 const actions = [
   {
@@ -58,10 +59,15 @@ export const QuickActionsCard: React.FC = () => {
       await goToWithFeedback(action.to, action.label);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('[QuickActions] Navigation failed:', {
-        action: action.label,
-        path: action.to,
-        error: errorMessage
+      errorReporter.report({
+        type: 'error',
+        message: `Quick action navigation failed: ${action.label} to ${action.to}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { action: action.label, path: action.to, error: errorMessage }
       });
       
       toast.error('Action Failed', {

@@ -37,7 +37,7 @@ serve(async (req) => {
     const requestId = crypto.randomUUID();
 
     // Only admins can delete user data
-    const { data: isAdmin, error: roleError } = await supabaseClient.rpc<boolean>('has_role', {
+    const { data: isAdmin, error: roleError } = await supabaseClient.rpc('has_role', {
       p_user: user.id,
       p_role: 'admin'
     });

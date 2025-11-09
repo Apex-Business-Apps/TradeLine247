@@ -29,7 +29,37 @@ export async function reportError(err: unknown, orgId?: string) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-  } catch (_) {
-    // no-op: logging bridge must not throw
+  } catch (reportingError) {
+    // Fallback: Store error in localStorage for debugging
+    try {
+      const fallbackKey = 'error_reporting_failures';
+      const existing = JSON.parse(localStorage.getItem(fallbackKey) || '[]');
+
+      // Helper to extract message from various error types
+      const getErrorMessage = (error: unknown): string => {
+        if (error instanceof Error) return error.message;
+        if (error && typeof error === 'object' && 'message' in error) {
+          return String(error.message);
+        }
+        return String(error);
+      };
+
+      existing.push({
+        originalError: getErrorMessage(err),
+        reportingError: getErrorMessage(reportingError),
+        timestamp: new Date().toISOString(),
+        userAgent: navigator?.userAgent || 'unknown'
+      });
+      // Keep only last 10 failures to prevent localStorage bloat
+      const limited = existing.slice(-10);
+      localStorage.setItem(fallbackKey, JSON.stringify(limited));
+    } catch (storageError) {
+      // Final fallback - console only (better than complete silence)
+      console.error('[reportError] Failed to report error and store fallback:', {
+        originalError: err,
+        reportingError,
+        storageError
+      });
+    }
   }
 }

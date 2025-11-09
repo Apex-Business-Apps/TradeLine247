@@ -19,7 +19,7 @@ const automationProviders = [
     status: 'available',
     features: ['Trigger workflows', 'Multi-step zaps', 'Conditional logic', 'Error handling'],
     pricing: 'Free + Premium',
-    color: 'bg-orange-500/10 text-orange-600 border-orange-500/20'
+    color: 'bg-orange-500/10 text-brand-primary border-brand-primary'
   },
   {
     id: 'ifttt',
@@ -29,7 +29,7 @@ const automationProviders = [
     status: 'available',
     features: ['Simple triggers', 'Applet creation', 'Location-based', 'IoT integration'],
     pricing: 'Free + Pro',
-    color: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+    color: 'bg-blue-500/10 text-info border-info'
   },
   {
     id: 'power-automate',
@@ -39,7 +39,7 @@ const automationProviders = [
     status: 'available',
     features: ['Microsoft 365', 'AI Builder', 'Desktop flows', 'Approval workflows'],
     pricing: 'Subscription',
-    color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20'
+    color: 'bg-indigo-500/10 text-info border-indigo-500/20'
   },
   {
     id: 'make',
@@ -49,7 +49,7 @@ const automationProviders = [
     status: 'coming-soon',
     features: ['Visual builder', 'Complex scenarios', 'Data transformation', 'Real-time sync'],
     pricing: 'Free + Premium',
-    color: 'bg-purple-500/10 text-purple-600 border-purple-500/20'
+    color: 'bg-purple-500/10 text-neutral border-neutral'
   }
 ];
 
@@ -156,8 +156,8 @@ const AutomationIntegration = () => {
           </Button>
           
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-yellow-500/10 to-yellow-500/5">
-              <Zap className="h-6 w-6 text-yellow-600" />
+            <div className="p-2 rounded-xl bg-gradient-to-br from-amber-600/10 to-amber-600/5">
+              <Zap className="h-6 w-6 text-amber-800" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Automation Integrations</h1>
@@ -195,7 +195,7 @@ const AutomationIntegration = () => {
                     </div>
                   </div>
                   <Badge className={provider.status === 'available' 
-                    ? "bg-green-500/10 text-green-600 border-green-500/20"
+                    ? "bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]"
                     : "bg-gray-500/10 text-gray-600 border-gray-500/20"
                   }>
                     {provider.status === 'available' ? 'Available' : 'Coming Soon'}
@@ -209,7 +209,7 @@ const AutomationIntegration = () => {
                   <div className="grid grid-cols-1 gap-1">
                     {provider.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
-                        <CheckCircle className="h-3 w-3 text-green-500" />
+                        <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}
@@ -340,8 +340,8 @@ const AutomationIntegration = () => {
                       <h3 className="font-semibold text-foreground">{template.title}</h3>
                       <Badge className={`text-xs ${
                         template.difficulty === 'Easy' 
-                          ? 'bg-green-500/10 text-green-600 border-green-500/20'
-                          : 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
+                          ? 'bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]'
+                          : 'bg-amber-600/10 text-amber-800 border-amber-600/20'
                       }`}>
                         {template.difficulty}
                       </Badge>
@@ -350,11 +350,11 @@ const AutomationIntegration = () => {
                     <p className="text-sm text-muted-foreground">{template.description}</p>
                     
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="px-2 py-1 bg-blue-500/10 text-blue-600 rounded">
+                      <span className="px-2 py-1 bg-blue-500/10 text-info rounded">
                         {template.trigger}
                       </span>
                       <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                      <span className="px-2 py-1 bg-green-500/10 text-green-600 rounded">
+                      <span className="px-2 py-1 bg-green-500/10 text-[hsl(142,85%,25%)] rounded">
                         {template.action}
                       </span>
                     </div>

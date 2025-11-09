@@ -86,18 +86,18 @@ export const PageHealthChecker: React.FC = () => {
   const getStatusIcon = (status: PageTest['status']) => {
     switch (status) {
       case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case 'error':
-        return <XCircle className="h-4 w-4 text-red-600" />;
+        return <XCircle className="h-4 w-4 text-error" />;
       case 'warning':
-        return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+        return <AlertCircle className="h-4 w-4 text-amber-800" />;
       default:
         return <RefreshCw className="h-4 w-4 text-gray-400 animate-spin" />;
     }
   };
 
   const getStatusBadge = (status: PageTest['status']) => {
-    const variants = {
+    const variants: Record<PageTest['status'], 'default' | 'destructive' | 'secondary' | 'outline'> = {
       success: 'default',
       error: 'destructive',
       warning: 'secondary',
@@ -105,7 +105,7 @@ export const PageHealthChecker: React.FC = () => {
     };
     
     return (
-      <Badge variant={variants[status] as any}>
+      <Badge variant={variants[status]}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </Badge>
     );
@@ -144,15 +144,15 @@ export const PageHealthChecker: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{successCount}</div>
+              <div className="text-2xl font-bold text-success">{successCount}</div>
               <div className="text-sm text-muted-foreground">Healthy</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-red-600">{errorCount}</div>
+              <div className="text-2xl font-bold text-error">{errorCount}</div>
               <div className="text-sm text-muted-foreground">Errors</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">{warningCount}</div>
+              <div className="text-2xl font-bold text-amber-800">{warningCount}</div>
               <div className="text-sm text-muted-foreground">Warnings</div>
             </div>
             <div className="text-center">

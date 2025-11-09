@@ -70,7 +70,7 @@ const defaultPreferences: UserPreferences = {
   preferredName: null,
   lastLoginTime: null,
   theme: 'light', // Default to light mode instead of system preference
-  accentColor: '#3b82f6', // blue-500
+  accentColor: 'hsl(217, 91%, 60%)', // blue-500 equivalent in HSL
   dashboardLayout: 'comfortable',
   showWelcomeMessage: true,
   showQuickActions: true,

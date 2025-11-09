@@ -19,7 +19,7 @@ const Demo = () => {
         {/* Hero Section */}
         <section className="py-20 bg-gradient-to-br from-background to-secondary/20">
           <div className="container text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
               See TradeLine 24/7 in Action
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
@@ -46,15 +46,15 @@ const Demo = () => {
                 <CardContent>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Live call demonstrations
                     </li>
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Dashboard walkthrough
                     </li>
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Integration examples
                     </li>
                   </ul>
@@ -78,15 +78,15 @@ const Demo = () => {
                 <CardContent>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       30-minute one-on-one session
                     </li>
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Tailored to your business
                     </li>
                     <li className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)]" aria-hidden="true" />
                       Q&A with our experts
                     </li>
                   </ul>

@@ -14,6 +14,7 @@ import { FormErrorFallback } from "@/components/errors/FormErrorFallback";
 import { z } from "zod";
 import { PUBLIC_HELPLINE_E164, PUBLIC_HELPLINE_DISPLAY, PUBLIC_EMAIL } from "@/config/public";
 import builtCanadianBadge from "@/assets/badges/built-canadian.svg";
+import { errorReporter } from "@/lib/errorReporter";
 
 const contactFormSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),
@@ -161,7 +162,15 @@ const Contact = () => {
       });
 
     } catch (error: any) {
-      console.error("Contact form error:", error);
+      errorReporter.report({
+        type: 'error',
+        message: `Contact form error: ${error?.message || error}`,
+        stack: error?.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       
       // Set error for FormErrorFallback
       setSubmitError('Unable to send message at this time.');
@@ -184,7 +193,7 @@ const Contact = () => {
         {/* Hero Section */}
         <section className="py-20 bg-gradient-to-br from-background to-secondary/20">
           <div className="container text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
               Get in Touch
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">

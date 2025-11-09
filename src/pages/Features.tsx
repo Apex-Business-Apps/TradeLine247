@@ -75,7 +75,7 @@ const Features = () => {
         }}>
           <div className="container">
             <div className="text-center max-w-3xl mx-auto">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
                 Powerful Features
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-8">
@@ -108,7 +108,7 @@ const Features = () => {
                     <ul className="space-y-2">
                       {feature.benefits.map((benefit, idx) => (
                         <li key={idx} className="flex items-center gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)] flex-shrink-0" aria-hidden="true" />
                           <span>{benefit}</span>
                         </li>
                       ))}

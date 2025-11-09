@@ -59,9 +59,9 @@ describe('userPreferencesStore', () => {
     });
 
     it('should set accent color', () => {
-      useUserPreferencesStore.getState().setAccentColor('#ff0000');
+      useUserPreferencesStore.getState().setAccentColor('hsl(0, 100%, 50%)');
       
-      expect(useUserPreferencesStore.getState().accentColor).toBe('#ff0000');
+      expect(useUserPreferencesStore.getState().accentColor).toBe('hsl(0, 100%, 50%)');
     });
   });
 

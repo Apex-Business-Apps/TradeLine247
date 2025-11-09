@@ -180,16 +180,16 @@ const RoiCalculator = () => {
                 </div>
               </div>
 
-              <Badge className="w-full justify-center py-2 bg-primary text-primary-foreground">
+              <Badge className="w-full justify-center py-2 bg-[hsl(17,90%,38%)] text-primary-foreground">
                 Best value this month: {results.bestPlan}
               </Badge>
 
               <div className="space-y-2 pt-2">
-                <Button size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
+                <Button size="lg" className="w-full bg-[hsl(17,90%,38%)] hover:bg-[hsl(17,90%,34%)] text-primary-foreground" asChild>
                   <a href="/auth?plan=commission">Start Zero-Monthly</a>
                 </Button>
-                
-                <Button size="lg" variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground" asChild>
+
+                <Button size="lg" variant="outline" className="w-full border-[hsl(17,90%,38%)] text-[hsl(17,90%,38%)] hover:bg-[hsl(17,90%,38%)] hover:text-primary-foreground" asChild>
                   <a href="/auth?plan=core">Choose Predictable</a>
                 </Button>
               </div>

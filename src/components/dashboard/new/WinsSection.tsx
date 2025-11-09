@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { errorReporter } from '@/lib/errorReporter';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, TrendingUp, Phone } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,7 +34,15 @@ export const WinsSection: React.FC = () => {
         if (error) throw error;
         setWins(data || []);
       } catch (error) {
-        console.error('Error fetching wins:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Error fetching wins: ${error instanceof Error ? error.message : String(error)}`,
+          stack: error instanceof Error ? error.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
       } finally {
         setIsLoading(false);
       }
@@ -99,7 +108,7 @@ export const WinsSection: React.FC = () => {
                   className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent/50 transition-colors"
                 >
                   <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-                    <Icon className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    <Icon className="h-4 w-4 text-success dark:text-green-400" />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">{getWinLabel(win.event_type)}</p>

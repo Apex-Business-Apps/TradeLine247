@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Phone, MessageSquare, RefreshCw, DollarSign, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { safeWindowOpen } from "@/utils/safetyHelpers";
 
 export default function ClientNumberOnboarding() {
   const navigate = useNavigate();
@@ -194,10 +195,13 @@ export default function ClientNumberOnboarding() {
       }
       
       toast.success("Quick-Start Forward complete!");
-      
-      // Open forwarding kit in new tab
+
+      // Open forwarding kit in new tab with URL validation
       if (data.forwarding_kit_url) {
-        window.open(data.forwarding_kit_url, '_blank');
+        const urlValid = safeWindowOpen(data.forwarding_kit_url);
+        if (!urlValid) {
+          toast.error('Invalid forwarding kit URL. Please contact support.');
+        }
       }
 
     } catch (error: any) {

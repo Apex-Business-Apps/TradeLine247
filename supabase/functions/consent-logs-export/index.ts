@@ -33,7 +33,7 @@ serve(async (req) => {
     }
 
     // Only admins can export consent logs
-    const { data: isAdmin, error: roleError } = await supabaseClient.rpc<boolean>('has_role', {
+    const { data: isAdmin, error: roleError } = await supabaseClient.rpc('has_role', {
       p_user: user.id,
       p_role: 'admin'
     });
