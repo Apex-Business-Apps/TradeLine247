@@ -792,14 +792,37 @@ button.shadow-md.bg-primary,
   color: white !important;
 }
 
-/* OUTLINE BUTTONS: Use darker orange text */
-button.border-input,
-button[class*="border"][class*="bg-background"] {
+/* OUTLINE BUTTONS: Border buttons with primary color */
+button.border-primary,
+a.border-primary,
+.border-primary,
+button[class*="border-primary"],
+a[class*="border-primary"] {
   color: hsl(15 100% 35%) !important;
+  border-color: hsl(15 100% 35%) !important;
 }
 
-button.border-input:hover,
-button[class*="border"][class*="bg-background"]:hover {
+button.border-primary:hover,
+a.border-primary:hover,
+.border-primary:hover,
+button[class*="border-primary"]:hover,
+a[class*="border-primary"]:hover {
+  color: white !important;
+  background-color: hsl(15 100% 35%) !important;
+  border-color: hsl(15 100% 35%) !important;
+}
+
+/* Also handle the Tailwind utility combination */
+.border.border-primary,
+button.border.border-primary,
+a.border.border-primary {
+  color: hsl(15 100% 35%) !important;
+  border-color: hsl(15 100% 35%) !important;
+}
+
+.border.border-primary:hover,
+button.border.border-primary:hover,
+a.border.border-primary:hover {
   color: white !important;
   background-color: hsl(15 100% 35%) !important;
 }
@@ -813,4 +836,16 @@ a[href^="mailto"] {
 address a[href^="mailto"]:hover,
 a[href^="mailto"]:hover {
   color: hsl(15 100% 30%) !important;
+}
+
+/* HEADER POSITION FIX: Reduce margin at narrow viewports */
+#app-header-left {
+  justify-content: flex-start !important;
+  margin-left: 8px !important;
+}
+
+@media (max-width: 768px) {
+  #app-header-left {
+    margin-left: 0px !important;
+  }
 }
