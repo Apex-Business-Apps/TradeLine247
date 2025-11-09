@@ -33,11 +33,10 @@ header[data-site-header] [data-slot="center"] {
 }
 
 /* Ensure header stickiness and stacking */
-/* CRITICAL FIX: z-index must match Header.tsx z-[9999] to prevent being covered by other elements */
 header[data-site-header] {
   position: sticky;
   top: 0;
-  z-index: 9999 !important; /* Must match Header.tsx z-[9999] - was 50 which caused header to be covered */
+  z-index: 50;
 }
 
 /* Mobile: same grid, center may be hidden behind hamburger */

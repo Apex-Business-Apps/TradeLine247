@@ -23,14 +23,14 @@ export const HowItWorks = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             How It Works
           </h2>
-          <p className="text-lg text-foreground/90 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-700 dark:text-slate-300 max-w-2xl mx-auto">
             Get up and running in three simple steps
           </p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {steps.map((step, index) => <Card key={index} className="relative text-center group hover:shadow-lg transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-[hsl(17,90%,38%)] text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
                 {step.step}
               </div>
               <CardHeader className="pt-8">
@@ -40,7 +40,7 @@ export const HowItWorks = () => {
                 <CardTitle className="text-xl">{step.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base text-foreground/90">
+                <CardDescription className="text-base text-[#1e556b]">
                   {step.description}
                 </CardDescription>
               </CardContent>

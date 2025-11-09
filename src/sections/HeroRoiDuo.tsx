@@ -27,15 +27,15 @@ import React from "react";
 import "../styles/hero-roi.css";
 import { LeadCaptureCard } from "../components/sections/LeadCaptureCard";
 import RoiCalculator from "../components/RoiCalculator";
-import officialLogo from '@/assets/official-logo.png';
+import officialLogo from '@/assets/official-logo.svg';
 export default function HeroRoiDuo() {
-  return <section className="relative bg-gradient-orange-subtle section-heavy overflow-hidden" style={{
+  return <section className="bg-gradient-orange-subtle section-heavy" style={{
     paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
     paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
-      <div className="container relative z-10" data-lovable-lock="structure-only">
+      <div className="container" data-lovable-lock="structure-only">
         {/* Hero Content */}
         <div className="text-center mb-16" data-lovable-lock="structure-only">
           
@@ -49,7 +49,7 @@ export default function HeroRoiDuo() {
               className="h-[9.1875rem] md:h-[11.8125rem] w-auto opacity-80" 
               style={{ 
                 transform: 'translateY(-0.5cm) scale(1.5225) scaleY(1.388625) scaleX(1.388625)',
-                filter: 'drop-shadow(0 4px 8px hsl(0 0% 0% / 0.1))'
+                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))'
               }}
               loading="eager"
               fetchpriority="high"
@@ -57,34 +57,34 @@ export default function HeroRoiDuo() {
             />
           </div>
           
-          <h1 id="hero-h1" className="mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60  text-foreground font-extrabold" style={{ fontSize: 'clamp(2rem, 5vw + 1rem, 4.5rem)', lineHeight: '1.1' }} data-lovable-lock="permanent">
+          <h1 id="hero-h1" className="mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent font-extrabold" style={{ fontSize: 'clamp(2rem, 5vw + 1rem, 4.5rem)', lineHeight: '1.1' }} data-lovable-lock="structure-only">
             Your 24/7 A<span className="text-primary">i</span> Receptionist!
           </h1>
-          <p className="mb-8 max-w-3xl mx-auto font-semibold text-foreground" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5' }} data-lovable-lock="structure-only">
+          <p className="mb-8 max-w-3xl mx-auto font-semibold text-foreground/80" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5' }} data-lovable-lock="structure-only">
             Never miss a call. Work while you sleep.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-8 text-sm md:text-base">
             <a href="/security" className="text-primary hover:underline font-medium">🔒 Enterprise Security</a>
-            <span className="text-white/70">•</span>
+            <span className="text-muted-foreground">•</span>
             <a href="/compare" className="text-primary hover:underline font-medium">📊 Compare Services</a>
-            <span className="text-white/70">•</span>
+            <span className="text-muted-foreground">•</span>
             <a href="/pricing" className="text-primary hover:underline font-medium">💰 See Pricing</a>
           </div>
           
-          {/* Premium Phone Number - WCAG AA: fully opaque white, darker orange (7.14:1) */}
-          <a
-            href="tel:+15877428885"
-            className="inline-flex items-center gap-3 px-6 py-3 mb-8 text-xl md:text-2xl font-bold text-[hsl(var(--brand-orange-dark))] bg-white backdrop-blur-sm rounded-full shadow-elegant hover:shadow-glow hover:scale-105 transition-all duration-300 border-2 border-primary/20"
+          {/* Premium Phone Number */}
+          <a 
+            href="tel:+15877428885" 
+            className="inline-flex items-center gap-3 px-6 py-3 mb-8 text-xl md:text-2xl font-bold text-primary bg-white/90 backdrop-blur-sm rounded-full shadow-elegant hover:shadow-glow hover:scale-105 transition-all duration-300 border-2 border-primary/20"
             aria-label="Call for demo"
           >
             <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
             <span>587-742-8885</span>
-            <span className="text-sm font-semibold uppercase tracking-wide text-[hsl(var(--brand-orange-dark))]/90">FOR DEMO</span>
+            <span className="text-sm font-semibold uppercase tracking-wide text-primary/80">FOR DEMO</span>
           </a>
           
-          <h2 className="text-foreground mb-12 mt-16 text-center py-0 font-semibold mx-auto" style={{ fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 2.5rem)' }} data-lovable-lock="structure-only">Help us help you.</h2>
+          <h2 className="text-foreground/90 mb-12 mt-16 text-center py-0 font-semibold mx-auto" style={{ fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 2.5rem)' }} data-lovable-lock="structure-only">Help us help you.</h2>
           
           {/* Custom grid layout for side-by-side components */}
           <div className="hero-roi__container mx-auto" data-lovable-lock="structure-only" aria-label="Start Trial and ROI">
@@ -99,6 +99,5 @@ export default function HeroRoiDuo() {
           </div>
         </div>
       </div>
-      <div className="absolute inset-0 bg-black/40 pointer-events-none z-0" aria-hidden="true"></div>
     </section>;
 }

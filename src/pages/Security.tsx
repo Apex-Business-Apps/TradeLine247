@@ -231,7 +231,7 @@ const Security = () => {
               <Card className="inline-block bg-background/80 backdrop-blur">
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3 text-left">
-                    <AlertTriangle className="w-8 h-8 text-primary flex-shrink-0" aria-hidden="true" />
+                    <AlertTriangle className="w-8 h-8 text-primary flex-shrink-0" />
                     <div>
                       <p className="font-semibold mb-1">Security Vulnerability Reporting</p>
                       <p className="text-sm text-muted-foreground">
@@ -263,7 +263,7 @@ const Security = () => {
                 <Card key={index} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-[hsl(142,85%,25%)] flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                       <CardTitle className="text-base">{commitment.title}</CardTitle>
                     </div>
                   </CardHeader>

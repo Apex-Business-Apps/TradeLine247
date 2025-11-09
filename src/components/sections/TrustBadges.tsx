@@ -20,8 +20,7 @@ export const TrustBadges = () => {
   ];
 
   return (
-    <section className="py-20 bg-background/90 backdrop-blur-sm">
-      {/* Increased opacity to 90% (from 50%) for WCAG contrast */}
+    <section className="py-20 bg-background/50 backdrop-blur-sm">
       <div className="container">
         {/* Section Header */}
         <div className="text-center mb-12">

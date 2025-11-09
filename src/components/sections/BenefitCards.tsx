@@ -8,7 +8,7 @@ export const BenefitCards = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
             See TradeLine 24/7 in Action
           </h2>
-          <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed text-foreground/90">
+          <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed text-[#1e556b]">
             Watch how we handle your calls with speed, personalization, and follow-through
           </p>
         </div>

@@ -10,7 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSecureABTest } from "@/hooks/useSecureABTest";
 import { useSecureFormSubmission } from "@/hooks/useSecureFormSubmission";
-import { errorReporter } from "@/lib/errorReporter";
 import { z } from "zod";
 
 // Client-side validation schema matching server-side
@@ -142,16 +141,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
       }, 5000);
 
     } catch (error: any) {
-      errorReporter.report({
-        type: 'error',
-        message: `Lead submission error: ${error.message || 'Unknown error'}`,
-        stack: error.stack,
-        timestamp: new Date().toISOString(),
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        environment: errorReporter['getEnvironment'](),
-        metadata: { formData: { name: formData.name, company: formData.company }, variant }
-      });
+      console.error("Lead submission error:", error);
       trackFormSubmission('lead_capture', false, {
         error: error.message || 'unknown_error',
         variant: variant
@@ -216,7 +206,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Tell us about your business
           </h2>
-          <p className="text-lg mb-8 text-foreground/90">
+          <p className="text-lg mb-8 text-[#1e556b]">
             Start your free trial today.
           </p>
         </>
@@ -301,7 +291,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                       <input
                         type="checkbox"
                         required
-                        className="mt-1 rounded border-border text-primary focus:ring-primary"
+                        className="mt-1 rounded border-gray-300 text-primary focus:ring-primary"
                       />
                       <span>
                         I'm cool with emails about setup and updates. Unsubscribe anytime.
@@ -381,7 +371,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="w-full border-[hsl(17,90%,38%)] text-[hsl(17,90%,38%)] hover:bg-[hsl(17,90%,38%)] hover:text-primary-foreground transition-all duration-200 active:scale-[0.98] font-medium"
+                      className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 active:scale-[0.98] font-medium"
                       type="button"
                       asChild
                     >

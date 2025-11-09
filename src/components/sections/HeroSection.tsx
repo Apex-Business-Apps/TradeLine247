@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import officialLogo from '@/assets/official-logo.png';
+import officialLogo from '@/assets/official-logo.svg';
 
 export const HeroSection = () => {
   return (
@@ -17,8 +17,6 @@ export const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-background/72 via-transparent to-background/67"></div>
       {/* Saturated orange wash (top of background layers) */}
       <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/100 via-brand-orange-light/100 to-brand-orange/89"></div>
-      {/* Unified overlay ensures WCAG contrast */}
-      <div className="absolute inset-0 bg-black/40 pointer-events-none" aria-hidden="true"></div>
       
       {/* Enhanced Glowing Orbs with Animation */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-orange/40 rounded-full blur-3xl animate-pulse"></div>
@@ -42,12 +40,12 @@ export const HeroSection = () => {
         </div>
         
         {/* Main Headline with Staggered Animation */}
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-primary/80 to-primary/60  text-foreground leading-tight animate-fade-in [animation-delay:200ms]">
-          Your 24/7 Ai Receptionist
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent leading-tight animate-fade-in [animation-delay:200ms]">
+          Your 24/7 Ai Receptionist!
         </h1>
         
         {/* Value Proposition with Delayed Animation */}
-        <p className="text-lg md:text-xl text-foreground mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
+        <p className="text-lg md:text-xl text-slate-700 dark:text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:400ms]">
           We pick up when you can't, so customers aren't kept waiting.
         </p>
         
@@ -71,14 +69,14 @@ export const HeroSection = () => {
               <Link to="/features">See how it works</Link>
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground animate-pulse">
+          <p className="text-sm text-slate-600 dark:text-slate-400 animate-pulse">
             No credit card required • 10-minute setup
           </p>
         </div>
 
         {/* Trust Indicators */}
         <div className="mt-16 animate-fade-in [animation-delay:800ms]">
-          <p className="text-sm text-muted-foreground mb-4">Trusted by 1000+ businesses</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Trusted by 1000+ businesses</p>
           <div className="flex justify-center items-center gap-8 opacity-60">
             <div className="h-8 w-16 bg-muted-foreground/20 rounded"></div>
             <div className="h-8 w-20 bg-muted-foreground/20 rounded"></div>

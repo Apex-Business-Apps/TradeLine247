@@ -7,9 +7,4 @@
   #app-header-left {
     margin-left: 4px !important;
   }
-  #app-home, #app-badge-ca {
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    flex-shrink: 0 !important;
-  }
 }
