@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import '@/components/nav/AppHeaderOverride.module.css';
 
 // Navigation configuration
 const MARKETING_NAV = [
