@@ -1,0 +1,9 @@
+# CareConnect Terraform Variables (Example)
+#
+# Copy to terraform.tfvars and fill in actual values
+
+project_id = "careconnect-dev-123456"
+region     = "northamerica-northeast1"
+
+# Optional: VPC-SC Access Policy ID
+# access_policy_id = "123456789"

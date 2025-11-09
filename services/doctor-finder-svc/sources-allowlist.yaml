@@ -1,0 +1,45 @@
+# Doctor Finder - Compliant Source Allowlist
+#
+# CRITICAL: Only add sources that comply with:
+# 1. Public/official directories
+# 2. TOS allows automated access
+# 3. robots.txt permits crawling (if applicable)
+# 4. No scraping of private/gated content
+#
+# Human approval required before outreach to matched providers.
+
+allowed_sources:
+  - name: Alberta College of Physicians and Surgeons
+    url: https://search.cpsa.ca/physiciansearch
+    type: public_directory
+    robots_txt_allowed: true
+    tos_compliant: true
+    rate_limit: 10 requests/minute
+    notes: Public physician search; no login required
+
+  - name: BC College of Physicians
+    url: https://www.cpsbc.ca/physician_search
+    type: public_directory
+    robots_txt_allowed: true
+    tos_compliant: true
+    rate_limit: 10 requests/minute
+
+  - name: College of Physicians and Surgeons of Ontario (CPSO)
+    url: https://www.cpso.on.ca/Public-Information-Services/Find-a-Doctor
+    type: public_directory
+    robots_txt_allowed: true
+    tos_compliant: true
+    rate_limit: 10 requests/minute
+
+  - name: Manual CSV Import
+    type: csv
+    tos_compliant: true
+    notes: Staff manually imports provider lists from approved sources
+
+# Blocked sources (do not use)
+blocked_sources:
+  - reason: TOS violation
+    examples:
+      - RateMDs (scraping prohibited)
+      - Healthgrades (requires commercial license)
+      - Google Maps scraping (TOS violation)
