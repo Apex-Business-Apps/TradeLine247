@@ -10,7 +10,21 @@ header[data-site-header] [data-header-inner] {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 0.5rem;
+  /* px-4 baseline (1rem = 16px) at 360px, scales with sm:px-6 lg:px-8 */
   padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
+}
+
+/* Responsive padding scaling */
+@media (min-width: 640px) {
+  header[data-site-header] [data-header-inner] {
+    padding-inline: max(1.5rem, env(safe-area-inset-left)) max(1.5rem, env(safe-area-inset-right));
+  }
+}
+
+@media (min-width: 1024px) {
+  header[data-site-header] [data-header-inner] {
+    padding-inline: max(2rem, env(safe-area-inset-left)) max(2rem, env(safe-area-inset-right));
+  }
 }
 
 /* Pin left and right slots to edges - never wrap */

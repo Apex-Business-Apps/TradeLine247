@@ -42,6 +42,7 @@ export const Header: React.FC = () => {
   const { goToWithFeedback } = useSafeNavigation();
   const location = useLocation();
   const isUserAdmin = isAdmin();
+  const isMarketingHome = location.pathname === paths.home;
 
   // Navigation handler
   const handleNavigation = useCallback(async (href: string, label: string, closeMenu = false) => {
@@ -123,11 +124,7 @@ export const Header: React.FC = () => {
     >
       <div 
         data-header-inner 
-        className="container h-14 items-center gap-4"
-        style={{ 
-          maxWidth: '100%'
-          /* Padding handled by header-align.css for consistency */
-        }}
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 items-center gap-4"
       >
         {/* Left: Home Button & Badge */}
         <div 
@@ -192,8 +189,8 @@ export const Header: React.FC = () => {
           </NavigationMenu>
         </nav>
 
-        {/* Center: Desktop Admin Navigation (Admin Only) */}
-        {isUserAdmin && (
+        {/* Center: Desktop Admin Navigation (Admin Only, NOT on marketing home) */}
+        {isUserAdmin && !isMarketingHome && (
           <nav 
             data-slot="app-nav" 
             aria-label="Application" 
@@ -243,7 +240,7 @@ export const Header: React.FC = () => {
           <button
             id="burger-menu-button"
             data-testid="burger-menu-button"
-            className="flex items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
+            className="flex lg:hidden items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
             onClick={() => setIsMobileMenuOpen(prev => !prev)}
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
@@ -373,8 +370,8 @@ export const Header: React.FC = () => {
             ))}
           </div>
 
-          {/* Admin Links (Admin Only) */}
-          {isUserAdmin && (
+          {/* Admin Links (Admin Only, NOT on marketing home) */}
+          {isUserAdmin && !isMarketingHome && (
             <>
               <div className="border-t border-border my-2" />
               <div className="px-2 py-2">

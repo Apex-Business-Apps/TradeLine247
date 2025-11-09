@@ -44,11 +44,11 @@ test.describe('Header Position', () => {
       
       if (boundingBox) {
         // Header should be positioned near left edge (within container padding)
-        // Account for container padding: max(1rem, min(2rem, 4vw))
-        // At 360px: 4vw = 14.4px, so padding is 16px (1rem)
-        // At 768px: 4vw = 30.7px, so padding is 30.7px
-        // At 1024px: 2rem = 32px, so padding is 32px
-        const maxPadding = width <= 360 ? 16 : width <= 768 ? 32 : 32;
+        // Account for container padding: px-4 (1rem = 16px) at 360px
+        // At 360px: padding is 16px (1rem)
+        // At 768px: padding is 24px (1.5rem)
+        // At 1024px: padding is 32px (2rem)
+        const maxPadding = width <= 360 ? 16 : width <= 768 ? 24 : 32;
         expect(boundingBox.x).toBeLessThanOrEqual(maxPadding);
       }
     });
