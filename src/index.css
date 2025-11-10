@@ -170,6 +170,7 @@ All colors MUST be HSL.
     --popover-foreground: 222.2 84% 4.9%;
 
     /* Primary: Brand orange baseline */
+    /* Keep bright orange for backgrounds, override for text in CSS rules below */
     --primary: var(--brand-orange-500);
     --primary-foreground: 0 0% 100%;
 
@@ -829,7 +830,18 @@ header {
   .border-primary:hover,
   .border-primary:focus-visible {
     border-color: hsl(var(--primary)) !important;
-    color: hsl(var(--primary)) !important;
+    /* Use darker orange for text on white backgrounds - WCAG AA compliance */
+    color: #CC4A1F !important;
+  }
+  
+  /* Ensure outline buttons and their children use darker orange on hover for WCAG AA */
+  button[class*="outline"]:hover,
+  button[class*="outline"]:hover *,
+  button[class*="outline"]:hover span,
+  a[class*="outline"]:hover,
+  a[class*="outline"]:hover *,
+  a[class*="outline"]:hover span {
+    color: #CC4A1F !important;
   }
 }
 
@@ -907,16 +919,29 @@ header {
 /* Global Orange Color Unification - All orange elements use hero text orange (#FF6B35) */
 :root {
   --unified-orange: #FF6B35;
+  --unified-orange-dark: #CC4A1F; /* Darker orange for text on white (WCAG AA: 4.5:1 contrast) */
 }
 
 /* Unify all primary color usage to hero text orange */
+/* For text on white/light backgrounds, use darker orange for WCAG AA compliance */
+/* Target Tailwind's text-primary utility class specifically - override hsl(var(--primary)) */
 .text-primary,
 [class*="text-primary"],
 button.text-primary,
-a.text-primary {
-  color: #FF6B35 !important;
+a.text-primary,
+[class*="hover:text-primary"]:hover,
+button[class*="hover:text-primary"]:hover,
+a[class*="hover:text-primary"]:hover,
+/* Target any element using hsl(var(--primary)) for text color */
+[style*="color"][style*="primary"],
+button[class*="hover:text-primary"]:hover,
+a[class*="hover:text-primary"]:hover {
+  /* Use darker orange for better contrast on white backgrounds (WCAG AA: 4.5:1) */
+  /* This overrides Tailwind's hsl(var(--primary)) for text contexts */
+  color: #CC4A1F !important;
 }
 
+/* For backgrounds and borders, use the original bright orange */
 .bg-primary,
 [class*="bg-primary"],
 button.bg-primary,
@@ -927,6 +952,34 @@ a.bg-primary {
 .border-primary,
 [class*="border-primary"] {
   border-color: #FF6B35 !important;
+}
+
+/* Special case: outline buttons with primary text on white background need darker orange for WCAG AA */
+/* Target all outline buttons and their children on hover - override any primary color */
+/* Use high specificity to override Tailwind's hover:text-primary */
+button[class*="outline"]:hover,
+button[class*="outline"]:hover span,
+button[class*="outline"]:hover *,
+a[class*="outline"]:hover,
+a[class*="outline"]:hover span,
+a[class*="outline"]:hover *,
+button.variant-outline:hover,
+button.variant-outline:hover span,
+button.variant-outline:hover * {
+  color: #CC4A1F !important;
+}
+
+/* Override any hsl(var(--primary)) usage in outline buttons - highest specificity */
+button[class*="outline"]:hover,
+a[class*="outline"]:hover {
+  color: #CC4A1F !important;
+}
+
+/* Also target ghost buttons that use hover:text-primary */
+button[class*="ghost"]:hover,
+button[class*="ghost"]:hover span,
+button[class*="ghost"]:hover * {
+  color: #CC4A1F !important;
 }
 
 /* Ensure Home button and other orange buttons use unified color */
