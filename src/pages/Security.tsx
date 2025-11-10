@@ -173,8 +173,19 @@ const Security = () => {
         </section>
 
         {/* Security Features */}
-        <section className="py-20">
-          <div className="container">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>Enterprise-Grade Security</h2>
@@ -232,8 +243,19 @@ const Security = () => {
         </section>
 
         {/* Compliance Standards */}
-        <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
-          <div className="container">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>Compliance & Standards</h2>
@@ -294,8 +316,19 @@ const Security = () => {
         </section>
 
         {/* Privacy Commitments */}
-        <section className="py-20">
-          <div className="container">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Privacy Commitments</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -322,8 +355,19 @@ const Security = () => {
         </section>
 
         {/* Data Handling */}
-        <section className="py-20 bg-gradient-to-br from-accent/5 to-primary/5">
-          <div className="container">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">How We Handle Your Data</h2>
@@ -423,8 +467,19 @@ const Security = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20">
-          <div className="container">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
               <CardContent className="pt-12 pb-12 text-center">
                 <Shield className="w-16 h-16 text-primary mx-auto mb-6" />

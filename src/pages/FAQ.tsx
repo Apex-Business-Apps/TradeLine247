@@ -88,8 +88,19 @@ const FAQ = () => {
         </section>
 
         {/* FAQ Accordion */}
-        <section className="py-20">
-          <div className="container">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem', maxWidth: '4xl', margin: '0 auto' }}>
               <Card className="max-w-4xl mx-auto border-0 shadow-none bg-transparent">
                 <CardHeader>
@@ -115,8 +126,19 @@ const FAQ = () => {
         </section>
 
         {/* Still Have Questions */}
-        <section className="py-20 bg-gradient-to-br from-primary/10 to-accent/10">
-          <div className="container text-center">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: '#1e556b' }}>
               Still Have Questions?
             </h2>
@@ -135,8 +157,19 @@ const FAQ = () => {
         </section>
 
         {/* Quick Stats */}
-        <section className="py-16">
-          <div className="container">
+        <section 
+          className="py-16 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 <div style={{ border: '2px solid #FF6B35', borderRadius: '8px', padding: '1.5rem' }}>

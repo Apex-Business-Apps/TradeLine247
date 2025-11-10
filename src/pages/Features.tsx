@@ -100,8 +100,19 @@ const Features = () => {
         </section>
 
         {/* Features Grid */}
-        <section className="py-20">
-          <div className="container">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>Powerful Features</h2>
@@ -165,8 +176,19 @@ const Features = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-gradient-to-br from-primary/10 to-accent/10">
-          <div className="container text-center">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>
               Ready to Grow Your Business?
             </h2>

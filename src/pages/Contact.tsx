@@ -219,8 +219,19 @@ const Contact = () => {
         </section>
 
         {/* Contact Methods */}
-        <section className="py-20">
-          <div className="container">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
               {contactMethods.map((method, index) => {
                 const isDirectLink = method.action.startsWith('tel:') || method.action.startsWith('mailto:');

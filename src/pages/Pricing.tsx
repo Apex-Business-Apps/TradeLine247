@@ -144,8 +144,19 @@ const Pricing = () => {
         </section>
 
         {/* Pricing Cards */}
-        <section className="py-20">
-          <div className="container">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem', maxWidth: '4xl', margin: '0 auto' }}>
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>Choose Your Plan</h2>
@@ -217,8 +228,19 @@ const Pricing = () => {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
-          <div className="container text-center">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-12">Frequently Asked Questions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
               <div>
