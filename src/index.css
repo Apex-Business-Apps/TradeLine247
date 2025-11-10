@@ -879,10 +879,10 @@ header {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  /* Orange mask overlay - visible orange tint over entire background image */
-  /* Increased hue by 40% total (5% more): #FF6B35 (hsl(14,100%,60%)) -> hsl(55,100%,63%) ≈ #FFD14C */
-  /* Increased saturation and lightness for more vibrant orange tint */
-  background: rgba(255, 209, 76, 0.20); /* #FFD14C with 20% opacity - vibrant orange tint with increased saturation */
+  /* Orange mask overlay - darker, more noticeable orange tint over entire background image */
+  /* Increased hue by 40% total: #FF6B35 (hsl(14,100%,60%)) -> hsl(55,100%,63%) ≈ #FFD14C */
+  /* Increased opacity and saturation for more noticeable darker orange tint */
+  background: rgba(255, 193, 76, 0.30); /* #FFC14C with 30% opacity - darker, more noticeable orange tint */
   pointer-events: none;
   z-index: 1;
 }
