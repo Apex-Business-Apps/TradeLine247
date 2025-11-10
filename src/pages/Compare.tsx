@@ -48,38 +48,38 @@ export default function Compare() {
             <div className="max-w-5xl mx-auto">
               <Card>
                 <CardHeader className="text-center">
-                  <CardTitle className="text-2xl md:text-3xl">Provider Comparison</CardTitle>
-                  <CardDescription>Key features across TradeLine 24/7, Smith.ai, Ruby, and CallRail</CardDescription>
+                  <CardTitle className="text-2xl md:text-3xl" style={{ color: '#1e556b' }}>Provider Comparison</CardTitle>
+                  <CardDescription style={{ color: '#1e556b' }}>Key features across TradeLine 24/7, Smith.ai, Ruby, and CallRail</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left py-3 px-2 min-w-[120px]">Feature</th>
-                          <th className="text-center py-3 px-2 bg-primary/5 min-w-[100px]">
-                            <Badge className="mb-1 text-xs">TradeLine 24/7</Badge>
+                          <th className="text-left py-3 px-2 min-w-[120px]" style={{ color: '#1e556b' }}>Feature</th>
+                          <th className="text-center py-3 px-2 min-w-[100px]" style={{ backgroundColor: '#FF6B35' }}>
+                            <Badge className="mb-1 text-xs" style={{ backgroundColor: '#FF6B35', color: 'white' }}>TradeLine 24/7</Badge>
                           </th>
-                          <th className="text-center py-3 px-2 min-w-[100px]">Smith.ai (Human)</th>
-                          <th className="text-center py-3 px-2 min-w-[100px]">Smith.ai (AI)</th>
-                          <th className="text-center py-3 px-2 min-w-[100px]">Ruby</th>
-                          <th className="text-center py-3 px-2 min-w-[100px]">CallRail</th>
+                          <th className="text-center py-3 px-2 min-w-[100px]" style={{ color: '#1e556b' }}>Smith.ai (Human)</th>
+                          <th className="text-center py-3 px-2 min-w-[100px]" style={{ color: '#1e556b' }}>Smith.ai (AI)</th>
+                          <th className="text-center py-3 px-2 min-w-[100px]" style={{ color: '#1e556b' }}>Ruby</th>
+                          <th className="text-center py-3 px-2 min-w-[100px]" style={{ color: '#1e556b' }}>CallRail</th>
                         </tr>
                       </thead>
                       <tbody>
                         {comparisonData.map((row, i) => (
                           <tr key={i} className="border-b hover:bg-muted/30 transition-colors">
-                            <td className="py-3 px-2 font-medium">
+                            <td className="py-3 px-2 font-medium" style={{ color: '#1e556b' }}>
                               {row.feature}
-                              <div className="text-xs text-muted-foreground mt-0.5">{row.notes}</div>
+                              <div className="text-xs mt-0.5" style={{ color: '#1e556b', opacity: 0.7 }}>{row.notes}</div>
                             </td>
-                            <td className="text-center py-3 px-2 bg-primary/5">
-                              <span className="font-semibold text-primary text-xs">{row.tradeline}</span>
+                            <td className="text-center py-3 px-2" style={{ backgroundColor: '#FF6B35' }}>
+                              <span className="font-semibold text-xs" style={{ color: 'white' }}>{row.tradeline}</span>
                             </td>
-                            <td className="text-center py-3 px-2"><span className="text-muted-foreground text-xs">{row.smithAI}</span></td>
-                            <td className="text-center py-3 px-2"><span className="text-muted-foreground text-xs">{row.smithAIBot}</span></td>
-                            <td className="text-center py-3 px-2"><span className="text-muted-foreground text-xs">{row.ruby}</span></td>
-                            <td className="text-center py-3 px-2"><span className="text-muted-foreground text-xs">{row.callrail}</span></td>
+                            <td className="text-center py-3 px-2"><span className="text-xs" style={{ color: '#1e556b' }}>{row.smithAI}</span></td>
+                            <td className="text-center py-3 px-2"><span className="text-xs" style={{ color: '#1e556b' }}>{row.smithAIBot}</span></td>
+                            <td className="text-center py-3 px-2"><span className="text-xs" style={{ color: '#1e556b' }}>{row.ruby}</span></td>
+                            <td className="text-center py-3 px-2"><span className="text-xs" style={{ color: '#1e556b' }}>{row.callrail}</span></td>
                           </tr>
                         ))}
                       </tbody>
