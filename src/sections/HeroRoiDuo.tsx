@@ -72,17 +72,18 @@ export default function HeroRoiDuo() {
             <a href="/pricing" className="feature-badge font-medium">💰 See Pricing</a>
           </div>
           
-          {/* Premium Phone Number - WCAG AA: fully opaque white, darker orange (7.14:1) */}
+          {/* Premium Phone Number - Hero text orange (#FF6B35) */}
           <a
             href="tel:+15877428885"
-            className="inline-flex items-center gap-3 px-6 py-3 mb-8 text-xl md:text-2xl font-bold text-[hsl(var(--brand-orange-dark))] bg-white backdrop-blur-sm rounded-full shadow-elegant hover:shadow-glow hover:scale-105 transition-all duration-300 border-2 border-primary/20"
+            className="inline-flex items-center gap-3 px-6 py-3 mb-8 text-xl md:text-2xl font-bold bg-white backdrop-blur-sm rounded-full shadow-elegant hover:shadow-glow hover:scale-105 transition-all duration-300 border-2 border-primary/20"
+            style={{ color: '#FF6B35' }}
             aria-label="Call for demo"
           >
-            <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ color: '#FF6B35' }}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
             <span>587-742-8885</span>
-            <span className="text-sm font-semibold uppercase tracking-wide text-[hsl(var(--brand-orange-dark))]/90">FOR DEMO</span>
+            <span className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#FF6B35' }}>FOR DEMO</span>
           </a>
           
           <h2 className="hero-tagline mb-12 mt-16 text-center py-0 font-semibold mx-auto" style={{ fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 2.5rem)' }} data-lovable-lock="structure-only">Help us help you.</h2>

@@ -44,7 +44,7 @@ const Index = () => {
         className="min-h-screen flex flex-col relative"
         style={{
           backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "85%", // Reduced from cover to show full head
+          backgroundSize: "100% auto", // Stretch horizontally to prevent cutoff
           backgroundPosition: "center top", // Positioned to show top of head
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",

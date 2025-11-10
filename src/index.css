@@ -798,15 +798,16 @@ header {
   }
 
   /* Opt-in class for AA-compliant buttons (applies to both light and dark modes) */
+  /* Override with hero text orange for brand consistency */
   .btn-aa,
   button.btn-aa,
   [data-variant="default"].btn-aa {
-    background-color: hsl(var(--a11y-cta-bg)) !important;
-    color: hsl(var(--a11y-cta-fg)) !important;
+    background-color: #FF6B35 !important;
+    color: white !important;
   }
 
   .btn-aa:hover:not(:disabled) {
-    background-color: hsl(var(--a11y-cta-hover)) !important;
+    background-color: #ff5722 !important; /* Slightly darker orange on hover */
   }
 
   /* Ensure disabled state maintains proper opacity without color override */
@@ -984,7 +985,9 @@ button[class*="ghost"]:hover * {
 
 /* Ensure Home button and other orange buttons use unified color */
 button[class*="default"],
-a[class*="default"] {
+a[class*="default"],
+button.btn-aa,
+button[class*="btn-aa"] {
   background-color: #FF6B35 !important;
   color: white !important;
 }
