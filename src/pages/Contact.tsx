@@ -244,7 +244,7 @@ const Contact = () => {
                 >
                   <CardHeader>
                     <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors" style={{ border: '2px solid #FF6B35' }}>
-                      <method.icon className="w-6 h-6" style={{ color: '#1e556b', strokeWidth: '2px' }} />
+                      <method.icon className="w-6 h-6" style={{ color: '#1e556b' }} strokeWidth={2} />
                     </div>
                     <CardTitle className="text-lg">{method.title}</CardTitle>
                     <CardDescription style={{ color: '#1e556b' }}>{method.description}</CardDescription>
@@ -404,7 +404,7 @@ const Contact = () => {
                     <CardHeader>
                       <div className="flex items-center gap-3">
                         <div style={{ border: '2px solid #1e556b', borderRadius: '8px', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Clock className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                          <Clock className="w-6 h-6" style={{ color: '#FF6B35' }} strokeWidth={2} />
                         </div>
                         <CardTitle className="text-xl" style={{ color: '#1e556b' }}>24/7 Support</CardTitle>
                       </div>

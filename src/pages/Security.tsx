@@ -227,7 +227,7 @@ const Security = () => {
                     <CardHeader>
                       <div className="flex items-start justify-between mb-3">
                         <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
-                          <IconComponent className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                          <IconComponent className="w-6 h-6" style={{ color: '#FF6B35' }} strokeWidth={2} />
                         </div>
                         <Badge variant="secondary" className="text-xs">
                           {feature.badge}
@@ -275,7 +275,7 @@ const Security = () => {
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
-                            <standard.icon className="w-5 h-5" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                            <standard.icon className="w-5 h-5" style={{ color: '#FF6B35' }} strokeWidth={2} />
                           </div>
                           <div>
                             <CardTitle className="text-lg" style={{ color: '#1e556b' }}>{standard.name}</CardTitle>
@@ -301,7 +301,7 @@ const Security = () => {
                 <Card className="inline-block bg-background/80 backdrop-blur" style={{ border: '2px solid #FF6B35' }}>
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-3 text-left">
-                      <AlertTriangle className="w-8 h-8 flex-shrink-0" style={{ color: '#FF6B35', strokeWidth: '2px' }} aria-hidden="true" />
+                      <AlertTriangle className="w-8 h-8 flex-shrink-0" style={{ color: '#FF6B35' }} strokeWidth={2} aria-hidden="true" />
                       <div>
                         <p className="font-semibold mb-1" style={{ color: '#1e556b' }}>Security Vulnerability Reporting</p>
                         <p className="text-sm" style={{ color: '#1e556b' }}>
