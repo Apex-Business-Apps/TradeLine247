@@ -22,7 +22,7 @@ const Demo = () => {
           className="hero-section py-20 relative"
           style={{
             backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "85%",
+            backgroundSize: "100% auto",
             backgroundPosition: "center top",
             backgroundRepeat: "no-repeat",
             backgroundAttachment: "fixed",

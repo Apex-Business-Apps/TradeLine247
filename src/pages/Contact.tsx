@@ -196,7 +196,7 @@ const Contact = () => {
           className="hero-section py-20 relative"
           style={{
             backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "85%",
+            backgroundSize: "100% auto",
             backgroundPosition: "center top",
             backgroundRepeat: "no-repeat",
             backgroundAttachment: "fixed",
@@ -238,10 +238,11 @@ const Contact = () => {
                     <CardDescription>{method.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {isDirectLink ? (
+                      {isDirectLink ? (
                       <a
                         href={method.action}
-                        className="text-primary font-medium block"
+                        className="font-medium block"
+                        style={{ color: '#FF6B35' }}
                         onClick={(event) => {
                           event.stopPropagation();
                         }}
@@ -249,7 +250,7 @@ const Contact = () => {
                         {method.contact}
                       </a>
                     ) : (
-                      <div className="text-primary font-medium">
+                      <div className="font-medium" style={{ color: '#FF6B35' }}>
                         {method.contact}
                       </div>
                     )}
@@ -341,6 +342,7 @@ const Contact = () => {
                           placeholder="+1 (555) 123-4567" 
                           value={contactFormData.phone}
                           onChange={(e) => setContactFormData(prev => ({...prev, phone: e.target.value}))}
+                          style={{ color: '#FF6B35' }}
                         />
                       </div>
                       
@@ -367,7 +369,7 @@ const Contact = () => {
                         />
                       </div>
                       
-                      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+                      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting} style={{ backgroundColor: '#FF6B35', color: 'white' }}>
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
