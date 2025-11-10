@@ -133,8 +133,8 @@ const Security = () => {
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundAttachment: "fixed",
-            paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
-            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
+            paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
             paddingLeft: 'env(safe-area-inset-left, 0)',
             paddingRight: 'env(safe-area-inset-right, 0)'
           }}
@@ -152,22 +152,22 @@ const Security = () => {
               Enterprise-grade security protecting your business data. Built for Canadian businesses with Canadian data sovereignty.
             </p>
             <div className="flex flex-wrap justify-center gap-3 mb-8">
-              <Badge variant="outline" className="text-sm px-4 py-2">
-                <Lock className="w-4 h-4 mr-2" />
+              <a href="#encryption" className="feature-badge font-medium">
+                <Lock className="w-4 h-4 mr-2 inline" />
                 AES-256 Encryption
-              </Badge>
-              <Badge variant="outline" className="text-sm px-4 py-2">
-                <Globe className="w-4 h-4 mr-2" />
+              </a>
+              <a href="#gdpr" className="feature-badge font-medium">
+                <Globe className="w-4 h-4 mr-2 inline" />
                 GDPR Aligned
-              </Badge>
-              <Badge variant="outline" className="text-sm px-4 py-2">
-                <Shield className="w-4 h-4 mr-2" />
+              </a>
+              <a href="#soc2" className="feature-badge font-medium">
+                <Shield className="w-4 h-4 mr-2 inline" />
                 SOC 2 Ready
-              </Badge>
-              <Badge variant="outline" className="text-sm px-4 py-2">
-                <FileCheck className="w-4 h-4 mr-2" />
+              </a>
+              <a href="#pipeda" className="feature-badge font-medium">
+                <FileCheck className="w-4 h-4 mr-2 inline" />
                 PIPEDA Aligned
-              </Badge>
+              </a>
             </div>
           </div>
         </section>

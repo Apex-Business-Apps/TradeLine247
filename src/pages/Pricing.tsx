@@ -125,8 +125,8 @@ const Pricing = () => {
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundAttachment: "fixed",
-            paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
-            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
+            paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
             paddingLeft: 'env(safe-area-inset-left, 0)',
             paddingRight: 'env(safe-area-inset-right, 0)'
           }}

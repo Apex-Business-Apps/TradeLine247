@@ -30,8 +30,8 @@ import RoiCalculator from "../components/RoiCalculator";
 import officialLogo from '@/assets/official-logo.png';
 export default function HeroRoiDuo() {
   return <section className="hero-section section-heavy overflow-hidden" style={{
-    paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
-    paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
+    paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
+    paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
