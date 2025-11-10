@@ -1089,27 +1089,22 @@ button[class*="btn-aa"] {
    UNIVERSAL OVERLAY SYSTEM - TRADELINE 24/7
    ====================================================================== */
 
-/* Landing page - subtle peachy overlay (less orange, more visible background) */
-.hero-section .hero-gradient-overlay {
-  background: linear-gradient(
-    135deg,
-    rgba(245, 150, 120, 0.26) 0%,
-    rgba(240, 145, 115, 0.27) 40%,
-    rgba(235, 140, 110, 0.28) 100%
-  );
-}
-
-/* Other pages - stronger orange overlay (covers background more) */
-.pricing-section .hero-gradient-overlay,
-.compare-section .hero-gradient-overlay,
-.faq-section .hero-gradient-overlay,
-.features-section .hero-gradient-overlay,
-.security-section .hero-gradient-overlay,
-.contact-section .hero-gradient-overlay {
+/* Default for all pages - stronger orange overlay (covers background more) */
+.hero-gradient-overlay {
   background: linear-gradient(
     135deg,
     rgba(255, 107, 53, 0.48) 0%,
     rgba(242, 120, 65, 0.46) 50%,
     rgba(255, 130, 80, 0.44) 100%
+  );
+}
+
+/* Landing page override (#app-home) - subtle peachy overlay (less orange, more visible background) */
+#app-home .hero-gradient-overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 150, 120, 0.26) 0%,
+    rgba(240, 145, 115, 0.27) 40%,
+    rgba(235, 140, 110, 0.28) 100%
   );
 }
