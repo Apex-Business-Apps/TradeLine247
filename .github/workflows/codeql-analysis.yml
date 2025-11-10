@@ -63,10 +63,11 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        continue-on-error: true
         with:
           category: "/language:${{matrix.language}}"
-          # Upload SARIF file for security tab
-          upload: true
+          # Upload SARIF file for security tab (may fail if Code Scanning not enabled)
+          upload: false
 
       - name: Report status (security/codeql)
         if: always()

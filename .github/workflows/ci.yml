@@ -122,7 +122,10 @@ jobs:
         with:
           node-version: 20
           cache: npm
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
       - run: npm ci --no-audit --fund=false
+      - run: npm run build
       - run: npm run test:ci --if-present
       - name: Report status (ci/test)
         if: always()
