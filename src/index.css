@@ -1084,3 +1084,79 @@ button[class*="btn-aa"] {
   .hero-gradient { animation: none; }
   .hero-cta-button:hover, .feature-badge:hover { transform: none; }
 }
+
+/* ======================================================================
+   UNIVERSAL OVERLAY SYSTEM - TRADELINE 24/7
+   ====================================================================== */
+
+/* Position all sections */
+.hero-section,
+.pricing-section,
+.compare-section,
+.faq-section,
+.features-section,
+.security-section,
+.contact-section {
+  position: relative;
+}
+
+/* LANDING PAGE - Subtle peachy overlay (35-38% opacity) */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 140, 100, 0.36) 0%,
+    rgba(255, 130, 90, 0.37) 40%,
+    rgba(245, 120, 80, 0.38) 100%
+  );
+  background-color: rgba(255, 130, 90, 0.37);
+}
+
+/* OTHER PAGES - Stronger orange overlay (44-48% opacity) */
+.pricing-section::before,
+.compare-section::before,
+.faq-section::before,
+.features-section::before,
+.security-section::before,
+.contact-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 53, 0.48) 0%,
+    rgba(242, 120, 65, 0.46) 50%,
+    rgba(255, 130, 80, 0.44) 100%
+  );
+  background-color: rgba(255, 107, 53, 0.46);
+}
+
+/* Content above overlay */
+.hero-section > *:not(script):not(style),
+.pricing-section > *:not(script):not(style),
+.compare-section > *:not(script):not(style),
+.faq-section > *:not(script):not(style),
+.features-section > *:not(script):not(style),
+.security-section > *:not(script):not(style),
+.contact-section > *:not(script):not(style) {
+  position: relative;
+  z-index: 2;
+}
+
+/* Interactive elements highest */
+button, a, input, textarea, select, form,
+.card, .pricing-card, .comparison-table, .faq-item {
+  position: relative;
+  z-index: 3;
+}
+
+/* Text readability */
+h1, h2, h3, h4, h5, h6 {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+}

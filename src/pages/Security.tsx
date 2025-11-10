@@ -7,7 +7,7 @@ import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import {
   Shield,
   Lock,
-  Eye,
+  ShieldCheck,
   Server,
   FileCheck,
   Users,
@@ -16,7 +16,8 @@ import {
   Globe,
   Database,
   Key,
-  Activity
+  FileText,
+  MapPin
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -34,7 +35,7 @@ const securityFeatures = [
     badge: "Enterprise"
   },
   {
-    icon: Eye,
+    icon: ShieldCheck,
     title: "24/7 Security Monitoring",
     description: "Continuous monitoring with real-time threat detection and automated incident response protocols.",
     badge: "Active"
@@ -52,7 +53,7 @@ const securityFeatures = [
     badge: "Private"
   },
   {
-    icon: Activity,
+    icon: FileText,
     title: "Audit Logging",
     description: "Comprehensive audit trails for all system access and data modifications. Tamper-proof logging.",
     badge: "Compliant"
@@ -64,25 +65,25 @@ const complianceStandards = [
     name: "SOC 2 Type II",
     status: "In Progress",
     description: "Independent SOC 2 Type II attestation (AICPA Trust Services Criteria). Availability, security, confidentiality in scope.",
-    icon: FileCheck
+    icon: Shield
   },
   {
     name: "GDPR Compliant",
     status: "Aligned",
     description: "Controls aligned to GDPR requirements; data subject rights honored (access, erasure, portability).",
-    icon: Globe
+    icon: CheckCircle2
   },
   {
     name: "PIPEDA Ready",
     status: "Aligned",
     description: "Canadian privacy law alignment based on PIPEDA's Fair Information Principles.",
-    icon: Shield
+    icon: MapPin
   },
   {
     name: "HTTPS Only",
     status: "Enforced",
     description: "All connections use HTTPS with HSTS enabled. No unencrypted traffic ever.",
-    icon: Lock
+    icon: Globe
   }
 ];
 

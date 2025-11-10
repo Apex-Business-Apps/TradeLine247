@@ -439,7 +439,7 @@ const Contact = () => {
                   </Card>
                 </div>
 
-                <div className="mt-8 p-6 bg-muted/30 rounded-lg">
+                <div className="mt-8 p-6 bg-muted/85 rounded-lg">
                   <div data-guard="canada-badge" className="flex items-start gap-3">
                     <img
                       src={builtCanadianBadge}
