@@ -264,16 +264,16 @@ const Contact = () => {
             {/* Contact Form */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 max-w-6xl mx-auto">
               <div>
-                <h2 className="text-3xl font-bold mb-6">Send Us a Message</h2>
-                <p className="text-muted-foreground mb-8">
+                <h2 className="text-3xl font-bold mb-6" style={{ color: '#1e556b' }}>Send Us a Message</h2>
+                <p className="mb-8" style={{ color: '#1e556b' }}>
                   Fill out the form below and our team will get back to you within 24 hours. 
                   For urgent matters, please call us directly.
                 </p>
                 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Contact Form</CardTitle>
-                    <CardDescription>
+                    <CardTitle style={{ color: '#1e556b' }}>Contact Form</CardTitle>
+                    <CardDescription style={{ color: '#1e556b' }}>
                       Tell us about your business needs and we'll help you get started
                     </CardDescription>
                   </CardHeader>
@@ -385,19 +385,21 @@ const Contact = () => {
                 </Card>
               </div>
 
-              <div>
-                <h2 className="text-3xl font-bold mb-6">Why Choose TradeLine 24/7?</h2>
+              <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
+                <h2 className="text-3xl font-bold mb-6" style={{ color: '#1e556b' }}>Why Choose TradeLine 24/7?</h2>
                 
                 <div className="space-y-8">
                   <Card className="bg-gradient-to-br from-primary/5 to-accent/5">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <Clock className="w-6 h-6 text-primary" />
-                        <CardTitle className="text-xl">24/7 Support</CardTitle>
+                        <div style={{ border: '2px solid #1e556b', borderRadius: '8px', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Clock className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                        </div>
+                        <CardTitle className="text-xl" style={{ color: '#1e556b' }}>24/7 Support</CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">
+                      <p style={{ color: '#1e556b' }}>
                         Our team and AI are available around the clock to ensure your business never misses an opportunity.
                       </p>
                     </CardContent>
@@ -405,10 +407,10 @@ const Contact = () => {
 
                   <Card className="bg-gradient-to-br from-accent/5 to-primary/5">
                     <CardHeader>
-                      <CardTitle className="text-xl">Quick Setup</CardTitle>
+                      <CardTitle className="text-xl" style={{ color: '#1e556b' }}>Quick Setup</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">
+                      <p style={{ color: '#1e556b' }}>
                         Set up in 10 minutes with our guided onboarding and integration support.
                       </p>
                     </CardContent>
@@ -416,10 +418,10 @@ const Contact = () => {
 
                   <Card className="bg-gradient-to-br from-secondary/20 to-accent/10">
                     <CardHeader>
-                      <CardTitle className="text-xl">Proven Results</CardTitle>
+                      <CardTitle className="text-xl" style={{ color: '#1e556b' }}>Proven Results</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">
+                      <p style={{ color: '#1e556b' }}>
                         Join thousands of businesses that have increased their lead conversion by 40% with our AI.
                       </p>
                     </CardContent>
@@ -436,9 +438,9 @@ const Contact = () => {
                       loading="lazy"
                     />
                     <div>
-                      <h3 className="font-semibold">Built in Canada</h3>
-                      <p className="opacity-80">Canadian-hosted. Privacy-by-design.</p>
-                      <p className="opacity-80">Made here. Trusted here.</p>
+                      <h3 className="font-semibold" style={{ color: '#1e556b' }}>Built in Canada</h3>
+                      <p style={{ color: '#1e556b', opacity: 0.8 }}>Canadian-hosted. Privacy-by-design.</p>
+                      <p style={{ color: '#1e556b', opacity: 0.8 }}>Made here. Trusted here.</p>
                     </div>
                   </div>
                 </div>
