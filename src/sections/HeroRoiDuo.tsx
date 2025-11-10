@@ -85,7 +85,7 @@ export default function HeroRoiDuo() {
             <span className="text-sm font-semibold uppercase tracking-wide text-[hsl(var(--brand-orange-dark))]/90">FOR DEMO</span>
           </a>
           
-          <h2 className="text-foreground mb-12 mt-16 text-center py-0 font-semibold mx-auto" style={{ fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 2.5rem)' }} data-lovable-lock="structure-only">Help us help you.</h2>
+          <h2 className="hero-tagline mb-12 mt-16 text-center py-0 font-semibold mx-auto" style={{ fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 2.5rem)' }} data-lovable-lock="structure-only">Help us help you.</h2>
           
           {/* Custom grid layout for side-by-side components */}
           <div className="hero-roi__container mx-auto" data-lovable-lock="structure-only" aria-label="Start Trial and ROI">

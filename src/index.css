@@ -864,7 +864,8 @@ header {
   position: absolute;
   inset: 0;
   /* Orange mask overlay with reduced opacity to allow background image to show through */
-  background: rgba(255, 107, 53, 0.15); /* #FF6B35 with 15% opacity - reduced for better see-through effect */
+  /* Increased hue by 5%: #FF6B35 (hsl(14,100%,60%)) -> hsl(19,100%,60%) = #FF7A35 */
+  background: rgba(255, 122, 53, 0.10); /* #FF7A35 with 10% opacity - reduced opacity, increased hue by 5% */
   pointer-events: none;
   z-index: 1;
 }
@@ -901,6 +902,38 @@ header {
     0 4px 8px rgba(255,255,255,0.1);
   line-height: 1.3;
   font-weight: 600;
+}
+
+/* Global Orange Color Unification - All orange elements use hero text orange (#FF6B35) */
+:root {
+  --unified-orange: #FF6B35;
+}
+
+/* Unify all primary color usage to hero text orange */
+.text-primary,
+[class*="text-primary"],
+button.text-primary,
+a.text-primary {
+  color: #FF6B35 !important;
+}
+
+.bg-primary,
+[class*="bg-primary"],
+button.bg-primary,
+a.bg-primary {
+  background-color: #FF6B35 !important;
+}
+
+.border-primary,
+[class*="border-primary"] {
+  border-color: #FF6B35 !important;
+}
+
+/* Ensure Home button and other orange buttons use unified color */
+button[class*="default"],
+a[class*="default"] {
+  background-color: #FF6B35 !important;
+  color: white !important;
 }
 
 .feature-badge {

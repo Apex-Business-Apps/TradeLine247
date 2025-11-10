@@ -196,8 +196,8 @@ const Contact = () => {
           className="hero-section py-20 relative"
           style={{
             backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundSize: "85%",
+            backgroundPosition: "center top",
             backgroundRepeat: "no-repeat",
             backgroundAttachment: "fixed",
             paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',

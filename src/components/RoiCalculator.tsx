@@ -139,20 +139,20 @@ const RoiCalculator = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="bg-muted/50 p-3 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-primary" />
+                    <TrendingUp className="h-4 w-4" style={{ color: '#FF6B35' }} />
                     <span className="font-medium text-foreground px-0 mx-0 text-xs -ml-[3px]">Recovered appointments</span>
                   </div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-2xl font-bold" style={{ color: '#FF6B35' }}>
                     {Math.round(results.qualifiedAppts)}
                   </div>
                 </div>
 
                 <div className="bg-muted/50 p-3 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="h-4 w-4 text-primary" />
+                    <DollarSign className="h-4 w-4" style={{ color: '#FF6B35' }} />
                     <span className="text-sm font-medium text-foreground">Projected revenue (CAD)</span>
                   </div>
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-2xl font-bold" style={{ color: '#FF6B35' }}>
                     {cad.format(results.monthlyRevenue)}
                   </div>
                 </div>
@@ -171,25 +171,25 @@ const RoiCalculator = () => {
 
                 <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm text-muted-foreground">ROI (Commission)</span>
-                  <span className="font-medium text-primary">{Math.round(results.roiCommission * 100)}%</span>
+                  <span className="font-medium" style={{ color: '#FF6B35' }}>{Math.round(results.roiCommission * 100)}%</span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-sm text-muted-foreground">ROI (Predictable)</span>
-                  <span className="font-medium text-primary">{Math.round(results.roiPredictable * 100)}%</span>
+                  <span className="font-medium" style={{ color: '#FF6B35' }}>{Math.round(results.roiPredictable * 100)}%</span>
                 </div>
               </div>
 
-              <Badge className="w-full justify-center py-2 bg-[hsl(17,90%,38%)] text-primary-foreground">
+              <Badge className="w-full justify-center py-2 text-white" style={{ backgroundColor: '#FF6B35' }}>
                 Best value this month: {results.bestPlan}
               </Badge>
 
               <div className="space-y-2 pt-2">
-                <Button size="lg" className="w-full bg-[hsl(17,90%,38%)] hover:bg-[hsl(17,90%,34%)] text-primary-foreground" asChild>
+                <Button size="lg" className="w-full text-white hover:opacity-90" style={{ backgroundColor: '#FF6B35' }} asChild>
                   <a href="/auth?plan=commission">Start Zero-Monthly</a>
                 </Button>
 
-                <Button size="lg" variant="outline" className="w-full border-[hsl(17,90%,38%)] text-[hsl(17,90%,38%)] hover:bg-[hsl(17,90%,38%)] hover:text-primary-foreground" asChild>
+                <Button size="lg" variant="outline" className="w-full hover:text-white" style={{ borderColor: '#FF6B35', color: '#FF6B35' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FF6B35'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }} asChild>
                   <a href="/auth?plan=core">Choose Predictable</a>
                 </Button>
               </div>
