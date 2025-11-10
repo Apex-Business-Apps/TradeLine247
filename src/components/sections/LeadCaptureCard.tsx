@@ -363,7 +363,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                       type="submit" 
                       size="lg" 
                       className="w-full text-white hover:opacity-90 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 font-semibold" 
-                      style={{ backgroundColor: '#FF6B35' }}
+                      className="btn-aa"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -384,7 +384,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                       variant="outline"
                       className="w-full hover:text-white transition-all duration-200 active:scale-[0.98] font-medium"
                       style={{ borderColor: '#FF6B35', color: '#FF6B35' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FF6B35'; }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#D95226'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                       type="button"
                       asChild

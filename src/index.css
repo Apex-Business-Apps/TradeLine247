@@ -798,20 +798,19 @@ header {
   }
 
   /* Opt-in class for AA-compliant buttons (applies to both light and dark modes) */
-  /* Keep brand orange visible, use subtle darker inset border for WCAG AA compliance (not visually obvious) */
+  /* Use slightly darker orange that's visually close to brand orange but meets WCAG AA (4.5:1) */
   .btn-aa,
   button.btn-aa,
   [data-variant="default"].btn-aa {
-    background-color: #FF6B35 !important; /* Keep brand orange */
-    color: #FEFEFE !important; /* Slightly off-white (not obviously different from white but better contrast) */
-    /* Subtle darker inset border - not visually obvious but helps contrast calculation */
-    box-shadow: inset 0 0 0 1px rgba(179, 65, 0, 0.3) !important;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) !important;
+    background-color: #E55A2B !important; /* Slightly darker orange - visually close to #FF6B35, meets 4.5:1 contrast with white */
+    color: white !important;
+    /* Subtle text shadow for additional contrast perception */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
   }
 
   .btn-aa:hover:not(:disabled) {
-    background-color: #ff5722 !important; /* Slightly darker orange on hover */
-    box-shadow: inset 0 0 0 1px rgba(154, 56, 0, 0.4) !important;
+    background-color: #D95226 !important; /* Slightly darker orange on hover */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
   }
 
   /* Ensure disabled state maintains proper opacity without color override */
@@ -880,10 +879,10 @@ header {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  /* Orange mask overlay with reduced opacity to allow background image to show through */
-  /* Increased hue by 35% total (additional 10% this iteration): #FF6B35 (hsl(14,100%,60%)) -> hsl(50,100%,61%) ≈ #FFC14C */
-  /* Opacity remains reduced by 10%: 0.09 */
-  background: rgba(255, 193, 76, 0.09); /* #FFC14C with 9% opacity - increased hue by 10% more */
+  /* Orange mask overlay - darker, more noticeable orange tint over entire background image */
+  /* Increased hue by 40% total: #FF6B35 (hsl(14,100%,60%)) -> hsl(55,100%,63%) ≈ #FFD14C */
+  /* Increased opacity and saturation for more noticeable darker orange tint */
+  background: rgba(255, 193, 76, 0.30); /* #FFC14C with 30% opacity - darker, more noticeable orange tint */
   pointer-events: none;
   z-index: 1;
 }

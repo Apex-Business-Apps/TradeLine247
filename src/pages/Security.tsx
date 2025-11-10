@@ -188,8 +188,8 @@ const Security = () => {
           <div className="container relative z-10">
             <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
               <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>Enterprise-Grade Security</h2>
-                <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e556b' }}>
+                <h2 className="hero-headline text-3xl md:text-4xl font-bold mb-4">Enterprise-Grade Security</h2>
+                <p className="hero-tagline text-lg max-w-2xl mx-auto">
                   Multiple layers of security protecting your data at every level.
                 </p>
               </div>
@@ -219,12 +219,14 @@ const Security = () => {
               </svg>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto relative" style={{ zIndex: 1 }}>
-                {securityFeatures.map((feature, index) => (
+                {securityFeatures.map((feature, index) => {
+                  const IconComponent = feature.icon;
+                  return (
                   <Card key={index} className="hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <div className="flex items-start justify-between mb-3">
                         <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
-                          <feature.icon className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                          <IconComponent className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
                         </div>
                         <Badge variant="secondary" className="text-xs">
                           {feature.badge}
@@ -236,7 +238,8 @@ const Security = () => {
                       <p className="text-sm" style={{ color: '#1e556b' }}>{feature.description}</p>
                     </CardContent>
                   </Card>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -278,7 +281,7 @@ const Security = () => {
                             <Badge
                               variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
                               className="mt-1 text-xs"
-                              style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#FF6B35' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
+                              style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#E55A2B' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
                             >
                               {standard.status}
                             </Badge>
