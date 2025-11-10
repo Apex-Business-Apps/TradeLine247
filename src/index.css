@@ -877,9 +877,9 @@ header {
   position: absolute;
   inset: 0;
   /* Orange mask overlay with reduced opacity to allow background image to show through */
-  /* Increased hue by 15% total (10% more from previous): #FF6B35 (hsl(14,100%,60%)) -> hsl(29,100%,60%) = #FF9A35 */
-  /* Reduced opacity by 10% from previous: 0.10 -> 0.09 */
-  background: rgba(255, 154, 53, 0.09); /* #FF9A35 with 9% opacity - increased hue by 10%, reduced opacity by 10% */
+  /* Increased hue by 25% total (additional 10% this iteration): #FF6B35 (hsl(14,100%,60%)) -> hsl(40,100%,61%) ≈ #FFB14C */
+  /* Opacity remains reduced by 10%: 0.09 */
+  background: rgba(255, 177, 76, 0.09); /* #FFB14C with 9% opacity */
   pointer-events: none;
   z-index: 1;
 }
