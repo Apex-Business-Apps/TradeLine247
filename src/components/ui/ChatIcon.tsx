@@ -70,8 +70,9 @@ export const ChatIcon: React.FC<ChatIconProps> = ({
         'object-contain flex-shrink-0',
         className
       )}
-      loading={props.loading || "lazy"}
+      loading={props.loading || "eager"}
       onError={() => setHasError(true)}
+      onLoad={() => setHasError(false)}
       {...props}
     />
   );
