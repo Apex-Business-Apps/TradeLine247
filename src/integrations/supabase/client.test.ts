@@ -71,12 +71,12 @@ describe('Supabase Client', () => {
     expect(content).toMatch(/SUPABASE_(PUBLISHABLE_KEY|ANON_KEY)/);
   });
 
-  it('should be marked as auto-generated', () => {
+  it('should have preview-safe design', () => {
     const content = readClientFileContent();
 
-    // Verify the file has the auto-generated comment
-    expect(content).toContain('automatically generated');
-    expect(content).toContain('Do not edit it directly');
+    // Verify the file has the preview-safe comment and disabled proxy
+    expect(content).toContain('Preview-safe Supabase client');
+    expect(content).toContain('disabledProxy');
   });
 });
 
