@@ -13,9 +13,9 @@ const buttonVariants = cva(
         // To revert: remove "btn-aa" from this line
         default: "btn-aa bg-primary text-primary-foreground hover:bg-primary/90",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        outline: "border border-input bg-background text-foreground hover:border-primary hover:text-primary hover:bg-accent",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "bg-transparent text-foreground hover:bg-muted",
+        ghost: "bg-transparent text-foreground hover:bg-muted hover:text-primary",
         link: "text-primary underline-offset-4 hover:underline",
         success: "bg-[hsl(142_85%_25%)] text-white hover:bg-[hsl(142_90%_20%)]", // WCAG AA: brand-green-dark (5.76:1 contrast)
       },
