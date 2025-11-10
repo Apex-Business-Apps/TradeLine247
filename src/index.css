@@ -730,6 +730,7 @@ a[class*="bg-primary"],
 .btn-aa.bg-primary {
   background-color: hsl(15 100% 35%) !important; /* brand-orange-dark: 7.14:1 with white */
   color: white !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.30) !important;
 }
 
 button.bg-primary:hover,
