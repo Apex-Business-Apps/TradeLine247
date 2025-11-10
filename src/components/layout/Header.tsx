@@ -243,9 +243,9 @@ export const Header: React.FC = () => {
             type="button"
           >
             {isMobileMenuOpen ? (
-              <X size={20} className="text-foreground" strokeWidth={2} />
+              <X size={20} strokeWidth={2} style={{ color: '#FF6B35' }} />
             ) : (
-              <Menu size={20} className="text-foreground" strokeWidth={2} />
+              <Menu size={20} strokeWidth={2} style={{ color: '#FF6B35' }} />
             )}
           </button>
 
