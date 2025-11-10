@@ -9,6 +9,7 @@ import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { errorReporter } from '@/lib/errorReporter';
+import builtCanadianBadge from '@/assets/badges/built-canadian.svg';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -141,21 +142,15 @@ export const Header: React.FC = () => {
           >
             Home
           </Button>
-          <picture>
-            <source
-              srcSet="/assets/brand/badges/built-in-canada-badge.webp"
-              type="image/webp"
-            />
-            <img
-              id="app-badge-ca"
-              src="/assets/brand/badges/built-in-canada-badge.png"
-              alt="Built in Canada"
-              className="h-[45px] sm:h-[60px] lg:h-[65px] w-auto"
-              width="156"
-              height="65"
-              loading="eager"
-            />
-          </picture>
+          <img
+            id="app-badge-ca"
+            src={builtCanadianBadge}
+            alt="Built in Canada"
+            className="h-[45px] sm:h-[60px] lg:h-[65px] w-auto"
+            width="156"
+            height="65"
+            loading="eager"
+          />
         </div>
 
         {/* Center: Desktop Marketing Navigation */}
