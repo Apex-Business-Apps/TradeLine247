@@ -180,12 +180,12 @@ const RoiCalculator = () => {
                 </div>
               </div>
 
-              <Badge className="w-full justify-center py-2 text-white" style={{ backgroundColor: '#FF6B35' }}>
+              <Badge className="w-full justify-center py-2 text-white" style={{ backgroundColor: '#E55A2B' }}>
                 Best value this month: {results.bestPlan}
               </Badge>
 
               <div className="space-y-2 pt-2">
-                <Button size="lg" className="w-full text-white hover:opacity-90" style={{ backgroundColor: '#FF6B35' }} asChild>
+                <Button size="lg" className="w-full text-white hover:opacity-90 btn-aa" asChild>
                   <a href="/auth?plan=commission">Start Zero-Monthly</a>
                 </Button>
 
