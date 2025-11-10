@@ -1089,13 +1089,13 @@ button[class*="btn-aa"] {
    UNIVERSAL OVERLAY SYSTEM - TRADELINE 24/7
    ====================================================================== */
 
-/* Landing page - subtle peachy overlay (background visible) */
+/* Landing page - subtle peachy overlay (less orange, more visible background) */
 .hero-section .hero-gradient-overlay {
   background: linear-gradient(
     135deg,
-    rgba(255, 140, 100, 0.36) 0%,
-    rgba(255, 130, 90, 0.37) 40%,
-    rgba(245, 120, 80, 0.38) 100%
+    rgba(245, 150, 120, 0.26) 0%,
+    rgba(240, 145, 115, 0.27) 40%,
+    rgba(235, 140, 110, 0.28) 100%
   );
 }
 
