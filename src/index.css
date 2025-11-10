@@ -864,7 +864,7 @@ header {
   position: absolute;
   inset: 0;
   /* Orange mask overlay with reduced opacity to allow background image to show through */
-  background: rgba(255, 107, 53, 0.35); /* #FF6B35 with 35% opacity */
+  background: rgba(255, 107, 53, 0.25); /* #FF6B35 with 25% opacity - reduced for better visibility */
   pointer-events: none;
   z-index: 1;
 }

@@ -236,11 +236,11 @@ export const Header: React.FC = () => {
         >
           <LanguageSwitcher />
 
-          {/* Burger Menu Button (Mobile Only) */}
+          {/* Burger Menu Button - Always visible */}
           <button
             id="burger-menu-button"
             data-testid="burger-menu-button"
-            className="flex lg:hidden items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
+            className="flex items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
             onClick={() => setIsMobileMenuOpen(prev => !prev)}
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
@@ -341,13 +341,13 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Navigation Drawer - Now visible on all screen sizes */}
       <nav
         id="mobile-menu"
         aria-label="Mobile"
         aria-hidden={!isMobileMenuOpen}
         className={cn(
-          'lg:hidden border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden',
+          'border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden',
           isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
         )}
       >
