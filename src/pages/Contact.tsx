@@ -228,14 +228,15 @@ const Contact = () => {
                 <Card
                   key={index}
                   className="text-center hover:shadow-lg transition-shadow cursor-pointer group"
+                  style={{ borderColor: '#FF6B35', borderWidth: '2px' }}
                   onClick={() => handleContactAction(method.action)}
                 >
                   <CardHeader>
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-                      <method.icon className="w-6 h-6 text-primary" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors" style={{ border: '2px solid #FF6B35' }}>
+                      <method.icon className="w-6 h-6" style={{ color: '#1e556b', strokeWidth: '2px' }} />
                     </div>
                     <CardTitle className="text-lg">{method.title}</CardTitle>
-                    <CardDescription>{method.description}</CardDescription>
+                    <CardDescription style={{ color: '#1e556b' }}>{method.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
                       {isDirectLink ? (
