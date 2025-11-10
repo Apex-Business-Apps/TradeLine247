@@ -234,58 +234,61 @@ const Security = () => {
         {/* Compliance Standards */}
         <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
           <div className="container">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Compliance & Standards</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Aligned with recognized standards. Independent assessments where applicable.
-              </p>
-            </div>
+            <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>Compliance & Standards</h2>
+                <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e556b' }}>
+                  Aligned with recognized standards. Independent assessments where applicable.
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {complianceStandards.map((standard, index) => (
-                <Card key={index} className="bg-background/80 backdrop-blur">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <standard.icon className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg">{standard.name}</CardTitle>
-                          <Badge
-                            variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
-                            className="mt-1 text-xs"
-                          >
-                            {standard.status}
-                          </Badge>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto relative" style={{ zIndex: 1 }}>
+                {complianceStandards.map((standard, index) => (
+                  <Card key={index} className="bg-background/80 backdrop-blur">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
+                            <standard.icon className="w-5 h-5" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg" style={{ color: '#1e556b' }}>{standard.name}</CardTitle>
+                            <Badge
+                              variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
+                              className="mt-1 text-xs"
+                              style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#FF6B35' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
+                            >
+                              {standard.status}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm" style={{ color: '#1e556b' }}>{standard.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              <div className="text-center mt-12">
+                <Card className="inline-block bg-background/80 backdrop-blur" style={{ border: '2px solid #FF6B35' }}>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-3 text-left">
+                      <AlertTriangle className="w-8 h-8 flex-shrink-0" style={{ color: '#FF6B35', strokeWidth: '2px' }} aria-hidden="true" />
+                      <div>
+                        <p className="font-semibold mb-1" style={{ color: '#1e556b' }}>Security Vulnerability Reporting</p>
+                        <p className="text-sm" style={{ color: '#1e556b' }}>
+                          Found a security issue? Email us at{" "}
+                          <a href="mailto:security@tradeline247ai.com" className="hover:underline" style={{ color: '#FF6B35', fontWeight: 'bold' }}>
+                            security@tradeline247ai.com
+                          </a>
+                        </p>
+                      </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{standard.description}</p>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-
-            <div className="text-center mt-12">
-              <Card className="inline-block bg-background/80 backdrop-blur">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3 text-left">
-                    <AlertTriangle className="w-8 h-8 text-primary flex-shrink-0" aria-hidden="true" />
-                    <div>
-                      <p className="font-semibold mb-1">Security Vulnerability Reporting</p>
-                      <p className="text-sm text-muted-foreground">
-                        Found a security issue? Email us at{" "}
-                        <a href="mailto:security@tradeline247ai.com" className="text-primary hover:underline">
-                          security@tradeline247ai.com
-                        </a>
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              </div>
             </div>
           </div>
         </section>
