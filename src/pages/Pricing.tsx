@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SEOHead } from "@/components/seo/SEOHead";
+import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 
 const plans = [
   {
@@ -116,17 +117,27 @@ const Pricing = () => {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-background to-secondary/20" style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
-          paddingLeft: 'env(safe-area-inset-left, 0)',
-          paddingRight: 'env(safe-area-inset-right, 0)'
-        }}>
-          <div className="container text-center">
+        <section 
+          className="hero-section py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+            paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
+            paddingLeft: 'env(safe-area-inset-left, 0)',
+            paddingRight: 'env(safe-area-inset-right, 0)'
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container text-center relative z-10">
             <h1 className="hero-headline text-4xl md:text-6xl font-bold mt-0 mb-8">
               Simple, Transparent Pricing
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="hero-tagline text-lg md:text-xl mb-8 max-w-3xl mx-auto">
               Choose the perfect plan for your business. All plans include our core AI receptionist features with 14-day free trial.
             </p>
           </div>

@@ -3,6 +3,7 @@ import { SEOHead } from "@/components/seo/SEOHead";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import {
   Shield,
   Lock,
@@ -124,15 +125,30 @@ const Security = () => {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-br from-background via-secondary/10 to-primary/5">
-          <div className="container text-center">
+        <section 
+          className="hero-section py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+            paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
+            paddingLeft: 'env(safe-area-inset-left, 0)',
+            paddingRight: 'env(safe-area-inset-right, 0)'
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container text-center relative z-10">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
               <Shield className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="hero-headline text-4xl md:text-6xl font-bold mb-6">
               Security & Privacy First
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="hero-tagline text-lg md:text-xl mb-8 max-w-3xl mx-auto">
               Enterprise-grade security protecting your business data. Built for Canadian businesses with Canadian data sovereignty.
             </p>
             <div className="flex flex-wrap justify-center gap-3 mb-8">

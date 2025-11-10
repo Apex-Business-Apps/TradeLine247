@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { SEOHead } from "@/components/seo/SEOHead";
+import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 
 const features = [
   {
@@ -67,18 +68,28 @@ const Features = () => {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-background to-secondary/20" style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
-          paddingLeft: 'env(safe-area-inset-left, 0)',
-          paddingRight: 'env(safe-area-inset-right, 0)'
-        }}>
-          <div className="container">
+        <section 
+          className="hero-section py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+            paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
+            paddingLeft: 'env(safe-area-inset-left, 0)',
+            paddingRight: 'env(safe-area-inset-right, 0)'
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
             <div className="text-center max-w-3xl mx-auto">
               <h1 className="hero-headline text-4xl md:text-6xl font-bold mb-6">
                 Powerful Features
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground mb-8">
+              <p className="hero-tagline text-lg md:text-xl mb-8">
                 Everything you need for fast and reliable customer interaction automation
               </p>
               <Button size="lg" className="shadow-lg" onClick={handleCTAClick} asChild>

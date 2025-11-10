@@ -15,6 +15,7 @@ import { z } from "zod";
 import { PUBLIC_HELPLINE_E164, PUBLIC_HELPLINE_DISPLAY, PUBLIC_EMAIL } from "@/config/public";
 import builtCanadianBadge from "@/assets/badges/built-canadian.svg";
 import { errorReporter } from "@/lib/errorReporter";
+import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 
 const contactFormSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),
@@ -191,12 +192,27 @@ const Contact = () => {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-br from-background to-secondary/20">
-          <div className="container text-center">
+        <section 
+          className="hero-section py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+            paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
+            paddingLeft: 'env(safe-area-inset-left, 0)',
+            paddingRight: 'env(safe-area-inset-right, 0)'
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container text-center relative z-10">
             <h1 className="hero-headline text-4xl md:text-6xl font-bold mb-6">
               Get in Touch
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="hero-tagline text-lg md:text-xl mb-8 max-w-3xl mx-auto">
               Ready to grow your business with AI? Let's talk about how TradeLine 24/7 can help you.
             </p>
           </div>
