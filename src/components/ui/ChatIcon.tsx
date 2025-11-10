@@ -5,9 +5,10 @@
  * Idempotent: Safe to use multiple times without side effects.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ROBOT_ICON_PATH } from '@/lib/brandIcons';
 import { cn } from '@/lib/utils';
+import { MessageCircle } from 'lucide-react';
 
 interface ChatIconProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   /**
@@ -28,9 +29,17 @@ const sizeClasses = {
   xl: 'w-12 h-12',
 } as const;
 
+const iconSizes = {
+  sm: 16,
+  md: 24,
+  lg: 32,
+  xl: 48,
+} as const;
+
 /**
  * ChatIcon component that displays the brand robot icon
  * Used globally for chatbox, assistant UI, and AI-related features
+ * Falls back to MessageCircle icon if robot icon fails to load
  */
 export const ChatIcon: React.FC<ChatIconProps> = ({
   size = 'md',
@@ -38,6 +47,20 @@ export const ChatIcon: React.FC<ChatIconProps> = ({
   alt = 'TradeLine 24/7 AI Assistant',
   ...props
 }) => {
+  const [hasError, setHasError] = useState(false);
+
+  // If image failed to load, use fallback icon
+  if (hasError) {
+    return (
+      <MessageCircle 
+        size={iconSizes[size]} 
+        className={cn(sizeClasses[size], className)}
+        aria-label={alt}
+        {...(props as any)}
+      />
+    );
+  }
+
   return (
     <img
       src={ROBOT_ICON_PATH}
@@ -48,6 +71,7 @@ export const ChatIcon: React.FC<ChatIconProps> = ({
         className
       )}
       loading={props.loading || "lazy"}
+      onError={() => setHasError(true)}
       {...props}
     />
   );
