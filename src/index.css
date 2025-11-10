@@ -1093,9 +1093,9 @@ button[class*="btn-aa"] {
 .hero-gradient-overlay {
   background: linear-gradient(
     135deg,
-    rgba(255, 107, 53, 0.63) 0%,
-    rgba(242, 120, 65, 0.61) 50%,
-    rgba(255, 130, 80, 0.59) 100%
+    rgba(255, 107, 53, 0.75) 0%,
+    rgba(242, 120, 65, 0.73) 50%,
+    rgba(255, 130, 80, 0.71) 100%
   );
 }
 
