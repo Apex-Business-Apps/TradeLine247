@@ -910,11 +910,11 @@ header {
 }
 
 .hero-tagline {
-  color: #1e556b;
+  color: #1e556b !important;
   text-shadow: 
-    0 2px 4px rgba(255, 107, 53, 0.6),
-    0 4px 8px rgba(255, 107, 53, 0.3),
-    0 8px 16px rgba(255, 107, 53, 0.2);
+    0 2px 4px rgba(255, 107, 53, 0.8) !important,
+    0 4px 8px rgba(255, 107, 53, 0.5) !important,
+    0 8px 16px rgba(255, 107, 53, 0.3) !important;
   line-height: 1.3;
   font-weight: 600;
 }
@@ -923,6 +923,34 @@ header {
 :root {
   --unified-orange: #FF6B35;
   --unified-orange-dark: #CC4A1F; /* Darker orange for text on white (WCAG AA: 4.5:1 contrast) */
+}
+
+/* Force all black text to navy blue globally */
+* {
+  color: inherit;
+}
+
+/* Override any black text colors to navy blue */
+[style*="color: #000"],
+[style*="color:#000"],
+[style*="color: black"],
+[style*="color:black"],
+[style*="color: rgb(0,0,0)"],
+[style*="color:rgb(0,0,0)"],
+.text-black,
+[class*="text-black"] {
+  color: #1e556b !important;
+}
+
+/* Ensure foreground color is navy, not black */
+body,
+p,
+span,
+div,
+h1, h2, h3, h4, h5, h6,
+.text-foreground,
+[class*="text-foreground"] {
+  color: hsl(var(--foreground)) !important;
 }
 
 /* Unify all primary color usage to hero text orange */
