@@ -120,10 +120,10 @@ All colors MUST be HSL.
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 200 60% 25%; /* Navy blue (#1e556b) instead of black */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 200 60% 25%; /* Navy blue (#1e556b) instead of black */
 
     --primary: var(--brand-orange-dark); /* WCAG AA: use darker orange (15 100% 35%) for 7.14:1 contrast */
     --primary-foreground: 0 0% 100%; /* White text on darker orange background */
@@ -849,4 +849,36 @@ a[href^="mailto"]:hover {
   #app-header-left {
     margin-left: 0px !important;
   }
+  
+  /* Ensure outline buttons and their children use darker orange on hover for WCAG AA */
+  button[class*="outline"]:hover,
+  button[class*="outline"]:hover *,
+  button[class*="outline"]:hover span,
+  a[class*="outline"]:hover,
+  a[class*="outline"]:hover *,
+  a[class*="outline"]:hover span {
+    color: #CC4A1F !important;
+  }
+}
+
+
+/* Hero Section Visual Restoration - Nov 10, 2025 */
+/* ============================================
+   HERO SECTION - VISUAL RESTORATION
+   Restores Nov 4 production aesthetics
+   Preserves all current functionality
+   ============================================ */
+
+.hero-section {
+  position: relative;
+  min-height: auto; /* Changed from 100vh to auto to reduce gap */
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: transparent; /* Allow parent background image to show through */
+}
+
+.hero-gradient {
+  /* Removed dark gradient - background image from parent should show through */
+  display: none;
 }
