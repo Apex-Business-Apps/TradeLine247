@@ -124,7 +124,7 @@ export const Header: React.FC = () => {
     >
       <div 
         data-header-inner 
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 items-center gap-4"
+        className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 items-center gap-4"
       >
         {/* Left: Home Button & Badge */}
         <div 
@@ -330,7 +330,7 @@ export const Header: React.FC = () => {
             </>
           ) : (
             <Button 
-              variant="default" 
+              variant="success" 
               size={isScrolled ? 'sm' : 'default'} 
               onClick={() => handleNavigation(paths.auth, 'Login')}
               className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
