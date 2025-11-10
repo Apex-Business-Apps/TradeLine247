@@ -9,15 +9,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // A11Y: btn-aa class provides WCAG AA compliance (see src/index.css @layer accessibility-buttons)
-        // To revert: remove "btn-aa" from this line
-        default: "btn-aa bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:bg-primary/80",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background text-foreground hover:border-primary hover:text-primary hover:bg-accent",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "bg-transparent text-foreground hover:bg-muted hover:text-primary",
+        outline:
+          "border border-input bg-background text-foreground hover:border-primary hover:text-primary hover:bg-accent focus-visible:border-primary focus-visible:text-primary",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus-visible:bg-secondary/70",
+        ghost:
+          "bg-transparent text-foreground hover:bg-muted hover:text-primary focus-visible:text-primary focus-visible:bg-muted/80",
         link: "text-primary underline-offset-4 hover:underline",
-        success: "bg-[hsl(142_85%_25%)] text-white hover:bg-[hsl(142_90%_20%)]", // WCAG AA: brand-green-dark (5.76:1 contrast)
+        success: "bg-green-700 text-white hover:bg-green-800 focus-visible:bg-green-800",
       },
       size: {
         default: "h-10 px-4 py-2",
