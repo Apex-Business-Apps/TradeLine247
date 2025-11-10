@@ -224,13 +224,13 @@ export const Header: React.FC = () => {
           </nav>
         )}
 
-        {/* Right: Language Switcher, User Menu, Burger */}
+        {/* Right: Language Switcher, Burger, User Menu */}
         <div 
           data-slot="right" 
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 ml-auto"
         >
           <LanguageSwitcher />
-
+          
           {/* Burger Menu Button - Always visible */}
           <button
             id="burger-menu-button"
