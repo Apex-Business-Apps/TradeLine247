@@ -146,7 +146,11 @@ const Pricing = () => {
         {/* Pricing Cards */}
         <section className="py-20">
           <div className="container">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem', maxWidth: '4xl', margin: '0 auto' }}>
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>Choose Your Plan</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative" style={{ zIndex: 1 }}>
               {plans.map((plan, index) => (
                 <Card key={index} id={plan.id} className={`relative ${plan.popular ? 'ring-2 ring-primary shadow-xl scale-105' : ''}`}>
                   {plan.popular && (
@@ -156,8 +160,8 @@ const Pricing = () => {
                     </Badge>
                   )}
                   <CardHeader className="text-center pb-8">
-                    <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                    <CardDescription className="text-base">
+                    <CardTitle className="text-2xl" style={{ color: '#1e556b' }}>{plan.name}</CardTitle>
+                    <CardDescription className="text-base" style={{ color: '#1e556b' }}>
                       {plan.description}
                     </CardDescription>
                     <div className="mt-4">
@@ -169,7 +173,7 @@ const Pricing = () => {
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-3">
                           <CheckCircle className="w-5 h-5 text-[hsl(142,85%,25%)] flex-shrink-0 mt-0.5" aria-hidden="true" />
-                          <span className="text-sm">{feature}</span>
+                          <span className="text-sm" style={{ color: '#1e556b' }}>{feature}</span>
                         </li>
                       ))}
                     </ul>

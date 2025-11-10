@@ -90,35 +90,37 @@ const FAQ = () => {
         {/* FAQ Accordion */}
         <section className="py-20">
           <div className="container">
-            <Card className="max-w-4xl mx-auto">
-              <CardHeader>
-                <CardTitle className="text-2xl text-center">Common Questions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible className="w-full">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger className="text-left">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </CardContent>
-            </Card>
+            <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem', maxWidth: '4xl', margin: '0 auto' }}>
+              <Card className="max-w-4xl mx-auto border-0 shadow-none bg-transparent">
+                <CardHeader>
+                  <CardTitle className="text-2xl text-center" style={{ color: '#1e556b' }}>Common Questions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`item-${index}`}>
+                        <AccordionTrigger className="text-left" style={{ color: '#1e556b' }}>
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent style={{ color: '#1e556b' }}>
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </section>
 
         {/* Still Have Questions */}
         <section className="py-20 bg-gradient-to-br from-primary/10 to-accent/10">
           <div className="container text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: '#1e556b' }}>
               Still Have Questions?
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: '#1e556b' }}>
               Our team is here to help. Get in touch and we'll answer any questions about TradeLine 24/7.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
