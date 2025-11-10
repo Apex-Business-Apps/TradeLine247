@@ -188,6 +188,7 @@ const Pricing = () => {
                   </CardContent>
                 </Card>
               ))}
+              </div>
             </div>
 
             {/* Additional Info */}

@@ -137,18 +137,20 @@ const FAQ = () => {
         {/* Quick Stats */}
         <section className="py-16">
           <div className="container">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">99.9%</div>
-                <div className="text-muted-foreground">Uptime Guarantee</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">10 min</div>
-                <div className="text-muted-foreground">Setup Time</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">50+</div>
-                <div className="text-muted-foreground">Languages Supported</div>
+            <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div style={{ border: '2px solid #FF6B35', borderRadius: '8px', padding: '1.5rem' }}>
+                  <div className="text-4xl font-bold mb-2" style={{ color: '#FF6B35' }}>99.9%</div>
+                  <div style={{ color: '#1e556b' }}>Uptime Guarantee</div>
+                </div>
+                <div style={{ border: '2px solid #FF6B35', borderRadius: '8px', padding: '1.5rem' }}>
+                  <div className="text-4xl font-bold mb-2" style={{ color: '#FF6B35' }}>10 min</div>
+                  <div style={{ color: '#1e556b' }}>Setup Time</div>
+                </div>
+                <div style={{ border: '2px solid #FF6B35', borderRadius: '8px', padding: '1.5rem' }}>
+                  <div className="text-4xl font-bold mb-2" style={{ color: '#FF6B35' }}>50+</div>
+                  <div style={{ color: '#1e556b' }}>Languages Supported</div>
+                </div>
               </div>
             </div>
           </div>
