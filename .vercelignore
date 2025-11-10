@@ -1,0 +1,76 @@
+# Vercel ignore file
+# Files and directories to exclude from Vercel deployments
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+test-results/
+playwright-report/
+.nyc_output
+
+# Build outputs (Vercel builds these)
+dist/
+build/
+.next/
+out/
+
+# Environment files (use Vercel dashboard instead)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in deployment)
+*.md
+docs/
+audit/
+
+# Scripts (not needed in deployment)
+scripts/
+*.ps1
+*.sh
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Mobile
+ios/
+android/
+capacitor.config.ts
+
+# Supabase (deployed separately)
+supabase/
+
+# K6 tests
+k6/
+
+# Fastlane
+fastlane/
+
+# Config (some may be needed, adjust as needed)
+config/
+
+# Temporary files
+*.log
+*.tmp
+*.temp
+
