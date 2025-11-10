@@ -9,8 +9,6 @@ import {
   Lock,
   ShieldCheck,
   Server,
-  FileCheck,
-  Users,
   AlertTriangle,
   CheckCircle2,
   Globe,
