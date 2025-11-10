@@ -318,20 +318,20 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                 <div className="space-y-3">
                   <div className="bg-muted/50 p-3 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-4 w-4 text-primary" />
+                      <Clock className="h-4 w-4" style={{ color: '#FF6B35' }} />
                       <span className="font-medium text-foreground text-xs">Response Time</span>
                     </div>
-                    <div className="text-2xl font-bold text-primary">
+                    <div className="text-2xl font-bold" style={{ color: '#FF6B35' }}>
                       2 hours
                     </div>
                   </div>
 
                   <div className="bg-muted/50 p-3 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <DollarSign className="h-4 w-4 text-primary" />
+                      <DollarSign className="h-4 w-4" style={{ color: '#FF6B35' }} />
                       <span className="text-sm font-medium text-foreground">Setup Cost</span>
                     </div>
-                    <div className="text-2xl font-bold text-primary">
+                    <div className="text-2xl font-bold" style={{ color: '#FF6B35' }}>
                       Free
                     </div>
                   </div>
@@ -349,12 +349,12 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
 
                     <div className="flex justify-between items-center py-2 border-b border-border">
                       <span className="text-sm text-muted-foreground">Trial period</span>
-                      <span className="font-medium text-primary">14 days</span>
+                      <span className="font-medium" style={{ color: '#FF6B35' }}>14 days</span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b border-border">
                       <span className="text-sm text-muted-foreground">Contract length</span>
-                      <span className="font-medium text-primary">Month-to-month</span>
+                      <span className="font-medium" style={{ color: '#FF6B35' }}>Month-to-month</span>
                     </div>
                   </div>
 
@@ -362,7 +362,8 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                     <Button 
                       type="submit" 
                       size="lg" 
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 font-semibold" 
+                      className="w-full text-white hover:opacity-90 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 font-semibold" 
+                      style={{ backgroundColor: '#FF6B35' }}
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -381,7 +382,10 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="w-full border-[hsl(17,90%,38%)] text-[hsl(17,90%,38%)] hover:bg-[hsl(17,90%,38%)] hover:text-primary-foreground transition-all duration-200 active:scale-[0.98] font-medium"
+                      className="w-full hover:text-white transition-all duration-200 active:scale-[0.98] font-medium"
+                      style={{ borderColor: '#FF6B35', color: '#FF6B35' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FF6B35'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                       type="button"
                       asChild
                     >

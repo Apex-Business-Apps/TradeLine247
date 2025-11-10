@@ -30,17 +30,17 @@ export const HowItWorks = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {steps.map((step, index) => <Card key={index} className="relative text-center group hover:shadow-lg transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-[hsl(17,90%,38%)] text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: '#FF6B35', textShadow: '0 1px 2px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.6)' }}>
                 {step.step}
               </div>
               <CardHeader className="pt-8">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-                  <step.icon className="w-8 h-8 text-primary" />
+                  <step.icon className="w-8 h-8" style={{ color: '#FF6B35' }} />
                 </div>
                 <CardTitle className="text-xl">{step.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base text-foreground/90">
+                <CardDescription className="text-base" style={{ color: '#1e556b' }}>
                   {step.description}
                 </CardDescription>
               </CardContent>

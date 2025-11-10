@@ -12,10 +12,10 @@ export const Footer: React.FC = () => {
             </div>
             <address className="not-italic text-sm">
               <strong>Apex Business Systems</strong> • Edmonton, Alberta • Built Canadian<br />
-              <a href="mailto:info@tradeline247ai.com" className="hover:text-foreground transition-colors">info@tradeline247ai.com</a>
+              <a href="mailto:info@tradeline247ai.com" className="hover:text-foreground transition-colors" style={{ color: '#FF6B35' }}>info@tradeline247ai.com</a>
             </address>
             <div className="flex items-center gap-3 text-sm text-muted-foreground mt-2">
-              <span>© 2025 TradeLine 24/7. Never miss a call. We got it.</span>
+              <span>© 2025 <span style={{ color: '#FF6B35' }}>TradeLine 24/7</span>. Never miss a call. We got it.</span>
             </div>
           </div>
           
