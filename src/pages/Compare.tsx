@@ -68,8 +68,8 @@ export default function Compare() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left py-3 px-2 min-w-[120px]" style={{ color: '#1e556b' }}>Feature</th>
-                          <th className="text-center py-3 px-2 min-w-[100px]" style={{ backgroundColor: '#FF6B35' }}>
-                            <Badge className="mb-1 text-xs" style={{ backgroundColor: '#FF6B35', color: 'white' }}>TradeLine 24/7</Badge>
+                          <th className="text-center py-3 px-2 min-w-[100px]" style={{ backgroundColor: '#E55A2B' }}>
+                            <Badge className="mb-1 text-xs" style={{ backgroundColor: '#E55A2B', color: 'white' }}>TradeLine 24/7</Badge>
                           </th>
                           <th className="text-center py-3 px-2 min-w-[100px]" style={{ color: '#1e556b' }}>Smith.ai (Human)</th>
                           <th className="text-center py-3 px-2 min-w-[100px]" style={{ color: '#1e556b' }}>Smith.ai (AI)</th>
@@ -84,7 +84,7 @@ export default function Compare() {
                               {row.feature}
                               <div className="text-xs mt-0.5" style={{ color: '#1e556b', opacity: 0.7 }}>{row.notes}</div>
                             </td>
-                            <td className="text-center py-3 px-2" style={{ backgroundColor: '#FF6B35' }}>
+                            <td className="text-center py-3 px-2" style={{ backgroundColor: '#E55A2B' }}>
                               <span className="font-semibold text-xs" style={{ color: 'white' }}>{row.tradeline}</span>
                             </td>
                             <td className="text-center py-3 px-2"><span className="text-xs" style={{ color: '#1e556b' }}>{row.smithAI}</span></td>

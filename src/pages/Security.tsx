@@ -281,7 +281,7 @@ const Security = () => {
                             <Badge
                               variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
                               className="mt-1 text-xs"
-                              style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#FF6B35' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
+                              style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#E55A2B' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
                             >
                               {standard.status}
                             </Badge>
