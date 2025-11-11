@@ -136,3 +136,24 @@ jobs:
               state, context: "ci/test",
               description: state === "success" ? "Tests passed" : "Tests failed"
             });
+
+  lighthouse:
+    name: ci/lighthouse
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    continue-on-error: true
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --fund=false
+      - run: npm run -s build
+      - name: Start preview server
+        run: |
+          npx vite preview --port 43073 --strictPort &
+          sleep 2
+      - name: Run Lighthouse CI
+        run: npx lhci autorun --config=.lighthouserc.cjs
