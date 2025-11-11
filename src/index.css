@@ -54,6 +54,24 @@ body {
   font-variant: normal;
   overflow-x: hidden;
   background-color: hsl(var(--background));
+  position: relative;
+}
+
+/* Orange tint overlay for non-landing pages - subtle and non-intrusive */
+body:not([data-page="landing"])::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, 
+    hsla(21, 100%, 61%, 0.08) 0%, 
+    hsla(21, 100%, 61%, 0.04) 50%,
+    hsla(21, 100%, 61%, 0.08) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 #root {
@@ -63,6 +81,8 @@ body {
   visibility: visible !important;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 /* Ensure main content is always visible */
