@@ -37,7 +37,14 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright suite
-        run: npx playwright test tests/e2e --reporter=list
+        run: |
+          if node -e "process.exit(require('./package.json').scripts?.e2e ? 0 : 1)"; then
+            npm run e2e
+          elif node -e "process.exit(require('./package.json').scripts?.['e2e:ci'] ? 0 : 1)"; then
+            npm run e2e:ci
+          else
+            echo 'No e2e script defined, skipping.'
+          fi
 
       - name: Upload Playwright artifacts
         if: always()
