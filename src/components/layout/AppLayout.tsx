@@ -1,5 +1,5 @@
 import { HelmetProvider } from "react-helmet-async";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { ThemeProvider, useTheme } from "next-themes";
 import { lazy, Suspense, useEffect } from "react";
@@ -51,20 +51,9 @@ const ThemeSync = () => {
 
 export const AppLayout = () => {
   const { theme } = useUserPreferencesStore();
-  const location = useLocation();
 
   // Initialize Klaviyo analytics tracking
   useKlaviyoAnalytics();
-
-  // Set body data-page attribute based on current route
-  useEffect(() => {
-    const isLanding = location.pathname === '/';
-    if (isLanding) {
-      document.body.setAttribute('data-page', 'landing');
-    } else {
-      document.body.removeAttribute('data-page');
-    }
-  }, [location.pathname]);
 
   return (
     <HelmetProvider>
