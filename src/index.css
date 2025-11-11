@@ -1117,6 +1117,26 @@ header {
   --unified-orange-dark: #CC4A1F; /* Darker orange for text on white (WCAG AA: 4.5:1 contrast) */
 }
 
+/* WCAG AA Fix: Override ALL inline orange text to darker shade for contrast */
+[style*="color: #FF6B35"],
+[style*="color:#FF6B35"],
+[style*="color: rgb(255, 107, 53)"],
+[style*="color:rgb(255, 107, 53)"],
+a[style*="#FF6B35"]:not([class*="bg-"]),
+span[style*="#FF6B35"]:not([class*="bg-"]),
+div[style*="#FF6B35"]:not([class*="bg-"]),
+svg[style*="#FF6B35"] {
+  color: #CC4A1F !important; /* Darker orange - WCAG AA compliant (4.5:1 on white) */
+}
+
+/* Keep bright orange for solid backgrounds (buttons, badges with bg) */
+[class*="bg-primary"][style*="#FF6B35"],
+[class*="bg-orange"][style*="#FF6B35"],
+button[style*="#FF6B35"],
+.btn-aa[style*="#FF6B35"] {
+  color: #FFFFFF !important; /* White text on orange background */
+}
+
 /* Force all black text to navy blue globally */
 * {
   color: inherit;
@@ -1219,13 +1239,13 @@ button[class*="btn-aa"] {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,1);
   backdrop-filter: blur(8px);
   border-radius: 9999px;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #FF6B35;
-  box-shadow: 
+  color: #CC4A1F;
+  box-shadow:
     0 2px 8px rgba(0,0,0,0.15),
     0 4px 16px rgba(0,0,0,0.1);
   transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
@@ -1233,10 +1253,11 @@ button[class*="btn-aa"] {
 
 .feature-badge:hover {
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0,0,0,0.2),
     0 8px 24px rgba(0,0,0,0.15);
   background: rgba(255,255,255,1);
+  color: #B8431C;
 }
 
 .hero-cta-button {
