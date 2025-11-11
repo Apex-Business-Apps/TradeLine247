@@ -1062,10 +1062,10 @@ header {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  /* Orange mask overlay - darker, more noticeable orange tint over entire background image */
-  /* Increased hue by 40% total: #FF6B35 (hsl(14,100%,60%)) -> hsl(55,100%,63%) ≈ #FFD14C */
-  /* Increased opacity and saturation for more noticeable darker orange tint */
-  background: rgba(255, 193, 76, 0.30); /* #FFC14C with 30% opacity - darker, more noticeable orange tint */
+  /* Per-route overlay using custom properties (defined at end of file) */
+  /* Home: warm orange tint + clearer (~18% alpha) */
+  /* Other pages: neutral + more opaque (~32% alpha) */
+  background: rgba(var(--overlay-current-rgb) / var(--overlay-current-alpha));
   pointer-events: none;
   z-index: 1;
 }
@@ -1266,4 +1266,33 @@ button[class*="btn-aa"] {
 @media (prefers-reduced-motion: reduce) {
   .hero-gradient { animation: none; }
   .hero-cta-button:hover, .feature-badge:hover { transform: none; }
+}
+
+/* ===================================================================
+   PER-ROUTE OVERLAY TOKENS (Scoped + Reversible) - Nov 10, 2025
+   ===================================================================
+   Purpose: Allow per-route overlay opacity and tint customization
+   - Home: clearer + warm orange tint (~18% alpha)
+   - Other pages: more opaque neutral overlay (~32% alpha)
+   Changes ONLY overlay translucency - no brand token edits
+   =================================================================== */
+:root {
+  /* Brand orange RGB for tinting (matches #FF6B35 = rgb(255, 107, 53)) */
+  --brand-orange-rgb: 255 107 53;
+  /* Neutral overlay base (near-zinc-900 = rgb(24, 24, 27)) */
+  --overlay-rgb: 24 24 27;
+  /* Opacity values per route type */
+  --overlay-alpha-home: 0.18;      /* Clearer home overlay */
+  --overlay-alpha-default: 0.32;   /* More opaque for other pages */
+}
+
+/* Per-route hook via data attribute on <body> */
+body[data-route="home"] {
+  --overlay-current-rgb: var(--brand-orange-rgb);
+  --overlay-current-alpha: var(--overlay-alpha-home);
+}
+
+body:not([data-route="home"]) {
+  --overlay-current-rgb: var(--overlay-rgb);
+  --overlay-current-alpha: var(--overlay-alpha-default);
 }
