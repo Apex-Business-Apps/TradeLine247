@@ -225,7 +225,7 @@ const Security = () => {
                   <Card key={index} className="hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <div className="flex items-start justify-between mb-3">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
+                        <div className="relative z-10 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
                           <IconComponent className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
                         </div>
                         <Badge variant="secondary" className="text-xs">
@@ -273,7 +273,7 @@ const Security = () => {
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
+                          <div className="relative z-10 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
                             <standard.icon className="w-5 h-5" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
                           </div>
                           <div>

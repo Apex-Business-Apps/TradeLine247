@@ -150,7 +150,7 @@ const Features = () => {
                   <Card key={index} className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <CardHeader className="relative">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4" style={{ border: '2px solid #1e556b' }}>
+                      <div className="relative z-10 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4" style={{ border: '2px solid #1e556b' }}>
                         <feature.icon className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
                       </div>
                       <CardTitle className="text-xl" style={{ color: '#1e556b' }}>{feature.title}</CardTitle>
