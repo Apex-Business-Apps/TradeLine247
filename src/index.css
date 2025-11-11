@@ -882,7 +882,8 @@ header {
   /* Orange mask overlay - darker, more noticeable orange tint over entire background image */
   /* Increased hue by 40% total: #FF6B35 (hsl(14,100%,60%)) -> hsl(55,100%,63%) ≈ #FFD14C */
   /* Increased opacity and saturation for more noticeable darker orange tint */
-  background: rgba(255, 193, 76, 0.30); /* #FFC14C with 30% opacity - darker, more noticeable orange tint */
+  background-color: rgba(0,0,0,var(--overlay-dark-alpha));
+  background-image: linear-gradient(hsla(var(--overlay-tint-hsl) / var(--overlay-tint-alpha)), hsla(var(--overlay-tint-hsl) / var(--overlay-tint-alpha)));
   pointer-events: none;
   z-index: 1;
 }
@@ -1083,4 +1084,14 @@ button[class*="btn-aa"] {
 @media (prefers-reduced-motion: reduce) {
   .hero-gradient { animation: none; }
   .hero-cta-button:hover, .feature-badge:hover { transform: none; }
+}
+/* === Overlay tuning (append-only, visual-only) === */
+:root{
+  --overlay-dark-alpha: 0.55;        /* default pages slightly more opaque */
+  --overlay-tint-hsl: 24 100% 50%;   /* brand orange HSL (no bands) */
+  --overlay-tint-alpha: 0.06;        /* gentle warmth on non-home pages */
+}
+body[data-page="home"]{
+  --overlay-dark-alpha: 0.35;        /* landing a bit clearer */
+  --overlay-tint-alpha: 0.12;        /* slightly warmer on landing */
 }
