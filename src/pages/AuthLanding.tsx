@@ -52,15 +52,17 @@ export default function AuthLanding() {
 
     try {
       // Store trial signup information
+      const leadData = {
+        name: businessName,
+        email: email.toLowerCase(),
+        company: businessName,
+        notes: 'Trial signup from AuthLanding',
+        source: 'trial_landing_page'
+      };
+
       const { error: insertError } = await supabase
         .from('leads')
-        .insert({
-          name: businessName,
-          email: email.toLowerCase(),
-          company: businessName,
-          notes: 'Trial signup from AuthLanding',
-          source: 'trial_landing_page'
-        });
+        .insert(leadData as any);
 
       if (insertError) {
         throw insertError;
