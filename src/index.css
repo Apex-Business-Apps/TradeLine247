@@ -54,6 +54,26 @@ body {
   font-variant: normal;
   overflow-x: hidden;
   background-color: hsl(var(--background));
+  position: relative;
+}
+
+/* Orange tint overlay for non-landing pages */
+body:not([data-page="landing"])::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-orange);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Ensure content stays above the orange tint */
+body:not([data-page="landing"]) #root {
+  position: relative;
+  z-index: 2;
 }
 
 #root {

@@ -362,8 +362,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                     <Button 
                       type="submit" 
                       size="lg" 
-                      className="w-full text-white hover:opacity-90 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 font-semibold" 
-                      className="btn-aa"
+                      className="w-full text-white hover:opacity-90 shadow-md hover:shadow-lg active:scale-[0.98] transition-all duration-200 font-semibold btn-aa" 
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (

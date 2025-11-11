@@ -51,20 +51,6 @@ export default function AuthLanding() {
     setLoading(true);
 
     try {
-      // Check if user already exists
-      const { data: existingUser } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email.toLowerCase())
-        .single() as { data: { id: string } | null; error: any };
-
-      if (existingUser) {
-        setError('An account with this email already exists. Please sign in instead.');
-        setLoading(false);
-        setTimeout(() => navigate(paths.auth), 2000);
-        return;
-      }
-
       // Store trial signup information
       const { error: insertError } = await supabase
         .from('leads')
