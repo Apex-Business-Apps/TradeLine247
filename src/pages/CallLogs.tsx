@@ -108,11 +108,11 @@ export default function CallLogs() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-500';
-      case 'failed': return 'bg-red-500';
-      case 'busy': return 'bg-yellow-500';
-      case 'no-answer': return 'bg-orange-500';
-      default: return 'bg-gray-500';
+      case 'completed': return 'bg-[hsl(142,85%,25%)]'; // Dark green for WCAG AA compliance
+      case 'failed': return 'bg-red-700'; // Dark red for better visibility
+      case 'busy': return 'bg-amber-600'; // Amber instead of yellow for better contrast
+      case 'no-answer': return 'bg-orange-600'; // Darker orange
+      default: return 'bg-gray-600'; // Darker gray
     }
   };
 
@@ -187,7 +187,7 @@ export default function CallLogs() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4 flex-1 min-w-0">
-                  <div className={`w-2 h-12 rounded ${getStatusColor(call.status)}`} />
+                  <div className={`w-2 h-12 rounded ${getStatusColor(call.status)}`} aria-hidden="true" role="presentation" />
                   
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center gap-2">

@@ -54,10 +54,11 @@ serve(async (req) => {
     try {
       e164 = isValidE164(phone_number) ? phone_number : normalizeToE164(phone_number);
     } catch (error) {
-      console.error('E.164 normalization failed:', error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('E.164 normalization failed:', errorMessage);
       return new Response(JSON.stringify({
         valid: false,
-        error: `Invalid phone format: ${error.message}`,
+        error: `Invalid phone format: ${errorMessage}`,
         e164: null
       }), {
         status: 200,
@@ -128,9 +129,10 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error in lookup-number:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in lookup-number:', errorMessage);
     return new Response(JSON.stringify({ 
-      error: error.message,
+      error: errorMessage,
       valid: false 
     }), {
       status: 500,

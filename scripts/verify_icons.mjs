@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 
 // Strict mode: set STRICT_ICONS=true to fail build on missing/invalid icons
 // Default (non-strict): logs warnings but allows build to continue
@@ -32,8 +32,13 @@ for (const f of mustExist) {
 
 // quick PNG dim check (requires ImageMagick identify; skip if absent)
 function size(p) {
-  try { return execSync(`identify -format %wx%h ${p}`).toString().trim(); }
-  catch { return "unknown"; }
+  try {
+    return execFileSync("identify", ["-format", "%wx%h", p], {
+      stdio: ["ignore", "pipe", "ignore"]
+    }).toString().trim();
+  } catch {
+    return "unknown";
+  }
 }
 const dimChecks = {
   "public/assets/brand/App_Icons/icon-192.png": "192x192",

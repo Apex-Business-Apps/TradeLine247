@@ -83,9 +83,12 @@ if ('serviceWorker' in navigator) {
 }
 
 const root = document.getElementById('root');
-if (!root) { 
-  document.body.innerHTML = '<pre>Missing #root</pre>'; 
-  throw new Error('Missing #root'); 
+if (!root) {
+  // Safe DOM manipulation instead of innerHTML
+  const errorPre = document.createElement('pre');
+  errorPre.textContent = 'Missing #root';
+  document.body.appendChild(errorPre);
+  throw new Error('Missing #root');
 }
 
 // CRITICAL: Hide loading fallback immediately when this script executes (non-blocking, safe)
@@ -126,18 +129,23 @@ function boot() {
         React.createElement(App)
       )
     );
-    
+
     // Ensure root is visible (CSS might hide it initially)
     root!.style.opacity = '1';
     root!.style.visibility = 'visible';
-    
+
     // Hide loading fallback immediately
     const loadingEl = document.getElementById('root-loading');
     if (loadingEl) {
       loadingEl.style.display = 'none';
     }
-    
+
     console.log('✅ React mounted successfully');
+
+    // Signal to E2E tests that React hydration is complete
+    setTimeout(() => {
+      (window as any).__REACT_READY__ = true;
+    }, 0);
     
     // Run SW cleanup hotfix (one-time, auto-expires after 7 days)
     runSwCleanup().catch(err => console.warn('[SW Cleanup] Failed:', err));
@@ -148,7 +156,8 @@ function boot() {
     // Load optional features after mount (non-blocking)
     setTimeout(() => {
       import("./styles/roi-table.css").catch(e => console.warn('⚠️ ROI table CSS failed:', e));
-      import("./styles/header-align.css").catch(e => console.warn('⚠️ Header align CSS failed:', e));
+      // CRITICAL FIX: header-align.css must load synchronously to prevent layout shifts
+      // Moved to index.css import for synchronous loading
       
       // Check for safe mode
       const urlParams = new URLSearchParams(window.location.search);

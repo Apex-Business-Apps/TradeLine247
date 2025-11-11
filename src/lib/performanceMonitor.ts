@@ -1,4 +1,6 @@
 // Production-ready performance monitoring
+import { errorReporter } from '@/lib/errorReporter';
+
 interface PerformanceMetric {
   name: string;
   value: number;
@@ -109,16 +111,48 @@ class PerformanceMonitor {
 
     // Log significant issues
     if (name === 'LCP' && value > 2500) {
-      console.warn(`⚠️ Poor LCP: ${Math.round(value)}ms`);
+      errorReporter.report({
+        type: 'error',
+        message: `Poor LCP: ${Math.round(value)}ms`,
+        timestamp: new Date().toISOString(),
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        environment: errorReporter['getEnvironment'](),
+        metadata: { metric: name, value, ...metadata }
+      });
     }
     if (name === 'FID' && value > 100) {
-      console.warn(`⚠️ Poor FID: ${Math.round(value)}ms`);
+      errorReporter.report({
+        type: 'error',
+        message: `Poor FID: ${Math.round(value)}ms`,
+        timestamp: new Date().toISOString(),
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        environment: errorReporter['getEnvironment'](),
+        metadata: { metric: name, value, ...metadata }
+      });
     }
     if (name === 'CLS' && value > 0.1) {
-      console.warn(`⚠️ Poor CLS: ${value.toFixed(3)}`);
+      errorReporter.report({
+        type: 'error',
+        message: `Poor CLS: ${value.toFixed(3)}`,
+        timestamp: new Date().toISOString(),
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        environment: errorReporter['getEnvironment'](),
+        metadata: { metric: name, value, ...metadata }
+      });
     }
     if (name === 'LongTask' && value > 50) {
-      console.warn(`⚠️ Long task detected: ${Math.round(value)}ms`);
+      errorReporter.report({
+        type: 'error',
+        message: `Long task detected: ${Math.round(value)}ms`,
+        timestamp: new Date().toISOString(),
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        environment: errorReporter['getEnvironment'](),
+        metadata: { metric: name, value, ...metadata }
+      });
     }
   }
 

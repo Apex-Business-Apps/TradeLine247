@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SEOHead } from "@/components/seo/SEOHead";
+import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 
 const plans = [
   {
@@ -116,26 +117,51 @@ const Pricing = () => {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-background to-secondary/20" style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
-          paddingLeft: 'env(safe-area-inset-left, 0)',
-          paddingRight: 'env(safe-area-inset-right, 0)'
-        }}>
-          <div className="container text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mt-0 mb-8 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <section 
+          className="hero-section py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+            paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
+            paddingLeft: 'env(safe-area-inset-left, 0)',
+            paddingRight: 'env(safe-area-inset-right, 0)'
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container text-center relative z-10">
+            <h1 className="hero-headline text-4xl md:text-6xl font-bold mt-0 mb-8">
               Simple, Transparent Pricing
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="hero-tagline text-lg md:text-xl mb-8 max-w-3xl mx-auto">
               Choose the perfect plan for your business. All plans include our core AI receptionist features with 14-day free trial.
             </p>
           </div>
         </section>
 
         {/* Pricing Cards */}
-        <section className="py-20">
-          <div className="container">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container relative z-10">
+            <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem', maxWidth: '4xl', margin: '0 auto' }}>
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>Choose Your Plan</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative" style={{ zIndex: 1 }}>
               {plans.map((plan, index) => (
                 <Card key={index} id={plan.id} className={`relative ${plan.popular ? 'ring-2 ring-primary shadow-xl scale-105' : ''}`}>
                   {plan.popular && (
@@ -145,8 +171,8 @@ const Pricing = () => {
                     </Badge>
                   )}
                   <CardHeader className="text-center pb-8">
-                    <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                    <CardDescription className="text-base">
+                    <CardTitle className="text-2xl" style={{ color: '#1e556b' }}>{plan.name}</CardTitle>
+                    <CardDescription className="text-base" style={{ color: '#1e556b' }}>
                       {plan.description}
                     </CardDescription>
                     <div className="mt-4">
@@ -157,8 +183,8 @@ const Pricing = () => {
                     <ul className="space-y-3">
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-3">
-                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                          <span className="text-sm">{feature}</span>
+                          <CheckCircle className="w-5 h-5 text-[hsl(142,85%,25%)] flex-shrink-0 mt-0.5" aria-hidden="true" />
+                          <span className="text-sm" style={{ color: '#1e556b' }}>{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -173,6 +199,7 @@ const Pricing = () => {
                   </CardContent>
                 </Card>
               ))}
+              </div>
             </div>
 
             {/* Additional Info */}
@@ -201,8 +228,19 @@ const Pricing = () => {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
-          <div className="container text-center">
+        <section 
+          className="py-20 relative"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "100% auto",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed"
+          }}
+        >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
+          <div className="container text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-12">Frequently Asked Questions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
               <div>

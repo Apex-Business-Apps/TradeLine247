@@ -17,7 +17,7 @@ export const ROBOT_ICON_PATH = '/assets/brand/TRADELEINE_ROBOT_V2.svg';
  * Official logo path
  * Used in: Headers, footers, hero sections
  */
-export const OFFICIAL_LOGO_PATH = '/assets/official-logo.svg';
+export const OFFICIAL_LOGO_PATH = '/assets/official-logo.png';
 
 /**
  * Brand icon paths mapped by usage context

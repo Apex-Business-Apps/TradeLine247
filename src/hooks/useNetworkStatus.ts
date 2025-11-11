@@ -19,6 +19,22 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 export type NetworkType = '5g' | '4g' | '3g' | '2g' | 'wifi' | 'unknown' | 'offline';
 export type ConnectionQuality = 'excellent' | 'good' | 'slow' | 'offline';
 
+interface NetworkConnection {
+  effectiveType?: '4g' | '3g' | '2g' | 'slow-2g';
+  type?: string;
+  downlink?: number;
+  rtt?: number;
+  saveData?: boolean;
+  addEventListener?: (type: string, listener: () => void) => void;
+  removeEventListener?: (type: string, listener: () => void) => void;
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkConnection;
+  mozConnection?: NetworkConnection;
+  webkitConnection?: NetworkConnection;
+}
+
 export interface NetworkStatus {
   online: boolean;
   type: NetworkType;
@@ -45,7 +61,7 @@ const REQUEST_QUEUE_KEY = 'tl247_request_queue';
 /**
  * Get network type from Connection API
  */
-function getNetworkType(connection?: any): NetworkType {
+function getNetworkType(connection?: NetworkConnection): NetworkType {
   if (!connection) return 'unknown';
   
   const effectiveType = connection.effectiveType;
@@ -87,7 +103,8 @@ export function useNetworkStatus() {
   const [status, setStatus] = useState<NetworkStatus>(() => {
     // Initial state
     const online = typeof navigator !== 'undefined' ? navigator.onLine : true;
-    const connection = (navigator as any)?.connection || (navigator as any)?.mozConnection || (navigator as any)?.webkitConnection;
+    const nav = navigator as NavigatorWithConnection;
+    const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
     
     return {
       online,
@@ -108,7 +125,8 @@ export function useNetworkStatus() {
    */
   const updateStatus = useCallback(() => {
     const online = navigator.onLine;
-    const connection = (navigator as any)?.connection || (navigator as any)?.mozConnection || (navigator as any)?.webkitConnection;
+    const nav = navigator as NavigatorWithConnection;
+    const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
     
     const newStatus: NetworkStatus = {
       online,
@@ -218,15 +236,16 @@ export function useNetworkStatus() {
     window.addEventListener('offline', updateStatus);
 
     // Connection API changes (if available)
-    const connection = (navigator as any)?.connection || (navigator as any)?.mozConnection || (navigator as any)?.webkitConnection;
-    if (connection) {
+    const nav = navigator as NavigatorWithConnection;
+    const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
+    if (connection?.addEventListener) {
       connection.addEventListener('change', updateStatus);
     }
 
     return () => {
       window.removeEventListener('online', updateStatus);
       window.removeEventListener('offline', updateStatus);
-      if (connection) {
+      if (connection?.removeEventListener) {
         connection.removeEventListener('change', updateStatus);
       }
       // Clear timeouts

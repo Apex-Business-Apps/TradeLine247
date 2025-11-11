@@ -7,7 +7,8 @@ import {
   sanitizePhone,
   validateSecurity
 } from "../_shared/advancedSanitizer.ts";
-import { preflight, jsonResponse, unexpectedErrorResponse } from "../_shared/cors.ts";
+import { preflight, corsHeaders } from "../_shared/cors.ts";
+import { secureHeaders, mergeHeaders } from "../_shared/secure_headers.ts";
 
 // Simple in-memory rate limiter (production would use Redis)
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -50,13 +51,14 @@ serve(async (req) => {
     const rateCheck = checkRateLimit(clientIp);
     if (!rateCheck.allowed) {
       console.warn(`Rate limit exceeded for ${clientIp}`);
-      return jsonResponse(
-        {
+      return new Response(
+        JSON.stringify({ 
           error: 'Too many requests. Please try again later.',
           remaining: 0
-        },
-        {
-          status: 429
+        }),
+        { 
+          status: 429, 
+          headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
         }
       );
     }
@@ -67,9 +69,9 @@ serve(async (req) => {
 
     // Validate required fields
     if (!name || !email || !message) {
-      return jsonResponse(
-        { error: 'Missing required fields' },
-        { status: 400 }
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields' }),
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -93,9 +95,9 @@ serve(async (req) => {
     } catch (sanitizeError: any) {
       // DevOps SRE: Log validation details internally, return generic message to client
       console.error('Input validation failed:', sanitizeError.message);
-      return jsonResponse(
-        { error: 'Invalid input detected. Please check your information and try again.' },
-        { status: 400 }
+      return new Response(
+        JSON.stringify({ error: 'Invalid input detected. Please check your information and try again.' }),
+        { status: 400, headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' }) }
       );
     }
 
@@ -157,18 +159,29 @@ serve(async (req) => {
       // Don't fail the request if email fails - message is saved
     }
 
-      return jsonResponse(
-        {
-          success: true,
-          id: contactRecord.id,
-          remaining: rateCheck.remaining
-        },
-        {
-          status: 202
-        }
-      );
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        id: contactRecord.id,
+        remaining: rateCheck.remaining
+      }),
+      { 
+        status: 202, 
+        headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
+      }
+    );
 
   } catch (error) {
-    return unexpectedErrorResponse(error, 'contact-submit');
+    // DevOps SRE: Log detailed errors internally, return generic message to client
+    console.error('Contact submission error:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Unable to submit contact form. Please try again or call us directly.'
+      }),
+      { 
+        status: 500, 
+        headers: mergeHeaders(corsHeaders, secureHeaders, { 'Content-Type': 'application/json' })
+      }
+    );
   }
 });

@@ -12,6 +12,7 @@ import { Loader2 } from 'lucide-react';
 import { Session, User } from '@supabase/supabase-js';
 import { Footer } from '@/components/layout/Footer';
 import { usePasswordSecurity } from '@/hooks/usePasswordSecurity';
+import { errorReporter } from '@/lib/errorReporter';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -51,7 +52,14 @@ const Auth = () => {
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       // If there's a JWT error, clear the corrupted session
       if (error?.message?.includes('malformed') || error?.message?.includes('invalid')) {
-        console.warn('[Auth] Detected malformed token, clearing session:', error.message);
+        errorReporter.report({
+          type: 'error',
+          message: `Auth: Detected malformed token, clearing session: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         supabase.auth.signOut().catch(() => {/* ignore errors during cleanup */});
         setSession(null);
         setUser(null);
@@ -67,7 +75,15 @@ const Auth = () => {
       }
     }).catch((err) => {
       // Catch any unhandled JWT errors
-      console.error('[Auth] Session check failed:', err);
+      errorReporter.report({
+        type: 'error',
+        message: `Auth: Session check failed: ${err?.message || err}`,
+        stack: err?.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       supabase.auth.signOut().catch(() => {/* ignore */});
       setSession(null);
       setUser(null);
@@ -123,7 +139,15 @@ const Auth = () => {
         }
       }
     } catch (error) {
-      console.error('Password validation error:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Password validation error: ${error}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       // Don't block user if validation fails
     } finally {
       setPasswordCheckLoading(false);
@@ -294,8 +318,9 @@ const Auth = () => {
                     />
                   </div>
                   
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
+                    variant="success"
                     className="w-full"
                     disabled={loading}
                   >
@@ -347,23 +372,23 @@ const Auth = () => {
                           <div>
                             <span className="text-muted-foreground">Strength: </span>
                             <span className={`font-medium ${
-                              passwordStrength === 'Very strong' || passwordStrength === 'Strong' ? 'text-green-600' :
-                              passwordStrength === 'Good' ? 'text-yellow-600' :
-                              'text-red-600'
+                              passwordStrength === 'Very strong' || passwordStrength === 'Strong' ? 'text-[hsl(142,85%,25%)]' :
+                              passwordStrength === 'Good' ? 'text-amber-800' :
+                              'text-red-700'
                             }`}>
                               {passwordStrength}
                               {passwordCheckLoading && <Loader2 className="inline w-3 h-3 ml-1 animate-spin" />}
                             </span>
                           </div>
-                          
+
                           {passwordBreached && (
-                            <div className="text-xs text-red-600 font-medium">
+                            <div className="text-xs text-red-700 font-medium">
                               ⚠️ This password appears in known data breaches. Please choose a different password.
                             </div>
                           )}
-                          
+
                           {password.length >= 8 && !passwordBreached && passwordStrength !== 'Too short' && (
-                            <div className="text-xs text-green-600">
+                            <div className="text-xs text-[hsl(142,85%,25%)]">
                               ✓ Password meets security requirements
                             </div>
                           )}

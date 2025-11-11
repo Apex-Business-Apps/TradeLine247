@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface SecureAnalyticsConfig {
   respectDoNotTrack?: boolean;
@@ -49,11 +50,28 @@ export const useSecureAnalytics = (config: SecureAnalyticsConfig = {}) => {
       });
 
       if (error) {
-        console.warn('Analytics tracking failed:', error.message);
+        errorReporter.report({
+          type: 'error',
+          message: `Analytics tracking failed: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { event: sanitizedEvent, error }
+        });
       }
     } catch (error) {
       // Fail silently to not break user experience
-      console.warn('Analytics error:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Analytics error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { error }
+      });
     }
   }, [isTracking, config]);
 

@@ -95,7 +95,7 @@ const CRMIntegration = () => {
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5">
-              <Database className="h-6 w-6 text-blue-600" />
+              <Database className="h-6 w-6 text-info" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">CRM Integrations</h1>
@@ -127,7 +127,7 @@ const CRMIntegration = () => {
                       <p className="text-sm text-muted-foreground mt-1">{provider.description}</p>
                     </div>
                   </div>
-                  <Badge className="bg-green-500/10 text-green-800 border-green-500/20">
+                  <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">
                     {provider.status === 'available' ? 'Available' : 'Coming Soon'}
                   </Badge>
                 </div>
@@ -139,7 +139,7 @@ const CRMIntegration = () => {
                   <div className="grid grid-cols-2 gap-2">
                     {provider.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
-                        <CheckCircle className="h-3 w-3 text-green-500" />
+                        <CheckCircle className="h-3 w-3 text-[hsl(142,85%,25%)]" />
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}

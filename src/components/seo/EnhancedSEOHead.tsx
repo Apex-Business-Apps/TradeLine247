@@ -129,7 +129,7 @@ export const EnhancedSEOHead: React.FC<EnhancedSEOHeadProps> = ({
     url: baseUrl,
     logo: {
       '@type': 'ImageObject',
-      url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.svg`,
+      url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.png`,
       width: 512,
       height: 512,
     },
@@ -216,7 +216,7 @@ export const EnhancedSEOHead: React.FC<EnhancedSEOHeadProps> = ({
         name: 'TradeLine 24/7',
         logo: {
           '@type': 'ImageObject',
-          url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.svg`,
+          url: `${baseUrl}/assets/brand/OFFICIAL_LOGO.png`,
         },
       },
       articleSection: article.section,
@@ -316,9 +316,9 @@ export const EnhancedSEOHead: React.FC<EnhancedSEOHeadProps> = ({
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="apple-mobile-web-app-title" content="TradeLine 24/7" />
       
-      {/* Theme Color */}
-      <meta name="theme-color" content="#ff6b35" />
-      <meta name="msapplication-TileColor" content="#ff6b35" />
+      {/* Theme Color - Use brand orange from design system */}
+      <meta name="theme-color" content="hsl(21, 100%, 67%)" />
+      <meta name="msapplication-TileColor" content="hsl(21, 100%, 67%)" />
     </Helmet>
   );
 };
