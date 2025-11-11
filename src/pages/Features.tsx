@@ -147,28 +147,40 @@ const Features = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative" style={{ zIndex: 1 }}>
                 {features.map((feature, index) => (
-                  <Card key={index} className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CardHeader className="relative">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4" style={{ border: '2px solid #1e556b' }}>
-                        <feature.icon className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                  <div key={index} className="relative">
+                    {/* Decorative orbit icon */}
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10">
+                      <div className="relative">
+                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
+                          <feature.icon className="w-8 h-8 text-white" style={{ strokeWidth: '2.5px' }} />
+                        </div>
+                        {/* Orbital ring */}
+                        <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
                       </div>
-                      <CardTitle className="text-xl" style={{ color: '#1e556b' }}>{feature.title}</CardTitle>
-                      <CardDescription className="text-base" style={{ color: '#1e556b' }}>
-                        {feature.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="relative">
-                      <ul className="space-y-2">
-                        {feature.benefits.map((benefit, idx) => (
-                          <li key={idx} className="flex items-center gap-2 text-sm" style={{ color: '#1e556b' }}>
-                            <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)] flex-shrink-0" aria-hidden="true" />
-                            <span>{benefit}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
+                    </div>
+                    <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 pt-10">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CardHeader className="relative">
+                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4" style={{ border: '2px solid #1e556b' }}>
+                          <feature.icon className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                        </div>
+                        <CardTitle className="text-xl" style={{ color: '#1e556b' }}>{feature.title}</CardTitle>
+                        <CardDescription className="text-base" style={{ color: '#1e556b' }}>
+                          {feature.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="relative">
+                        <ul className="space-y-2">
+                          {feature.benefits.map((benefit, idx) => (
+                            <li key={idx} className="flex items-center gap-2 text-sm" style={{ color: '#1e556b' }}>
+                              <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)] flex-shrink-0" aria-hidden="true" />
+                              <span>{benefit}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </div>
                 ))}
               </div>
             </div>
