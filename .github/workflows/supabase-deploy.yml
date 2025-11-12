@@ -55,10 +55,50 @@ jobs:
       - name: Link to Supabase project
         if: steps.check-secrets.outputs.can_deploy == 'true'
         run: |
+          echo "🔗 Linking to Supabase project: $SUPABASE_PROJECT_REF"
           supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+      
+      - name: Repair migration history (if needed)
+        if: steps.check-secrets.outputs.can_deploy == 'true'
+        run: |
+          echo "🔍 Checking for migration history issues..."
+          
+          # Attempt to push migrations and capture output
+          if ! supabase db push 2>&1 | tee /tmp/db-push-output.txt | grep -q "Remote migration versions not found"; then
+            echo "✅ No migration history issues detected"
+            exit 0
+          fi
+          
+          echo "⚠️  Migration history mismatch detected"
+          echo "📋 Extracting migration IDs that need repair..."
+          
+          # Extract migration IDs from error message
+          MIGRATION_IDS=$(grep -oP '\d{14}' /tmp/db-push-output.txt | sort -u | tr '\n' ' ')
+          
+          if [ -z "$MIGRATION_IDS" ]; then
+            echo "❌ Could not extract migration IDs for repair"
+            echo "📄 Full output:"
+            cat /tmp/db-push-output.txt
+            exit 1
+          fi
+          
+          echo "🔧 Repairing migration history for IDs: $MIGRATION_IDS"
+          supabase migration repair --status reverted $MIGRATION_IDs
+          
+          echo "✅ Migration history repaired successfully"
+      
       - name: Deploy database migrations
         if: steps.check-secrets.outputs.can_deploy == 'true'
-        run: supabase db push
+        run: |
+          echo "📊 Deploying database migrations..."
+          supabase db push
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Database migrations deployed successfully"
+          else
+            echo "❌ Database migration deployment failed"
+            exit 1
+          fi
       - name: Deploy Supabase functions
         if: steps.check-secrets.outputs.can_deploy == 'true'
         run: supabase functions deploy telephony-onboard telephony-voice telephony-sms

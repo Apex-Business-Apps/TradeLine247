@@ -43,24 +43,54 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Validate Vercel secrets
+        id: check-vercel-secrets
+        run: |
+          echo "🔍 Validating Vercel deployment secrets..."
+          MISSING_SECRETS=0
+          
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "❌ VERCEL_TOKEN secret is not set"
+            MISSING_SECRETS=1
+          fi
+          
+          if [ -z "${{ secrets.VERCEL_ORG_ID }}" ]; then
+            echo "❌ VERCEL_ORG_ID secret is not set"
+            MISSING_SECRETS=1
+          fi
+          
+          if [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            echo "❌ VERCEL_PROJECT_ID secret is not set"
+            MISSING_SECRETS=1
+          fi
+          
+          if [ "$MISSING_SECRETS" -eq 1 ]; then
+            echo ""
+            echo "📋 To enable Vercel deployment, add these secrets:"
+            echo "1. Go to: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            echo "2. Add required secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID"
+            echo "3. Get values from: https://vercel.com/account/tokens"
+            exit 1
+          fi
+          
+          echo "✅ All Vercel secrets are configured"
 
-      - name: Build for Vercel
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      - name: Deploy to Vercel Production
+      - name: Deploy to Vercel Production (Direct)
         id: vercel-deploy
         run: |
-          DEPLOYMENT_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --yes)
+          echo "🚀 Starting Vercel deployment..."
+          echo "📦 Deploying pre-built application to production..."
+          
+          # Deploy directly using the built dist/ folder - no need for vercel pull/build
+          DEPLOYMENT_URL=$(vercel deploy ./dist --prod --token=${{ secrets.VERCEL_TOKEN }} --yes)
+          
+          if [ -z "$DEPLOYMENT_URL" ]; then
+            echo "❌ Deployment failed - no URL returned"
+            exit 1
+          fi
+          
           echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
-          echo "🚀 Deployment completed: $DEPLOYMENT_URL"
+          echo "✅ Deployment completed successfully: $DEPLOYMENT_URL"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
