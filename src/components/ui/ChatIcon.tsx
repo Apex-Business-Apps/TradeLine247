@@ -56,7 +56,7 @@ export const ChatIcon: React.FC<ChatIconProps> = ({
         size={iconSizes[size]} 
         className={cn(sizeClasses[size], className)}
         aria-label={alt}
-        {...(props as any)}
+        {...(props as React.ComponentPropsWithoutRef<'svg'>)}
       />
     );
   }

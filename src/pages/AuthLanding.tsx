@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { paths } from '@/routes/paths';
 import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
 // Validation schema
 const trialSignupSchema = z.object({
@@ -51,8 +52,8 @@ export default function AuthLanding() {
     setLoading(true);
 
     try {
-      // Store trial signup information
-      const leadData = {
+      // Store trial signup information - properly typed from Database schema
+      const leadData: Database['public']['Tables']['leads']['Insert'] = {
         name: businessName,
         email: email.toLowerCase(),
         company: businessName,
@@ -62,7 +63,7 @@ export default function AuthLanding() {
 
       const { error: insertError } = await supabase
         .from('leads')
-        .insert(leadData as any);
+        .insert(leadData);
 
       if (insertError) {
         throw insertError;

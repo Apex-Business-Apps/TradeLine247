@@ -294,7 +294,9 @@ const Contact = () => {
                         error={submitError} 
                         onRetry={() => {
                           setSubmitError(null);
-                          handleSubmit(new Event('submit') as any);
+                          // Properly typed synthetic form event
+                          const syntheticEvent = new Event('submit', { bubbles: true, cancelable: true }) as unknown as React.FormEvent<HTMLFormElement>;
+                          handleSubmit(syntheticEvent);
                         }} 
                       />
                     )}
