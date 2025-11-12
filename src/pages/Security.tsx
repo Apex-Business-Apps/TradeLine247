@@ -223,22 +223,19 @@ const Security = () => {
                   const IconComponent = feature.icon;
                   return (
                   <div key={index} className="relative">
-                    {/* Decorative orbit icon */}
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10">
-                      <div className="relative">
-                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
-                          {(() => {
-                            const Icon = feature.icon;
-                            return <Icon className="w-8 h-8 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
-                          })()}
-                        </div>
-                        {/* Orbital ring */}
-                        <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
-                      </div>
-                    </div>
-                    <Card className="hover:shadow-lg transition-shadow pt-10">
+                    <Card className="hover:shadow-lg transition-shadow">
                       <CardHeader>
                         <div className="flex items-start justify-between mb-3">
+                          <div className="relative">
+                            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
+                              {(() => {
+                                const Icon = feature.icon;
+                                return <Icon className="w-6 h-6 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
+                              })()}
+                            </div>
+                            {/* Orbital ring */}
+                            <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
+                          </div>
                           <Badge variant="secondary" className="text-xs">
                             {feature.badge}
                           </Badge>
@@ -282,30 +279,29 @@ const Security = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto relative" style={{ zIndex: 1 }}>
                 {complianceStandards.map((standard, index) => (
                   <div key={index} className="relative">
-                    {/* Decorative orbit icon */}
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10">
-                      <div className="relative">
-                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
-                          {(() => {
-                            const Icon = standard.icon;
-                            return <Icon className="w-8 h-8 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
-                          })()}
-                        </div>
-                        {/* Orbital ring */}
-                        <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
-                      </div>
-                    </div>
-                    <Card className="bg-background/80 backdrop-blur pt-10">
+                    <Card className="bg-background/80 backdrop-blur">
                       <CardHeader>
-                        <div className="flex flex-col gap-2">
-                          <CardTitle className="text-lg" style={{ color: '#1e556b' }}>{standard.name}</CardTitle>
-                          <Badge
-                            variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
-                            className="text-xs self-start"
-                            style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#E55A2B' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
-                          >
-                            {standard.status}
-                          </Badge>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="relative">
+                            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
+                              {(() => {
+                                const Icon = standard.icon;
+                                return <Icon className="w-5 h-5 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
+                              })()}
+                            </div>
+                            {/* Orbital ring */}
+                            <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
+                          </div>
+                          <div className="flex-1">
+                            <CardTitle className="text-lg mb-2" style={{ color: '#1e556b' }}>{standard.name}</CardTitle>
+                            <Badge
+                              variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
+                              className="text-xs"
+                              style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#E55A2B' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
+                            >
+                              {standard.status}
+                            </Badge>
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent>
