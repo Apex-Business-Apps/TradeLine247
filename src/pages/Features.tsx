@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import React from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { CheckCircle, Phone, MessageSquare, Brain, Zap, Shield, Clock } from "lucide-react";
@@ -153,7 +152,10 @@ const Features = () => {
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10">
                       <div className="relative">
                         <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
-                          {React.createElement(feature.icon, { className: "w-8 h-8 text-white", style: { strokeWidth: '2.5px' }, 'aria-hidden': true })}
+                          {(() => {
+                            const Icon = feature.icon;
+                            return <Icon className="w-8 h-8 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
+                          })()}
                         </div>
                         {/* Orbital ring */}
                         <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
@@ -163,7 +165,7 @@ const Features = () => {
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                       <CardHeader className="relative">
                         <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4" style={{ border: '2px solid #1e556b' }}>
-                          {React.createElement(feature.icon, { className: "w-6 h-6", style: { color: '#FF6B35', strokeWidth: '2px' } })}
+                          <feature.icon className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
                         </div>
                         <CardTitle className="text-xl" style={{ color: '#1e556b' }}>{feature.title}</CardTitle>
                         <CardDescription className="text-base" style={{ color: '#1e556b' }}>
