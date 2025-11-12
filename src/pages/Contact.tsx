@@ -441,7 +441,7 @@ const Contact = () => {
                   </Card>
                 </div>
 
-                <div className="mt-8 p-6 bg-card rounded-lg border border-border shadow-sm relative" style={{ backgroundColor: 'white', opacity: 1, zIndex: 10 }}>
+                <div className="mt-8 p-6 bg-card rounded-lg border border-border shadow-sm relative opacity-100 z-10">
                   <div data-guard="canada-badge" className="flex items-start gap-3">
                     <img
                       src={builtCanadianBadge}
