@@ -152,10 +152,7 @@ const Features = () => {
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10">
                       <div className="relative">
                         <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
-                          {(() => {
-                            const Icon = feature.icon;
-                            return <Icon className="w-8 h-8 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
-                          })()}
+                          <feature.icon className="w-8 h-8 text-white" style={{ strokeWidth: '2.5px' }} />
                         </div>
                         {/* Orbital ring */}
                         <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />

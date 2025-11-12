@@ -57,7 +57,7 @@ body {
   position: relative;
 }
 
-/* Orange tint overlay for non-landing pages - much stronger dimming for visual obscuring */
+/* Orange tint overlay for non-landing pages - increased opacity for stronger dimming */
 body:not([data-page="landing"])::after {
   content: '';
   position: fixed;
@@ -66,9 +66,9 @@ body:not([data-page="landing"])::after {
   right: 0;
   bottom: 0;
   background: linear-gradient(180deg, 
-    hsla(21, 100%, 61%, 0.70) 0%, 
-    hsla(21, 100%, 61%, 0.60) 50%,
-    hsla(21, 100%, 61%, 0.70) 100%
+    hsla(21, 100%, 61%, 0.35) 0%, 
+    hsla(21, 100%, 61%, 0.28) 50%,
+    hsla(21, 100%, 61%, 0.35) 100%
   );
   pointer-events: none;
   z-index: 0;
