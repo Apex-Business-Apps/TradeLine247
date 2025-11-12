@@ -35,7 +35,7 @@ export default function HeroRoiDuo() {
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
-      <div className="hero-gradient" aria-hidden="true"></div>
+      <div className="hero-gradient" aria-hidden="true" data-testid="hero-bg"></div>
       <div className="hero-gradient-overlay" aria-hidden="true"></div>
       <div className="hero-vignette" aria-hidden="true"></div>
       <div className="container relative z-10" data-lovable-lock="structure-only">

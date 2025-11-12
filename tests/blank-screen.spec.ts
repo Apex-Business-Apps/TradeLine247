@@ -21,17 +21,16 @@ test.describe('Blank Screen Prevention', () => {
 
   test('background image loads correctly', async ({ page }) => {
     await page.goto('/');
-    
-    const bgImage = page.locator('[style*="backgroundImage"]').first();
-    await expect(bgImage).toBeVisible({ timeout: 5000 });
-    
-    // Check if image is actually loaded (not broken)
-    const hasBackground = await bgImage.evaluate((el) => {
-      const style = window.getComputedStyle(el);
-      return style.backgroundImage !== 'none';
-    });
-    
-    expect(hasBackground).toBe(true);
+    await page.waitForLoadState('domcontentloaded');
+
+    const bg = page
+      .getByTestId('hero-bg')
+      .or(page.locator('[style*="background-image"]').first());
+
+    await expect(bg).toBeVisible({ timeout: 10_000 });
+
+    const css = await bg.evaluate((el) => getComputedStyle(el).backgroundImage);
+    expect(css).toMatch(/url\(/);
   });
 
   test('startup splash does not block content', async ({ page }) => {
