@@ -1,3 +1,4 @@
+import React from "react";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -220,17 +221,13 @@ const Security = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto relative" style={{ zIndex: 1 }}>
                 {securityFeatures.map((feature, index) => {
-                  const IconComponent = feature.icon;
                   return (
                   <div key={index} className="relative">
                     {/* Decorative orbit icon */}
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10">
                       <div className="relative">
                         <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
-                          {(() => {
-                            const Icon = feature.icon;
-                            return <Icon className="w-8 h-8 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
-                          })()}
+                          {React.createElement(feature.icon, { className: "w-8 h-8 text-white", style: { strokeWidth: '2.5px' }, 'aria-hidden': true })}
                         </div>
                         {/* Orbital ring */}
                         <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
@@ -240,7 +237,7 @@ const Security = () => {
                       <CardHeader>
                         <div className="flex items-start justify-between mb-3">
                           <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
-                            <IconComponent className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                            {React.createElement(feature.icon, { className: "w-6 h-6", style: { color: '#FF6B35', strokeWidth: '2px' } })}
                           </div>
                           <Badge variant="secondary" className="text-xs">
                             {feature.badge}
@@ -289,10 +286,7 @@ const Security = () => {
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-10">
                       <div className="relative">
                         <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
-                          {(() => {
-                            const Icon = standard.icon;
-                            return <Icon className="w-8 h-8 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
-                          })()}
+                          {React.createElement(standard.icon, { className: "w-8 h-8 text-white", style: { strokeWidth: '2.5px' }, 'aria-hidden': true })}
                         </div>
                         {/* Orbital ring */}
                         <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
@@ -303,7 +297,7 @@ const Security = () => {
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
-                              <standard.icon className="w-5 h-5" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
+                              {React.createElement(standard.icon, { className: "w-5 h-5", style: { color: '#FF6B35', strokeWidth: '2px' } })}
                             </div>
                             <div>
                               <CardTitle className="text-lg" style={{ color: '#1e556b' }}>{standard.name}</CardTitle>
