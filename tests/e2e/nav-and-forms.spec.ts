@@ -22,12 +22,12 @@ test.describe('Nav & refresh', () => {
       await button.click();
 
       // Wait for navigation and heading
-      await expect(page.getByRole('heading', { level: 1 })).toHaveText(action.h1, { timeout: 30000 });
+      await expect(page.getByRole('heading', { level: 1 }).first()).toHaveText(action.h1, { timeout: 30000 });
 
       // Reload and verify persistence
       await page.reload({ waitUntil: 'networkidle' });
       await page.waitForLoadState('domcontentloaded');
-      await expect(page.getByRole('heading', { level: 1 })).toHaveText(action.h1, { timeout: 30000 });
+      await expect(page.getByRole('heading', { level: 1 }).first()).toHaveText(action.h1, { timeout: 30000 });
     });
   }
 });

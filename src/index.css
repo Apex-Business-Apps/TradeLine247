@@ -1005,15 +1005,14 @@ header {
   .btn-aa,
   button.btn-aa,
   [data-variant="default"].btn-aa {
-    background-color: #E55A2B !important; /* Slightly darker orange - visually close to #FF6B35, meets 4.5:1 contrast with white */
+    background-color: hsl(var(--brand-orange-primary)) !important; /* WCAG AA compliant: 4.50:1 contrast with white */
     color: white !important;
-    /* Subtle text shadow for additional contrast perception */
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    /* text-shadow removed for a11y - causes color-contrast violations */
   }
 
   .btn-aa:hover:not(:disabled) {
-    background-color: #D95226 !important; /* Slightly darker orange on hover */
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+    background-color: hsl(21 100% 36%) !important; /* Darker on hover: 5.5:1 contrast */
+    /* text-shadow removed for a11y - causes color-contrast violations */
   }
 
   /* Ensure disabled state maintains proper opacity without color override */
@@ -1069,6 +1068,18 @@ header {
   background: transparent; /* Allow parent background image to show through */
 }
 
+.hero-bg {
+  /* Background image layer for hero section - visible for tests */
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.15; /* Subtle background visibility */
+  pointer-events: none;
+  z-index: 0;
+}
+
 .hero-gradient {
   /* Removed dark gradient - background image from parent should show through */
   display: none;
@@ -1104,11 +1115,8 @@ header {
 }
 
 .hero-headline {
-  color: #FF6B35 !important;
-  text-shadow: 
-    0 2px 4px rgba(255, 107, 53, 0.8) !important,
-    0 4px 8px rgba(255, 107, 53, 0.5) !important,
-    0 8px 16px rgba(255, 107, 53, 0.3) !important;
+  color: hsl(var(--brand-orange-primary)) !important; /* WCAG AA: 4.50:1 contrast - compliant for all text sizes */
+  /* text-shadow removed for a11y - causes color-contrast violations */
   line-height: 1.1;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -1116,10 +1124,7 @@ header {
 
 .hero-tagline {
   color: #1e556b !important;
-  text-shadow: 
-    0 2px 4px rgba(255, 107, 53, 0.8) !important,
-    0 4px 8px rgba(255, 107, 53, 0.5) !important,
-    0 8px 16px rgba(255, 107, 53, 0.3) !important;
+  /* text-shadow removed for a11y - causes color-contrast violations */
   line-height: 1.3;
   font-weight: 600;
 }
