@@ -239,9 +239,6 @@ const Security = () => {
                     <Card className="hover:shadow-lg transition-shadow pt-10">
                       <CardHeader>
                         <div className="flex items-start justify-between mb-3">
-                          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
-                            <IconComponent className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
-                          </div>
                           <Badge variant="secondary" className="text-xs">
                             {feature.badge}
                           </Badge>
@@ -300,22 +297,15 @@ const Security = () => {
                     </div>
                     <Card className="bg-background/80 backdrop-blur pt-10">
                       <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" style={{ border: '2px solid #1e556b' }}>
-                              <standard.icon className="w-5 h-5" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
-                            </div>
-                            <div>
-                              <CardTitle className="text-lg" style={{ color: '#1e556b' }}>{standard.name}</CardTitle>
-                              <Badge
-                                variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
-                                className="mt-1 text-xs"
-                                style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#E55A2B' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
-                              >
-                                {standard.status}
-                              </Badge>
-                            </div>
-                          </div>
+                        <div className="flex flex-col gap-2">
+                          <CardTitle className="text-lg" style={{ color: '#1e556b' }}>{standard.name}</CardTitle>
+                          <Badge
+                            variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
+                            className="text-xs self-start"
+                            style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#E55A2B' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
+                          >
+                            {standard.status}
+                          </Badge>
                         </div>
                       </CardHeader>
                       <CardContent>
