@@ -1,8 +1,6 @@
-// Temporary NOOP to ensure guards never blank public routes.
-// Keep function signature so existing imports don't break.
+// Temporary NOOP to ensure public routes render
+// Allow all marketing routes to render unconditionally.
 export function allowPublicRoutes(pathname: string): boolean {
-  // Allow all marketing routes to render unconditionally.
-  // Tighten later with an explicit allowlist if you want.
   return true;
 }
 

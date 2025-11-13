@@ -26,3 +26,28 @@ export function preflight(req: Request): Response | null {
     },
   });
 }
+
+export function jsonResponse(data: any, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+export function unexpectedErrorResponse(error: unknown): Response {
+  console.error("Unexpected error:", error);
+  return jsonResponse(
+    { error: error instanceof Error ? error.message : "Unexpected error" },
+    500
+  );
+}
+
+export function withCors(headers: Record<string, string>): Record<string, string> {
+  return {
+    ...corsHeaders,
+    ...headers,
+  };
+}

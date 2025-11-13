@@ -11,15 +11,61 @@ function substitutePromptTemplate(template: string, variables: Record<string, st
   return result;
 }
 
+// Helper: Get optimized prompt with caching structure and few-shot examples
+function getOptimizedVoicePrompt(businessName: string, humanNumber: string): string {
+  return `[STATIC INSTRUCTIONS - Cacheable]
+You are the AI receptionist for ${businessName}. You speak Canadian English with a warm, professional tone.
+
+CORE PRINCIPLES:
+1. Brevity: Keep responses under 15 seconds
+2. Accuracy: Never invent data - if unsure, ask
+3. Confirmation: Always read back captured information
+4. Human Handoff: Offer immediately if requested or situation is urgent
+
+REQUIRED FIELDS TO CAPTURE:
+- caller_name: Full name of caller
+- callback_number: Phone number (read digit-by-digit for confirmation)
+- email: Email address (spell back for confirmation)
+- job_summary: Brief description of their needs (max 50 words)
+- preferred_datetime: When they want service
+
+[EXAMPLES - Few-Shot Learning]
+
+Example 1: New Caller
+Caller: "Hi, I need some electrical work done."
+Assistant: "Welcome to ${businessName}! I'd be happy to help. May I start with your name?"
+Caller: "It's Sarah Chen."
+Assistant: "Thank you, Sarah. What's the best number to reach you?"
+Caller: "416-555-0123."
+Assistant: "Great, 4-1-6, 5-5-5, 0-1-2-3. And your email?"
+Caller: "sarah.chen@email.com"
+Assistant: "Perfect, S-A-R-A-H dot C-H-E-N at email dot com. Can you briefly describe the electrical work you need?"
+Caller: "Some outlets in my kitchen aren't working."
+Assistant: "Got it. When would you like us to come by?"
+Caller: "This Thursday afternoon?"
+Assistant: "Thursday afternoon works. I've captured all your details. Let me connect you to our scheduling team right now."
+
+Example 2: Urgent Request
+Caller: "I need to speak to someone right away! My furnace died!"
+Assistant: "I understand this is urgent. Let me connect you to ${humanNumber} immediately. Please hold."
+
+Example 3: Handling Background Noise
+Caller: [muffled] "Can you hear me?"
+Assistant: "I'm having trouble hearing you clearly. Could you repeat that in a quieter area?"
+
+[DYNAMIC CONTEXT - Changes Per Call]
+Current conversation will unfold below:
+`;
+}
+
 // Helper: Get enhanced preset with safety config
 async function getEnhancedPreset(supabase: any, presetId: string | null, config: any) {
+  const businessName = config?.business_name || 'Apex Business Systems';
+  const humanNumber = config?.human_number_e164 || '+14319900222';
+  
   if (!presetId) {
     return {
-      system_prompt: config?.system_prompt || 
-        `You are TradeLine 24/7, an AI receptionist. Canadian English. Be warm, concise (≤15s per reply). 
-         Capture: name, callback number, email, job summary, preferred date/time. Confirm back. 
-         Offer to connect to a human on request/urgent. If human unreachable, take a message and promise a callback. 
-         Never invent data; read numbers digit-by-digit. On background noise, ask to repeat briefly.`,
+      system_prompt: getOptimizedVoicePrompt(businessName, humanNumber),
       max_reply_seconds: config?.llm_max_reply_seconds || 15,
       speaking_rate: config?.llm_speaking_rate || 1.0,
       voice: config?.llm_voice || 'alloy',
@@ -42,14 +88,9 @@ async function getEnhancedPreset(supabase: any, presetId: string | null, config:
     return null;
   }
 
-  // Substitute template variables
-  const variables = {
-    BusinessName: config?.business_name || 'Apex Business Systems',
-    HumanNumberE164: config?.human_number_e164 || '+14319900222'
-  };
-
+  // Substitute template variables in optimized prompt
   return {
-    system_prompt: substitutePromptTemplate(preset.system_prompt, variables),
+    system_prompt: getOptimizedVoicePrompt(businessName, humanNumber),
     max_reply_seconds: preset.max_reply_seconds || 15,
     speaking_rate: preset.speaking_rate || 1.0,
     voice: preset.voice || 'alloy',
@@ -393,16 +434,16 @@ serve(async (req) => {
         ? sentimentHistory.reduce((a, b) => a + b, 0) / sentimentHistory.length
         : null;
       
-      // Save transcript and captured fields with enhanced metadata
+      // Save transcript and captured fields with compressed metadata
       await supabase.from('call_logs')
         .update({
           transcript: transcript,
           captured_fields: {
             ...capturedFields,
-            conversation_duration_seconds: conversationDuration,
-            turn_count: turnCount,
-            avg_sentiment: avgSentiment,
-            safety_config_used: preset.safety_guardrails ? 'enabled' : 'disabled'
+            dur_s: conversationDuration,
+            turns: turnCount,
+            sent: avgSentiment,
+            safe: preset.safety_guardrails ? 1 : 0
           },
           ended_at: new Date().toISOString(),
           status: 'completed'
