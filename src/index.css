@@ -57,29 +57,22 @@ body {
   position: relative;
 }
 
-/* REMOVED: Global body overlay for non-landing pages
- * This was causing visual inconsistency across pages.
- * Now using consistent hero-specific overlays instead.
- * Previous implementation:
- * - 88-92% orange overlay on all non-landing pages
- * - Applied via body::after pseudo-element
- * - Removed to achieve visual consistency
- */
-/* body:not([data-page="landing"])::after {
+/* Orange tint overlay for non-landing pages - MAXIMUM dimming for heavy visual obscuring */
+body:not([data-page="landing"])::after {
   content: '';
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(180deg,
-    hsla(21, 100%, 61%, 0.92) 0%,
+  background: linear-gradient(180deg, 
+    hsla(21, 100%, 61%, 0.92) 0%, 
     hsla(21, 100%, 61%, 0.88) 50%,
     hsla(21, 100%, 61%, 0.92) 100%
   );
   pointer-events: none;
   z-index: 0;
-} */
+}
 
 #root {
   min-height: 100vh;
@@ -1102,14 +1095,9 @@ header {
   inset: 0;
   /* Orange mask overlay - proper brand orange with reduced opacity for better background visibility */
   /* Using brand orange #FF6B35 (hsl(21, 100%, 60%)) for consistent brand identity */
-  background: rgba(255, 107, 53, 0.20); /* Brand orange #FF6B35 with 20% opacity - baseline for non-landing pages */
+  background: rgba(255, 107, 53, 0.20); /* Brand orange #FF6B35 with 20% opacity - reduced by 10% for better background visibility */
   pointer-events: none;
   z-index: 1;
-}
-
-/* Landing page overlay - 20% more transparent (20% * 0.8 = 16%) */
-[data-page="landing"] .hero-gradient-overlay {
-  background: rgba(255, 107, 53, 0.16); /* Brand orange #FF6B35 with 16% opacity - landing page lighter baseline */
 }
 
 .hero-vignette {
