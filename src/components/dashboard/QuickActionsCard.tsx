@@ -89,7 +89,8 @@ export const QuickActionsCard: React.FC = () => {
         {actions.map((action) => {
           const Icon = action.icon;
           const isActionLoading = isNavigating && clickedAction === action.label;
-          
+          const descriptionId = `quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}-description`;
+
           return (
             <Button
               key={action.label}
@@ -97,7 +98,8 @@ export const QuickActionsCard: React.FC = () => {
               onClick={() => handleActionClick(action)}
               disabled={isNavigating}
               className="w-full justify-start gap-2 relative"
-              aria-label={`${action.label}: ${action.description}`}
+              aria-label={action.label}
+              aria-describedby={descriptionId}
               title={action.description}
               data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
               data-qa-action={action.label}
@@ -109,6 +111,9 @@ export const QuickActionsCard: React.FC = () => {
               )}
               <span className={isActionLoading ? 'opacity-70' : ''}>
               {action.label}
+              </span>
+              <span id={descriptionId} className="sr-only">
+                {action.description}
               </span>
             </Button>
           );

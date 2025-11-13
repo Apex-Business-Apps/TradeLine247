@@ -6,17 +6,17 @@ export const ImpactStrip = () => {
     icon: TrendingUp,
     title: "More booked work",
     description: "Fewer voicemails means more conversations and more wins.",
-    color: "text-[hsl(var(--status-success))]" // WCAG AA: 5.76:1 contrast
+    color: "#FF6B35" // Hero text orange
   }, {
     icon: Clock,
     title: "Time back",
     description: "We cover nights and busy hours so you don't have to.",
-    color: "text-[hsl(var(--status-info))]" // WCAG AA: 4.56:1 contrast
+    color: "#FF6B35" // Hero text orange
   }, {
     icon: DollarSign,
     title: "Lower costs",
     description: "Coverage without hiring overhead.",
-    color: "text-primary" // Brand orange, use for large elements only (3.03:1)
+    color: "#FF6B35" // Hero text orange
   }];
   return <section className="py-16 bg-muted/30">
       <div className="container">
@@ -43,12 +43,12 @@ export const ImpactStrip = () => {
           }}>
                 <CardHeader className="pb-4">
                   <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl flex items-center justify-center mb-4 group-hover:shadow-lg transition-all duration-300">
-                    <Icon className={`h-8 w-8 ${impact.color} group-hover:scale-110 transition-transform duration-300`} />
+                    <Icon className="h-8 w-8 group-hover:scale-110 transition-transform duration-300" style={{ color: impact.color }} />
                   </div>
-                  <CardTitle className="text-xl group-hover:text-primary transition-colors duration-300">{impact.title}</CardTitle>
+                  <CardTitle className="text-xl transition-colors duration-300" style={{ color: '#FF6B35' }}>{impact.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="text-base leading-relaxed group-hover:text-foreground transition-colors duration-300">
+                  <CardDescription className="text-base leading-relaxed transition-colors duration-300" style={{ color: '#1e556b' }}>
                     {impact.description}
                   </CardDescription>
                 </CardContent>

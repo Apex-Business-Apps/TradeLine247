@@ -9,6 +9,7 @@ import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { errorReporter } from '@/lib/errorReporter';
+import builtCanadianBadge from '@/assets/badges/built-canadian.svg';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -124,7 +125,7 @@ export const Header: React.FC = () => {
     >
       <div 
         data-header-inner 
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 items-center gap-4"
+        className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 items-center gap-4"
       >
         {/* Left: Home Button & Badge */}
         <div 
@@ -141,21 +142,15 @@ export const Header: React.FC = () => {
           >
             Home
           </Button>
-          <picture>
-            <source
-              srcSet="/assets/brand/badges/built-in-canada-badge.webp"
-              type="image/webp"
-            />
-            <img
-              id="app-badge-ca"
-              src="/assets/brand/badges/built-in-canada-badge.png"
-              alt="Built in Canada"
-              className="h-[45px] sm:h-[60px] lg:h-[65px] w-auto"
-              width="156"
-              height="65"
-              loading="eager"
-            />
-          </picture>
+          <img
+            id="app-badge-ca"
+            src={builtCanadianBadge}
+            alt="Built in Canada"
+            className="h-[45px] sm:h-[60px] lg:h-[65px] w-auto"
+            width="156"
+            height="65"
+            loading="eager"
+          />
         </div>
 
         {/* Center: Desktop Marketing Navigation */}
@@ -229,18 +224,19 @@ export const Header: React.FC = () => {
           </nav>
         )}
 
-        {/* Right: Language Switcher, User Menu, Burger */}
+        {/* Right: Language Switcher, Burger, User Menu */}
         <div 
           data-slot="right" 
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 ml-auto"
         >
           <LanguageSwitcher />
-
-          {/* Burger Menu Button (Mobile Only) */}
+          
+          {/* Burger Menu Button - Always visible */}
           <button
             id="burger-menu-button"
             data-testid="burger-menu-button"
-            className="flex lg:hidden items-center justify-center p-2 rounded-md border border-border bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
+            className="flex items-center justify-center p-2 rounded-md bg-background hover:bg-accent transition-all duration-300 hover-scale min-w-[44px] min-h-[44px]"
+            style={{ border: '2px solid #FF6B35' }}
             onClick={() => setIsMobileMenuOpen(prev => !prev)}
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
@@ -248,9 +244,9 @@ export const Header: React.FC = () => {
             type="button"
           >
             {isMobileMenuOpen ? (
-              <X size={20} className="text-foreground" strokeWidth={2} />
+              <X size={20} strokeWidth={2} style={{ color: '#FF6B35' }} />
             ) : (
-              <Menu size={20} className="text-foreground" strokeWidth={2} />
+              <Menu size={20} strokeWidth={2} style={{ color: '#FF6B35' }} />
             )}
           </button>
 
@@ -330,7 +326,7 @@ export const Header: React.FC = () => {
             </>
           ) : (
             <Button 
-              variant="default" 
+              variant="success" 
               size={isScrolled ? 'sm' : 'default'} 
               onClick={() => handleNavigation(paths.auth, 'Login')}
               className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
@@ -341,13 +337,13 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Navigation Drawer - Now visible on all screen sizes */}
       <nav
         id="mobile-menu"
         aria-label="Mobile"
         aria-hidden={!isMobileMenuOpen}
         className={cn(
-          'lg:hidden border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden',
+          'border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden',
           isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
         )}
       >
