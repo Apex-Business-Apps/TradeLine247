@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Send, User, Loader2, Minimize2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { streamChatResponse } from '@/lib/chatStreaming';
 import { useToast } from '@/hooks/use-toast';
 import { ChatIcon } from './ChatIcon';
 import { cn } from '@/lib/utils';
@@ -81,83 +82,75 @@ export const MiniChat: React.FC = React.memo(() => {
     setInput('');
     setIsLoading(true);
 
-    let assistantContent = '';
+    // Create placeholder for streaming response
+    const assistantId = crypto.randomUUID();
     const assistantMessage: Message = {
-      id: crypto.randomUUID(),
+      id: assistantId,
       role: 'assistant',
       content: '',
       timestamp: new Date(),
     };
+    setMessages(prev => [...prev, assistantMessage]);
 
     try {
-      console.log('Sending chat request with', messages.length + 1, 'messages');
+      console.log('Starting streaming chat with', messages.length + 1, 'messages');
       
-      // Use Supabase client for proper authentication
-      const { data, error: functionError } = await supabase.functions.invoke('chat', {
-        body: {
-          messages: [...messages, userMessage].map(m => ({
-            role: m.role,
-            content: m.content
-          }))
+      await streamChatResponse(
+        [...messages, userMessage].map(m => ({ role: m.role, content: m.content })),
+        {
+          onChunk: (chunk) => {
+            setMessages(prev => 
+              prev.map(m => 
+                m.id === assistantId 
+                  ? { ...m, content: m.content + chunk }
+                  : m
+              )
+            );
+          },
+          onComplete: (fullResponse) => {
+            console.log('Chat stream completed, length:', fullResponse.length);
+            setIsLoading(false);
+          },
+          onError: (err) => {
+            errorReporter.report({
+              type: 'error',
+              message: `Chat stream error: ${err.message}`,
+              stack: err.stack,
+              timestamp: new Date().toISOString(),
+              url: window.location.href,
+              userAgent: navigator.userAgent,
+              environment: errorReporter['getEnvironment'](),
+              metadata: { messageCount: messages.length }
+            });
+            
+            console.error('Chat stream error:', err);
+            
+            let errorMessage = 'Sorry, I encountered an error. Please try again.';
+            if (err.message?.includes('429')) {
+              errorMessage = 'I\'m receiving too many requests right now. Please wait a moment and try again.';
+            } else if (err.message?.includes('402')) {
+              errorMessage = 'The AI service is temporarily unavailable. Please try again later.';
+            }
+            
+            setMessages(prev => 
+              prev.map(m => 
+                m.id === assistantId 
+                  ? { ...m, content: errorMessage }
+                  : m
+              )
+            );
+            setIsLoading(false);
+            
+            toast({
+              title: 'Chat Error',
+              description: errorMessage,
+              variant: 'destructive'
+            });
+          }
         }
-      });
-
-      console.log('Chat function invoked');
-
-      if (functionError) {
-        errorReporter.report({
-          type: 'error',
-          message: `Chat API error: ${functionError.message || 'Unknown error'}`,
-          timestamp: new Date().toISOString(),
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-          environment: errorReporter['getEnvironment'](),
-          metadata: { functionError, messageCount: messages.length }
-        });
-        throw new Error(functionError.message || 'Chat function error');
-      }
-
-      // Add assistant message with the response
-      assistantContent = data?.content || data?.message || 'I apologize, but I didn\'t receive a complete response. Please try asking again.';
-      
-      setMessages(prev => [...prev, { ...assistantMessage, content: assistantContent }]);
-
-      console.log('Chat request completed successfully');
-
-    } catch (error: any) {
-      errorReporter.report({
-        type: 'error',
-        message: `Chat error: ${error.message || 'Unknown error'}`,
-        stack: error.stack,
-        timestamp: new Date().toISOString(),
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        environment: errorReporter['getEnvironment'](),
-        metadata: { error, messageCount: messages.length }
-      });
-      
-      let errorMessage = 'Sorry, I encountered an error. Please try again.';
-      
-      if (error.message?.includes('429')) {
-        errorMessage = 'I\'m receiving too many requests right now. Please wait a moment and try again.';
-      } else if (error.message?.includes('402')) {
-        errorMessage = 'The AI service is temporarily unavailable. Please try again later.';
-      }
-
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === assistantMessage.id 
-            ? { ...msg, content: errorMessage }
-            : msg
-        )
       );
-
-      toast({
-        title: "Chat Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
+    } catch (err) {
+      console.error('Chat error:', err);
       setIsLoading(false);
     }
   };
