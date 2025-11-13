@@ -41,6 +41,7 @@ const Index = () => {
     <>
       <div
         id="app-home"
+        data-page="landing"
         className="min-h-screen flex flex-col relative"
         style={{
           backgroundImage: `url(${backgroundImage})`,
