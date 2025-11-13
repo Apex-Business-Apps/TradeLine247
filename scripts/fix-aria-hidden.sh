@@ -28,7 +28,7 @@ fix_icons() {
 }
 
 # Process key files
-for file in /home/user/tradeline247aicom/src/pages/{Features,Pricing,Demo,Security}.tsx; do
+for file in src/pages/{Features,Pricing,Demo,Security}.tsx; do
   if [ -f "$file" ]; then
     fix_icons "$file"
   fi

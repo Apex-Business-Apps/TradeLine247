@@ -491,7 +491,7 @@ f98d6ef Add new PR description for follow-up fixes
 
 ## 📋 PR LINK FOR REVIEW
 
-**Create PR:** https://github.com/apexbusiness-systems/tradeline247aicom/compare/main...claude/repo-scope-root-analysis-011CUrjBpBDEMoguDu7r7Jvy
+**Create PR:** https://github.com/apexbusiness-systems/tradeline247/compare/main...claude/repo-scope-root-analysis-011CUrjBpBDEMoguDu7r7Jvy
 
 **Title:** Enterprise-Grade Fixes: WCAG 2 AA Compliance + Critical Security
 

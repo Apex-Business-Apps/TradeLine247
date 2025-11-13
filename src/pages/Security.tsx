@@ -115,7 +115,17 @@ const privacyCommitments = [
 
 const Security = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div 
+      className="min-h-screen flex flex-col relative"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+        backgroundColor: "hsl(0, 0%, 97%)",
+      }}
+    >
       <SEOHead
         title="Security & Privacy - TradeLine 24/7"
         description="Enterprise-grade security and privacy for your business. SOC 2, GDPR, and PIPEDA compliant. End-to-end encryption, 24/7 monitoring, and Canadian data sovereignty."
@@ -123,231 +133,143 @@ const Security = () => {
         canonical="https://www.tradeline247ai.com/security"
       />
 
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section 
-          className="hero-section py-20 relative"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "100% auto",
-            backgroundPosition: "center top",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed",
-            paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
-            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
-            paddingLeft: 'env(safe-area-inset-left, 0)',
-            paddingRight: 'env(safe-area-inset-right, 0)'
-          }}
-        >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
-          <div className="container text-center relative z-10">
+      <div className="relative z-10" style={{ minHeight: "100vh" }}>
+        <main className="flex-1">
+          {/* Hero Section */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
+          <div className="container text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
               <Shield className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="hero-headline text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Security & Privacy First
             </h1>
-            <p className="hero-tagline text-lg md:text-xl mb-8 max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
               Enterprise-grade security protecting your business data. Built for Canadian businesses with Canadian data sovereignty.
             </p>
             <div className="flex flex-wrap justify-center gap-3 mb-8">
-              <a href="#encryption" className="feature-badge font-medium">
-                <Lock className="w-4 h-4 mr-2 inline" />
+              <Badge variant="outline" className="text-sm px-4 py-2">
+                <Lock className="w-4 h-4 mr-2" />
                 AES-256 Encryption
-              </a>
-              <a href="#gdpr" className="feature-badge font-medium">
-                <Globe className="w-4 h-4 mr-2 inline" />
+              </Badge>
+              <Badge variant="outline" className="text-sm px-4 py-2">
+                <Globe className="w-4 h-4 mr-2" />
                 GDPR Aligned
-              </a>
-              <a href="#soc2" className="feature-badge font-medium">
-                <Shield className="w-4 h-4 mr-2 inline" />
+              </Badge>
+              <Badge variant="outline" className="text-sm px-4 py-2">
+                <Shield className="w-4 h-4 mr-2" />
                 SOC 2 Ready
-              </a>
-              <a href="#pipeda" className="feature-badge font-medium">
-                <FileCheck className="w-4 h-4 mr-2 inline" />
+              </Badge>
+              <Badge variant="outline" className="text-sm px-4 py-2">
+                <FileCheck className="w-4 h-4 mr-2" />
                 PIPEDA Aligned
-              </a>
+              </Badge>
             </div>
           </div>
-        </section>
-
-        {/* Security Features */}
-        <section 
-          className="py-20 relative"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "100% auto",
-            backgroundPosition: "center top",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed"
-          }}
-        >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
-          <div className="container relative z-10">
-            <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
-              <div className="text-center mb-16">
-                <h2 className="hero-headline text-3xl md:text-4xl font-bold mb-4">Enterprise-Grade Security</h2>
-                <p className="hero-tagline text-lg max-w-2xl mx-auto">
-                  Multiple layers of security protecting your data at every level.
-                </p>
-              </div>
-
-              {/* Navy lines connecting title to cards - decorative SVG lines */}
-              <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-                {securityFeatures.map((_, index) => {
-                  const cols = 3;
-                  const row = Math.floor(index / cols);
-                  const col = index % cols;
-                  const cardX = (col + 0.5) * (100 / cols);
-                  const cardY = 25 + (row * 35);
-                  return (
-                    <line
-                      key={index}
-                      x1="50%"
-                      y1="15%"
-                      x2={`${cardX}%`}
-                      y2={`${cardY}%`}
-                      stroke="#1e556b"
-                      strokeWidth="2"
-                      strokeDasharray="5,5"
-                      opacity="0.4"
-                    />
-                  );
-                })}
-              </svg>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto relative" style={{ zIndex: 1 }}>
-                {securityFeatures.map((feature, index) => {
-                  const IconComponent = feature.icon;
-                  return (
-                  <div key={index} className="relative">
-                    <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="relative">
-                            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
-                              {(() => {
-                                const Icon = feature.icon;
-                                return <Icon className="w-6 h-6 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
-                              })()}
-                            </div>
-                            {/* Orbital ring */}
-                            <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
-                          </div>
-                          <Badge variant="secondary" className="text-xs">
-                            {feature.badge}
-                          </Badge>
-                        </div>
-                        <CardTitle className="text-lg" style={{ color: '#1e556b' }}>{feature.title}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm" style={{ color: '#1e556b' }}>{feature.description}</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  );
-                })}
-              </div>
-            </div>
+            </section>
           </div>
-        </section>
 
-        {/* Compliance Standards */}
-        <section 
-          className="py-20 relative"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "100% auto",
-            backgroundPosition: "center top",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed"
-          }}
-        >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
-          <div className="container relative z-10">
-            <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
-              <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>Compliance & Standards</h2>
-                <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e556b' }}>
-                  Aligned with recognized standards. Independent assessments where applicable.
-                </p>
-              </div>
+          {/* Security Features */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
+          <div className="container">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Enterprise-Grade Security</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Multiple layers of security protecting your data at every level.
+              </p>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto relative" style={{ zIndex: 1 }}>
-                {complianceStandards.map((standard, index) => (
-                  <div key={index} className="relative">
-                    <Card className="bg-background/80 backdrop-blur">
-                      <CardHeader>
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="relative">
-                            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ backgroundColor: '#FF6B35', border: '3px solid #FF8C35' }}>
-                              {(() => {
-                                const Icon = standard.icon;
-                                return <Icon className="w-5 h-5 text-white" style={{ strokeWidth: '2.5px' }} aria-hidden="true" />;
-                              })()}
-                            </div>
-                            {/* Orbital ring */}
-                            <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ border: '2px solid #FF6B35', transform: 'scale(1.3)' }} />
-                          </div>
-                          <div className="flex-1">
-                            <CardTitle className="text-lg mb-2" style={{ color: '#1e556b' }}>{standard.name}</CardTitle>
-                            <Badge
-                              variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
-                              className="text-xs"
-                              style={{ backgroundColor: standard.status === "Aligned" || standard.status === "Enforced" ? '#E55A2B' : undefined, color: standard.status === "Aligned" || standard.status === "Enforced" ? 'white' : undefined }}
-                            >
-                              {standard.status}
-                            </Badge>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm" style={{ color: '#1e556b' }}>{standard.description}</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-center mt-12">
-                <Card className="inline-block bg-background/80 backdrop-blur" style={{ border: '2px solid #FF6B35' }}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-3 text-left">
-                      <AlertTriangle className="w-8 h-8 flex-shrink-0" style={{ color: '#FF6B35', strokeWidth: '2px' }} aria-hidden="true" />
-                      <div>
-                        <p className="font-semibold mb-1" style={{ color: '#1e556b' }}>Security Vulnerability Reporting</p>
-                        <p className="text-sm" style={{ color: '#1e556b' }}>
-                          Found a security issue? Email us at{" "}
-                          <a href="mailto:security@tradeline247ai.com" className="hover:underline" style={{ color: '#FF6B35', fontWeight: 'bold' }}>
-                            security@tradeline247ai.com
-                          </a>
-                        </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {securityFeatures.map((feature, index) => (
+                <Card key={index} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <feature.icon className="w-6 h-6 text-primary" />
                       </div>
+                      <Badge variant="secondary" className="text-xs">
+                        {feature.badge}
+                      </Badge>
                     </div>
+                    <CardTitle className="text-lg">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">{feature.description}</p>
                   </CardContent>
                 </Card>
-              </div>
+              ))}
             </div>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* Privacy Commitments */}
-        <section 
-          className="py-20 relative"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "100% auto",
-            backgroundPosition: "center top",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed"
-          }}
-        >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
-          <div className="container relative z-10">
+          {/* Compliance Standards */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
+          <div className="container">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Compliance & Standards</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Aligned with recognized standards. Independent assessments where applicable.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {complianceStandards.map((standard, index) => (
+                <Card key={index} className="bg-background/80 backdrop-blur">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <standard.icon className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">{standard.name}</CardTitle>
+                          <Badge
+                            variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
+                            className="mt-1 text-xs"
+                          >
+                            {standard.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">{standard.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <Card className="inline-block bg-background/80 backdrop-blur">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 text-left">
+                    <AlertTriangle className="w-8 h-8 text-primary flex-shrink-0" aria-hidden="true" />
+                    <div>
+                      <p className="font-semibold mb-1">Security Vulnerability Reporting</p>
+                      <p className="text-sm text-muted-foreground">
+                        Found a security issue? Email us at{" "}
+                        <a href="mailto:security@tradeline247ai.com" className="text-primary hover:underline">
+                          security@tradeline247ai.com
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+            </section>
+          </div>
+
+          {/* Privacy Commitments */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
+          <div className="container">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Privacy Commitments</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -371,22 +293,13 @@ const Security = () => {
               ))}
             </div>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* Data Handling */}
-        <section 
-          className="py-20 relative"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "100% auto",
-            backgroundPosition: "center top",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed"
-          }}
-        >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
-          <div className="container relative z-10">
+          {/* Data Handling */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
+          <div className="container">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">How We Handle Your Data</h2>
@@ -483,22 +396,13 @@ const Security = () => {
               </div>
             </div>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* CTA Section */}
-        <section 
-          className="py-20 relative"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "100% auto",
-            backgroundPosition: "center top",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed"
-          }}
-        >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
-          <div className="container relative z-10">
+          {/* CTA Section */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
+          <div className="container">
             <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
               <CardContent className="pt-12 pb-12 text-center">
                 <Shield className="w-16 h-16 text-primary mx-auto mb-6" />
@@ -518,10 +422,14 @@ const Security = () => {
               </CardContent>
             </Card>
           </div>
-        </section>
-      </main>
-
-      <Footer />
+            </section>
+          </div>
+        </main>
+        
+        <div className="bg-background/85 backdrop-blur-[2px]">
+          <Footer />
+        </div>
+      </div>
     </div>
   );
 };

@@ -502,7 +502,7 @@ curl https://YOUR_PROJECT.supabase.co/functions/v1/voice-health
 
 ### Create Pull Request
 ```
-https://github.com/apexbusiness-systems/tradeline247aicom/pull/new/claude/critical-issue-debug-011CUhe9VFFw1Vrr5ScycCGw
+https://github.com/apexbusiness-systems/tradeline247/pull/new/claude/critical-issue-debug-011CUhe9VFFw1Vrr5ScycCGw
 ```
 
 ### Support Contacts

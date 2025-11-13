@@ -67,7 +67,7 @@ k6/
 fastlane/
 
 # Config (some may be needed, adjust as needed)
-config/
+# config/ - REMOVED: featureFlags.ts needed for deployment
 
 # Temporary files
 *.log

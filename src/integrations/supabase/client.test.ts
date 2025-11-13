@@ -32,9 +32,9 @@ function readClientFileContent(): string {
       // Fallback: try from process.cwd()
       return readFileSync(join(process.cwd(), 'src/integrations/supabase/client.ts'), 'utf-8');
     } catch {
-      // Final fallback: try from current working directory with tradeline247aicom prefix
+      // Final fallback: try from current working directory with tradeline247 prefix
       return readFileSync(
-        join(process.cwd(), 'tradeline247aicom/src/integrations/supabase/client.ts'),
+        join(process.cwd(), 'src/integrations/supabase/client.ts'),
         'utf-8'
       );
     }

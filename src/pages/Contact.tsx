@@ -181,7 +181,17 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div 
+      className="min-h-screen flex flex-col relative"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+        backgroundColor: "hsl(0, 0%, 97%)",
+      }}
+    >
       <SEOHead 
         title="Contact Us - TradeLine 24/7 AI Receptionist"
         description="Get in touch with TradeLine 24/7 for AI receptionist services. Contact sales, support, or request a demo of our 24/7 customer service automation."
@@ -190,48 +200,26 @@ const Contact = () => {
       />
       <LocalBusinessSchema />
       
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section 
-          className="hero-section py-20 relative"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "100% auto",
-            backgroundPosition: "center top",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed",
-            paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
-            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
-            paddingLeft: 'env(safe-area-inset-left, 0)',
-            paddingRight: 'env(safe-area-inset-right, 0)'
-          }}
-        >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
-          <div className="container text-center relative z-10">
-            <h1 className="hero-headline text-4xl md:text-6xl font-bold mb-6">
+      <div className="relative z-10" style={{ minHeight: "100vh" }}>
+        <main className="flex-1">
+          {/* Hero Section */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
+          <div className="container text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
               Get in Touch
             </h1>
-            <p className="hero-tagline text-lg md:text-xl mb-8 max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
               Ready to grow your business with AI? Let's talk about how TradeLine 24/7 can help you.
             </p>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* Contact Methods */}
-        <section 
-          className="py-20 relative"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "100% auto",
-            backgroundPosition: "center top",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed"
-          }}
-        >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
-          <div className="container relative z-10">
+          {/* Contact Methods */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
+          <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
               {contactMethods.map((method, index) => {
                 const isDirectLink = method.action.startsWith('tel:') || method.action.startsWith('mailto:');
@@ -239,22 +227,20 @@ const Contact = () => {
                 <Card
                   key={index}
                   className="text-center hover:shadow-lg transition-shadow cursor-pointer group"
-                  style={{ borderColor: '#FF6B35', borderWidth: '2px' }}
                   onClick={() => handleContactAction(method.action)}
                 >
                   <CardHeader>
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors" style={{ border: '2px solid #FF6B35' }}>
-                      <method.icon className="w-6 h-6" style={{ color: '#1e556b', strokeWidth: '2px' }} />
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+                      <method.icon className="w-6 h-6 text-primary" />
                     </div>
                     <CardTitle className="text-lg">{method.title}</CardTitle>
-                    <CardDescription style={{ color: '#1e556b' }}>{method.description}</CardDescription>
+                    <CardDescription>{method.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                      {isDirectLink ? (
+                    {isDirectLink ? (
                       <a
                         href={method.action}
-                        className="font-medium block"
-                        style={{ color: '#FF6B35' }}
+                        className="text-primary font-medium block"
                         onClick={(event) => {
                           event.stopPropagation();
                         }}
@@ -262,7 +248,7 @@ const Contact = () => {
                         {method.contact}
                       </a>
                     ) : (
-                      <div className="font-medium" style={{ color: '#FF6B35' }}>
+                      <div className="text-primary font-medium">
                         {method.contact}
                       </div>
                     )}
@@ -275,16 +261,16 @@ const Contact = () => {
             {/* Contact Form */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 max-w-6xl mx-auto">
               <div>
-                <h2 className="text-3xl font-bold mb-6" style={{ color: '#1e556b' }}>Send Us a Message</h2>
-                <p className="mb-8" style={{ color: '#1e556b' }}>
+                <h2 className="text-3xl font-bold mb-6">Send Us a Message</h2>
+                <p className="text-muted-foreground mb-8">
                   Fill out the form below and our team will get back to you within 24 hours. 
                   For urgent matters, please call us directly.
                 </p>
                 
                 <Card>
                   <CardHeader>
-                    <CardTitle style={{ color: '#1e556b' }}>Contact Form</CardTitle>
-                    <CardDescription style={{ color: '#1e556b' }}>
+                    <CardTitle>Contact Form</CardTitle>
+                    <CardDescription>
                       Tell us about your business needs and we'll help you get started
                     </CardDescription>
                   </CardHeader>
@@ -294,9 +280,7 @@ const Contact = () => {
                         error={submitError} 
                         onRetry={() => {
                           setSubmitError(null);
-                          // Properly typed synthetic form event
-                          const syntheticEvent = new Event('submit', { bubbles: true, cancelable: true }) as unknown as React.FormEvent<HTMLFormElement>;
-                          handleSubmit(syntheticEvent);
+                          handleSubmit(new Event('submit') as any);
                         }} 
                       />
                     )}
@@ -356,7 +340,6 @@ const Contact = () => {
                           placeholder="+1 (555) 123-4567" 
                           value={contactFormData.phone}
                           onChange={(e) => setContactFormData(prev => ({...prev, phone: e.target.value}))}
-                          style={{ color: '#FF6B35' }}
                         />
                       </div>
                       
@@ -383,7 +366,7 @@ const Contact = () => {
                         />
                       </div>
                       
-                      <Button type="submit" size="lg" className="w-full btn-aa" disabled={isSubmitting}>
+                      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -398,21 +381,19 @@ const Contact = () => {
                 </Card>
               </div>
 
-              <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
-                <h2 className="text-3xl font-bold mb-6" style={{ color: '#1e556b' }}>Why Choose TradeLine 24/7?</h2>
+              <div>
+                <h2 className="text-3xl font-bold mb-6">Why Choose TradeLine 24/7?</h2>
                 
                 <div className="space-y-8">
                   <Card className="bg-gradient-to-br from-primary/5 to-accent/5">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div style={{ border: '2px solid #1e556b', borderRadius: '8px', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Clock className="w-6 h-6" style={{ color: '#FF6B35', strokeWidth: '2px' }} />
-                        </div>
-                        <CardTitle className="text-xl" style={{ color: '#1e556b' }}>24/7 Support</CardTitle>
+                        <Clock className="w-6 h-6 text-primary" />
+                        <CardTitle className="text-xl">24/7 Support</CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <p style={{ color: '#1e556b' }}>
+                      <p className="text-muted-foreground">
                         Our team and AI are available around the clock to ensure your business never misses an opportunity.
                       </p>
                     </CardContent>
@@ -420,10 +401,10 @@ const Contact = () => {
 
                   <Card className="bg-gradient-to-br from-accent/5 to-primary/5">
                     <CardHeader>
-                      <CardTitle className="text-xl" style={{ color: '#1e556b' }}>Quick Setup</CardTitle>
+                      <CardTitle className="text-xl">Quick Setup</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p style={{ color: '#1e556b' }}>
+                      <p className="text-muted-foreground">
                         Set up in 10 minutes with our guided onboarding and integration support.
                       </p>
                     </CardContent>
@@ -431,17 +412,17 @@ const Contact = () => {
 
                   <Card className="bg-gradient-to-br from-secondary/20 to-accent/10">
                     <CardHeader>
-                      <CardTitle className="text-xl" style={{ color: '#1e556b' }}>Proven Results</CardTitle>
+                      <CardTitle className="text-xl">Proven Results</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p style={{ color: '#1e556b' }}>
+                      <p className="text-muted-foreground">
                         Join thousands of businesses that have increased their lead conversion by 40% with our AI.
                       </p>
                     </CardContent>
                   </Card>
                 </div>
 
-                <div className="mt-8 p-6 bg-card rounded-lg border border-border shadow-sm relative opacity-100 z-10">
+                <div className="mt-8 p-6 bg-muted/30 rounded-lg">
                   <div data-guard="canada-badge" className="flex items-start gap-3">
                     <img
                       src={builtCanadianBadge}
@@ -451,19 +432,23 @@ const Contact = () => {
                       loading="lazy"
                     />
                     <div>
-                      <h3 className="font-semibold text-foreground">Built in Canada</h3>
-                      <p className="text-muted-foreground">Canadian-hosted. Privacy-by-design.</p>
-                      <p className="text-muted-foreground">Made here. Trusted here.</p>
+                      <h3 className="font-semibold">Built in Canada</h3>
+                      <p className="opacity-80">Canadian-hosted. Privacy-by-design.</p>
+                      <p className="opacity-80">Made here. Trusted here.</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
-      </main>
-      
-      <Footer />
+            </section>
+          </div>
+        </main>
+        
+        <div className="bg-background/85 backdrop-blur-[2px]">
+          <Footer />
+        </div>
+      </div>
 
       {/* Chat Modal */}
       {showChatModal && (

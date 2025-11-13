@@ -91,7 +91,7 @@
 
 ### Accessing the Dashboard
 
-**URL:** `https://yoursite.https://tradeline247aicom.lovable.app//sms-delivery`
+**URL:** `https://yoursite.lovable.app/sms-delivery`
 
 **Requirements:**
 - Admin role required
