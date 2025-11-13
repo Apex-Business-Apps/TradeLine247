@@ -3,6 +3,7 @@ import { SEOHead } from "@/components/seo/SEOHead";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import {
   Shield,
   Lock,
@@ -114,7 +115,17 @@ const privacyCommitments = [
 
 const Security = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div 
+      className="min-h-screen flex flex-col relative"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+        backgroundColor: "hsl(0, 0%, 97%)",
+      }}
+    >
       <SEOHead
         title="Security & Privacy - TradeLine 24/7"
         description="Enterprise-grade security and privacy for your business. SOC 2, GDPR, and PIPEDA compliant. End-to-end encryption, 24/7 monitoring, and Canadian data sovereignty."
@@ -122,9 +133,11 @@ const Security = () => {
         canonical="https://www.tradeline247ai.com/security"
       />
 
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-br from-background via-secondary/10 to-primary/5">
+      <div className="relative z-10" style={{ minHeight: "100vh" }}>
+        <main className="flex-1">
+          {/* Hero Section */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
           <div className="container text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
               <Shield className="w-8 h-8 text-primary" />
@@ -154,10 +167,12 @@ const Security = () => {
               </Badge>
             </div>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* Security Features */}
-        <section className="py-20">
+          {/* Security Features */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
           <div className="container">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Enterprise-Grade Security</h2>
@@ -187,10 +202,12 @@ const Security = () => {
               ))}
             </div>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* Compliance Standards */}
-        <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
+          {/* Compliance Standards */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
           <div className="container">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Compliance & Standards</h2>
@@ -246,10 +263,12 @@ const Security = () => {
               </Card>
             </div>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* Privacy Commitments */}
-        <section className="py-20">
+          {/* Privacy Commitments */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
           <div className="container">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Privacy Commitments</h2>
@@ -274,10 +293,12 @@ const Security = () => {
               ))}
             </div>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* Data Handling */}
-        <section className="py-20 bg-gradient-to-br from-accent/5 to-primary/5">
+          {/* Data Handling */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
           <div className="container">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
@@ -375,10 +396,12 @@ const Security = () => {
               </div>
             </div>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* CTA Section */}
-        <section className="py-20">
+          {/* CTA Section */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
           <div className="container">
             <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
               <CardContent className="pt-12 pb-12 text-center">
@@ -399,10 +422,14 @@ const Security = () => {
               </CardContent>
             </Card>
           </div>
-        </section>
-      </main>
-
-      <Footer />
+            </section>
+          </div>
+        </main>
+        
+        <div className="bg-background/85 backdrop-blur-[2px]">
+          <Footer />
+        </div>
+      </div>
     </div>
   );
 };

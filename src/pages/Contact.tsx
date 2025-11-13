@@ -15,6 +15,7 @@ import { z } from "zod";
 import { PUBLIC_HELPLINE_E164, PUBLIC_HELPLINE_DISPLAY, PUBLIC_EMAIL } from "@/config/public";
 import builtCanadianBadge from "@/assets/badges/built-canadian.svg";
 import { errorReporter } from "@/lib/errorReporter";
+import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 
 const contactFormSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50),
@@ -180,7 +181,17 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div 
+      className="min-h-screen flex flex-col relative"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+        backgroundColor: "hsl(0, 0%, 97%)",
+      }}
+    >
       <SEOHead 
         title="Contact Us - TradeLine 24/7 AI Receptionist"
         description="Get in touch with TradeLine 24/7 for AI receptionist services. Contact sales, support, or request a demo of our 24/7 customer service automation."
@@ -189,9 +200,11 @@ const Contact = () => {
       />
       <LocalBusinessSchema />
       
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-br from-background to-secondary/20">
+      <div className="relative z-10" style={{ minHeight: "100vh" }}>
+        <main className="flex-1">
+          {/* Hero Section */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
           <div className="container text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
               Get in Touch
@@ -200,10 +213,12 @@ const Contact = () => {
               Ready to grow your business with AI? Let's talk about how TradeLine 24/7 can help you.
             </p>
           </div>
-        </section>
+            </section>
+          </div>
 
-        {/* Contact Methods */}
-        <section className="py-20">
+          {/* Contact Methods */}
+          <div className="bg-background/85 backdrop-blur-[2px]">
+            <section className="py-20">
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
               {contactMethods.map((method, index) => {
@@ -426,10 +441,14 @@ const Contact = () => {
               </div>
             </div>
           </div>
-        </section>
-      </main>
-      
-      <Footer />
+            </section>
+          </div>
+        </main>
+        
+        <div className="bg-background/85 backdrop-blur-[2px]">
+          <Footer />
+        </div>
+      </div>
 
       {/* Chat Modal */}
       {showChatModal && (
