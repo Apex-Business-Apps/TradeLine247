@@ -1,0 +1,41 @@
+---
+type: always
+description: CI/Config/Test Guardrails - Enforce idempotent operations
+---
+
+# CI Operations Guardrails
+
+## Scope
+
+**DO NOT modify:** Product UI, features, user-facing content
+**DO modify:** CI workflows, tests, configs, build scripts
+
+## Requirements
+
+**Idempotency:** All edits must skip if content matches
+**Time Caps:** Build ≤150s, Tests ≤120s, LHCI ≤90s, Lint ≤60s
+**LHCI:** Always non-blocking (continue-on-error: true)
+
+## PR Criteria (Rubric 10/10)
+
+1. Cursor rules exist (≤60 lines)
+2. Vercel deploy stateless
+3. Playwright locators strict-safe
+4. LHCI non-blocking + recommended
+5. No invalid security meta
+6. Supabase non-interactive
+7. Time caps respected
+8. No branch protections changed
+9. No product UI changed
+10. Idempotent (re-run = no diffs)
+
+**If ANY fail → STOP. Print 5-line report:**
+- Failed rubric item
+- File:line location
+- Next action
+- No commit, no PR
+
+## Security
+
+Never print GH_TOKEN, GH_TOKEN_ORG, or secrets
+Use ${VAR:-} expansion for safety
