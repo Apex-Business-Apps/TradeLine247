@@ -68,7 +68,7 @@ const Features = () => {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section 
+        <section
           className="hero-section py-20 relative"
           style={{
             backgroundImage: `url(${backgroundImage})`,
@@ -82,6 +82,8 @@ const Features = () => {
             paddingRight: 'env(safe-area-inset-right, 0)'
           }}
         >
+          <div className="hero-gradient-overlay" aria-hidden="true"></div>
+          <div className="hero-vignette" aria-hidden="true"></div>
           <div className="container relative z-10">
             <div className="text-center max-w-3xl mx-auto">
               <h1 className="hero-headline text-4xl md:text-6xl font-bold mb-6">
