@@ -82,8 +82,6 @@ const Features = () => {
             paddingRight: 'env(safe-area-inset-right, 0)'
           }}
         >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
           <div className="container relative z-10">
             <div className="text-center max-w-3xl mx-auto">
               <h1 className="hero-headline text-4xl md:text-6xl font-bold mb-6">
@@ -110,8 +108,6 @@ const Features = () => {
             backgroundAttachment: "fixed"
           }}
         >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
           <div className="container relative z-10">
             <div className="relative" style={{ border: '3px solid #FF6B35', borderRadius: '12px', padding: '2rem' }}>
               <div className="text-center mb-16">
@@ -198,8 +194,6 @@ const Features = () => {
             backgroundAttachment: "fixed"
           }}
         >
-          <div className="hero-gradient-overlay" aria-hidden="true"></div>
-          <div className="hero-vignette" aria-hidden="true"></div>
           <div className="container text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e556b' }}>
               Ready to Grow Your Business?
