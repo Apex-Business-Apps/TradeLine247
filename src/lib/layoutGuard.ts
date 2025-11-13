@@ -1,3 +1,8 @@
+// Temporary NOOP to ensure public routes render
+export function allowPublicRoutes(pathname: string): boolean {
+  return true;
+}
+
 // Temporary NOOP to ensure guards never blank public routes.
 // Keep function signature so existing imports don't break.
 export function allowPublicRoutes(pathname: string): boolean {

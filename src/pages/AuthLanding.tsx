@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { paths } from '@/routes/paths';
 import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
 // Validation schema
 const trialSignupSchema = z.object({
@@ -51,30 +52,18 @@ export default function AuthLanding() {
     setLoading(true);
 
     try {
-      // Check if user already exists
-      const { data: existingUser } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email.toLowerCase())
-        .single() as { data: { id: string } | null; error: any };
+      // Store trial signup information - properly typed from Database schema
+      const leadData: Database['public']['Tables']['leads']['Insert'] = {
+        name: businessName,
+        email: email.toLowerCase(),
+        company: businessName,
+        notes: 'Trial signup from AuthLanding',
+        source: 'trial_landing_page'
+      };
 
-      if (existingUser) {
-        setError('An account with this email already exists. Please sign in instead.');
-        setLoading(false);
-        setTimeout(() => navigate(paths.auth), 2000);
-        return;
-      }
-
-      // Store trial signup information
       const { error: insertError } = await supabase
         .from('leads')
-        .insert({
-          name: businessName,
-          email: email.toLowerCase(),
-          company: businessName,
-          notes: 'Trial signup from AuthLanding',
-          source: 'trial_landing_page'
-        });
+        .insert(leadData);
 
       if (insertError) {
         throw insertError;

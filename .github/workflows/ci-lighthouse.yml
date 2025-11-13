@@ -1,0 +1,27 @@
+name: ci/lighthouse
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+jobs:
+  lhci:
+    name: ci/lighthouse
+    runs-on: ubuntu-latest
+    continue-on-error: true   # LHCI advisory: non-blocking
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Build (Vite)
+        run: npm run -s build
+      - name: Lighthouse CI (autorun)
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --yes @lhci/cli@0.14.0 autorun --config=.lighthouserc.cjs --upload.target=temporary-public-storage
