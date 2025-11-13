@@ -6,20 +6,20 @@ export const BenefitsGrid = () => {
     icon: Zap,
     title: "Lightning Speed",
     description: "We pick up in 2-3 rings. No one likes waiting.",
-    color: "text-[hsl(var(--brand-orange-dark))]",
+    color: "#FF6B35", // Hero text orange
     gradient: "from-primary/20 to-primary/10"
   }, {
     icon: User,
     title: "Personal Touch",
     description: "We match your vibe. Friendly, on-brand, and sounds just like you.",
-    color: "text-primary",
+    color: "#FF6B35", // Hero text orange
     gradient: "from-primary/20 to-primary/10"
   }, {
     icon: Target,
     title: "Cleaner Follow-through",
     description: "Quick summary + next steps, straight to your inbox.",
-    color: "text-[hsl(var(--status-success))]",
-    gradient: "from-[hsl(var(--status-success))]/20 to-[hsl(var(--status-success))]/10"
+    color: "#FF6B35", // Hero text orange
+    gradient: "from-primary/20 to-primary/10"
   }];
 
   return (
@@ -45,9 +45,9 @@ export const BenefitsGrid = () => {
               >
                 <CardHeader className="text-center pb-4">
                   <div className={`mx-auto w-16 h-16 bg-gradient-to-br ${benefit.gradient} rounded-2xl flex items-center justify-center mb-4 group-hover:shadow-lg group-hover:shadow-current/20 transition-all duration-300 hover-scale`}>
-                    <Icon className={`h-8 w-8 ${benefit.color} transition-all duration-300 group-hover:scale-110 group-hover:rotate-6`} />
+                    <Icon className="h-8 w-8 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" style={{ color: benefit.color }} />
                   </div>
-                  <CardTitle className="text-xl text-card-foreground mb-2 group-hover:text-primary transition-colors duration-300">
+                  <CardTitle className="text-xl mb-2 transition-colors duration-300" style={{ color: '#FF6B35' }}>
                     {benefit.title}
                   </CardTitle>
                 </CardHeader>

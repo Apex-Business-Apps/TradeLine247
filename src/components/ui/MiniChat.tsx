@@ -237,7 +237,7 @@ export const MiniChat: React.FC = React.memo(() => {
         )}
       >
         <span className="sr-only">Open chat</span>
-        <ChatIcon size="md" className="w-[22px] h-[22px] brightness-0 invert" aria-hidden="true" />
+        <ChatIcon size="md" className="w-[22px] h-[22px] brightness-0 invert" aria-hidden="true" loading="eager" />
         {messages.length > 0 && !isOpen && (
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background animate-pulse" aria-label="Unread messages" />
         )}
