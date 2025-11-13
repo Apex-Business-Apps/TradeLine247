@@ -1100,16 +1100,15 @@ header {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  /* Orange mask overlay - proper brand orange with reduced opacity for better background visibility */
-  /* Using brand orange #FF6B35 (hsl(21, 100%, 60%)) for consistent brand identity */
-  background: rgba(255, 107, 53, 0.20); /* Brand orange #FF6B35 with 20% opacity - baseline for non-landing pages */
+  /* Black overlay with 70% opacity for non-landing pages */
+  background: rgba(0, 0, 0, 0.70); /* Black with 70% opacity - baseline for non-landing pages */
   pointer-events: none;
   z-index: 1;
 }
 
-/* Landing page overlay - 20% more transparent (20% * 0.8 = 16%) */
+/* Landing page overlay - lighter for better visibility (40% opacity) */
 [data-page="landing"] .hero-gradient-overlay {
-  background: rgba(255, 107, 53, 0.16); /* Brand orange #FF6B35 with 16% opacity - landing page lighter baseline */
+  background: rgba(0, 0, 0, 0.40); /* Black with 40% opacity - landing page lighter */
 }
 
 .hero-vignette {
