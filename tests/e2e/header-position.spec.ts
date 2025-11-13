@@ -23,7 +23,8 @@ test.describe('Header Position', () => {
 
       // Get the element and check if it's actually in the DOM
       const headerLeft = page.locator('#app-header-left');
-      
+      await expect(headerLeft).toBeVisible({ timeout: 10000 });
+
       // Wait for element to have non-zero dimensions (proves it's rendered)
       await page.waitForFunction(
         () => {
@@ -37,12 +38,13 @@ test.describe('Header Position', () => {
 
       // Ensure element is scrolled into view
       await headerLeft.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(300); // Wait for layout to stabilize
 
       const boundingBox = await headerLeft.boundingBox();
       expect(boundingBox).not.toBeNull();
-      
+
       if (boundingBox) {
+        expect(boundingBox.width).toBeGreaterThan(0);
+        expect(boundingBox.height).toBeGreaterThan(0);
         // Header should be positioned near left edge (within container padding)
         // Account for container padding: px-4 (1rem = 16px) at 360px
         // At 360px: padding is 16px (1rem)

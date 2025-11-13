@@ -1,13 +1,13 @@
-/* CJS config compatible with package.json { "type": "module" } */
+/* CJS config to work with "type": "module" projects */
 module.exports = {
   ci: {
     collect: {
-      staticDistDir: "./dist",
-      url: [process.env.LHCI_URL || "/"],
+      staticDistDir: 'dist',
       numberOfRuns: 1,
       settings: {
-        chromeFlags: "--no-sandbox --headless --disable-dev-shm-usage",
-        onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
+        emulatedFormFactor: 'mobile',
+        locale: 'en-US',
+        throttlingMethod: 'devtools',
       },
     },
     assert: {

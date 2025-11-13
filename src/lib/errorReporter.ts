@@ -35,12 +35,15 @@ function normalizeError(value: unknown): Error {
   }
 
   if (value && typeof value === 'object') {
-    // Try to extract message from object
-    const message = (value as any).message || (value as any).error || JSON.stringify(value);
+    // Try to extract message from error-like object using type guards
+    const errorLike = value as Record<string, unknown>;
+    const message = (typeof errorLike.message === 'string' ? errorLike.message : null) ||
+                    (typeof errorLike.error === 'string' ? errorLike.error : null) ||
+                    JSON.stringify(value);
     const error = new Error(message);
     // Preserve original stack if available
-    if ((value as any).stack) {
-      error.stack = (value as any).stack;
+    if (typeof errorLike.stack === 'string') {
+      error.stack = errorLike.stack;
     }
     return error;
   }
@@ -192,8 +195,9 @@ class ErrorReporter {
     // Only send critical errors to avoid spam
     if (error.type === 'error' || error.type === 'unhandledRejection') {
       try {
-        // Use centralized Supabase config (secure, DRY principle)
-        let base = (import.meta as any)?.env?.VITE_FUNCTIONS_BASE;
+        // Use centralized Supabase config (secure, DRY principle) with proper type access
+        const importMetaEnv = import.meta.env as Record<string, string | undefined>;
+        let base = importMetaEnv.VITE_FUNCTIONS_BASE;
 
         // Fallback for production if env var not set (maintains backward compatibility)
         if (!base && typeof window !== 'undefined' && window.location.hostname === 'tradeline247ai.com') {
