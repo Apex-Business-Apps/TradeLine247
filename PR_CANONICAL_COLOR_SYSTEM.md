@@ -4,7 +4,7 @@
 
 ### Option 1: GitHub UI (Recommended - 30 seconds)
 ```
-1. Click: https://github.com/apexbusiness-systems/tradeline247aicom/pull/new/claude/wcag-typescript-final-011CUrjBpBDEMoguDu7r7Jvy
+1. Click: https://github.com/apexbusiness-systems/tradeline247/pull/new/claude/wcag-typescript-final-011CUrjBpBDEMoguDu7r7Jvy
 2. Click: "Create Pull Request"
 3. Click: "Merge Pull Request"
 4. Click: "Confirm Merge"
@@ -359,7 +359,7 @@ gh pr merge claude/wcag-typescript-final-011CUrjBpBDEMoguDu7r7Jvy --squash --del
 
 **Merge URL:**
 ```
-https://github.com/apexbusiness-systems/tradeline247aicom/pull/new/claude/wcag-typescript-final-011CUrjBpBDEMoguDu7r7Jvy
+https://github.com/apexbusiness-systems/tradeline247/pull/new/claude/wcag-typescript-final-011CUrjBpBDEMoguDu7r7Jvy
 ```
 
 ---

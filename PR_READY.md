@@ -40,7 +40,7 @@
 ## 🚀 PR Link
 
 **Create PR:**
-https://github.com/apexbusiness-systems/tradeline247aicom/pull/new/quick-wins-ai-seo-enhancements
+https://github.com/apexbusiness-systems/tradeline247/pull/new/quick-wins-ai-seo-enhancements
 
 ---
 

@@ -28,7 +28,7 @@ fix_colors() {
 
 # Fix all TSX files in src directory
 echo "📁 Processing TypeScript files..."
-find /home/user/tradeline247aicom/src -type f -name "*.tsx" -print0 | while IFS= read -r -d '' file; do
+find src -type f -name "*.tsx" -print0 | while IFS= read -r -d '' file; do
   if grep -q -E "text-yellow-600|text-yellow-500|text-green-500|border-yellow-500" "$file" 2>/dev/null; then
     fix_colors "$file"
   fi

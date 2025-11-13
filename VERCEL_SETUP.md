@@ -9,7 +9,7 @@ This guide will help you set up Vercel deployment for TradeLine 24/7.
 1. **Connect Repository to Vercel**
    - Go to [Vercel Dashboard](https://vercel.com/dashboard)
    - Click "Add New Project"
-   - Import `Apex-Business-Apps/tradeline247aicom`
+   - Import `apexbusiness-systems/tradeline247`
    - Vercel will auto-detect Vite configuration
 
 2. **Configure Build Settings**
@@ -41,7 +41,7 @@ This guide will help you set up Vercel deployment for TradeLine 24/7.
 The repository already includes a GitHub Actions workflow (`.github/workflows/vercel-deploy.yml`) that deploys to Vercel.
 
 **Required GitHub Secrets:**
-1. Go to: https://github.com/Apex-Business-Apps/tradeline247aicom/settings/secrets/actions
+1. Go to: https://github.com/apexbusiness-systems/tradeline247/settings/secrets/actions
 2. Add the following secrets:
 
    ```

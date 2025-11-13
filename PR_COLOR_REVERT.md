@@ -32,7 +32,7 @@
 ## Copy-Paste Execution Commands
 
 ### Option 1: GitHub UI (Recommended for CEO)
-1. Open: https://github.com/apexbusiness-systems/tradeline247aicom/pull/new/claude/wcag-typescript-final-011CUrjBpBDEMoguDu7r7Jvy
+1. Open: https://github.com/apexbusiness-systems/tradeline247/pull/new/claude/wcag-typescript-final-011CUrjBpBDEMoguDu7r7Jvy
 2. Click "Create Pull Request"
 3. Click "Merge Pull Request"
 4. Click "Confirm Merge"
@@ -206,7 +206,7 @@ This PR is production-ready and can be merged immediately via GitHub UI or comma
 **Commits:** 1 (clean revert)
 **Status:** ✅ All checks pass
 
-**Merge URL:** https://github.com/apexbusiness-systems/tradeline247aicom/pull/new/claude/wcag-typescript-final-011CUrjBpBDEMoguDu7r7Jvy
+**Merge URL:** https://github.com/apexbusiness-systems/tradeline247/pull/new/claude/wcag-typescript-final-011CUrjBpBDEMoguDu7r7Jvy
 
 ---
 

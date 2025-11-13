@@ -49,7 +49,7 @@ Since Vercel's GitHub integration can be unreliable, we'll use **GitHub Actions*
    - Copy the "Team ID" or "Organization ID"
 
 4. **Add to GitHub Secrets:**
-   - Go to: https://github.com/apexbusiness-systems/tradeline247aicom/settings/secrets/actions
+   - Go to: https://github.com/apexbusiness-systems/tradeline247/settings/secrets/actions
    - Add these secrets:
      - `VERCEL_TOKEN` = (your Vercel token)
      - `VERCEL_PROJECT_ID` = (your project ID)
@@ -81,7 +81,7 @@ Since Vercel's GitHub integration can be unreliable, we'll use **GitHub Actions*
 
 ### Step 3: Verify Webhook
 
-1. Go to: https://github.com/apexbusiness-systems/tradeline247aicom/settings/hooks
+1. Go to: https://github.com/apexbusiness-systems/tradeline247/settings/hooks
 2. Look for Vercel webhook
 3. Check:
    - ✅ Status: Active
