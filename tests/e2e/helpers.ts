@@ -18,9 +18,7 @@ export async function waitForReactHydration(page: Page, timeout = 45000): Promis
   // Wait for header left section to be ready (critical for position tests)
   const headerLeft = page.locator('#app-header-left');
   await expect(headerLeft).toBeAttached({ timeout: 10000 });
-
-  // Small buffer for any final React effects and layout stabilization
-  await page.waitForTimeout(300);
+  await expect(headerLeft).toBeVisible({ timeout: 10000 });
 }
 
 /**

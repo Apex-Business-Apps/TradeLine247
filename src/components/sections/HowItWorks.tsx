@@ -33,12 +33,12 @@ export const HowItWorks = () => {
             const IconComponent = step.icon;
             return (
             <Card key={index} className="relative text-center group hover:shadow-lg transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: '#E55A2B', textShadow: '0 1px 2px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.6)' }}>
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: 'hsl(21 100% 41%)' }}>
                 {step.step}
               </div>
               <CardHeader className="pt-8">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-                  <IconComponent className="w-8 h-8" style={{ color: '#FF6B35' }} />
+                  <IconComponent className="w-8 h-8" style={{ color: 'hsl(21 100% 41%)' }} />
                 </div>
                 <CardTitle className="text-xl">{step.title}</CardTitle>
               </CardHeader>

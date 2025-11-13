@@ -294,7 +294,9 @@ const Contact = () => {
                         error={submitError} 
                         onRetry={() => {
                           setSubmitError(null);
-                          handleSubmit(new Event('submit') as any);
+                          // Properly typed synthetic form event
+                          const syntheticEvent = new Event('submit', { bubbles: true, cancelable: true }) as unknown as React.FormEvent<HTMLFormElement>;
+                          handleSubmit(syntheticEvent);
                         }} 
                       />
                     )}
@@ -439,7 +441,7 @@ const Contact = () => {
                   </Card>
                 </div>
 
-                <div className="mt-8 p-6 bg-muted/30 rounded-lg">
+                <div className="mt-8 p-6 bg-card rounded-lg border border-border shadow-sm relative opacity-100 z-10">
                   <div data-guard="canada-badge" className="flex items-start gap-3">
                     <img
                       src={builtCanadianBadge}
@@ -449,9 +451,9 @@ const Contact = () => {
                       loading="lazy"
                     />
                     <div>
-                      <h3 className="font-semibold" style={{ color: '#1e556b' }}>Built in Canada</h3>
-                      <p style={{ color: '#1e556b', opacity: 0.8 }}>Canadian-hosted. Privacy-by-design.</p>
-                      <p style={{ color: '#1e556b', opacity: 0.8 }}>Made here. Trusted here.</p>
+                      <h3 className="font-semibold text-foreground">Built in Canada</h3>
+                      <p className="text-muted-foreground">Canadian-hosted. Privacy-by-design.</p>
+                      <p className="text-muted-foreground">Made here. Trusted here.</p>
                     </div>
                   </div>
                 </div>
