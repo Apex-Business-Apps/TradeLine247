@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, AlertTriangle, ExternalLink } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client.ts";
 
 // PROMPT F: Evidence dashboard with 24h tiles
 interface HealthMetrics {

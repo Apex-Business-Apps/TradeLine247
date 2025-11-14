@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Phone, Clock, User, MessageSquare, Download, Search, Filter, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client.ts";
 import { formatDistanceToNow } from "date-fns";
 import QuickActions from "@/components/calls/QuickActions";
 

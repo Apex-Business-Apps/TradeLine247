@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { supabase, isSupabaseEnabled } from "@/integrations/supabase/client";
+import { supabase, isSupabaseEnabled } from "@/integrations/supabase/client.ts";
 
 type Carrier = "ROGERS_FIDO" | "TELUS_KOODO" | "BELL_MOBILITY" | "LANDLINE";
 const FUNCTIONS_BASE = import.meta.env.VITE_FUNCTIONS_BASE!;
