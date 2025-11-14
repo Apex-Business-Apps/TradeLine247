@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Mail, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { errorReporter } from '@/lib/errorReporter';
 
 interface InviteStaffDialogProps {

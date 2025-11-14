@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { errorReporter } from '@/lib/errorReporter';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { CheckCircle2, TrendingUp, Phone } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 

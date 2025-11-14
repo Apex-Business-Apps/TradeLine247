@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Send, User, Loader2, Minimize2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { streamChatResponse } from '@/lib/chatStreaming';
 import { useToast } from '@/hooks/use-toast';
 import { ChatIcon } from './ChatIcon';

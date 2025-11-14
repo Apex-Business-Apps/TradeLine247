@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
+import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client.ts';
 import { ensureMembership } from '@/lib/ensureMembership';
 import { toast } from '@/hooks/use-toast';
 import { errorReporter } from '@/lib/errorReporter';
