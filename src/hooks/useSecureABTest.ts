@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { useSecureAnalytics } from './useSecureAnalytics';
 import { featureFlags } from '@/config/featureFlags';
 import { errorReporter } from '@/lib/errorReporter';

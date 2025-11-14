@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { Activity, Phone, Settings, Download, MessageSquare } from 'lucide-react';
 import { errorReporter } from '@/lib/errorReporter';
 
