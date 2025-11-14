@@ -136,7 +136,7 @@ const Security = () => {
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
         <main className="flex-1">
           {/* Hero Section */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
           <div className="container text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
@@ -171,7 +171,7 @@ const Security = () => {
           </div>
 
           {/* Security Features */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
           <div className="container">
             <div className="text-center mb-16">
@@ -206,7 +206,7 @@ const Security = () => {
           </div>
 
           {/* Compliance Standards */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
           <div className="container">
             <div className="text-center mb-16">
@@ -267,7 +267,7 @@ const Security = () => {
           </div>
 
           {/* Privacy Commitments */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
           <div className="container">
             <div className="text-center mb-16">
@@ -297,7 +297,7 @@ const Security = () => {
           </div>
 
           {/* Data Handling */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
           <div className="container">
             <div className="max-w-4xl mx-auto">
@@ -400,7 +400,7 @@ const Security = () => {
           </div>
 
           {/* CTA Section */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
           <div className="container">
             <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
@@ -425,8 +425,8 @@ const Security = () => {
             </section>
           </div>
         </main>
-        
-        <div className="bg-background/85 backdrop-blur-[2px]">
+
+        <div className="bg-background/70 backdrop-blur-[2px]">
           <Footer />
         </div>
       </div>

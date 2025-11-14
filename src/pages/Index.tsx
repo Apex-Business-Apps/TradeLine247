@@ -95,20 +95,20 @@ const Index = () => {
           />
 
           <main className="flex-1" style={{ minHeight: "60vh" }}>
-            {/* All sections now use 85% opacity to match secondary pages */}
-            <div className="bg-background/85 backdrop-blur-[2px]" style={{ willChange: "transform" }}>
+            {/* Landing page uses 40% opacity for better background visibility */}
+            <div className="bg-background/40 backdrop-blur-[2px]" style={{ willChange: "transform" }}>
               <HeroRoiDuo />
             </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
+            <div className="bg-background/40 backdrop-blur-[2px]">
               <BenefitsGrid />
             </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
+            <div className="bg-background/40 backdrop-blur-[2px]">
               <ImpactStrip />
             </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
+            <div className="bg-background/40 backdrop-blur-[2px]">
               <HowItWorks />
             </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
+            <div className="bg-background/40 backdrop-blur-[2px]">
               <div className="container mx-auto px-4 py-12">
                 <div className="mx-auto max-w-4xl space-y-6 text-center">
                   <h2 className="text-2xl font-semibold tracking-tight text-foreground">
@@ -123,15 +123,15 @@ const Index = () => {
             </div>
           </main>
 
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/40 backdrop-blur-[2px]">
             <TrustBadgesSlim />
           </div>
 
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/40 backdrop-blur-[2px]">
             <LeadCaptureForm />
           </div>
 
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/40 backdrop-blur-[2px]">
             <Footer />
           </div>
 

@@ -28,7 +28,7 @@ export default function Compare() {
       {/* Simple title/description to avoid SEOHead until we're stable */}
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
         <main className="flex-1">
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
               <div className="container text-center">
                 <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
@@ -41,7 +41,7 @@ export default function Compare() {
             </section>
           </div>
 
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
               <div className="container">
                 <div className="max-w-5xl mx-auto">
@@ -94,7 +94,7 @@ export default function Compare() {
             </section>
           </div>
 
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
               <div className="container">
                 <div className="max-w-4xl mx-auto text-center">
@@ -116,7 +116,7 @@ export default function Compare() {
           </div>
         </main>
 
-        <div className="bg-background/85 backdrop-blur-[2px]">
+        <div className="bg-background/70 backdrop-blur-[2px]">
           <Footer />
         </div>
       </div>

@@ -72,7 +72,7 @@ const FAQ = () => {
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
         <main className="flex-1">
           {/* Hero Section */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section style={{
               paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
               paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
@@ -91,7 +91,7 @@ const FAQ = () => {
           </div>
 
           {/* FAQ Accordion */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
               <div className="container">
                 <Card className="max-w-4xl mx-auto">
@@ -118,7 +118,7 @@ const FAQ = () => {
           </div>
 
           {/* Still Have Questions */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-20">
               <div className="container text-center">
                 <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -140,7 +140,7 @@ const FAQ = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/70 backdrop-blur-[2px]">
             <section className="py-16">
               <div className="container">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -161,8 +161,8 @@ const FAQ = () => {
             </section>
           </div>
         </main>
-        
-        <div className="bg-background/85 backdrop-blur-[2px]">
+
+        <div className="bg-background/70 backdrop-blur-[2px]">
           <Footer />
         </div>
       </div>
