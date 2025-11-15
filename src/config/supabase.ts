@@ -11,11 +11,11 @@
  */
 
 export const SUPABASE_CONFIG = {
-  // Public Supabase project URL
-  url: 'https://hysvqdwmhxnblxfqnszn.supabase.co',
+  // Public Supabase project URL - use environment variable with fallback
+  url: import.meta.env.VITE_SUPABASE_URL || 'https://hysvqdwmhxnblxfqnszn.supabase.co',
 
   // Public anonymous key (safe for client-side use)
   // This key has LIMITED permissions enforced by RLS policies
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo'
+  anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo'
 } as const;
 
