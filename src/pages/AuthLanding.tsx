@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { paths } from '@/routes/paths';
-import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
+import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client.ts';
 import type { Database } from '@/integrations/supabase/types';
 
 // Validation schema

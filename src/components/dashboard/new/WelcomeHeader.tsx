@@ -15,7 +15,7 @@ import { errorReporter } from '@/lib/errorReporter';
 import { Settings, Home, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { paths } from '@/routes/paths';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import { useDashboardStore } from '@/stores/dashboardStore';
 import { ThemeSwitcher } from '../ThemeSwitcher';
