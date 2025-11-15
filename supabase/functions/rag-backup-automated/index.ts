@@ -199,10 +199,11 @@ Deno.serve(async (req: Request) => {
         backupResult = await backupAllSources(supabase, reason);
         break;
       
-      case 'recent':
+      case 'recent': {
         const hours = body.hours || 24;
         backupResult = await backupRecentSources(supabase, hours, reason);
         break;
+      }
       
       case 'specific':
         if (!body.source_ids || body.source_ids.length === 0) {
