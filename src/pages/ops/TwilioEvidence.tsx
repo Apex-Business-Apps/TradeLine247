@@ -27,6 +27,10 @@ interface HealthMetrics {
 export default function TwilioEvidence() {
   const [metrics, setMetrics] = useState<HealthMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const supabaseProjectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+  const supabaseDashboardBase = supabaseProjectId
+    ? `https://supabase.com/dashboard/project/${supabaseProjectId}`
+    : 'https://supabase.com/dashboard';
 
   useEffect(() => {
     loadMetrics();
@@ -186,7 +190,7 @@ export default function TwilioEvidence() {
               variant="outline" 
               size="sm" 
               className="w-full mt-2"
-              onClick={() => window.open('https://supabase.com/dashboard/project/hysvqdwmhxnblxfqnszn/editor/28892', '_blank')}
+              onClick={() => window.open(`${supabaseDashboardBase}/editor/28892`, '_blank')}
             >
               View Logs <ExternalLink className="ml-2 h-3 w-3" />
             </Button>
@@ -218,7 +222,7 @@ export default function TwilioEvidence() {
               variant="outline" 
               size="sm" 
               className="w-full mt-2"
-              onClick={() => window.open('https://supabase.com/dashboard/project/hysvqdwmhxnblxfqnszn/editor/28893', '_blank')}
+              onClick={() => window.open(`${supabaseDashboardBase}/editor/28893`, '_blank')}
             >
               Stream Logs <ExternalLink className="ml-2 h-3 w-3" />
             </Button>
@@ -248,7 +252,7 @@ export default function TwilioEvidence() {
                 variant="outline" 
                 size="sm" 
                 className="flex-1"
-                onClick={() => window.open('https://supabase.com/dashboard/project/hysvqdwmhxnblxfqnszn/editor/28894', '_blank')}
+                onClick={() => window.open(`${supabaseDashboardBase}/editor/28894`, '_blank')}
               >
                 Reply Logs
               </Button>
@@ -256,7 +260,7 @@ export default function TwilioEvidence() {
                 variant="outline" 
                 size="sm" 
                 className="flex-1"
-                onClick={() => window.open('https://supabase.com/dashboard/project/hysvqdwmhxnblxfqnszn/editor/28895', '_blank')}
+                onClick={() => window.open(`${supabaseDashboardBase}/editor/28895`, '_blank')}
               >
                 Status Logs
               </Button>
@@ -275,7 +279,7 @@ export default function TwilioEvidence() {
               variant="outline" 
               size="sm" 
               className="w-full mt-4"
-              onClick={() => window.open('https://supabase.com/dashboard/project/hysvqdwmhxnblxfqnszn/editor/28897', '_blank')}
+              onClick={() => window.open(`${supabaseDashboardBase}/editor/28897`, '_blank')}
             >
               Purchase Logs <ExternalLink className="ml-2 h-3 w-3" />
             </Button>

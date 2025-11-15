@@ -13,8 +13,10 @@ interface RateLimitConfig {
   skipSuccessfulRequests?: boolean;
 }
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://hysvqdwmhxnblxfqnszn.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseConfigured = Boolean(supabaseUrl && supabaseKey);
+let missingSupabaseLogged = false;
 
 // In-memory fallback if Supabase is unavailable
 const memoryStore = new Map<string, { count: number; resetAt: number; blockedUntil?: number }>();
@@ -30,9 +32,24 @@ export function createRateLimiter(config: RateLimitConfig) {
     const identifier = getIdentifier(req);
     const now = Date.now();
 
+    if (!supabaseConfigured) {
+      logMissingSupabaseConfig();
+      applyMemoryRateLimit({
+        identifier,
+        endpoint,
+        now,
+        res,
+        next,
+        windowMs,
+        maxRequests,
+        blockDurationMs,
+      });
+      return;
+    }
+
     try {
       // Initialize Supabase client
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const supabase = createClient(supabaseUrl!, supabaseKey!);
 
       // Calculate window start
       const windowStart = new Date(now - windowMs);
@@ -134,37 +151,16 @@ export function createRateLimiter(config: RateLimitConfig) {
 
     } catch (error) {
       console.error('[RateLimit] Error:', error);
-      
-      // Fallback to memory store
-      const key = `${identifier}:${endpoint}`;
-      const record = memoryStore.get(key);
-
-      if (record) {
-        if (record.blockedUntil && record.blockedUntil > now) {
-          return res.status(429).json({
-            error: 'Too many requests',
-            retry_after: new Date(record.blockedUntil).toISOString()
-          });
-        }
-
-        if (record.resetAt < now) {
-          // Reset window
-          memoryStore.set(key, { count: 1, resetAt: now + windowMs });
-        } else {
-          record.count++;
-          if (record.count > maxRequests) {
-            record.blockedUntil = now + blockDurationMs;
-            return res.status(429).json({
-              error: 'Too many requests',
-              retry_after: new Date(record.blockedUntil).toISOString()
-            });
-          }
-        }
-      } else {
-        memoryStore.set(key, { count: 1, resetAt: now + windowMs });
-      }
-
-      next();
+      applyMemoryRateLimit({
+        identifier,
+        endpoint,
+        now,
+        res,
+        next,
+        windowMs,
+        maxRequests,
+        blockDurationMs,
+      });
     }
   };
 }
@@ -194,6 +190,67 @@ function getIdentifier(req: Request): string {
     : req.socket.remoteAddress || 'unknown';
   
   return `ip:${ip}`;
+}
+
+function logMissingSupabaseConfig() {
+  if (!missingSupabaseLogged) {
+    console.error('[RateLimit] SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing. Using in-memory rate limiting only.');
+    missingSupabaseLogged = true;
+  }
+}
+
+interface MemoryRateLimitArgs {
+  identifier: string;
+  endpoint: string;
+  now: number;
+  res: Response;
+  next: NextFunction;
+  windowMs: number;
+  maxRequests: number;
+  blockDurationMs: number;
+}
+
+function applyMemoryRateLimit({
+  identifier,
+  endpoint,
+  now,
+  res,
+  next,
+  windowMs,
+  maxRequests,
+  blockDurationMs,
+}: MemoryRateLimitArgs) {
+  const key = `${identifier}:${endpoint}`;
+  const record = memoryStore.get(key);
+
+  if (record) {
+    if (record.blockedUntil && record.blockedUntil > now) {
+      res.status(429).json({
+        error: 'Too many requests',
+        retry_after: new Date(record.blockedUntil).toISOString()
+      });
+      return;
+    }
+
+    if (record.resetAt < now) {
+      // Reset window
+      memoryStore.set(key, { count: 1, resetAt: now + windowMs });
+    } else {
+      record.count++;
+      if (record.count > maxRequests) {
+        record.blockedUntil = now + blockDurationMs;
+        res.status(429).json({
+          error: 'Too many requests',
+          retry_after: new Date(record.blockedUntil).toISOString()
+        });
+        return;
+      }
+    }
+  } else {
+    memoryStore.set(key, { count: 1, resetAt: now + windowMs });
+  }
+
+  next();
 }
 
 /**

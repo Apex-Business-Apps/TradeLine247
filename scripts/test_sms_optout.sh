@@ -2,8 +2,8 @@
 # SMS Opt-Out Flow Test
 set -euo pipefail
 
-PROJECT_URL="${1:-https://hysvqdwmhxnblxfqnszn.supabase.co}"
-ANON_KEY="${2:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo}"
+PROJECT_URL="${1:-${SUPABASE_URL:-https://<your-supabase-project>.supabase.co}}"
+ANON_KEY="${2:-${SUPABASE_ANON_KEY:?Set SUPABASE_ANON_KEY for this script}}"
 
 TEST_NUMBER="+15551234567"
 

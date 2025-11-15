@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@/components/ui/navigation-menu';
 import { Menu, X, LogOut, User, Settings, ChevronDown, Phone, Smartphone } from 'lucide-react';
@@ -39,6 +39,7 @@ const ADMIN_NAV = [
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLElement | null>(null);
   const { user, userRole, signOut, isAdmin } = useAuth();
   const { goToWithFeedback } = useSafeNavigation();
   const location = useLocation();
@@ -103,6 +104,22 @@ export const Header: React.FC = () => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    const element = mobileMenuRef.current;
+    if (!element) return;
+
+    const setInertState = (shouldBeInert: boolean) => {
+      element.toggleAttribute('inert', shouldBeInert);
+      (element as HTMLElement & { inert?: boolean }).inert = shouldBeInert;
+    };
+
+    setInertState(!isMobileMenuOpen);
+
+    return () => {
+      setInertState(false);
+    };
+  }, [isMobileMenuOpen]);
 
   // Active path check
   const isActivePath = useCallback((href: string) => {
@@ -342,7 +359,7 @@ export const Header: React.FC = () => {
         id="mobile-menu"
         aria-label="Mobile"
         aria-hidden={!isMobileMenuOpen}
-        inert={!isMobileMenuOpen}
+        ref={mobileMenuRef}
         className={cn(
           'border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden',
           isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'

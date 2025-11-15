@@ -20,8 +20,7 @@ export function getSecurityHeaders() {
         imgSrc: ["'self'", "data:", "https:"],
         connectSrc: [
           "'self'",
-          "https://hysvqdwmhxnblxfqnszn.supabase.co",
-          "wss://hysvqdwmhxnblxfqnszn.supabase.co",
+          ...getSupabaseConnectSources(),
           "https://api.tradeline247ai.com",
           "wss://api.tradeline247ai.com"
         ],
@@ -91,6 +90,22 @@ export function getSecurityHeaders() {
       permittedPolicies: 'none',
     },
   });
+}
+
+function getSupabaseConnectSources(): string[] {
+  const url = process.env.SUPABASE_URL;
+  if (!url) {
+    return ["https://*.supabase.co", "wss://*.supabase.co"];
+  }
+
+  try {
+    const parsed = new URL(url);
+    const httpsOrigin = parsed.origin;
+    const wssOrigin = httpsOrigin.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
+    return [httpsOrigin, wssOrigin];
+  } catch {
+    return ["https://*.supabase.co", "wss://*.supabase.co"];
+  }
 }
 
 /**

@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # Configuration
-PROJECT_URL="${PROJECT_URL:-https://hysvqdwmhxnblxfqnszn.supabase.co}"
+PROJECT_URL="${PROJECT_URL:-https://<your-supabase-project>.supabase.co}"
 CONCURRENT_USERS="${CONCURRENT_USERS:-10}"
 DURATION="${DURATION:-60}"
 RAMP_UP="${RAMP_UP:-10}"

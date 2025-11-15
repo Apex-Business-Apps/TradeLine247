@@ -2,7 +2,7 @@
 # SMS Webhook Security Test - Verifies Twilio signature validation
 set -euo pipefail
 
-BASE_URL="${1:-https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1}"
+BASE_URL="${1:-${SUPABASE_URL:-https://<your-supabase-project>.supabase.co}/functions/v1}"
 INBOUND_URL="$BASE_URL/sms-inbound"
 STATUS_URL="$BASE_URL/sms-status"
 

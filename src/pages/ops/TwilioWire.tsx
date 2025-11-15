@@ -17,8 +17,15 @@ export default function TwilioWire() {
   const [environment, setEnvironment] = useState<'staging' | 'production'>('staging');
   const { toast } = useToast();
 
-  const stagingUrl = 'https://hysvqdwmhxnblxfqnszn.supabase.co';
-  const productionUrl = 'https://hysvqdwmhxnblxfqnszn.supabase.co';
+  const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/+$/, '');
+  const supabaseBaseUrl = rawSupabaseUrl || 'https://<your-supabase-project>.supabase.co';
+  const supabaseProjectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+  const supabaseDashboardBase = supabaseProjectId
+    ? `https://supabase.com/dashboard/project/${supabaseProjectId}`
+    : 'https://supabase.com/dashboard';
+
+  const stagingUrl = supabaseBaseUrl;
+  const productionUrl = supabaseBaseUrl;
 
   const getWebhookUrls = (env: 'staging' | 'production') => ({
     voice_answer: `${env === 'staging' ? stagingUrl : productionUrl}/functions/v1/voice-answer`,
@@ -324,7 +331,7 @@ export default function TwilioWire() {
                 asChild
               >
                 <a
-                  href="https://supabase.com/dashboard/project/hysvqdwmhxnblxfqnszn/functions"
+                  href={`${supabaseDashboardBase}/functions`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

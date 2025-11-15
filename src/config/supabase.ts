@@ -1,21 +1,19 @@
+import { env } from '@/utils/env';
+
 /**
  * Supabase Public Configuration
  *
- * These credentials are SAFE to embed in client-side code:
- * - The anon key is designed for public exposure
- * - Supabase Row Level Security (RLS) protects all data
- * - Service role key (with full access) is NEVER exposed
- *
- * This follows Supabase best practices and standard deployment patterns.
- * Environment variables can still override these defaults if needed.
+ * Only publishable (anon) credentials belong here. All secrets (service role,
+ * access tokens) must be injected via server-side env vars.
  */
 
-export const SUPABASE_CONFIG = {
-  // Public Supabase project URL - use environment variable with fallback
-  url: import.meta.env.VITE_SUPABASE_URL || 'https://hysvqdwmhxnblxfqnszn.supabase.co',
+const urlFromEnv = env('VITE_SUPABASE_URL');
+const projectId = env('VITE_SUPABASE_PROJECT_ID');
+const publishableKey = env('VITE_SUPABASE_ANON_KEY') ?? env('VITE_SUPABASE_PUBLISHABLE_KEY');
 
-  // Public anonymous key (safe for client-side use)
-  // This key has LIMITED permissions enforced by RLS policies
-  anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo'
+export const SUPABASE_CONFIG = {
+  url: (urlFromEnv ?? (projectId ? `https://${projectId}.supabase.co` : undefined)) ?? '',
+  anonKey: publishableKey ?? '',
 } as const;
 
+export const hasSupabaseClientConfig = Boolean((urlFromEnv || projectId) && publishableKey);

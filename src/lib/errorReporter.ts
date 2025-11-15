@@ -199,13 +199,15 @@ class ErrorReporter {
         const importMetaEnv = import.meta.env as Record<string, string | undefined>;
         let base = importMetaEnv.VITE_FUNCTIONS_BASE;
 
-        // Fallback for production if env var not set (maintains backward compatibility)
-        if (!base && typeof window !== 'undefined' && window.location.hostname === 'tradeline247ai.com') {
-          base = 'https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1';
+        if (!base) {
+          const supabaseUrl = importMetaEnv.VITE_SUPABASE_URL;
+          if (supabaseUrl) {
+            base = `${supabaseUrl.replace(/\/+$/, '')}/functions/v1`;
+          }
         }
 
         if (!base) {
-          console.debug('[errorReporter] VITE_FUNCTIONS_BASE not configured, skipping backend send');
+          console.debug('[errorReporter] Supabase functions base not configured, skipping backend send');
           return;
         }
 

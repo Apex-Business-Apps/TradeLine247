@@ -1,82 +1,66 @@
-import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-/**
- * Supabase Client Unit Tests
- *
- * These tests verify that the Supabase client correctly handles:
- * 1. VITE_SUPABASE_PUBLISHABLE_KEY as an alias for VITE_SUPABASE_ANON_KEY
- * 2. Deriving URL from VITE_SUPABASE_PROJECT_ID when URL is not set
- * 3. Disabling Supabase when required env vars are missing
- *
- * Note: Due to the module-level initialization of the Supabase client and
- * Vitest's module caching, these tests verify the logic by inspecting the
- * code structure rather than testing runtime behavior with different env vars.
- * The actual runtime behavior can be verified through integration tests or
- * manual testing in different environments.
- */
+const modulePath = './client.ts';
 
-// Get the directory of this test file to resolve the client.ts path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const clientFilePath = join(__dirname, 'client.ts');
+const clearEnv = () => {
+  delete process.env.VITE_SUPABASE_URL;
+  delete process.env.VITE_SUPABASE_ANON_KEY;
+  delete process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  delete process.env.VITE_SUPABASE_PROJECT_ID;
+};
 
-function readClientFileContent(): string {
-  try {
-    // First try relative to test file
-    return readFileSync(clientFilePath, 'utf-8');
-  } catch {
-    try {
-      // Fallback: try from process.cwd()
-      return readFileSync(join(process.cwd(), 'src/integrations/supabase/client.ts'), 'utf-8');
-    } catch {
-      // Final fallback: try from current working directory with tradeline247 prefix
-      return readFileSync(
-        join(process.cwd(), 'src/integrations/supabase/client.ts'),
-        'utf-8'
-      );
-    }
-  }
-}
+const importClient = async () => {
+  return import(modulePath);
+};
 
 describe('Supabase Client', () => {
-  it('should export isSupabaseEnabled flag', async () => {
-    const { isSupabaseEnabled } = await import('./client.ts');
+  beforeEach(() => {
+    vi.resetModules();
+    clearEnv();
+  });
 
-    expect(typeof isSupabaseEnabled).toBe('boolean');
+  afterEach(() => {
+    vi.resetModules();
+    clearEnv();
+  });
+
+  it('disables Supabase when env vars are missing', async () => {
+    const { isSupabaseEnabled, supabaseFunctionsBase } = await importClient();
+
+    expect(isSupabaseEnabled).toBe(false);
+    expect(supabaseFunctionsBase).toBeUndefined();
+  });
+
+  it('enables Supabase when url and anon key are provided', async () => {
+    process.env.VITE_SUPABASE_URL = 'https://example.supabase.co';
+    process.env.VITE_SUPABASE_ANON_KEY = 'test-anon-key';
+
+    const { isSupabaseEnabled, supabaseFunctionsBase, supabase } = await importClient();
+
     expect(isSupabaseEnabled).toBe(true);
-  });
-
-  it('should export supabase client', async () => {
-    const { supabase } = await import('./client.ts');
-
+    expect(supabaseFunctionsBase).toBe('https://example.supabase.co/functions/v1');
     expect(supabase).toBeDefined();
-    expect(supabase.auth).toBeDefined();
+    expect(typeof supabase.auth).toBe('object');
   });
 
-  it('should have valid Supabase URL configured', () => {
-    const content = readClientFileContent();
+  it('accepts publishable key alias when anon key is not set', async () => {
+    process.env.VITE_SUPABASE_URL = 'https://alias.supabase.co';
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY = 'alias-key';
 
-    // Verify that SUPABASE_URL is defined and is a valid URL
-    expect(content).toContain('SUPABASE_URL');
-    expect(content).toMatch(/https:\/\/.*\.supabase\.co/);
+    const { isSupabaseEnabled, supabaseFunctionsBase } = await importClient();
+
+    expect(isSupabaseEnabled).toBe(true);
+    expect(supabaseFunctionsBase).toBe('https://alias.supabase.co/functions/v1');
   });
 
-  it('should have valid Supabase key configured', () => {
-    const content = readClientFileContent();
+  it('derives url from project id if url missing', async () => {
+    process.env.VITE_SUPABASE_PROJECT_ID = 'projectref';
+    process.env.VITE_SUPABASE_ANON_KEY = 'anon-key';
 
-    // Verify that SUPABASE_PUBLISHABLE_KEY or SUPABASE_ANON_KEY is defined
-    expect(content).toMatch(/SUPABASE_(PUBLISHABLE_KEY|ANON_KEY)/);
-  });
+    const { isSupabaseEnabled, supabaseFunctionsBase, supabaseUrl } = await importClient();
 
-  it('should be marked as auto-generated', () => {
-    const content = readClientFileContent();
-
-    // Verify the file has the auto-generated comment
-    expect(content).toContain('automatically generated');
-    expect(content).toContain('Do not edit it directly');
+    expect(isSupabaseEnabled).toBe(true);
+    expect(supabaseUrl).toBe('https://projectref.supabase.co');
+    expect(supabaseFunctionsBase).toBe('https://projectref.supabase.co/functions/v1');
   });
 });
-

@@ -20,6 +20,10 @@ const MessagingHealth = () => {
   const [loading, setLoading] = useState(true);
   const [a2pStatus, setA2pStatus] = useState<A2PStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const supabaseProjectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+  const supabaseDashboardBase = supabaseProjectId
+    ? `https://supabase.com/dashboard/project/${supabaseProjectId}`
+    : 'https://supabase.com/dashboard';
 
   useEffect(() => {
     loadA2PStatus();
@@ -259,8 +263,8 @@ const MessagingHealth = () => {
             >
               📚 Twilio A2P 10DLC Documentation
             </a>
-            <a 
-              href="https://supabase.com/dashboard/project/hysvqdwmhxnblxfqnszn/editor/messaging_compliance" 
+            <a
+              href={`${supabaseDashboardBase}/editor/messaging_compliance`}
               target="_blank" 
               rel="noopener noreferrer"
               className="block text-sm text-primary hover:underline"

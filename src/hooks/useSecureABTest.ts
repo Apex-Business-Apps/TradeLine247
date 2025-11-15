@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client.ts';
+import { supabase, isSupabaseEnabled, supabaseFunctionsBase } from '@/integrations/supabase/client.ts';
 import { useSecureAnalytics } from './useSecureAnalytics';
 import { featureFlags } from '@/config/featureFlags';
 import { errorReporter } from '@/lib/errorReporter';
@@ -17,18 +17,22 @@ const getOrCreateSessionId = (): string => {
     sessionId = crypto.randomUUID();
     sessionStorage.setItem(sessionKey, sessionId);
     
-    // Register session server-side for validation (async, non-blocking)
-    fetch('https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1/register-ab-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        sessionId,
-        userAgent: navigator.userAgent 
-      })
-    }).catch(() => {
-      // Fail silently - session registration is best-effort
-      console.debug('Session registration deferred');
-    });
+    if (supabaseFunctionsBase && isSupabaseEnabled) {
+      // Register session server-side for validation (async, non-blocking)
+      fetch(`${supabaseFunctionsBase}/register-ab-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          userAgent: navigator.userAgent
+        })
+      }).catch(() => {
+        // Fail silently - session registration is best-effort
+        console.debug('Session registration deferred');
+      });
+    } else if (import.meta.env.DEV) {
+      console.warn('[useSecureABTest] Supabase functions base missing; session registration skipped.');
+    }
   }
   
   return sessionId;
@@ -43,7 +47,7 @@ export const useSecureABTest = (testName: string) => {
   // Get user's assigned variant from secure server-side assignment
   const getSecureVariant = useCallback(async () => {
     // Feature flag: short-circuit A/B testing when disabled
-    if (!featureFlags.AB_ENABLED) {
+    if (!featureFlags.AB_ENABLED || !isSupabaseEnabled) {
       setVariant('A');
       setVariantData({ text: 'Grow Now', color: 'primary' });
       setLoading(false);
@@ -55,7 +59,7 @@ export const useSecureABTest = (testName: string) => {
 
       // Call secure assignment endpoint
       const { data, error } = await supabase.functions.invoke('secure-ab-assign', {
-        body: { 
+        body: {
           testName,
           anonId: sessionId
         }
@@ -130,7 +134,7 @@ export const useSecureABTest = (testName: string) => {
   // Track conversion (e.g., form submission, purchase)
   const convert = useCallback(async (conversionValue?: number) => {
     // Feature flag: no-op when A/B testing is disabled
-    if (!featureFlags.AB_ENABLED) {
+    if (!featureFlags.AB_ENABLED || !isSupabaseEnabled) {
       return;
     }
 

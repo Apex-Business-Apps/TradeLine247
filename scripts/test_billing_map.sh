@@ -11,8 +11,8 @@ echo "=========================================="
 echo ""
 
 # Test environment setup
-SUPABASE_URL="${SUPABASE_URL:-https://hysvqdwmhxnblxfqnszn.supabase.co}"
-SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo}"
+SUPABASE_URL="${SUPABASE_URL:-https://<your-supabase-project>.supabase.co}"
+SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:?Set SUPABASE_ANON_KEY for this script}"
 
 TEST_TENANT_ID="test-tenant-$(date +%s)"
 TEST_PHONE="+1$(printf '%03d%07d' $((RANDOM % 900 + 100)) $((RANDOM % 10000000)))"

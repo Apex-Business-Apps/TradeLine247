@@ -74,18 +74,28 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/c
 
 ## Environment configuration
 
-Certain public environment variables must be present before running builds or tests:
+Supabase credentials are split between browser-safe publishable values and server-only secrets. Configure them per environment (local, CI, Vercel) before running builds or tests.
 
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+### Supabase variables
 
-Use the provided preflight script to verify they are set without printing their values:
+| Scope | Variable | Purpose |
+|-------|----------|---------|
+| Client (Vite) | `VITE_SUPABASE_URL` | Supabase project URL used by the web app |
+| Client (Vite) | `VITE_SUPABASE_ANON_KEY` | Publishable anon key for RLS-protected access |
+| Client (optional) | `VITE_SUPABASE_PROJECT_ID` | Project ref used for dashboards/links |
+| Server/CI | `SUPABASE_URL` | Supabase project URL for privileged operations |
+| Server/CI | `SUPABASE_SERVICE_ROLE_KEY` | Service role key **(never expose to the browser)** |
+| Server/CI (optional) | `SUPABASE_ANON_KEY` | Anon key for server utilities that mirror client behaviour |
+
+The anon key is safe to embed in the frontend assuming Row Level Security remains enabled on all exposed tables.
+
+Use the provided preflight script to verify the client variables without echoing their values:
 
 ```sh
 VITE_SUPABASE_URL=... VITE_SUPABASE_ANON_KEY=... npm run verify:env:public
 ```
 
-The CI workflow runs this script automatically; ensure the variables are available in your environment to avoid failures.
+The CI workflow runs this script automatically; ensure the variables are available in your environment to avoid failures. Server-side jobs should additionally verify that `SUPABASE_SERVICE_ROLE_KEY` is present; rate limiting and compliance features fall back to an in-memory mode if it is missing.
 
 
 ## Forwarding Wizard (no new vendors)

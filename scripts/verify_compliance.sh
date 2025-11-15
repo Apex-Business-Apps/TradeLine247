@@ -4,6 +4,7 @@ set -euo pipefail
 
 BASE="${1:-https://www.tradeline247ai.com}"
 DOMAIN="tradeline247ai.com"
+SUPABASE_BASE="${SUPABASE_URL:-https://<your-supabase-project>.supabase.co}"
 
 echo "=== CASL/PIPEDA/Mailbox Compliance Check ==="
 echo ""
@@ -13,7 +14,7 @@ pass=true
 # 1. CASL: Unsubscribe endpoint works
 echo "== CASL: Unsubscribe endpoint =="
 unsub_code=$(curl -s -o /dev/null -w "%{http_code}" \
-  "https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1/unsubscribe?e=test@example.com")
+  "$SUPABASE_BASE/functions/v1/unsubscribe?e=test@example.com")
 if [ "$unsub_code" = "200" ]; then
   echo "✅ Unsubscribe endpoint returns 200"
 else

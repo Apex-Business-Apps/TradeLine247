@@ -2,7 +2,8 @@
 # Verify preview health and blank screen fixes
 set -euo pipefail
 
-BASE="${1:-https://hysvqdwmhxnblxfqnszn.supabase.co}"
+BASE="${1:-${SUPABASE_URL:-https://<your-supabase-project>.supabase.co}}"
+ANON_KEY="${SUPABASE_ANON_KEY:?Set SUPABASE_ANON_KEY for this script}"
 
 echo "=== Preview Health Verification ==="
 echo ""
@@ -30,7 +31,7 @@ echo ""
 # Test 3: Recording purge job works
 echo "Test 3: Recording retention purge"
 response=$(curl -s -X POST "$BASE/functions/v1/recording-purge" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo")
+  -H "Authorization: Bearer ${ANON_KEY}")
 if echo "$response" | grep -q "success"; then
   echo "✅ Recording purge job working"
 else

@@ -7,16 +7,20 @@ This document lists all environment variables used in the application and their 
 ### Frontend (Public - Safe to expose)
 | Variable | Purpose | Example | Required |
 |----------|---------|---------|----------|
-| `VITE_SUPABASE_URL` | Supabase project URL | `https://hysvqdwmhxnblxfqnszn.supabase.co` | ✅ Yes |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase anon/public key | `eyJhbGci...` | ✅ Yes |
-| `VITE_SUPABASE_PROJECT_ID` | Supabase project ID | `hysvqdwmhxnblxfqnszn` | ✅ Yes |
+| `VITE_SUPABASE_URL` | Supabase project URL | `https://<your-project>.supabase.co` | ✅ Yes |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anon/public key | `eyJhbGci...` | ✅ Yes |
+| `VITE_SUPABASE_PROJECT_ID` | Supabase project ID | `<your-project-id>` | ✅ Yes |
+
+> ℹ️ Legacy projects may still provide `VITE_SUPABASE_PUBLISHABLE_KEY`; the code treats it as an alias for `VITE_SUPABASE_ANON_KEY`.
 
 ### Backend (Secrets - Never expose to frontend)
 | Variable | Purpose | Security Level | Required |
 |----------|---------|----------------|----------|
 | `TWILIO_AUTH_TOKEN` | Twilio webhook signature validation | 🔴 Critical | ✅ Yes (if using Twilio) |
 | `TWILIO_ACCOUNT_SID` | Twilio account identifier | 🟡 Moderate | ✅ Yes (if using Twilio) |
+| `SUPABASE_URL` | Supabase project URL | 🟡 Moderate | ✅ Yes |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase admin access | 🔴 Critical | ✅ Yes (edge functions) |
+| `SUPABASE_ANON_KEY` | Optional anon key for server helpers | 🟡 Moderate | ⛔ Optional |
 
 ## 🔒 Security-Sensitive Variables
 

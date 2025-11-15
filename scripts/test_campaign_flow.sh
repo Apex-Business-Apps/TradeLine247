@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Configuration
-SUPABASE_URL="${SUPABASE_URL:-https://hysvqdwmhxnblxfqnszn.supabase.co}"
+SUPABASE_URL="${SUPABASE_URL:-https://<your-supabase-project>.supabase.co}"
 JWT_TOKEN="${JWT_TOKEN:-}"
 ORG_ID="${ORG_ID:-}"
 

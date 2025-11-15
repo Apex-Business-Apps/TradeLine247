@@ -15,20 +15,39 @@ export interface StreamOptions {
   signal?: AbortSignal;
 }
 
+const rawFunctionsBase = import.meta.env.VITE_SUPABASE_FUNCTIONS_BASE;
+const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const functionsBase = rawFunctionsBase
+  ? rawFunctionsBase.replace(/\/+$/, '')
+  : rawSupabaseUrl?.replace(/\/+$/, '')
+    ? `${rawSupabaseUrl.replace(/\/+$/, '')}/functions/v1`
+    : undefined;
+const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const chatConfigurationMessage = 'Supabase chat function is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.';
+
 export async function streamChatResponse(
   messages: StreamMessage[],
-  options: StreamOptions = {}
+  options: StreamOptions = {},
 ): Promise<string> {
   const { onChunk, onComplete, onError, signal } = options;
-  
+
   try {
+    if (!functionsBase || !anonKey) {
+      const error = new Error(chatConfigurationMessage);
+      if (import.meta.env.DEV) {
+        console.error('[chatStreaming]', chatConfigurationMessage);
+      }
+      onError?.(error);
+      throw error;
+    }
+
     const response = await fetch(
-      'https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1/chat',
+      `${functionsBase}/chat`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo`
+          'Authorization': `Bearer ${anonKey}`
         },
         body: JSON.stringify({ messages }),
         signal
@@ -50,7 +69,7 @@ export async function streamChatResponse(
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const { done, value } = await reader.read();
-      
+
       if (done) break;
 
       const chunk = decoder.decode(value, { stream: true });
@@ -59,7 +78,7 @@ export async function streamChatResponse(
       for (const line of lines) {
         if (line.startsWith('data: ')) {
           const data = line.slice(6);
-          
+
           if (data === '[DONE]') {
             onComplete?.(fullResponse);
             return fullResponse;
@@ -68,7 +87,7 @@ export async function streamChatResponse(
           try {
             const parsed = JSON.parse(data);
             const content = parsed.choices?.[0]?.delta?.content || '';
-            
+
             if (content) {
               fullResponse += content;
               onChunk?.(content);
@@ -83,7 +102,7 @@ export async function streamChatResponse(
 
     onComplete?.(fullResponse);
     return fullResponse;
-    
+
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     onError?.(err);
@@ -97,9 +116,9 @@ export class ChatStreamManager {
   async stream(messages: StreamMessage[], options: StreamOptions = {}): Promise<string> {
     // Cancel previous stream if running
     this.cancel();
-    
+
     this.abortController = new AbortController();
-    
+
     return streamChatResponse(messages, {
       ...options,
       signal: this.abortController.signal
