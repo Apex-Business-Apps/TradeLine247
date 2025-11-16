@@ -50,7 +50,7 @@ const Index = () => {
               </Button>
             </div>
             
-            <div className="flex items-center justify-center gap-6 text-sm text-gray-400">
+            <div className="flex items-center justify-center gap-6 text-sm text-gray-300">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-primary" />
                 No credit card required
@@ -186,27 +186,27 @@ const Index = () => {
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold mb-4 text-white">3x Revenue Growth</h3>
-              <p className="text-gray-400">
+              <p className="text-gray-300">
                 Dealerships using AutoAi see an average 3x increase in closed deals within the first quarter.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary mb-6">
                 <Zap className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold mb-4 text-white">10x Faster Process</h3>
-              <p className="text-gray-400">
+              <p className="text-gray-300">
                 Automate repetitive tasks and reduce manual work by 90% with intelligent AI workflows.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary mb-6">
                 <Award className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold mb-4 text-white">Industry Leading</h3>
-              <p className="text-gray-400">
+              <p className="text-gray-300">
                 Trusted by top dealerships for reliability, compliance, and cutting-edge AI technology.
               </p>
             </div>
@@ -220,7 +220,7 @@ const Index = () => {
           <h2 className="text-4xl sm:text-5xl font-bold mb-6 text-white">
             Ready to Transform Your Dealership?
           </h2>
-          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-white mb-10 max-w-2xl mx-auto">
             Join leading dealerships using AI to close more deals, automate workflows, and scale effortlessly.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -237,7 +237,7 @@ const Index = () => {
               </Link>
             </Button>
           </div>
-          <p className="text-sm text-white/80 mt-6">
+          <p className="text-sm text-white mt-6">
             Free 14-day trial • No credit card required • Setup in minutes
           </p>
         </div>
