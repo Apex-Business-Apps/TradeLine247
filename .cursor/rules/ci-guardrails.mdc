@@ -1,0 +1,8 @@
+# CI Guardrails
+
+1. **Scope** – Automated agents may only modify CI/CD workflows, test harnesses, and verification scripts. Product code changes require human approval.
+2. **Idempotence** – Every edit must be idempotent and safe to reapply. Prefer explicit search/replace blocks and deterministic scripts.
+3. **Timeboxing** – Abort changes that exceed the documented time budget. Record the partial work and surface blockers instead of looping indefinitely.
+4. **Validation** – All touched workflows must execute the relevant linters/tests locally or in CI. Never merge with red checks; re-run and fix failures.
+5. **Safety** – Treat secrets as write-only. Do not print or log sensitive env vars. Use temporary keychains and ephemeral files for signing assets.
+6. **Documentation** – Summaries and PRs must call out exactly which CI/test surfaces changed, why, and how to roll back (usually `git revert <sha>`).

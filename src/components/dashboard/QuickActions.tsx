@@ -66,6 +66,9 @@ export const QuickActions: React.FC = () => {
             <Link
               to={action.to}
               className="group block w-full rounded-2xl bg-gradient-to-r from-muted/10 to-muted/5 px-4 py-4 hover:from-primary/5 hover:to-primary/10 border border-transparent hover:border-primary/20 transition-all duration-300 hover:shadow-[var(--premium-shadow-subtle)] hover:-translate-y-0.5 animate-fade-in"
+              role="button"
+              aria-label={action.title}
+              data-qa-action={action.title}
             >
               <div className="flex items-start space-x-4">
                 <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 group-hover:from-primary/15 group-hover:to-primary/8 transition-all duration-300">

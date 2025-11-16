@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { performSafetyCheck, sanitizeForLogging, type SafetyConfig } from "../_shared/voiceSafety.ts";
 
@@ -103,7 +102,7 @@ async function getEnhancedPreset(supabase: any, presetId: string | null, config:
   };
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const upgrade = req.headers.get("upgrade") || "";
   
   if (upgrade.toLowerCase() !== "websocket") {

@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.79.0";
 import { preflight, jsonResponse, unexpectedErrorResponse, corsHeaders } from "../_shared/cors.ts";
 
@@ -6,7 +5,7 @@ import { preflight, jsonResponse, unexpectedErrorResponse, corsHeaders } from ".
  * Server-side admin verification endpoint
  * Returns 200 only if user is authenticated and has admin role
  */
-serve(async (req) => {
+Deno.serve(async (req) => {
   // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });

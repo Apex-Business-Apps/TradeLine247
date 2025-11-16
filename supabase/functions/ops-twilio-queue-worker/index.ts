@@ -1,5 +1,4 @@
 // deno-lint-ignore-file no-explicit-any
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { preflight, corsHeaders } from "../_shared/cors.ts";
 import { secureHeaders, mergeHeaders } from "../_shared/secure_headers.ts";
 import { twilioFormPOST, TwilioResponseError } from "../_shared/twilio_client.ts";
@@ -13,7 +12,7 @@ const MAX_PER_RUN = 5; // tune for CPS
 
 const supabase = createClient(SUPABASE_URL, SRV);
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   const pf = preflight(req);
   if (pf) return pf;
 
