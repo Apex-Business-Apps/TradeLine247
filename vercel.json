@@ -1,7 +1,7 @@
 {
   "name": "trade-line247",
   "version": 2,
-  "buildCommand": "cp .env.example .env && npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "devCommand": "npm run dev",
   "installCommand": "npm ci",
