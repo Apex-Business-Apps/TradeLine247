@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HelmetProvider } from 'react-helmet-async';
+import { MemoryRouter } from 'react-router-dom';
 import Pricing from '../Pricing';
 import Auth from '../Auth';
 import Index from '../Index';
@@ -71,45 +72,60 @@ vi.mock('react-router-dom', async () => {
 
 describe('Router Smoke Tests', () => {
   it('should render Pricing page with visible CTA', () => {
-    const { container } = render(<Pricing />);
+    const { container } = render(
+      <MemoryRouter>
+        <Pricing />
+      </MemoryRouter>
+    );
 
     // Check that pricing page renders
     expect(container.textContent).toMatch(/pricing/i);
 
-    // Check for actual CTA text from restored Pricing page (Zero-Monthly or Predictable)
-    expect(container.textContent).toMatch(/Zero-Monthly|Predictable/i);
+    // Check for actual CTA text from pricing page
+    expect(container.textContent).toMatch(/Starter \(Solo Operators\)/i);
+    expect(container.textContent).toMatch(/Predictable Plus/i);
   });
 
   it('should render Auth page with sign in form', () => {
-    const { container } = render(<Auth />);
+    const { container } = render(
+      <MemoryRouter>
+        <Auth />
+      </MemoryRouter>
+    );
 
     // Check that auth page renders
-    expect(container.textContent).toMatch(/welcome to tradeline 24\/7/i);
+    expect(container.textContent).toMatch(/Start your free 7-day trial/i);
 
     // Check for sign in button
-    expect(container.textContent).toMatch(/sign in/i);
+    expect(container.textContent).toMatch(/Send magic link/i);
   });
 
   it('should render Index page with hero section', () => {
     render(
-      <HelmetProvider>
-        <Index />
-      </HelmetProvider>
+      <MemoryRouter>
+        <HelmetProvider>
+          <Index />
+        </HelmetProvider>
+      </MemoryRouter>
     );
 
-    // Check that hero section renders
-    expect(screen.getByTestId('hero-roi-duo')).toBeInTheDocument();
+    // Check that hero section renders with the new headline
+    expect(screen.getByText(/Your 24\/7 AI Receptionist/i)).toBeInTheDocument();
   });
 
   it('should render Pricing with correct structure', () => {
-    const { container } = render(<Pricing />);
+    const { container } = render(
+      <MemoryRouter>
+        <Pricing />
+      </MemoryRouter>
+    );
 
     // Verify pricing page has proper structure (div wrapper with sections inside)
     const mainWrapper = container.querySelector('div.min-h-screen');
     expect(mainWrapper).toBeTruthy();
 
     // Check for pricing plan cards
-    expect(container.textContent).toMatch(/Zero-Monthly Plan/i);
-    expect(container.textContent).toMatch(/Predictable Plan/i);
+    expect(container.textContent).toMatch(/Starter \(Solo Operators\)/i);
+    expect(container.textContent).toMatch(/Predictable Plus/i);
   });
 });
