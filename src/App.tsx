@@ -10,8 +10,6 @@ import { paths } from "./routes/paths";
 
 // PERFORMANCE: Route-based code splitting - lazy load all routes except Index (critical)
 const Pricing = lazy(() => import("./pages/Pricing"));
-const MissedCallsCalculator = lazy(() => import("./pages/MissedCallsCalculator"));
-const TrialWelcome = lazy(() => import("./pages/TrialWelcome"));
 const FAQ = lazy(() => import("./pages/FAQ"));
 const Features = lazy(() => import("./pages/Features"));
 const Compare = lazy(() => import("./pages/Compare"));
@@ -32,8 +30,6 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.home, element: <Index /> },
   { path: paths.pricing, element: <Pricing /> },
-  { path: paths.missedCallsCalculator, element: <MissedCallsCalculator /> },
-  { path: paths.welcome, element: <TrialWelcome /> },
   { path: paths.faq, element: <FAQ /> },
   { path: paths.features, element: <Features /> },
   { path: paths.compare, element: <Compare /> },

@@ -2,8 +2,6 @@ export const paths = {
   home: "/",
   features: "/features",
   pricing: "/pricing",
-  missedCallsCalculator: "/missed-calls-calculator",
-  welcome: "/welcome",
   faq: "/faq",
   compare: "/compare",
   security: "/security",

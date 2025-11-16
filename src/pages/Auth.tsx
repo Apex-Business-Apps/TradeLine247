@@ -1,304 +1,424 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { z } from "zod";
-import { Loader2, Mail, ShieldCheck, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase, isSupabaseEnabled } from "@/integrations/supabase/client.ts";
-import type { Database } from "@/integrations/supabase/types";
-import { AISEOHead } from "@/components/seo/AISEOHead";
-import { paths } from "@/routes/paths";
-import { errorReporter } from "@/lib/errorReporter";
-import { getPlanDetails, PlanId } from "@/lib/trialPlans";
-
-const emailSchema = z
-  .string()
-  .trim()
-  .min(1, "Enter your work email")
-  .email("Enter a valid email address");
-
-const persistSelection = (plan: PlanId, email: string) => {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem("tradeline:selectedPlan", plan);
-    if (email) {
-      window.localStorage.setItem("tradeline:trialEmail", email);
-    }
-  } catch (error) {
-    console.warn("Failed to persist plan selection", error);
-  }
-};
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { paths } from '@/routes/paths';
+import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client.ts';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2 } from 'lucide-react';
+import { Session, User } from '@supabase/supabase-js';
+import { Footer } from '@/components/layout/Footer';
+import { usePasswordSecurity } from '@/hooks/usePasswordSecurity';
+import { errorReporter } from '@/lib/errorReporter';
 
 const Auth = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const requestedPlan = (searchParams.get("plan")?.toLowerCase() as PlanId | null) ?? "default";
-  const planInfo = useMemo(() => getPlanDetails(requestedPlan), [requestedPlan]);
-
-  const [email, setEmail] = useState(searchParams.get("email") ?? "");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    persistSelection(planInfo.id, email);
-  }, [planInfo.id, email]);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [passwordStrength, setPasswordStrength] = useState<string>('');
+  const [passwordCheckLoading, setPasswordCheckLoading] = useState(false);
+  const [passwordBreached, setPasswordBreached] = useState(false);
+  const navigate = useNavigate();
+  const { validatePassword: secureValidatePassword } = usePasswordSecurity();
 
   useEffect(() => {
     if (!isSupabaseEnabled) {
-      return;
+      setLoading(false);
+      return () => undefined;
     }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session?.user) {
-        persistSelection(planInfo.id, email);
-        navigate(paths.welcome, { replace: true });
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // Redirect authenticated users to dashboard
+        if (session?.user) {
+          navigate(paths.dashboard);
+        }
       }
-    });
+    );
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) {
-        navigate(paths.welcome, { replace: true });
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      // If there's a JWT error, clear the corrupted session
+      if (error?.message?.includes('malformed') || error?.message?.includes('invalid')) {
+        errorReporter.report({
+          type: 'error',
+          message: `Auth: Detected malformed token, clearing session: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
+        supabase.auth.signOut().catch(() => {/* ignore errors during cleanup */});
+        setSession(null);
+        setUser(null);
+        return;
       }
+
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      // Redirect if already logged in
+      if (session?.user) {
+        navigate(paths.dashboard);
+      }
+    }).catch((err) => {
+      // Catch any unhandled JWT errors
+      errorReporter.report({
+        type: 'error',
+        message: `Auth: Session check failed: ${err?.message || err}`,
+        stack: err?.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
+      supabase.auth.signOut().catch(() => {/* ignore */});
+      setSession(null);
+      setUser(null);
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, planInfo.id, email]);
+  }, [navigate]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-    setMessage(null);
+  const validatePassword = (password: string): { isValid: boolean; strength: string; message?: string } => {
+    if (password.length < 8) {
+      return { isValid: false, strength: 'Too short', message: 'Password must be at least 8 characters long' };
+    }
+    
+    const hasLower = /[a-z]/.test(password);
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    const criteriaCount = [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
+    
+    if (criteriaCount < 3) {
+      return { 
+        isValid: false, 
+        strength: 'Weak', 
+        message: 'Password must contain at least 3 of: lowercase, uppercase, number, special character' 
+      };
+    }
+    
+    const strength = criteriaCount === 4 ? 'Strong' : 'Good';
+    return { isValid: true, strength };
+  };
 
-    const parsedEmail = emailSchema.safeParse(email);
-    if (!parsedEmail.success) {
-      setError(parsedEmail.error.issues[0]?.message ?? "Enter a valid email address");
-      return;
+  const handlePasswordChange = async (newPassword: string) => {
+    setPassword(newPassword);
+    setPasswordCheckLoading(true);
+    setPasswordBreached(false);
+    
+    try {
+      // Quick client-side validation first
+      const basicValidation = validatePassword(newPassword);
+      setPasswordStrength(basicValidation.strength);
+      
+      // If password meets basic requirements, check for breaches
+      if (basicValidation.isValid && newPassword.length >= 8) {
+        const secureValidation = await secureValidatePassword(newPassword);
+        setPasswordStrength(secureValidation.strength);
+        setPasswordBreached(secureValidation.isBreached);
+        
+        if (secureValidation.isBreached) {
+          setError(secureValidation.message || 'This password appears in known data breaches');
+        } else {
+          setError(null);
+        }
+      }
+    } catch (error) {
+      errorReporter.report({
+        type: 'error',
+        message: `Password validation error: ${error}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
+      // Don't block user if validation fails
+    } finally {
+      setPasswordCheckLoading(false);
+    }
+  };
+
+  const signUp = async (email: string, password: string, displayName: string) => {
+    // Check password security (both strength and breach status)
+    const secureValidation = await secureValidatePassword(password);
+    
+    if (!secureValidation.isValid) {
+      throw new Error(secureValidation.message || 'Password does not meet security requirements');
+    }
+    
+    if (secureValidation.isBreached) {
+      throw new Error('This password appears in known data breaches. Please choose a different password.');
     }
 
+    const redirectUrl = `${window.location.origin}/`;
+    
     if (!isSupabaseEnabled) {
-      setError("Authentication service is unavailable. Please try again shortly.");
+      throw new Error('Supabase is disabled in this environment.');
+    }
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          display_name: displayName,
+        }
+      }
+    });
+    return { error };
+  };
+
+  const signIn = async (email: string, password: string) => {
+    if (!isSupabaseEnabled) {
+      throw new Error('Supabase is disabled in this environment.');
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { error };
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password || !displayName) {
+      setError('Please fill in all fields');
       return;
     }
 
     setLoading(true);
-
-    const normalizedEmail = parsedEmail.data.toLowerCase();
-    const leadPayload: Database["public"]["Tables"]["leads"]["Insert"] = {
-      name: normalizedEmail,
-      email: normalizedEmail,
-      company: planInfo.companyLabel,
-      notes: `${planInfo.leadSource}:fast-trust`,
-      source: planInfo.leadSource,
-    };
+    setError(null);
+    setMessage(null);
 
     try {
-      const { error: leadError } = await supabase.from("leads").insert(leadPayload);
-      if (leadError && !leadError.message?.toLowerCase().includes("duplicate")) {
-        errorReporter.report({
-          type: "error",
-          message: `Lead capture failed: ${leadError.message}`,
-          timestamp: new Date().toISOString(),
-          url: typeof window !== "undefined" ? window.location.href : "",
-          userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
-          environment: errorReporter["getEnvironment"]?.(),
-          metadata: { plan: planInfo.id },
-        });
+      const { error } = await signUp(email, password, displayName);
+      
+      if (error) {
+        if (error.message.includes('already registered')) {
+          setError('This email is already registered. Please sign in instead.');
+        } else {
+          setError(error.message);
+        }
+        setLoading(false);
+      } else {
+        setMessage('Account created successfully! Please check your email to verify your account.');
+        setLoading(false);
+        // Clear form
+        setEmail('');
+        setPassword('');
+        setDisplayName('');
       }
-    } catch (leadException) {
-      errorReporter.report({
-        type: "error",
-        message: "Lead capture threw",
-        timestamp: new Date().toISOString(),
-        url: typeof window !== "undefined" ? window.location.href : "",
-        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
-        environment: errorReporter["getEnvironment"]?.(),
-        metadata: { error: leadException instanceof Error ? leadException.message : String(leadException) },
-      });
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during sign up');
+      setLoading(false);
+    }
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
     }
 
+    setLoading(true);
+    setError(null);
+
     try {
-      const redirectUrl = `${window.location.origin}${paths.welcome}`;
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        email: normalizedEmail,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            trial_plan: planInfo.id,
-            lead_source: planInfo.leadSource,
-          },
-        },
-      });
-
-      if (otpError) {
-        throw otpError;
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please check your credentials.');
+        } else {
+          setError(error.message);
+        }
+        setLoading(false);
+      } else {
+        // Success - redirect will happen via onAuthStateChange listener
+        // But also do explicit navigation as backup
+        navigate(paths.dashboard);
       }
-
-      persistSelection(planInfo.id, normalizedEmail);
-      setMessage("Magic link sent! Check your email to activate your AI receptionist.");
-    } catch (authError: unknown) {
-      const friendlyMessage =
-        authError instanceof Error ? authError.message : "Unable to send magic link. Please try again.";
-      setError(friendlyMessage);
-      errorReporter.report({
-        type: "error",
-        message: `Magic link request failed: ${friendlyMessage}`,
-        timestamp: new Date().toISOString(),
-        url: typeof window !== "undefined" ? window.location.href : "",
-        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
-        environment: errorReporter["getEnvironment"]?.(),
-        metadata: { plan: planInfo.id },
-      });
-    } finally {
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during sign in');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <AISEOHead
-        title="Start Your Free TradeLine 24/7 Trial"
-        description="Activate your AI receptionist in one click. Hosted in Canada, compliant with PIPEDA/PIPA, and ready for trades, clinics, and solo operators."
-        canonical="https://tradeline247ai.com/auth"
-        contentType="service"
-        directAnswer="Enter your work email and we will send a secure magic link to activate your TradeLine 24/7 trial."
-        keyFacts={[
-          { label: "Trial length", value: "7 days" },
-          { label: "Setup", value: "One click" },
-          { label: "Coverage", value: "24/7 · 55+ languages" },
-          { label: "Hosting", value: "Canada" },
-        ]}
-        faqs={[
-          {
-            question: "Do I need a credit card to start?",
-            answer: "No. We only ask for your work email to send a secure magic link. Choose a plan once you see the value.",
-          },
-          {
-            question: "Is TradeLine 24/7 a credit tradeline service?",
-            answer: "No. We are an AI receptionist for service businesses — plumbers, HVAC, clinics, and operators who cannot miss calls.",
-          },
-          {
-            question: "What happens after the trial?",
-            answer: "Keep the plan you selected or switch. We’ll confirm payment details once you’re ready to stay live.",
-          },
-        ]}
-        ogMeta={{
-          title: "Start Your Free 7-Day Trial | TradeLine 24/7",
-          description: "One-click activation for your AI receptionist. Hosted in Canada with compliance baked in.",
-          image: "/og/tradeline-fast-trust.jpg",
-          url: "https://tradeline247ai.com/auth",
-        }}
-        twitterMeta={{
-          title: "TradeLine 24/7 Free Trial",
-          description: "Start your AI receptionist trial in one click. No passwords, no credit card.",
-          image: "/og/tradeline-fast-trust.jpg",
-        }}
-      />
+    <div className="min-h-screen flex flex-col bg-background">
 
-      <main className="container mx-auto flex flex-col gap-12 px-4 py-16 lg:flex-row lg:items-center">
-        <section className="flex-1 space-y-6">
-          <span className="inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-sm font-medium text-success">
-            <ShieldCheck className="h-4 w-4" /> Hosted in Canada · PIPEDA/PIPA-ready
-          </span>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Start your free 7-day trial — your AI receptionist is ready
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            We answer, qualify, and book calls while you’re on the job or off the clock. Enter your work email, receive a secure
-            magic link, and you’re live in minutes.
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm">
-              <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground">
-                <Sparkles className="h-4 w-4 text-primary" /> One-click onboarding
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                We provision your TradeLine number immediately. Forward calls or test instantly.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm">
-              <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground">
-                <Mail className="h-4 w-4 text-info" /> Magic link security
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                No passwords to remember. We send a secure link that expires quickly for safety.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="flex-1">
-          <Card className="border border-border/70 bg-card/90 shadow-xl backdrop-blur">
-            <CardHeader className="space-y-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold text-foreground">{planInfo.label}</CardTitle>
-                {planInfo.badge && (
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-                    {planInfo.badge}
-                  </span>
-                )}
-              </div>
-              <p className="text-muted-foreground">{planInfo.subtitle}</p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                {planInfo.highlights.map((highlight) => (
-                  <li key={highlight} className="flex items-start gap-2">
-                    <Sparkles className="mt-1 h-4 w-4 text-success" aria-hidden="true" />
-                    <span>{highlight}</span>
-                  </li>
-                ))}
-              </ul>
-
+      <main className="flex-1 container py-8 px-4 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Welcome to TradeLine 24/7</CardTitle>
+            <CardDescription>Sign in to your account or create a new one</CardDescription>
+          </CardHeader>
+          
+          <CardContent>
+            <Tabs defaultValue="signin" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="signin">Sign In</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
+              
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-
+              
               {message && (
                 <Alert>
                   <AlertDescription>{message}</AlertDescription>
                 </Alert>
               )}
-
-              <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-                <div className="space-y-2">
-                  <Label htmlFor="trial-email">Work email</Label>
-                  <Input
-                    id="trial-email"
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    placeholder="you@company.com"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    required
-                    aria-describedby="email-help"
+              
+              <TabsContent value="signin">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email">Email</Label>
+                    <Input
+                      id="signin-email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password">Password</Label>
+                    <Input
+                      id="signin-password"
+                      type="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    variant="success"
+                    className="w-full"
                     disabled={loading}
-                  />
-                  <p id="email-help" className="text-xs text-muted-foreground">
-                    We’ll send a secure magic link to activate your AI receptionist.
-                  </p>
-                </div>
+                  >
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Sign In
+                  </Button>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-name">Display Name</Label>
+                    <Input
+                      id="signup-name"
+                      type="text"
+                      placeholder="Enter your name"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  
+                   <div className="space-y-2">
+                     <Label htmlFor="signup-password">Password</Label>
+                     <Input
+                       id="signup-password"
+                       type="password"
+                       placeholder="Create a strong password"
+                       value={password}
+                       onChange={(e) => handlePasswordChange(e.target.value)}
+                       required
+                       minLength={8}
+                     />
+                      {password && (
+                        <div className="text-sm space-y-2">
+                          <div>
+                            <span className="text-muted-foreground">Strength: </span>
+                            <span className={`font-medium ${
+                              passwordStrength === 'Very strong' || passwordStrength === 'Strong' ? 'text-[hsl(142,85%,25%)]' :
+                              passwordStrength === 'Good' ? 'text-amber-800' :
+                              'text-red-700'
+                            }`}>
+                              {passwordStrength}
+                              {passwordCheckLoading && <Loader2 className="inline w-3 h-3 ml-1 animate-spin" />}
+                            </span>
+                          </div>
 
-                <Button type="submit" size="lg" className="w-full" disabled={loading} id="start-trial-auth">
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
-                  Send magic link
-                </Button>
-              </form>
+                          {passwordBreached && (
+                            <div className="text-xs text-red-700 font-medium">
+                              ⚠️ This password appears in known data breaches. Please choose a different password.
+                            </div>
+                          )}
 
-              <p className="text-xs text-muted-foreground">{planInfo.notes}</p>
-              <div className="text-xs text-muted-foreground">
-                Need to switch plans? <a className="font-medium text-primary underline-offset-4 hover:underline" href={paths.pricing}>See all pricing options</a>.
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+                          {password.length >= 8 && !passwordBreached && passwordStrength !== 'Too short' && (
+                            <div className="text-xs text-[hsl(142,85%,25%)]">
+                              ✓ Password meets security requirements
+                            </div>
+                          )}
+                          
+                          {(passwordStrength === 'Too short' || passwordStrength === 'Weak' || passwordStrength === 'Too weak') && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Use 8+ characters with uppercase, lowercase, numbers, and symbols
+                            </div>
+                          )}
+                        </div>
+                      )}
+                   </div>
+                  
+                  <Button 
+                    type="submit" 
+                    variant="success"
+                    className="w-full"
+                    disabled={loading}
+                  >
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Create Account
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </main>
+      
+      <Footer />
     </div>
   );
 };

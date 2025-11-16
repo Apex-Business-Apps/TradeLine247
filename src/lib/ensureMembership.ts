@@ -40,9 +40,8 @@ export async function ensureMembership(user: User): Promise<MembershipResult> {
 
     // 2) Call edge function to create org + 14-day trial (idempotent server-side)
     const company = (user.user_metadata?.display_name as string | undefined) || undefined;
-    const preferredPlan = (user.user_metadata?.trial_plan as string | undefined) || undefined;
     const { data, error } = await supabase.functions.invoke("start-trial", {
-      body: { company, plan: preferredPlan },
+      body: { company },
     });
 
     if (error) {

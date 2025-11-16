@@ -81,19 +81,6 @@ export interface AISEOHeadProps {
     url: string;
     date?: string;
   }>;
-  ogMeta?: {
-    title?: string;
-    description?: string;
-    image?: string;
-    url?: string;
-    type?: string;
-  };
-  twitterMeta?: {
-    title?: string;
-    description?: string;
-    image?: string;
-    card?: "summary" | "summary_large_image";
-  };
 }
 
 /**
@@ -110,8 +97,6 @@ export const AISEOHead: React.FC<AISEOHeadProps> = ({
   primaryEntity,
   relatedEntities,
   citations,
-  ogMeta,
-  twitterMeta,
 }) => {
   const baseUrl = 'https://www.tradeline247ai.com';
   const fullCanonical = canonical.startsWith('http') ? canonical : `${baseUrl}${canonical}`;
@@ -367,24 +352,17 @@ export const AISEOHead: React.FC<AISEOHeadProps> = ({
       <meta name="perplexitybot" content="index, follow" />
       
       {/* Open Graph */}
-      <meta property="og:type" content={ogMeta?.type ?? 'website'} />
-      <meta property="og:url" content={ogMeta?.url ?? fullCanonical} />
-      <meta property="og:title" content={ogMeta?.title ?? title} />
-      <meta property="og:description" content={ogMeta?.description ?? description} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={fullCanonical} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
       <meta property="og:site_name" content="TradeLine 24/7" />
-      {ogMeta?.image && <meta property="og:image" content={ogMeta.image} />}
-
+      
       {/* Twitter */}
-      <meta name="twitter:card" content={twitterMeta?.card ?? 'summary_large_image'} />
-      <meta name="twitter:url" content={ogMeta?.url ?? fullCanonical} />
-      <meta name="twitter:title" content={twitterMeta?.title ?? ogMeta?.title ?? title} />
-      <meta
-        name="twitter:description"
-        content={twitterMeta?.description ?? ogMeta?.description ?? description}
-      />
-      {(twitterMeta?.image ?? ogMeta?.image) && (
-        <meta name="twitter:image" content={twitterMeta?.image ?? ogMeta?.image} />
-      )}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content={fullCanonical} />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
       
       {/* Structured Data (JSON-LD) - Critical for AI */}
       <script type="application/ld+json">

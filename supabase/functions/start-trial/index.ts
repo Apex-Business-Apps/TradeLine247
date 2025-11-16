@@ -1,18 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.79.0";
-import { preflight, jsonResponse, unexpectedErrorResponse, corsHeaders } from "../_shared/cors.ts";
+import { preflight, jsonResponse, unexpectedErrorResponse } from "../_shared/cors.ts";
 
 interface StartTrialRequest {
   company?: string;
-  plan?: string;
 }
 
 serve(async (req) => {
-  const preflightResponse = preflight(req);
-  if (preflightResponse) {
-    return preflightResponse;
-  }
-
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -51,7 +45,6 @@ serve(async (req) => {
 
     const user = userData.user;
     const body = (await req.json().catch(() => ({}))) as StartTrialRequest;
-    const selectedPlan = (body.plan && typeof body.plan === "string" ? body.plan : "free").toLowerCase();
 
     // 1) Check existing membership (idempotent)
     const { data: existingMembership, error: membershipErr } = await supabase
@@ -118,7 +111,7 @@ serve(async (req) => {
     if (!existingSub) {
       const { error: createSubErr } = await supabase.from("subscriptions").insert({
         org_id: orgId,
-        plan: selectedPlan,
+        plan: "free",
         status: "active",
         stripe_customer_id: null,
         current_period_end: endsAt.toISOString(),
@@ -136,7 +129,7 @@ serve(async (req) => {
         const { error: updateSubErr } = await supabase
           .from("subscriptions")
           .update({
-            plan: selectedPlan,
+            plan: "free",
             status: "active",
             current_period_end: endsAt.toISOString(),
           })
@@ -144,18 +137,6 @@ serve(async (req) => {
         if (updateSubErr) {
           console.error("updateSubErr", updateSubErr);
           return new Response(JSON.stringify({ ok: false, error: "Failed to extend trial" }), {
-            status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-      } else if (selectedPlan && existingSub.plan !== selectedPlan) {
-        const { error: planUpdateErr } = await supabase
-          .from("subscriptions")
-          .update({ plan: selectedPlan })
-          .eq("id", existingSub.id);
-        if (planUpdateErr) {
-          console.error("planUpdateErr", planUpdateErr);
-          return new Response(JSON.stringify({ ok: false, error: "Failed to update plan" }), {
             status: 500,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
@@ -169,7 +150,10 @@ serve(async (req) => {
     );
   } catch (e) {
     console.error("start-trial unhandled error", e);
-    return unexpectedErrorResponse(e);
+    return new Response(JSON.stringify({ ok: false, error: "Server error" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
 
