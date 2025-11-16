@@ -19,8 +19,8 @@ import AxeBuilder from '@axe-core/playwright';
 // ==========================================
 
 async function analyzeAccessibility(page: any, routeName: string) {
+  // Use basic accessibility scan without specific tags for compatibility
   const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();
   
   // Log violations for debugging
