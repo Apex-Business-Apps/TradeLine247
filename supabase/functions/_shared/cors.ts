@@ -51,3 +51,11 @@ export function withCors(headers: Record<string, string>): Record<string, string
     ...headers,
   };
 }
+
+export function mergeHeaders(...headerSets: Record<string, string>[]): Record<string, string> {
+  return Object.assign({}, ...headerSets);
+}
+
+export function handleCors(req: Request): Response | null {
+  return preflight(req);
+}
