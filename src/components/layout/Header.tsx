@@ -281,6 +281,111 @@ export const Header: React.FC = () => {
               {/* Desktop: User Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size={isScrolled ? 'sm' : 'default'}
+                    className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300"
+                  >
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm font-medium text-foreground leading-tight">
+                        {userDisplayName}
+                      </span>
+                      {userRole && (
+                        <span className={cn(
+                          'text-xs font-medium leading-tight',
+                          isUserAdmin ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'
+                        )}>
+                          {userRole.toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{userDisplayName}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  {isUserAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <div className="px-2 py-1.5">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          Application
+                        </p>
+                      </div>
+                      <DropdownMenuItem
+                        onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
+                        className="cursor-pointer"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleNavigation(paths.calls, 'Calls')}
+                        className="cursor-pointer"
+                      >
+                        <Phone className="mr-2 h-4 w-4" />
+                        Calls
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleNavigation(paths.phoneApps, 'Phone Apps')}
+                        className="cursor-pointer"
+                      >
+                        <Smartphone className="mr-2 h-4 w-4" />
+                        Phone Apps
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleNavigation(paths.voiceSettings, 'Settings')}
+                        className="cursor-pointer"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:text-red-400 dark:focus:bg-red-950/20"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Mobile: Sign Out Icon */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSignOut}
+                className="lg:hidden hover:bg-accent transition-all duration-300"
+                aria-label="Sign out"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="success"
+              size={isScrolled ? 'sm' : 'default'}
+              onClick={() => handleNavigation(paths.auth, 'Login')}
+              className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
+            >
+              Login
+            </Button>
+          )}
+
+          {/* User Menu */}
+          {user ? (
+            <>
+              {/* Desktop: User Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button 
                     variant="ghost" 
                     size={isScrolled ? 'sm' : 'default'}
@@ -419,7 +524,7 @@ export const Header: React.FC = () => {
           )}
           <div className="border-t border-border" />
           <div className="space-y-3">
-            <LanguageSwitcher />
+            <LanguageSwitcher className="w-full" />
             {user ? (
               <Button
                 variant="ghost"
