@@ -24,18 +24,23 @@ jobs:
     name: ci/build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: '20'
+          cache: 'npm'
       - run: npm ci --no-audit --fund=false
+      - name: Verify public env
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        run: npm run -s verify:env:public
       - run: npm run -s typecheck --if-present
       - run: npm run -s build
       - name: Run preflight verifications
         run: |
-          npm run -s verify:env:public
           npm run -s verify:app
           npm run -s verify:icons
       - name: Verify web artifact
