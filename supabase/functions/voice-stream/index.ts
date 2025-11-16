@@ -390,7 +390,7 @@ Deno.serve(async (req) => {
   }, 2000);
 
   // Handle Twilio Media Stream events
-  socket.onmessage = (event) => {
+  socket.onmessage = async (event) => {
     const data = JSON.parse(event.data);
     
     if (data.event === 'start') {
