@@ -122,7 +122,16 @@ export function useSafeNavigation() {
 
       // Perform navigation
       navigate(path, { replace, state });
-
+      
+      // Log successful navigation in development
+      if (import.meta.env.DEV) {
+        console.log('[Navigation] Success:', {
+          path,
+          replace,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
       onSuccess?.();
     } catch (error) {
       const navError = error instanceof Error 

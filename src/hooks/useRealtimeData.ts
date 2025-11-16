@@ -58,6 +58,8 @@ export function useRealtimeData<T>(
               // Ignore updates if component unmounted
               if (isCleanedUp) return;
 
+              console.log('Realtime payload:', payload);
+
               switch (payload.eventType) {
                 case 'INSERT':
                   setData(prev => [...prev, payload.new]);
