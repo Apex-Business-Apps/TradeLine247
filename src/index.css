@@ -320,15 +320,15 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    /* Dark mode: Bright orange pops on dark */
-    --primary: var(--brand-orange-dark);
+    /* Dark mode: Bright orange pops on dark - WCAG AA compliant (4.5:1 on dark bg) */
+    --primary: 21 100% 50%; /* Brighter orange (50% vs 35%) for 4.5:1+ contrast on dark background */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: var(--brand-orange-light);
 
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted-foreground: 215 20.2% 70%; /* Increased from 65.1% to 70% for 4.5:1 contrast on dark background (WCAG AA) */
 
     --accent: var(--brand-orange-dark);
     --accent-foreground: 0 0% 100%;
