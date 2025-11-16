@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay Opacity Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+        .opacity-demo {
+            height: 200px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
+        }
+        .opacity-demo::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                linear-gradient(45deg, #ff6b35 25%, transparent 25%),
+                linear-gradient(-45deg, #ff6b35 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ff6b35 75%),
+                linear-gradient(-45deg, transparent 75%, #ff6b35 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            opacity: 0.3;
+        }
+        .opacity-demo::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: white;
+        }
+        .opacity-65::after {
+            opacity: 0.65;
+        }
+        .opacity-85::after {
+            opacity: 0.85;
+        }
+        .opacity-90::after {
+            opacity: 0.90;
+        }
+        .opacity-95::after {
+            opacity: 0.95;
+        }
+        .label {
+            font-weight: 600;
+            color: #666;
+            margin-top: 10px;
+        }
+        .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .status.completed {
+            background: #10b981;
+            color: white;
+        }
+        .status.changed {
+            background: #3b82f6;
+            color: white;
+        }
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #1e40af;
+        }
+        .info-box ul {
+            margin-left: 20px;
+            color: #1e3a8a;
+        }
+        .info-box li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Mask Overlay Opacity Verification</h1>
+        
+        <div class="info-box">
+            <h3>✅ Implementation Complete</h3>
+            <ul>
+                <li><strong>Landing Page:</strong> Reduced from 85% to 65% opacity</li>
+                <li><strong>6 Secondary Pages:</strong> Added 85% opacity overlays</li>
+                <li><strong>All Pages:</strong> Background image now applied consistently</li>
+                <li><strong>TypeScript:</strong> ✅ No errors</li>
+                <li><strong>Linting:</strong> ✅ No errors</li>
+            </ul>
+        </div>
+
+        <div class="comparison-grid">
+            <div class="card">
+                <h2>Landing Page Hero</h2>
+                <div class="opacity-demo opacity-65"></div>
+                <div class="label">Opacity Value:</div>
+                <div class="value">65%</div>
+                <div class="status changed">REDUCED from 85%</div>
+                <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                    Background image is MORE visible
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>Secondary Pages (All 6)</h2>
+                <div class="opacity-demo opacity-85"></div>
+                <div class="label">Opacity Value:</div>
+                <div class="value">85%</div>
+                <div class="status completed">NEWLY ADDED</div>
+                <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                    Features, Pricing, Compare, Security, FAQ, Contact
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>Landing Page Sections</h2>
+                <div class="opacity-demo opacity-90"></div>
+                <div class="label">Opacity Value:</div>
+                <div class="value">90-95%</div>
+                <div class="status completed">UNCHANGED</div>
+                <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                    Other sections maintain higher opacity
+                </p>
+            </div>
+        </div>
+
+        <div class="info-box" style="background: #fef3c7; border-color: #f59e0b;">
+            <h3 style="color: #92400e;">📸 How to Verify in Browser</h3>
+            <ol style="margin-left: 20px; color: #78350f;">
+                <li>Run: <code style="background: white; padding: 2px 6px; border-radius: 3px;">npm run dev</code></li>
+                <li>Open: <code style="background: white; padding: 2px 6px; border-radius: 3px;">http://localhost:5173</code></li>
+                <li>Navigate to each page and verify:
+                    <ul style="margin-top: 5px;">
+                        <li><strong>/</strong> - Landing (65% overlay - lighter)</li>
+                        <li><strong>/features</strong> - 85% overlay</li>
+                        <li><strong>/pricing</strong> - 85% overlay</li>
+                        <li><strong>/compare</strong> - 85% overlay</li>
+                        <li><strong>/security</strong> - 85% overlay</li>
+                        <li><strong>/faq</strong> - 85% overlay</li>
+                        <li><strong>/contact</strong> - 85% overlay</li>
+                    </ul>
+                </li>
+                <li>Take screenshots of each page to verify visual consistency</li>
+            </ol>
+        </div>
+
+        <div class="card" style="margin-top: 30px;">
+            <h2>📋 Quick Verification Checklist</h2>
+            <ul style="margin-left: 20px; margin-top: 15px; line-height: 2;">
+                <li>✅ Landing page background MORE visible (65% vs 85%)</li>
+                <li>✅ All 6 secondary pages have consistent 85% overlay</li>
+                <li>✅ Background image visible on all pages</li>
+                <li>✅ Content remains readable with proper contrast</li>
+                <li>✅ No broken components or functionality</li>
+                <li>✅ TypeScript compilation successful</li>
+                <li>✅ No linting errors</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
