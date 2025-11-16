@@ -1,0 +1,498 @@
+---
+description: CI Automation Safety Rules and Guardrails for tradeline247
+tags: [ci, automation, safety, devops, testing]
+version: 1.0.0
+---
+
+# CI Guardrails — Automation Safety Rules
+
+This document defines safety rules and best practices for CI/CD automation in the tradeline247 project.
+
+## Table of Contents
+
+1. [Core Principles](#core-principles)
+2. [Environment Variables](#environment-variables)
+3. [Test Strategy](#test-strategy)
+4. [Deployment Safety](#deployment-safety)
+5. [Error Handling](#error-handling)
+6. [Performance Guidelines](#performance-guidelines)
+
+---
+
+## Core Principles
+
+### 1. Fail Fast, Fail Safely
+
+CI should detect issues early and fail gracefully without cascading failures.
+
+**Rules:**
+- Environment verification must run BEFORE builds
+- Required checks must block PR merges
+- Advisory checks should not block merges but provide feedback
+- Use `continue-on-error: true` for non-critical quality gates
+
+### 2. Progressive Testing Strategy
+
+Not all tests need to run on every PR. Use tiered testing:
+
+**PR Tests (Fast Feedback ~3-5 min):**
+- Type checking
+- Linting
+- Unit tests
+- Smoke tests (CTA smoke + @critical e2e)
+- Build verification
+
+**Nightly Tests (Comprehensive ~30-40 min):**
+- Full E2E suite (all browsers)
+- Performance tests
+- Accessibility audit
+- Security scans
+
+### 3. Defense in Depth
+
+Multiple layers of validation prevent production issues:
+
+1. **Pre-commit**: Lint, format (local dev)
+2. **PR CI**: Fast smoke tests
+3. **Merge CI**: Full test suite
+4. **Pre-deploy**: Build + env validation
+5. **Post-deploy**: Health checks + monitoring
+
+---
+
+## Environment Variables
+
+### Required vs Optional
+
+**Required for Build:**
+```bash
+VITE_SUPABASE_URL              # Public Supabase URL
+VITE_SUPABASE_ANON_KEY         # Public Supabase anon key
+```
+
+**Required for Runtime (Server):**
+```bash
+SUPABASE_SERVICE_ROLE_KEY      # Backend Supabase admin key
+```
+
+**Optional (with safe fallbacks):**
+```bash
+SUPABASE_URL                   # Falls back to VITE_SUPABASE_URL
+```
+
+### Verification Strategy
+
+Use `.env.example` in CI since public env vars are safe to commit (see `.github/BRANCH_PROTECTION.md`):
+
+```yaml
+- name: Setup environment
+  run: cp .env.example .env
+```
+
+**Why this approach:**
+- VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are public/safe (anon key has RLS)
+- No need for GitHub secrets for public values
+- CI builds work out of the box
+- Developers can override locally with .env
+
+### Safe Fallback Pattern
+
+For optional server-side dependencies (like rate limiting with Supabase):
+
+```typescript
+// ✅ GOOD: Safe fallback
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseConfigured = Boolean(supabaseUrl && supabaseKey);
+
+if (!supabaseConfigured) {
+  console.warn('[Service] Supabase not configured, using fallback');
+  useFallbackImplementation();
+  return;
+}
+
+// ❌ BAD: Hard failure without fallback
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!supabaseKey) throw new Error('Missing key');
+```
+
+**Benefits:**
+- ✅ CI can build/test without production secrets
+- ✅ Vercel preview deploys work without backend features
+- ✅ Local dev works out of the box
+- ✅ Clear warning logs indicate missing config
+
+---
+
+## Test Strategy
+
+### E2E Test Split
+
+**Problem:** Running full E2E suite (all browsers, all tests) on every PR is slow (30-40 min).
+
+**Solution:** Split into PR-fast and nightly-comprehensive.
+
+#### PR E2E (Fast ~3-5 min)
+
+```yaml
+e2e-pr:
+  name: e2e/pr-smoke
+  runs-on: ubuntu-latest
+  needs: [ build ]
+  timeout-minutes: 10
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+    - run: npm ci --no-audit --fund=false
+    - run: npx playwright install chromium --with-deps
+    - run: npm run build
+    - name: Run PR smoke tests
+      run: npx playwright test tests/cta-smoke.spec.ts --project=chromium --reporter=line
+```
+
+**What runs:**
+- CTA smoke tests (critical user journeys)
+- Tests tagged with `@critical`
+- Chromium only (90%+ market share)
+- ~3-5 minutes total
+
+#### Nightly E2E (Comprehensive ~30-40 min)
+
+```yaml
+e2e-nightly:
+  name: e2e/nightly-full
+  runs-on: ubuntu-latest
+  if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+  timeout-minutes: 40
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+    - run: npm ci --no-audit --fund=false
+    - run: npx playwright install --with-deps
+    - run: npm run build
+    - name: Run full E2E suite
+      run: npx playwright test --reporter=html
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report
+        path: playwright-report/
+```
+
+**Schedule:**
+```yaml
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 2 AM UTC daily
+  workflow_dispatch:      # Manual trigger
+```
+
+**What runs:**
+- All E2E tests
+- All browsers (chromium, firefox, webkit)
+- Full test matrix
+- ~30-40 minutes total
+
+### Lighthouse CI (Advisory)
+
+Lighthouse should provide feedback but NOT block PRs:
+
+```yaml
+lhci:
+  name: ci/lighthouse
+  runs-on: ubuntu-latest
+  needs: [ build ]
+  timeout-minutes: 25
+  continue-on-error: true  # ← ADVISORY: don't block merge
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+    - run: npm ci --no-audit --fund=false
+    - run: npm run build
+    - run: npx vite preview --port 43073 --strictPort & sleep 2
+    - run: npx lhci autorun --config=.lighthouserc.cjs
+```
+
+**Why advisory?**
+- Performance scores fluctuate in CI
+- Network conditions vary
+- Should inform, not block
+- Use Lighthouse for trends, not gates
+
+---
+
+## Deployment Safety
+
+### Pre-Deploy Checklist
+
+Before any deployment (preview, staging, production):
+
+1. ✅ Build succeeds
+2. ✅ Type check passes
+3. ✅ Linting passes
+4. ✅ Unit tests pass
+5. ✅ Smoke E2E passes
+6. ✅ Public env vars verified
+
+### Vercel Deployment Guardrails
+
+**Problem:** Vercel builds can fail if server middleware expects production secrets.
+
+**Solution:** Server-side features must gracefully handle missing config.
+
+```typescript
+// Rate limiting example (server/middleware/rateLimit.ts)
+const supabaseConfigured = Boolean(
+  process.env.SUPABASE_URL &&
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+if (!supabaseConfigured) {
+  // Log warning ONCE
+  if (!warningLogged) {
+    console.warn('[RateLimit] Supabase not configured, using in-memory fallback');
+    warningLogged = true;
+  }
+  // Use in-memory store
+  return applyMemoryRateLimit(req, res, next);
+}
+```
+
+**Benefits:**
+- Vercel preview builds work without secrets
+- Local development works out of the box
+- CI can build without production credentials
+- Clear warnings indicate degraded mode
+
+---
+
+## Error Handling
+
+### CI Job Failure Modes
+
+**Hard Failures (Block PR):**
+- Build errors
+- Type errors
+- Lint errors
+- Unit test failures
+- Smoke test failures
+- Security vulnerabilities (high/critical)
+
+**Soft Failures (Advisory):**
+- Performance regressions (Lighthouse)
+- Accessibility warnings (axe-core info/moderate)
+- Code style suggestions
+- Coverage changes
+
+### Retry Strategy
+
+Some failures are transient (network, rate limits). Use smart retries:
+
+```yaml
+- name: Install dependencies
+  run: npm ci --no-audit --fund=false
+  timeout-minutes: 5
+  # GitHub Actions auto-retries failed steps up to 3 times
+  continue-on-error: false
+```
+
+For Playwright tests:
+
+```typescript
+// playwright.config.ts
+export default defineConfig({
+  retries: process.env.CI ? 2 : 0,  // Retry flaky tests in CI
+  workers: process.env.CI ? 1 : undefined,  // Sequential in CI
+});
+```
+
+---
+
+## Performance Guidelines
+
+### CI Runtime Targets
+
+| Stage | Target | Max |
+|-------|--------|-----|
+| Checkout + Install | 1-2 min | 5 min |
+| Build | 1-2 min | 5 min |
+| Lint | 30 sec | 2 min |
+| Unit tests | 1 min | 5 min |
+| PR E2E smoke | 3-5 min | 10 min |
+| **Total PR feedback** | **6-10 min** | **20 min** |
+
+### Optimization Techniques
+
+1. **Dependency Caching**
+   ```yaml
+   - uses: actions/setup-node@v4
+     with:
+       node-version: 20
+       cache: npm  # ← Cache node_modules
+   ```
+
+2. **Parallel Jobs**
+   ```yaml
+   needs: [ build ]  # lint, test, e2e run in parallel after build
+   ```
+
+3. **Concurrency Control**
+   ```yaml
+   concurrency:
+     group: ci-${{ github.ref }}
+     cancel-in-progress: true  # Cancel old runs on new push
+   ```
+
+4. **Selective Test Running**
+   - PR: Smoke tests only
+   - Nightly: Full suite
+   - On-demand: `workflow_dispatch`
+
+---
+
+## Automation Rules Summary
+
+### DO ✅
+
+- **DO** verify environment variables upfront (fail fast)
+- **DO** use in-memory fallbacks for optional server features
+- **DO** split tests into fast PR feedback and comprehensive nightly
+- **DO** make performance checks advisory (`continue-on-error: true`)
+- **DO** use concurrency control to cancel stale CI runs
+- **DO** cache dependencies (npm, playwright browsers)
+- **DO** retry flaky tests (2 retries in CI)
+- **DO** set appropriate timeouts (prevent zombie jobs)
+- **DO** log clear warnings when running in degraded mode
+- **DO** run full E2E suite on schedule (nightly)
+
+### DON'T ❌
+
+- **DON'T** hardcode credentials or secrets
+- **DON'T** use empty string fallbacks for required config (`|| ''`)
+- **DON'T** run full E2E suite on every PR (too slow)
+- **DON'T** block PRs on performance score fluctuations
+- **DON'T** fail builds for missing optional backend secrets
+- **DON'T** skip environment variable validation
+- **DON'T** use network calls without timeout/retry logic
+- **DON'T** run CI jobs without concurrency control
+- **DON'T** ignore flaky tests (fix or skip, don't ignore)
+- **DON'T** create dependencies between unrelated jobs
+
+---
+
+## CI Workflow Example
+
+Complete example showing all guardrails:
+
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'  # Nightly at 2 AM UTC
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  build:
+    name: ci/build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # GUARDRAIL: Use public env vars from .env.example
+      - name: Setup environment
+        run: cp .env.example .env
+
+      - run: npm ci --no-audit --fund=false
+      - run: npm run typecheck --if-present
+      - run: npm run build
+      - name: Verify artifact
+        run: test -f dist/index.html || exit 1
+
+  e2e-pr:
+    name: e2e/pr-smoke
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --fund=false
+      - run: npx playwright install chromium --with-deps
+      - run: npm run build
+      - run: npx playwright test tests/cta-smoke.spec.ts --project=chromium
+
+  e2e-nightly:
+    name: e2e/nightly-full
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    if: github.event_name == 'schedule'
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --fund=false
+      - run: npx playwright install --with-deps
+      - run: npm run build
+      - run: npx playwright test
+
+  lhci:
+    name: ci/lighthouse
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    timeout-minutes: 25
+    continue-on-error: true  # ADVISORY
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --fund=false
+      - run: npm run build
+      - run: npx vite preview --port 43073 --strictPort & sleep 2
+      - run: npx lhci autorun
+```
+
+---
+
+## Version History
+
+- **1.0.0** (2025-01-16): Initial CI guardrails documentation
+  - Environment variable validation strategy
+  - PR vs nightly E2E split
+  - Advisory Lighthouse CI
+  - Safe fallback patterns for server middleware

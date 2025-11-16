@@ -139,5 +139,8 @@
     "typescript-eslint": "^8.46.2",
     "vite": "^5.4.19",
     "vitest": "^2.1.5"
+  },
+  "overrides": {
+    "js-yaml": ">=4.1.1"
   }
 }
