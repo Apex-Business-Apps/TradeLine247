@@ -18,10 +18,13 @@ build/
 .next/
 out/
 
-# Environment files (use Vercel dashboard instead)
+# Environment files (secrets go in Vercel dashboard)
+# IMPORTANT: .env.production is NOT ignored - it contains public vars safe to commit
 .env
 .env.local
 .env.*.local
+.env.development
+.env.test
 
 # IDE
 .vscode/
