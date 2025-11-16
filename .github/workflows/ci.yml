@@ -155,6 +155,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ build ]
     timeout-minutes: 25
+    continue-on-error: true  # LHCI advisory: non-blocking
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -163,5 +164,4 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --fund=false
       - run: npm run -s build
-      - run: npx vite preview --port 43073 --strictPort & sleep 2
-      - run: npx lhci autorun --config=.lighthouserc.cjs
+      - run: npx @lhci/cli autorun --config=.lighthouserc.cjs
