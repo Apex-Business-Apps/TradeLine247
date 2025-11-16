@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": "20.x",
+    "node": "22.x",
     "npm": ">=10.0.0"
   },
   "scripts": {
@@ -12,6 +12,7 @@
     "verify:app": "node scripts/verify-app.cjs",
     "verify:icons": "node scripts/verify_icons.mjs",
     "verify:env:public": "node scripts/verify-public-env.mjs",
+    "verify:vercel": "node scripts/verify-vercel-preflight.mjs",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0 && node scripts/check-edge-imports.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "// web dev/build": "────────────────────────────────────────",
