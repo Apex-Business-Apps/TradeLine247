@@ -18,7 +18,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-// CSS import removed in main branch - keeping defensive approach
 
 // Navigation configuration
 const MARKETING_NAV = [
@@ -40,54 +39,32 @@ const ADMIN_NAV = [
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // Defensive hook calls with fallbacks for enterprise-grade resilience
-  const {
-    user = null,
-    userRole = null,
-    signOut = async () => ({ error: null }),
-    isAdmin = () => false
-  } = useAuth() || {};
-
-  const { goToWithFeedback = async (path: string) => { window.location.href = path; } } = useSafeNavigation() || {};
-
+  const { user, userRole, signOut, isAdmin } = useAuth();
+  const { goToWithFeedback } = useSafeNavigation();
   const location = useLocation();
-  const mobileMenuId = 'mobile-menu';
-  const isUserAdmin = typeof isAdmin === 'function' ? isAdmin() : false;
-  const isMarketingHome = location?.pathname === paths.home;
+  const isUserAdmin = isAdmin();
+  const isMarketingHome = location.pathname === paths.home;
 
-  // Streamlined navigation handler - single source of truth with enterprise error handling
-  const handleNavigation = React.useCallback(async (href: string, label: string, closeMenu = false) => {
+  // Navigation handler
+  const handleNavigation = useCallback(async (href: string, label: string, closeMenu = false) => {
     if (closeMenu) setIsMobileMenuOpen(false);
     try {
-      if (goToWithFeedback && typeof goToWithFeedback === 'function') {
-        await goToWithFeedback(href, label);
-      } else {
-        // Fallback to direct navigation if hook unavailable
-        window.location.href = href;
-      }
+      await goToWithFeedback(href, label);
     } catch (error) {
-      console.error(`[Header] Navigation failed for ${label}:`, error);
-      // Ultimate fallback
-      window.location.href = href;
+      errorReporter.report({
+        type: 'error',
+        message: `Header navigation failed: ${label} to ${href}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { label, href, error }
+      });
     }
   }, [goToWithFeedback]);
 
-  // Safe signOut handler with fallback
-  const handleSignOut = React.useCallback(async () => {
-    try {
-      if (signOut && typeof signOut === 'function') {
-        await signOut();
-      }
-      // Fallback: clear session and redirect
-      window.location.href = paths.home;
-    } catch (error) {
-      console.error('[Header] Sign out failed:', error);
-      // Force redirect on error
-      window.location.href = paths.home;
-    }
-  }, [signOut]);
-
-  // Optimized scroll handler
+  // Scroll detection with throttling to prevent excessive re-renders
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
     let lastScrollY = window.scrollY;
@@ -125,22 +102,20 @@ export const Header: React.FC = () => {
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [location?.pathname]);
+  }, [location.pathname]);
 
   // Active path check
   const isActivePath = useCallback((href: string) => {
     const [path] = href.split('#');
-    return location?.pathname === path;
-  }, [location?.pathname]);
+    return location.pathname === path;
+  }, [location.pathname]);
 
-  // User display name with defensive checks
+  // User display name
   const userDisplayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User';
 
   return (
-    <header
-      id="app-header"
-      data-site-header
-      data-testid="app-header"
+    <header 
+      data-site-header 
       className={cn(
         'sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur',
         'supports-[backdrop-filter]:bg-background/60 transition-all duration-300 isolate',
@@ -250,12 +225,12 @@ export const Header: React.FC = () => {
         )}
 
         {/* Right: Language Switcher, Burger, User Menu */}
-        <div
-          data-slot="right"
+        <div 
+          data-slot="right" 
           className="flex items-center gap-2 ml-auto"
         >
           <LanguageSwitcher />
-
+          
           {/* Burger Menu Button - Always visible */}
           <button
             id="burger-menu-button"
@@ -274,111 +249,6 @@ export const Header: React.FC = () => {
               <Menu size={20} strokeWidth={2} style={{ color: '#FF6B35' }} />
             )}
           </button>
-
-          {/* User Menu */}
-          {user ? (
-            <>
-              {/* Desktop: User Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size={isScrolled ? 'sm' : 'default'}
-                    className="hidden lg:flex items-center gap-2 hover:bg-accent transition-all duration-300"
-                  >
-                    <div className="flex flex-col items-start">
-                      <span className="text-sm font-medium text-foreground leading-tight">
-                        {userDisplayName}
-                      </span>
-                      {userRole && (
-                        <span className={cn(
-                          'text-xs font-medium leading-tight',
-                          isUserAdmin ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'
-                        )}>
-                          {userRole.toUpperCase()}
-                        </span>
-                      )}
-                    </div>
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">{userDisplayName}</p>
-                      <p className="text-xs text-muted-foreground">{user?.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  {isUserAdmin && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <div className="px-2 py-1.5">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                          Application
-                        </p>
-                      </div>
-                      <DropdownMenuItem
-                        onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
-                        className="cursor-pointer"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleNavigation(paths.calls, 'Calls')}
-                        className="cursor-pointer"
-                      >
-                        <Phone className="mr-2 h-4 w-4" />
-                        Calls
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleNavigation(paths.phoneApps, 'Phone Apps')}
-                        className="cursor-pointer"
-                      >
-                        <Smartphone className="mr-2 h-4 w-4" />
-                        Phone Apps
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleNavigation(paths.voiceSettings, 'Settings')}
-                        className="cursor-pointer"
-                      >
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleSignOut}
-                    className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:text-red-400 dark:focus:bg-red-950/20"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Mobile: Sign Out Icon */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleSignOut}
-                className="lg:hidden hover:bg-accent transition-all duration-300"
-                aria-label="Sign out"
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
-            </>
-          ) : (
-            <Button
-              variant="success"
-              size={isScrolled ? 'sm' : 'default'}
-              onClick={() => handleNavigation(paths.auth, 'Login')}
-              className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
-            >
-              Login
-            </Button>
-          )}
 
           {/* User Menu */}
           {user ? (
@@ -523,31 +393,6 @@ export const Header: React.FC = () => {
               </div>
             </>
           )}
-          <div className="border-t border-border" />
-          <div className="space-y-3">
-            <LanguageSwitcher className="w-full" />
-            {user ? (
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  handleSignOut();
-                }}
-                className="w-full justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-semibold text-red-600 transition-all duration-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </Button>
-            ) : (
-              <Button
-                variant="success"
-                onClick={() => handleNavigation(paths.auth, 'Login', true)}
-                className="w-full justify-center px-4 py-2.5 text-sm font-semibold"
-              >
-                Login
-              </Button>
-            )}
-          </div>
         </div>
       </nav>
     </header>

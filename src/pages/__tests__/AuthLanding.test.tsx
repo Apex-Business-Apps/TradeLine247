@@ -103,8 +103,8 @@ describe('AuthLanding - P0 Fix: Form Validation and Handler', () => {
 
       await waitFor(() => {
         expect(screen.getByText(/Business name too long/i)).toBeInTheDocument();
-      }, { timeout: 10000 });
-    }, 10000);
+      });
+    });
 
     it('should show validation error for invalid email', async () => {
       const user = userEvent.setup();
@@ -138,8 +138,8 @@ describe('AuthLanding - P0 Fix: Form Validation and Handler', () => {
 
       await waitFor(() => {
         expect(screen.getByText(/Email too long/i)).toBeInTheDocument();
-      }, { timeout: 10000 });
-    }, 10000);
+      });
+    });
 
     it('should trim whitespace from inputs', async () => {
       const user = userEvent.setup();
