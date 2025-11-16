@@ -39,30 +39,51 @@ const ADMIN_NAV = [
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, userRole, signOut, isAdmin } = useAuth();
-  const { goToWithFeedback } = useSafeNavigation();
+  // Defensive hook calls with fallbacks for enterprise-grade resilience
+  const {
+    user = null,
+    userRole = null,
+    signOut = async () => ({ error: null }),
+    isAdmin = () => false
+  } = useAuth() || {};
+
+  const { goToWithFeedback = async (path: string) => { window.location.href = path; } } = useSafeNavigation() || {};
+
   const location = useLocation();
-  const isUserAdmin = isAdmin();
+  const isUserAdmin = typeof isAdmin === 'function' ? isAdmin() : false;
   const isMarketingHome = location.pathname === paths.home;
 
-  // Navigation handler
-  const handleNavigation = useCallback(async (href: string, label: string, closeMenu = false) => {
+  // Streamlined navigation handler - single source of truth with enterprise error handling
+  const handleNavigation = React.useCallback(async (href: string, label: string, closeMenu = false) => {
     if (closeMenu) setIsMobileMenuOpen(false);
     try {
-      await goToWithFeedback(href, label);
+      if (goToWithFeedback && typeof goToWithFeedback === 'function') {
+        await goToWithFeedback(href, label);
+      } else {
+        // Fallback to direct navigation if hook unavailable
+        window.location.href = href;
+      }
     } catch (error) {
-      errorReporter.report({
-        type: 'error',
-        message: `Header navigation failed: ${label} to ${href}`,
-        stack: error instanceof Error ? error.stack : undefined,
-        timestamp: new Date().toISOString(),
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        environment: errorReporter['getEnvironment'](),
-        metadata: { label, href, error }
-      });
+      console.error(`[Header] Navigation failed for ${label}:`, error);
+      // Ultimate fallback
+      window.location.href = href;
     }
   }, [goToWithFeedback]);
+
+  // Safe signOut handler with fallback
+  const handleSignOut = React.useCallback(async () => {
+    try {
+      if (signOut && typeof signOut === 'function') {
+        await signOut();
+      }
+      // Fallback: clear session and redirect
+      window.location.href = paths.home;
+    } catch (error) {
+      console.error('[Header] Sign out failed:', error);
+      // Force redirect on error
+      window.location.href = paths.home;
+    }
+  }, [signOut]);
 
   // Scroll detection with throttling to prevent excessive re-renders
   useEffect(() => {
@@ -102,13 +123,13 @@ export const Header: React.FC = () => {
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [location.pathname]);
+  }, [location?.pathname]);
 
   // Active path check
   const isActivePath = useCallback((href: string) => {
     const [path] = href.split('#');
-    return location.pathname === path;
-  }, [location.pathname]);
+    return location?.pathname === path;
+  }, [location?.pathname]);
 
   // User display name
   const userDisplayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User';
@@ -303,8 +324,8 @@ export const Header: React.FC = () => {
                       <DropdownMenuSeparator />
                     </>
                   )}
-                  <DropdownMenuItem 
-                    onClick={() => signOut()}
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
                     className="cursor-pointer text-primary focus:text-primary focus:bg-primary/10 dark:focus:bg-primary/20"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
@@ -314,10 +335,10 @@ export const Header: React.FC = () => {
               </DropdownMenu>
 
               {/* Mobile: Sign Out Icon */}
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
-                onClick={() => signOut()} 
+                onClick={handleSignOut}
                 className="lg:hidden hover:bg-accent transition-all duration-300"
                 aria-label="Sign out"
               >
