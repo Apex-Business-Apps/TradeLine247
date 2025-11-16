@@ -152,7 +152,12 @@ function boot() {
     
     // Initialize boot sentinel (production monitoring only)
     initBootSentinel();
-    
+
+    // ENHANCED: Initialize enterprise monitoring & observability
+    import('./lib/monitoring').then(({ initializeMonitoring }) => {
+      initializeMonitoring();
+    }).catch(e => console.warn('⚠️ Monitoring initialization failed:', e));
+
     // Load optional features after mount (non-blocking)
     setTimeout(() => {
       import("./styles/roi-table.css").catch(e => console.warn('⚠️ ROI table CSS failed:', e));

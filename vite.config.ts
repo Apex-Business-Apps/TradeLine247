@@ -29,6 +29,8 @@ export default defineConfig(({ mode }) => ({
   build: {
     sourcemap: false, // Disable sourcemaps in production for better performance
     outDir: "dist",
+    target: 'es2020', // Modern target for better optimization
+    cssMinify: true,
     rollupOptions: {
       output: {
         // Optimized chunk splitting for better caching and parallel loading
@@ -83,8 +85,29 @@ export default defineConfig(({ mode }) => ({
         // Only drop console.log/debug to reduce noise
         drop_console: false,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.debug', 'console.trace']
+        pure_funcs: ['console.log', 'console.debug', 'console.trace'],
+        passes: 2, // Multiple passes for better compression
+      },
+      mangle: {
+        safari10: true, // Safari 10 bug workaround
+      },
+      format: {
+        comments: false, // Remove comments for smaller bundle
       },
     },
+    // ENHANCED: Report chunk sizes and optimize bundle
+    reportCompressedSize: true,
+    assetsInlineLimit: 4096, // Inline assets smaller than 4kb
+  },
+  // ENHANCED: Optimize dependencies prebundling
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@supabase/supabase-js',
+      '@tanstack/react-query',
+    ],
+    exclude: ['@vite/client', '@vite/env'],
   },
 }));

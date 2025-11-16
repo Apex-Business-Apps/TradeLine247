@@ -41,8 +41,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy-Report-Only" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https: wss:; font-src 'self' https://fonts.gstatic.com; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests;">
+    <!-- Security Headers - CSP now enforced server-side via Helmet for better control -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">

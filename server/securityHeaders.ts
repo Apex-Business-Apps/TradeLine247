@@ -11,21 +11,31 @@ import type { Request, Response, NextFunction } from 'express';
  */
 export function getSecurityHeaders() {
   return helmet({
-    // Content Security Policy - Secure configuration without unsafe directives
+    // Content Security Policy - ENHANCED: Production-grade CSP with third-party analytics
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"], // SECURE: Removed unsafe-inline and unsafe-eval
-        styleSrc: ["'self'", "https:", "'unsafe-inline'"], // Inline styles still needed for Tailwind
-        imgSrc: ["'self'", "data:", "https:"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'", // Required for inline scripts (emergency mount, analytics)
+          "https://www.googletagmanager.com",
+          "https://static.klaviyo.com",
+          "https://storage.googleapis.com"
+        ],
+        styleSrc: ["'self'", "https:", "'unsafe-inline'"], // Inline styles for Tailwind & dynamic theming
+        imgSrc: ["'self'", "data:", "https:", "blob:"],
         connectSrc: [
           "'self'",
           "https://hysvqdwmhxnblxfqnszn.supabase.co",
           "wss://hysvqdwmhxnblxfqnszn.supabase.co",
           "https://api.tradeline247ai.com",
-          "wss://api.tradeline247ai.com"
+          "wss://api.tradeline247ai.com",
+          "https://www.google-analytics.com",
+          "https://analytics.google.com",
+          "https://a.klaviyo.com",
+          "https://static.klaviyo.com"
         ],
-        fontSrc: ["'self'", "data:"],
+        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
         frameSrc: ["'none'"],
@@ -33,6 +43,7 @@ export function getSecurityHeaders() {
         formAction: ["'self'"],
         frameAncestors: ["'none'"],
         upgradeInsecureRequests: [],
+        workerSrc: ["'self'", "blob:"], // For service workers
       },
     },
 
