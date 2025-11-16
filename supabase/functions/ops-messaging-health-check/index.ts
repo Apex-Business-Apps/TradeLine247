@@ -70,11 +70,12 @@ serve(async (req) => {
     const healthChecks = [];
 
     for (const number of allNumbers) {
-      const accountSid = number.subaccount_sid || TWILIO_ACCOUNT_SID;
+      const numberData = number as any; // Type assertion for database row
+      const accountSid = numberData.subaccount_sid || TWILIO_ACCOUNT_SID;
       
       // Check if number is in a messaging service
       let messagingServiceStatus = 'not_configured';
-      let messagingServiceSid = number.messaging_service_sid;
+      let messagingServiceSid = numberData.messaging_service_sid;
 
       if (!messagingServiceSid) {
         // Try to find messaging service for this number
@@ -110,7 +111,7 @@ serve(async (req) => {
 
       // Check A2P registration status
       let a2pStatus = 'not_registered';
-      if (number.a2p_brand_sid && number.a2p_campaign_sid) {
+      if (numberData.a2p_brand_sid && numberData.a2p_campaign_sid) {
         a2pStatus = 'registered';
       }
 
@@ -150,8 +151,8 @@ serve(async (req) => {
         messaging_service_status: messagingServiceStatus,
         messaging_service_sid: messagingServiceSid,
         a2p_status: a2pStatus,
-        a2p_brand_sid: number.a2p_brand_sid || null,
-        a2p_campaign_sid: number.a2p_campaign_sid || null,
+        a2p_brand_sid: numberData.a2p_brand_sid || null,
+        a2p_campaign_sid: numberData.a2p_campaign_sid || null,
         delivery_stats_24h: deliveryStats,
         delivery_rate_percent: deliveryRate,
         recent_errors: recentErrors || []

@@ -136,7 +136,7 @@ serve(async (req: Request) => {
         results.failed++;
         results.errors.push({
           email: member.email,
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -147,7 +147,7 @@ serve(async (req: Request) => {
       .select('id', { count: 'exact', head: true })
       .eq('campaign_id', body.campaign_id);
 
-    if (!remainingMembers || remainingMembers === 0) {
+    if (!remainingMembers || remainingMembers.length === 0) {
       await supabase
         .from('campaigns')
         .update({
@@ -196,7 +196,7 @@ serve(async (req: Request) => {
   } catch (error) {
     console.error('Send batch function error:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Internal server error' }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

@@ -11,7 +11,7 @@ interface StatusRequest {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return handleCors(req);
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {

@@ -39,9 +39,10 @@ async function generateTOTP(secret: string, time: number): Promise<string> {
   timeView.setBigUint64(0, BigInt(time), false);
 
   // HMAC-SHA1
+  const keyBuffer = key.buffer.slice(key.byteOffset, key.byteOffset + key.byteLength);
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
-    key,
+    keyBuffer,
     {
       name: 'HMAC',
       hash: 'SHA-1'
