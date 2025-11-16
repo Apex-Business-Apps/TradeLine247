@@ -59,14 +59,6 @@ class RateLimiter {
       this.refillTimer = null;
     }
   }
-
-  /**
-   * Cleanup method to ensure proper resource cleanup
-   * Should be called when rate limiter is no longer needed
-   */
-  cleanup() {
-    this.destroy();
-  }
 }
 
 // Pre-configured rate limiters for different use cases

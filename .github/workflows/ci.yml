@@ -41,6 +41,7 @@ jobs:
       
       - name: Run unit tests
         run: npm run test:unit
+        # TODO: Add vitest configuration and test:unit script to package.json
 
   accessibility-tests:
     name: Accessibility Tests (axe-core)
