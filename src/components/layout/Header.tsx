@@ -342,7 +342,7 @@ export const Header: React.FC = () => {
         id="mobile-menu"
         aria-label="Mobile"
         aria-hidden={!isMobileMenuOpen}
-        {...(!isMobileMenuOpen && { inert: '' as any })}
+        inert={!isMobileMenuOpen}
         className={cn(
           'border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden',
           isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'

@@ -113,57 +113,6 @@ export type Database = {
         }
         Relationships: []
       }
-      api_cache: {
-        Row: {
-          cache_key: string
-          cache_type: string
-          cache_value: Json
-          created_at: string
-          created_by: string | null
-          expires_at: string
-          hit_count: number | null
-          id: string
-          last_hit_at: string | null
-          metadata: Json | null
-          miss_count: number | null
-          priority: number | null
-          tags: string[] | null
-          ttl_seconds: number
-        }
-        Insert: {
-          cache_key: string
-          cache_type: string
-          cache_value: Json
-          created_at?: string
-          created_by?: string | null
-          expires_at: string
-          hit_count?: number | null
-          id?: string
-          last_hit_at?: string | null
-          metadata?: Json | null
-          miss_count?: number | null
-          priority?: number | null
-          tags?: string[] | null
-          ttl_seconds?: number
-        }
-        Update: {
-          cache_key?: string
-          cache_type?: string
-          cache_value?: Json
-          created_at?: string
-          created_by?: string | null
-          expires_at?: string
-          hit_count?: number | null
-          id?: string
-          last_hit_at?: string | null
-          metadata?: Json | null
-          miss_count?: number | null
-          priority?: number | null
-          tags?: string[] | null
-          ttl_seconds?: number
-        }
-        Relationships: []
-      }
       app_config: {
         Row: {
           created_at: string
@@ -314,51 +263,6 @@ export type Database = {
           target?: string | null
           ts?: string
           user_id?: string | null
-        }
-        Relationships: []
-      }
-      batch_jobs: {
-        Row: {
-          batch_id: string
-          completed_at: string | null
-          created_at: string
-          failed_items: number
-          id: string
-          metadata: Json | null
-          processed_items: number
-          started_at: string | null
-          status: string
-          successful_items: number
-          total_items: number
-          updated_at: string
-        }
-        Insert: {
-          batch_id: string
-          completed_at?: string | null
-          created_at?: string
-          failed_items?: number
-          id?: string
-          metadata?: Json | null
-          processed_items?: number
-          started_at?: string | null
-          status?: string
-          successful_items?: number
-          total_items?: number
-          updated_at?: string
-        }
-        Update: {
-          batch_id?: string
-          completed_at?: string | null
-          created_at?: string
-          failed_items?: number
-          id?: string
-          metadata?: Json | null
-          processed_items?: number
-          started_at?: string | null
-          status?: string
-          successful_items?: number
-          total_items?: number
-          updated_at?: string
         }
         Relationships: []
       }
@@ -620,125 +524,6 @@ export type Database = {
         }
         Relationships: []
       }
-      cache_stats: {
-        Row: {
-          avg_ttl_seconds: number | null
-          cache_type: string
-          created_at: string
-          evictions: number | null
-          id: string
-          stat_date: string
-          total_hits: number | null
-          total_misses: number | null
-          total_size_bytes: number | null
-        }
-        Insert: {
-          avg_ttl_seconds?: number | null
-          cache_type: string
-          created_at?: string
-          evictions?: number | null
-          id?: string
-          stat_date: string
-          total_hits?: number | null
-          total_misses?: number | null
-          total_size_bytes?: number | null
-        }
-        Update: {
-          avg_ttl_seconds?: number | null
-          cache_type?: string
-          created_at?: string
-          evictions?: number | null
-          id?: string
-          stat_date?: string
-          total_hits?: number | null
-          total_misses?: number | null
-          total_size_bytes?: number | null
-        }
-        Relationships: []
-      }
-      cache_warming_config: {
-        Row: {
-          config_key: string
-          created_at: string
-          enabled: boolean | null
-          endpoint: string
-          failure_count: number | null
-          id: string
-          last_warmed_at: string | null
-          next_warmup_at: string | null
-          params: Json | null
-          priority: number | null
-          success_count: number | null
-          updated_at: string
-          warmup_interval_minutes: number
-        }
-        Insert: {
-          config_key: string
-          created_at?: string
-          enabled?: boolean | null
-          endpoint: string
-          failure_count?: number | null
-          id?: string
-          last_warmed_at?: string | null
-          next_warmup_at?: string | null
-          params?: Json | null
-          priority?: number | null
-          success_count?: number | null
-          updated_at?: string
-          warmup_interval_minutes?: number
-        }
-        Update: {
-          config_key?: string
-          created_at?: string
-          enabled?: boolean | null
-          endpoint?: string
-          failure_count?: number | null
-          id?: string
-          last_warmed_at?: string | null
-          next_warmup_at?: string | null
-          params?: Json | null
-          priority?: number | null
-          success_count?: number | null
-          updated_at?: string
-          warmup_interval_minutes?: number
-        }
-        Relationships: []
-      }
-      call_analytics_metrics: {
-        Row: {
-          call_sid: string
-          created_at: string
-          id: string
-          metric_metadata: Json | null
-          metric_name: string
-          metric_value: number | null
-        }
-        Insert: {
-          call_sid: string
-          created_at?: string
-          id?: string
-          metric_metadata?: Json | null
-          metric_name: string
-          metric_value?: number | null
-        }
-        Update: {
-          call_sid?: string
-          created_at?: string
-          id?: string
-          metric_metadata?: Json | null
-          metric_name?: string
-          metric_value?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "call_analytics_metrics_call_sid_fkey"
-            columns: ["call_sid"]
-            isOneToOne: false
-            referencedRelation: "call_transcriptions"
-            referencedColumns: ["call_sid"]
-          },
-        ]
-      }
       call_lifecycle: {
         Row: {
           call_sid: string
@@ -873,56 +658,6 @@ export type Database = {
           {
             foreignKeyName: "call_logs_organization_id_fkey"
             columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      call_transcriptions: {
-        Row: {
-          call_sid: string
-          call_status: string | null
-          created_at: string
-          direction: string
-          duration_seconds: number | null
-          id: string
-          phone_number: string
-          tenant_id: string | null
-          transcript_confidence: number | null
-          transcript_text: string | null
-          updated_at: string
-        }
-        Insert: {
-          call_sid: string
-          call_status?: string | null
-          created_at?: string
-          direction: string
-          duration_seconds?: number | null
-          id?: string
-          phone_number: string
-          tenant_id?: string | null
-          transcript_confidence?: number | null
-          transcript_text?: string | null
-          updated_at?: string
-        }
-        Update: {
-          call_sid?: string
-          call_status?: string | null
-          created_at?: string
-          direction?: string
-          duration_seconds?: number | null
-          id?: string
-          phone_number?: string
-          tenant_id?: string | null
-          transcript_confidence?: number | null
-          transcript_text?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "call_transcriptions_tenant_id_fkey"
-            columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
@@ -2620,60 +2355,6 @@ export type Database = {
         }
         Relationships: []
       }
-      priority_queue: {
-        Row: {
-          attempts: number | null
-          completed_at: string | null
-          created_at: string
-          error_details: Json | null
-          error_message: string | null
-          id: string
-          job_type: string
-          max_attempts: number | null
-          payload: Json
-          priority: number
-          scheduled_for: string | null
-          started_at: string | null
-          status: string
-          tenant_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          attempts?: number | null
-          completed_at?: string | null
-          created_at?: string
-          error_details?: Json | null
-          error_message?: string | null
-          id?: string
-          job_type: string
-          max_attempts?: number | null
-          payload: Json
-          priority?: number
-          scheduled_for?: string | null
-          started_at?: string | null
-          status?: string
-          tenant_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          attempts?: number | null
-          completed_at?: string | null
-          created_at?: string
-          error_details?: Json | null
-          error_message?: string | null
-          id?: string
-          job_type?: string
-          max_attempts?: number | null
-          payload?: Json
-          priority?: number
-          scheduled_for?: string | null
-          started_at?: string | null
-          status?: string
-          tenant_id?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           created_at: string
@@ -2780,335 +2461,41 @@ export type Database = {
           },
         ]
       }
-      rag_embeddings_backup: {
-        Row: {
-          backed_up_at: string | null
-          backup_reason: string
-          can_restore: boolean | null
-          chunk_id: string
-          embedding: string
-          id: string
-          original_embedding_id: string
-        }
-        Insert: {
-          backed_up_at?: string | null
-          backup_reason: string
-          can_restore?: boolean | null
-          chunk_id: string
-          embedding: string
-          id?: string
-          original_embedding_id: string
-        }
-        Update: {
-          backed_up_at?: string | null
-          backup_reason?: string
-          can_restore?: boolean | null
-          chunk_id?: string
-          embedding?: string
-          id?: string
-          original_embedding_id?: string
-        }
-        Relationships: []
-      }
-      rag_health_metrics: {
-        Row: {
-          details: Json | null
-          id: string
-          metric_name: string
-          metric_unit: string | null
-          metric_value: number
-          recorded_at: string | null
-          resolved_at: string | null
-          severity: string | null
-        }
-        Insert: {
-          details?: Json | null
-          id?: string
-          metric_name: string
-          metric_unit?: string | null
-          metric_value: number
-          recorded_at?: string | null
-          resolved_at?: string | null
-          severity?: string | null
-        }
-        Update: {
-          details?: Json | null
-          id?: string
-          metric_name?: string
-          metric_unit?: string | null
-          metric_value?: number
-          recorded_at?: string | null
-          resolved_at?: string | null
-          severity?: string | null
-        }
-        Relationships: []
-      }
-      rag_ingestion_jobs: {
-        Row: {
-          chunk_count: number | null
-          completed_at: string | null
-          created_at: string | null
-          embedding_count: number | null
-          error_details: Json | null
-          error_message: string | null
-          failed_count: number | null
-          id: string
-          job_type: string
-          metadata: Json | null
-          source_count: number | null
-          started_at: string | null
-          status: string
-        }
-        Insert: {
-          chunk_count?: number | null
-          completed_at?: string | null
-          created_at?: string | null
-          embedding_count?: number | null
-          error_details?: Json | null
-          error_message?: string | null
-          failed_count?: number | null
-          id?: string
-          job_type: string
-          metadata?: Json | null
-          source_count?: number | null
-          started_at?: string | null
-          status?: string
-        }
-        Update: {
-          chunk_count?: number | null
-          completed_at?: string | null
-          created_at?: string | null
-          embedding_count?: number | null
-          error_details?: Json | null
-          error_message?: string | null
-          failed_count?: number | null
-          id?: string
-          job_type?: string
-          metadata?: Json | null
-          source_count?: number | null
-          started_at?: string | null
-          status?: string
-        }
-        Relationships: []
-      }
-      rag_precomputed_answers: {
-        Row: {
-          answer_html: string | null
-          answer_text: string
-          confidence_score: number | null
-          created_at: string
-          created_by: string | null
-          enabled: boolean | null
-          hit_count: number | null
-          id: string
-          last_hit_at: string | null
-          metadata: Json | null
-          organization_id: string | null
-          priority: number | null
-          question_normalized: string
-          question_pattern: string
-          source_refs: Json | null
-          updated_at: string
-        }
-        Insert: {
-          answer_html?: string | null
-          answer_text: string
-          confidence_score?: number | null
-          created_at?: string
-          created_by?: string | null
-          enabled?: boolean | null
-          hit_count?: number | null
-          id?: string
-          last_hit_at?: string | null
-          metadata?: Json | null
-          organization_id?: string | null
-          priority?: number | null
-          question_normalized: string
-          question_pattern: string
-          source_refs?: Json | null
-          updated_at?: string
-        }
-        Update: {
-          answer_html?: string | null
-          answer_text?: string
-          confidence_score?: number | null
-          created_at?: string
-          created_by?: string | null
-          enabled?: boolean | null
-          hit_count?: number | null
-          id?: string
-          last_hit_at?: string | null
-          metadata?: Json | null
-          organization_id?: string | null
-          priority?: number | null
-          question_normalized?: string
-          question_pattern?: string
-          source_refs?: Json | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rag_precomputed_answers_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      rag_query_analytics: {
-        Row: {
-          created_at: string | null
-          execution_time_ms: number | null
-          filters_applied: Json | null
-          id: string
-          ip_address: unknown
-          query_hash: string
-          query_text: string
-          result_count: number | null
-          top_score: number | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          execution_time_ms?: number | null
-          filters_applied?: Json | null
-          id?: string
-          ip_address?: unknown
-          query_hash: string
-          query_text: string
-          result_count?: number | null
-          top_score?: number | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          execution_time_ms?: number | null
-          filters_applied?: Json | null
-          id?: string
-          ip_address?: unknown
-          query_hash?: string
-          query_text?: string
-          result_count?: number | null
-          top_score?: number | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      rag_source_history: {
-        Row: {
-          change_reason: string | null
-          change_type: string | null
-          changed_at: string | null
-          changed_by: string | null
-          checksum: string | null
-          external_id: string
-          id: string
-          lang: string | null
-          meta: Json | null
-          source_id: string
-          source_type: Database["public"]["Enums"]["rag_source_type"]
-          title: string | null
-          uri: string | null
-          version: number
-        }
-        Insert: {
-          change_reason?: string | null
-          change_type?: string | null
-          changed_at?: string | null
-          changed_by?: string | null
-          checksum?: string | null
-          external_id: string
-          id?: string
-          lang?: string | null
-          meta?: Json | null
-          source_id: string
-          source_type: Database["public"]["Enums"]["rag_source_type"]
-          title?: string | null
-          uri?: string | null
-          version: number
-        }
-        Update: {
-          change_reason?: string | null
-          change_type?: string | null
-          changed_at?: string | null
-          changed_by?: string | null
-          checksum?: string | null
-          external_id?: string
-          id?: string
-          lang?: string | null
-          meta?: Json | null
-          source_id?: string
-          source_type?: Database["public"]["Enums"]["rag_source_type"]
-          title?: string | null
-          uri?: string | null
-          version?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "rag_source_history_source_id_fkey"
-            columns: ["source_id"]
-            isOneToOne: false
-            referencedRelation: "rag_sources"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       rag_sources: {
         Row: {
-          checksum: string | null
           created_at: string | null
-          deleted_at: string | null
           external_id: string
           id: string
           lang: string | null
           meta: Json | null
-          previous_version_id: string | null
           source_type: Database["public"]["Enums"]["rag_source_type"]
           title: string | null
           updated_at: string | null
           uri: string | null
-          version: number | null
         }
         Insert: {
-          checksum?: string | null
           created_at?: string | null
-          deleted_at?: string | null
           external_id: string
           id?: string
           lang?: string | null
           meta?: Json | null
-          previous_version_id?: string | null
           source_type: Database["public"]["Enums"]["rag_source_type"]
           title?: string | null
           updated_at?: string | null
           uri?: string | null
-          version?: number | null
         }
         Update: {
-          checksum?: string | null
           created_at?: string | null
-          deleted_at?: string | null
           external_id?: string
           id?: string
           lang?: string | null
           meta?: Json | null
-          previous_version_id?: string | null
           source_type?: Database["public"]["Enums"]["rag_source_type"]
           title?: string | null
           updated_at?: string | null
           uri?: string | null
-          version?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "rag_sources_previous_version_id_fkey"
-            columns: ["previous_version_id"]
-            isOneToOne: false
-            referencedRelation: "rag_sources"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       reply_events: {
         Row: {
@@ -4831,7 +4218,6 @@ export type Database = {
           total_sources: number
         }[]
       }
-      cleanup_expired_cache: { Args: never; Returns: number }
       cleanup_expired_idempotency_keys: { Args: never; Returns: number }
       cleanup_expired_sessions: { Args: never; Returns: undefined }
       cleanup_expired_tokens: { Args: never; Returns: undefined }
@@ -4841,15 +4227,6 @@ export type Database = {
       cleanup_rate_limits: { Args: never; Returns: undefined }
       complete_idempotency: {
         Args: { p_key: string; p_response: Json; p_status?: string }
-        Returns: undefined
-      }
-      complete_job: {
-        Args: {
-          p_error_details?: Json
-          p_error_message?: string
-          p_job_id: string
-          p_success: boolean
-        }
         Returns: undefined
       }
       decrypt_org_secret: {
@@ -4901,27 +4278,7 @@ export type Database = {
           rows_deleted: number
         }[]
       }
-      enqueue_job: {
-        Args: {
-          p_job_type: string
-          p_payload: Json
-          p_priority?: number
-          p_scheduled_for?: string
-          p_tenant_id?: string
-        }
-        Returns: string
-      }
       expire_old_team_invitations: { Args: never; Returns: undefined }
-      fetch_next_batch: {
-        Args: { p_batch_size?: number; p_job_types?: string[] }
-        Returns: {
-          attempts: number
-          job_id: string
-          job_type: string
-          payload: Json
-          priority: number
-        }[]
-      }
       get_app_encryption_key: { Args: never; Returns: string }
       get_appointment_pii_secure: {
         Args: { access_reason: string; appointment_id_param: string }
@@ -4964,30 +4321,6 @@ export type Database = {
           start_at: string
           status: string
           tz: string
-        }[]
-      }
-      get_cache_statistics: {
-        Args: { p_days?: number }
-        Returns: {
-          avg_ttl: number
-          cache_type: string
-          hit_rate: number
-          total_entries: number
-          total_hits: number
-          total_misses: number
-          total_size_mb: number
-        }[]
-      }
-      get_cached_value: { Args: { p_cache_key: string }; Returns: Json }
-      get_call_analytics_summary: {
-        Args: { p_days?: number; p_tenant_id: string }
-        Returns: {
-          avg_confidence: number
-          avg_duration_seconds: number
-          inbound_calls: number
-          outbound_calls: number
-          total_calls: number
-          total_minutes: number
         }[]
       }
       get_contact_pii_secure: {
@@ -5132,17 +4465,6 @@ export type Database = {
           updated_at: string
         }[]
       }
-      get_queue_stats: {
-        Args: never
-        Returns: {
-          avg_processing_time_seconds: number
-          by_priority: Json
-          total_completed_today: number
-          total_failed_today: number
-          total_pending: number
-          total_processing: number
-        }[]
-      }
       get_rate_limit_stats: {
         Args: { time_window?: unknown }
         Returns: {
@@ -5214,15 +4536,6 @@ export type Database = {
         Args: { p_test_name: string; p_variant: string }
         Returns: Json
       }
-      get_warming_due: {
-        Args: never
-        Returns: {
-          config_key: string
-          endpoint: string
-          params: Json
-          priority: number
-        }[]
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -5236,10 +4549,6 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
-      }
-      invalidate_cache: {
-        Args: { p_cache_type?: string; p_pattern?: string; p_tags?: string[] }
-        Returns: number
       }
       is_autoheal_allowed: { Args: { p_action_type: string }; Returns: boolean }
       is_hotline_allowlisted: { Args: { p_e164: string }; Returns: boolean }
@@ -5366,7 +4675,6 @@ export type Database = {
           status: string
         }[]
       }
-      normalize_question: { Args: { question: string }; Returns: string }
       process_event: {
         Args: {
           p_call_sid: string
@@ -5376,21 +4684,6 @@ export type Database = {
           p_payload: Json
         }
         Returns: undefined
-      }
-      rag_backup_embeddings: {
-        Args: { p_reason?: string; p_source_id: string }
-        Returns: number
-      }
-      rag_cleanup_orphaned_data: { Args: never; Returns: Json }
-      rag_health_check: {
-        Args: never
-        Returns: {
-          check_name: string
-          details: Json
-          metric_value: number
-          severity: string
-          status: string
-        }[]
       }
       rag_match: {
         Args: { filter?: Json; query_vector: string; top_k?: number }
@@ -5403,14 +4696,6 @@ export type Database = {
           source_type: string
           uri: string
         }[]
-      }
-      rag_restore_source: {
-        Args: { p_reason?: string; p_source_id: string }
-        Returns: Json
-      }
-      rag_soft_delete_source: {
-        Args: { p_reason?: string; p_source_id: string }
-        Returns: Json
       }
       rag_stats: {
         Args: never
@@ -5490,17 +4775,6 @@ export type Database = {
         }
         Returns: Json
       }
-      set_cached_value: {
-        Args: {
-          p_cache_key: string
-          p_cache_type?: string
-          p_priority?: number
-          p_tags?: string[]
-          p_ttl_seconds?: number
-          p_value: Json
-        }
-        Returns: string
-      }
       share_org: { Args: { user_a: string; user_b: string }; Returns: boolean }
       test_encryption_roundtrip: {
         Args: never
@@ -5509,14 +4783,6 @@ export type Database = {
           passed: boolean
           test_name: string
         }[]
-      }
-      update_warming_status: {
-        Args: {
-          p_config_key: string
-          p_interval_minutes: number
-          p_success: boolean
-        }
-        Returns: undefined
       }
       validate_security_post_upgrade: { Args: never; Returns: Json }
       validate_session: {
