@@ -2,7 +2,7 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import AppLayout from "./components/layout/AppLayout";
+import LayoutShell from "./components/layout/LayoutShell";
 import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 // CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
@@ -76,7 +76,7 @@ export default function App() {
           {/* Suspense prevents a white screen if any child is lazy elsewhere */}
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
-              <Route element={<AppLayout />}>
+              <Route element={<LayoutShell />}>
                 {routeEntries.map(({ path, element }) => (
                   <Route key={path} path={path} element={element} />
                 ))}

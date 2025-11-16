@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders, preflight } from "../_shared/cors.ts";
 import { withJSON } from "../_shared/secure_headers.ts";
 
@@ -9,7 +8,7 @@ function assertHttps(label: string, value?: string) {
   }
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const pf = preflight(req);
   if (pf) return pf;
 

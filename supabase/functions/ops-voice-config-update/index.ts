@@ -1,11 +1,10 @@
 // Authenticated update of org voice settings. Non-critical audit logging.
 // Requires standard JWT auth via supabase-js when invoked from the app (token forwarded automatically).
-import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { preflight, corsHeaders } from '../_shared/cors.ts';
 import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const pf = preflight(req);
   if (pf) return pf;
 

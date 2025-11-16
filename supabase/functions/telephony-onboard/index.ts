@@ -1,11 +1,10 @@
 // Idempotent one-click: ensure subaccount, pick/buy number, bind webhooks, persist.
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { functionsBaseFromSupabaseUrl, ensureSubaccount, findLocalNumber, buyNumberAndBindWebhooks } from "../_shared/twilio.ts";
 
 type Body = { org_id: string; business_name: string; area_code?: string; country?: "CA" | "US" };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     const { org_id, business_name, area_code, country = "CA" } = (await req.json()) as Body;
 

@@ -6,7 +6,6 @@
  * Used by pre-warming cron job
  */
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { healthCheckQuery } from "../_shared/dbPool.ts";
 
@@ -14,7 +13,7 @@ import { healthCheckQuery } from "../_shared/dbPool.ts";
 let isColdStart = true;
 const startupTime = Date.now();
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });

@@ -1,13 +1,8 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
-import { addDays, setHours, setMinutes, setSeconds } from "https://esm.sh/v132/date-fns@2.30.0/es2022/date-fns.mjs";
-import { utcToZonedTime, zonedTimeToUtc } from "https://esm.sh/v132/date-fns-tz@2.0.0/es2022/date-fns-tz.mjs";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, preflight } from "../_shared/cors.ts";
+import { addDays, setHours, setMinutes, setSeconds } from "npm:date-fns@3.0.0";
+import { utcToZonedTime, zonedTimeToUtc } from "npm:date-fns-tz@2.0.0";
 
 interface FollowupRequest {
   campaign_id: string;
@@ -15,10 +10,9 @@ interface FollowupRequest {
   day7_enabled?: boolean;
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const supabaseClient = createClient(

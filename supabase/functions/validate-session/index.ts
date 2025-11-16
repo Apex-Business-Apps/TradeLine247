@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { preflight, corsHeaders } from '../_shared/cors.ts';
 import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
@@ -8,7 +7,7 @@ interface ValidateSessionRequest {
   session_token: string;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const pf = preflight(req);
   if (pf) return pf;
 

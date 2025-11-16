@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { preflight, corsHeaders } from "../_shared/cors.ts";
 import { secureHeaders, mergeHeaders } from "../_shared/secure_headers.ts";
 import { validateTwilioSignature } from "../_shared/twilio_sig.ts";
@@ -16,7 +15,7 @@ function json(headers: HeadersInit, status: number, body: unknown): Response {
   });
 }
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   const pf = preflight(req);
   if (pf) return pf;
 

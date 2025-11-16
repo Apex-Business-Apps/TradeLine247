@@ -1,6 +1,5 @@
 // Requires standard JWT auth via supabase-js when invoked from the app.
-import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response(null, { status: 405 })
   const body = await req.json().catch(() => ({}))
   const { name, email, company } = body

@@ -4,7 +4,7 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 interface RateLimitConfig {
   windowMs: number;
@@ -13,11 +13,27 @@ interface RateLimitConfig {
   skipSuccessfulRequests?: boolean;
 }
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://hysvqdwmhxnblxfqnszn.supabase.co';
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://hysvqdwmhxnblxfqnszn.supabase.co';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+let supabaseClient: SupabaseClient | null = null;
 
 // In-memory fallback if Supabase is unavailable
 const memoryStore = new Map<string, { count: number; resetAt: number; blockedUntil?: number }>();
+
+function getSupabaseClient(): SupabaseClient | null {
+  if (!supabaseUrl || !supabaseKey) {
+    return null;
+  }
+  if (!supabaseClient) {
+    supabaseClient = createClient(supabaseUrl, supabaseKey);
+  }
+  return supabaseClient;
+}
+
+if (!supabaseKey) {
+  console.warn('[RateLimit] Missing SUPABASE_SERVICE_ROLE_KEY. Falling back to in-memory limiter.');
+}
 
 /**
  * Create rate limiter middleware
@@ -31,8 +47,10 @@ export function createRateLimiter(config: RateLimitConfig) {
     const now = Date.now();
 
     try {
-      // Initialize Supabase client
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const supabase = getSupabaseClient();
+      if (!supabase) {
+        throw new Error('Supabase client unavailable');
+      }
 
       // Calculate window start
       const windowStart = new Date(now - windowMs);
@@ -201,7 +219,11 @@ function getIdentifier(req: Request): string {
  */
 export async function cleanupRateLimits(): Promise<number> {
   try {
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      console.warn('[RateLimit] Cleanup skipped - Supabase unavailable');
+      return 0;
+    }
     const { data, error } = await supabase.rpc('cleanup_old_rate_limits');
     
     if (error) {
