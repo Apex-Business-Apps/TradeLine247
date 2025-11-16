@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.79.0";
-import { preflight, jsonResponse, unexpectedErrorResponse } from "../_shared/cors.ts";
+import { preflight, jsonResponse, unexpectedErrorResponse, corsHeaders } from "../_shared/cors.ts";
 
 /**
  * Server-side admin verification endpoint

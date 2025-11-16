@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
     ctx.userId = user.id;
 
     // Rate limit check
-    const allowed = await checkRateLimit(supabase, user.id, ctx.ipAddress);
+    const allowed = await checkRateLimit(supabase, user.id, ctx.ipAddress || 'unknown');
     if (!allowed) {
       logWithContext(ctx, 'warn', 'MFA verification rate limited', { userId: user.id });
       return new Response(

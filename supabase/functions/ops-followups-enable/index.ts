@@ -1,8 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { addDays, setHours, setMinutes, setSeconds } from "https://esm.sh/date-fns@3.0.0";
-import { toZonedTime, fromZonedTime } from "https://esm.sh/date-fns-tz@3.0.0";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
+import * as dateFns from "https://esm.sh/date-fns@3.0.0";
+import * as dateFnsTz from "https://esm.sh/date-fns-tz@3.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -76,20 +76,20 @@ serve(async (req) => {
       // Day 3 nudge at 09:15 Vancouver time
       if (day3_enabled) {
         // Add 3 days to sent date
-        let day3Date = addDays(sentDate, 3);
+        let day3Date = dateFns.addDays(sentDate, 3);
         
         // Convert to Vancouver timezone and set to 09:15
-        const day3Vancouver = toZonedTime(day3Date, timezone);
-        const scheduledVancouver = setSeconds(
-          setMinutes(
-            setHours(day3Vancouver, targetHour),
+        const day3Vancouver = dateFnsTz.toZonedTime(day3Date, timezone);
+        const scheduledVancouver = dateFns.setSeconds(
+          dateFns.setMinutes(
+            dateFns.setHours(day3Vancouver, targetHour),
             targetMinute
           ),
           0
         );
         
         // Convert back to UTC for storage
-        const day3UTC = fromZonedTime(scheduledVancouver, timezone);
+        const day3UTC = dateFnsTz.fromZonedTime(scheduledVancouver, timezone);
         
         followups.push({
           campaign_id,
