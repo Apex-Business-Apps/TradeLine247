@@ -94,13 +94,13 @@ Deno.serve(async (req) => {
         event_type: 'retention_enforcement_job_failed',
         event_data: {
           executed_at: new Date().toISOString(),
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
         },
         severity: 'error',
       });
 
     return new Response(
-      JSON.stringify({ error: 'Job failed', message: error.message }),
+      JSON.stringify({ error: 'Job failed', message: error instanceof Error ? error.message : 'Unknown error' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

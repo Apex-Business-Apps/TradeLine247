@@ -112,8 +112,8 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Error in ops-map-number-to-tenant:', error);
     return new Response(JSON.stringify({ 
-      error: error.message,
-      details: error.toString()
+      error: error instanceof Error ? error.message : 'Unknown error',
+      details: String(error)
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

@@ -238,7 +238,7 @@ Deno.serve(async (req) => {
             if (!safetyResult.safe && safetyResult.action === 'escalate') {
               console.log(`⚠️ Safety escalation triggered: ${safetyResult.reason}`);
               
-              // Log safety event (async, non-blocking)
+              // Log safety event (non-blocking)
               supabase.from('voice_safety_logs').insert({
                 call_sid: callSid,
                 event_type: 'safety_escalation',
@@ -246,10 +246,11 @@ Deno.serve(async (req) => {
                 confidence: safetyResult.confidence || 0.8,
                 sanitized_text: sanitizeForLogging(userText),
                 sentiment_score: safetyResult.sentiment_score
-              }).catch(err => console.error('Safety log error:', err));
+              }).then(({ error }) => {
+                if (error) console.error('Safety log error:', error);
+              });
               
-              // Flag for escalation (doesn't interrupt current conversation)
-              // Human handoff will be handled by existing flow
+              // Flag for escalation
               supabase.from('call_logs')
                 .update({ 
                   captured_fields: { 
@@ -261,8 +262,9 @@ Deno.serve(async (req) => {
                   }
                 })
                 .eq('call_sid', callSid)
-                .then()
-                .catch(err => console.error('Safety flag error:', err));
+                .then(({ error }) => {
+                  if (error) console.error('Safety flag error:', error);
+                });
             }
           } catch (error) {
             // Safety checks should never break the conversation flow

@@ -1,8 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
 import { corsHeaders, preflight } from "../_shared/cors.ts";
-import { addDays, setHours, setMinutes, setSeconds } from "npm:date-fns@3.0.0";
-import { utcToZonedTime, zonedTimeToUtc } from "npm:date-fns-tz@2.0.0";
+import { addDays, setHours, setMinutes, setSeconds } from "npm:date-fns@3.6.0";
+import { toZonedTime, fromZonedTime } from "https://esm.sh/date-fns-tz@2.0.1";
 
 interface FollowupRequest {
   campaign_id: string;
@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
         let day3Date = addDays(sentDate, 3);
         
         // Convert to Vancouver timezone and set to 09:15
-        const day3Vancouver = utcToZonedTime(day3Date, timezone);
+        const day3Vancouver = toZonedTime(day3Date, timezone);
         const scheduledVancouver = setSeconds(
           setMinutes(
             setHours(day3Vancouver, targetHour),
@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
         );
         
         // Convert back to UTC for storage
-        const day3UTC = zonedTimeToUtc(scheduledVancouver, timezone);
+        const day3UTC = fromZonedTime(scheduledVancouver, timezone);
         
         followups.push({
           campaign_id,
@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
         let day7Date = addDays(sentDate, 7);
         
         // Convert to Vancouver timezone and set to 09:15
-        const day7Vancouver = utcToZonedTime(day7Date, timezone);
+        const day7Vancouver = toZonedTime(day7Date, timezone);
         const scheduledVancouver = setSeconds(
           setMinutes(
             setHours(day7Vancouver, targetHour),
@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
         );
         
         // Convert back to UTC for storage
-        const day7UTC = zonedTimeToUtc(scheduledVancouver, timezone);
+        const day7UTC = fromZonedTime(scheduledVancouver, timezone);
         
         followups.push({
           campaign_id,

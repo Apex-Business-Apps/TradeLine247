@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
     console.error('Error in export-finetuning-data:', error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         details: 'Failed to export fine-tuning data'
       }),
       { 
