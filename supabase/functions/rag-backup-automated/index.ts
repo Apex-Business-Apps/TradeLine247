@@ -205,12 +205,13 @@ Deno.serve(async (req: Request) => {
         break;
       }
       
-      case 'specific':
+      case 'specific': {
         if (!body.source_ids || body.source_ids.length === 0) {
           throw new Error('source_ids required for specific mode');
         }
         backupResult = await backupSpecificSources(supabase, body.source_ids, reason);
         break;
+      }
       
       default:
         throw new Error(`Invalid mode: ${mode}`);
