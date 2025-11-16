@@ -1,4 +1,6 @@
 // PWA install prompt management
+import { errorReporter } from '@/lib/errorReporter';
+
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
@@ -42,7 +44,15 @@ export async function installPWA() {
       return true;
     }
   } catch (error) {
-    console.error('PWA install failed:', error);
+    errorReporter.report({
+      type: 'error',
+      message: `PWA install failed: ${error}`,
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      environment: errorReporter['getEnvironment']()
+    });
   }
   
   return false;

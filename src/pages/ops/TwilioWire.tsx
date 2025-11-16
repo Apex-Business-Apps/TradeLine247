@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, Copy, Phone, MessageSquare, Loader2, AlertCircle, ExternalLink, Rocket } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client.ts";
 
 export default function TwilioWire() {
   const [numbers, setNumbers] = useState<any[]>([]);
@@ -287,10 +287,10 @@ export default function TwilioWire() {
                 <Phone className="w-4 h-4 mr-2" />
                 Test Voice Webhook
                 {testResults.voice === 'success' && (
-                  <Check className="w-4 h-4 ml-auto text-green-600" />
+                  <Check className="w-4 h-4 ml-auto text-success" />
                 )}
                 {testResults.voice === 'error' && (
-                  <AlertCircle className="w-4 h-4 ml-auto text-red-600" />
+                  <AlertCircle className="w-4 h-4 ml-auto text-error" />
                 )}
               </Button>
             </div>
@@ -305,10 +305,10 @@ export default function TwilioWire() {
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Test SMS Webhook
                 {testResults.sms === 'success' && (
-                  <Check className="w-4 h-4 ml-auto text-green-600" />
+                  <Check className="w-4 h-4 ml-auto text-success" />
                 )}
                 {testResults.sms === 'error' && (
-                  <AlertCircle className="w-4 h-4 ml-auto text-red-600" />
+                  <AlertCircle className="w-4 h-4 ml-auto text-error" />
                 )}
               </Button>
             </div>

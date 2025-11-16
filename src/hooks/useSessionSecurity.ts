@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { useAuth } from './useAuth';
+import { errorReporter } from '@/lib/errorReporter';
 
 export const useSessionSecurity = () => {
   const { user, session } = useAuth();
@@ -18,7 +19,15 @@ export const useSessionSecurity = () => {
         }
       });
     } catch (error) {
-      console.error('Failed to track session activity:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Failed to track session activity: ${error instanceof Error ? error.message : String(error)}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
   }, [user, session]);
 
@@ -38,7 +47,15 @@ export const useSessionSecurity = () => {
       if (data) {
         const uniqueSessions = new Set(data.map(event => event.session_id).filter(Boolean));
         if (uniqueSessions.size > 3) {
-          console.warn('🚨 Multiple active sessions detected');
+          errorReporter.report({
+            type: 'error',
+            message: '🚨 Multiple active sessions detected',
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            environment: errorReporter['getEnvironment'](),
+            metadata: { sessionCount: uniqueSessions.size, userId: user.id }
+          });
           // Log security event for monitoring
           supabase.functions.invoke('secure-analytics', {
             body: {
@@ -52,7 +69,15 @@ export const useSessionSecurity = () => {
         }
       }
     } catch (error) {
-      console.error('Failed to check concurrent sessions:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Failed to check concurrent sessions: ${error instanceof Error ? error.message : String(error)}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
   }, [user]);
 
@@ -68,7 +93,15 @@ export const useSessionSecurity = () => {
       
       // Only log if threshold exceeded (prevents false positives)
       if (eventCount > threshold) {
-        console.warn(`🚨 Suspicious activity pattern detected: ${event.type}`);
+        errorReporter.report({
+          type: 'error',
+          message: `🚨 Suspicious activity pattern detected: ${event.type}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { eventType: event.type, eventCount }
+        });
         supabase.functions.invoke('secure-analytics', {
           body: {
             event_type: 'suspicious_activity_pattern',

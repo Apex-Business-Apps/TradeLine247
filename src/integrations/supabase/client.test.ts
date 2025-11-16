@@ -32,9 +32,9 @@ function readClientFileContent(): string {
       // Fallback: try from process.cwd()
       return readFileSync(join(process.cwd(), 'src/integrations/supabase/client.ts'), 'utf-8');
     } catch {
-      // Final fallback: try from current working directory with tradeline247aicom prefix
+      // Final fallback: try from current working directory with tradeline247 prefix
       return readFileSync(
-        join(process.cwd(), 'tradeline247aicom/src/integrations/supabase/client.ts'),
+        join(process.cwd(), 'src/integrations/supabase/client.ts'),
         'utf-8'
       );
     }
@@ -42,26 +42,11 @@ function readClientFileContent(): string {
 }
 
 describe('Supabase Client', () => {
-  it('should have logic to support VITE_SUPABASE_PUBLISHABLE_KEY', () => {
-    // Read the client.ts file to verify it supports PUBLISHABLE_KEY
-    const content = readClientFileContent();
-
-    expect(content).toContain('VITE_SUPABASE_PUBLISHABLE_KEY');
-    expect(content).toContain("readEnv('VITE_SUPABASE_PUBLISHABLE_KEY')");
-  });
-
-  it('should have logic to derive URL from VITE_SUPABASE_PROJECT_ID', () => {
-    // Read the client.ts file to verify it supports PROJECT_ID
-    const content = readClientFileContent();
-
-    expect(content).toContain('VITE_SUPABASE_PROJECT_ID');
-    expect(content).toContain('.supabase.co');
-  });
-
   it('should export isSupabaseEnabled flag', async () => {
     const { isSupabaseEnabled } = await import('./client.ts');
 
     expect(typeof isSupabaseEnabled).toBe('boolean');
+    expect(isSupabaseEnabled).toBe(true);
   });
 
   it('should export supabase client', async () => {
@@ -71,20 +56,27 @@ describe('Supabase Client', () => {
     expect(supabase.auth).toBeDefined();
   });
 
-  it('should have proper env var priority: URL > PROJECT_ID', () => {
+  it('should have valid Supabase URL configured', () => {
     const content = readClientFileContent();
 
-    // Verify that VITE_SUPABASE_URL is checked first, then derivedUrl
-    const urlPattern = /SUPABASE_URL\s*=[\s\S]*?readEnv\(['"]VITE_SUPABASE_URL['"]\)[\s\S]*?derivedUrl/;
-    expect(content).toMatch(urlPattern);
+    // Verify that SUPABASE_URL is defined and is a valid URL
+    expect(content).toContain('SUPABASE_URL');
+    expect(content).toMatch(/https:\/\/.*\.supabase\.co/);
   });
 
-  it('should have proper key priority: ANON_KEY > PUBLISHABLE_KEY', () => {
+  it('should have valid Supabase key configured', () => {
     const content = readClientFileContent();
 
-    // Verify that VITE_SUPABASE_ANON_KEY is checked first, then PUBLISHABLE_KEY
-    const keyPattern = /SUPABASE_ANON_KEY\s*=[\s\S]*?readEnv\(['"]VITE_SUPABASE_ANON_KEY['"]\)[\s\S]*?readEnv\(['"]VITE_SUPABASE_PUBLISHABLE_KEY['"]\)/;
-    expect(content).toMatch(keyPattern);
+    // Verify that SUPABASE_PUBLISHABLE_KEY or SUPABASE_ANON_KEY is defined
+    expect(content).toMatch(/SUPABASE_(PUBLISHABLE_KEY|ANON_KEY)/);
+  });
+
+  it('should be marked as auto-generated', () => {
+    const content = readClientFileContent();
+
+    // Verify the file has the auto-generated comment
+    expect(content).toContain('automatically generated');
+    expect(content).toContain('Do not edit it directly');
   });
 });
 

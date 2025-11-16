@@ -1,14 +1,15 @@
 // Twilio API client with automatic retry on 429/5xx
 // Handles rate limits gracefully with exponential backoff
 
-const SID = Deno.env.get("TWILIO_ACCOUNT_SID");
-const AUTH = Deno.env.get("TWILIO_AUTH_TOKEN");
-
-if (!SID || !AUTH) {
-  throw new Error("TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must be configured");
+function getAuthz(): string {
+  const sid = Deno.env.get("TWILIO_ACCOUNT_SID");
+  const auth = Deno.env.get("TWILIO_AUTH_TOKEN");
+  if (!sid || !auth) {
+    throw new Error("TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must be configured");
+  }
+  return "Basic " + btoa(`${sid}:${auth}`);
 }
 
-const AUTHZ = "Basic " + btoa(`${SID}:${AUTH}`);
 const DEFAULT_MAX_TRIES = 4;
 
 export class TwilioResponseError extends Error {
@@ -39,9 +40,9 @@ export async function twilioFormPOST(
     const res = await fetch(`https://api.twilio.com/2010-04-01${path}`, {
       method: "POST",
       headers: {
-        Authorization: AUTHZ,
+        Authorization: getAuthz(),
         "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "tradeline247aicom-queue-worker/2025-11-03",
+        "User-Agent": "tradeline247-queue-worker/2025-11-03",
       },
       body: form,
       ...init,

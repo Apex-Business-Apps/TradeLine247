@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface PrivacyAnalyticsEvent {
   event_type: string;
@@ -58,12 +59,28 @@ export const usePrivacyAnalytics = () => {
       });
 
       if (error) {
-        console.error('Privacy analytics tracking error:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Privacy analytics tracking error: ${error instanceof Error ? error.message : String(error)}`,
+          stack: error instanceof Error ? error.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
       } else {
         console.log('Privacy analytics event tracked:', event.event_type);
       }
     } catch (error) {
-      console.error('Privacy analytics tracking failed:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Privacy analytics tracking failed: ${error instanceof Error ? error.message : String(error)}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
     }
   }, [getPrivacySessionId]);
 

@@ -8,8 +8,10 @@ interface AssignRequest {
 }
 
 serve(async (req) => {
-  const pf = preflight(req);
-  if (pf) return pf;
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
 
   try {
     const supabase = createClient(
@@ -24,13 +26,13 @@ serve(async (req) => {
     );
 
     if (req.method !== 'POST') {
-      return jsonResponse({ error: 'Method not allowed' }, { status: 405 });
+      return new Response('Method not allowed', { status: 405, headers: corsHeaders });
     }
 
     const { testName, anonId }: AssignRequest = await req.json();
     
     if (!testName) {
-      return jsonResponse({ error: 'Test name required' }, { status: 400 });
+      return new Response('Test name required', { status: 400, headers: corsHeaders });
     }
 
     // Get or create anonymous ID from cookie or generate new one
@@ -160,22 +162,24 @@ serve(async (req) => {
     const cookieOptions = 'Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000';
     const integrityValue = `${assignedVariant}.${signatureBase64}`;
     
-    return jsonResponse(
-      {
-        variant: assignedVariant,
-        testName,
-        anonId: anonymousId,
-        variantData: variantData || { text: 'Grow Now', color: 'primary', variant: assignedVariant }
-      },
-      {
-        status: 200,
-        headers: {
-          'Set-Cookie': `anon_id=${anonymousId}; ${cookieOptions}, exp_${testName}=${integrityValue}; ${cookieOptions}, exp_${testName}_v=${assignedVariant}; Path=/; Secure; SameSite=Lax; Max-Age=31536000`
-        }
+    const response = new Response(JSON.stringify({ 
+      variant: assignedVariant,
+      testName,
+      anonId: anonymousId,
+      variantData: variantData || { text: 'Grow Now', color: 'primary', variant: assignedVariant }
+    }), {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+        'Set-Cookie': `anon_id=${anonymousId}; ${cookieOptions}, exp_${testName}=${integrityValue}; ${cookieOptions}, exp_${testName}_v=${assignedVariant}; Path=/; Secure; SameSite=Lax; Max-Age=31536000`
       }
-    );
+    });
+
+    return response;
 
   } catch (error) {
-    return unexpectedErrorResponse(error, 'secure-ab-assign');
+    console.error('Error in secure-ab-assign:', error);
+    return new Response('Internal server error', { status: 500, headers: corsHeaders });
   }
 });

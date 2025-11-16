@@ -1,11 +1,8 @@
-import { mergeHeaders, secureHeaders } from "./secure_headers.ts";
-
 const ALLOW_HEADERS = [
   "authorization",
   "x-client-info",
   "apikey",
   "content-type",
-  "x-csrf-token",
   "x-request-id",
   "x-twilio-signature",
 ].join(", ");
@@ -22,53 +19,35 @@ export function preflight(req: Request): Response | null {
   if (req.method !== "OPTIONS") return null;
 
   return new Response(null, {
-    status: 200,
-    headers: corsHeaders,
-  });
-}
-
-export function withCors(
-  ...sets: Array<Record<string, string> | undefined>
-): Record<string, string> {
-  return mergeHeaders(corsHeaders, ...sets);
-}
-
-export function jsonResponse(
-  data: unknown,
-  init?: ResponseInit & {
-    headers?: Record<string, string>;
-    includeSecureHeaders?: boolean;
-  },
-): Response {
-  const { headers, includeSecureHeaders = true, ...rest } = init ?? {};
-  const secureSet = includeSecureHeaders !== false ? secureHeaders : undefined;
-  return new Response(JSON.stringify(data), {
-    ...rest,
-    headers: withCors(secureSet, headers, { "Content-Type": "application/json" }),
-  });
-}
-
-export function unexpectedErrorResponse(
-  error: unknown,
-  context: string,
-  options?: {
-    status?: number;
-    headers?: Record<string, string>;
-    includeSecureHeaders?: boolean;
-  },
-): Response {
-  const correlationId = crypto.randomUUID();
-  console.error(`[${context}] unexpected error`, {
-    correlationId,
-    error,
-  });
-
-  return jsonResponse(
-    { error: "Unexpected error", correlationId },
-    {
-      status: options?.status ?? 500,
-      headers: options?.headers,
-      includeSecureHeaders: options?.includeSecureHeaders,
+    status: 204,
+    headers: {
+      ...corsHeaders,
+      "Content-Length": "0",
     },
+  });
+}
+
+export function jsonResponse(data: any, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+export function unexpectedErrorResponse(error: unknown): Response {
+  console.error("Unexpected error:", error);
+  return jsonResponse(
+    { error: error instanceof Error ? error.message : "Unexpected error" },
+    500
   );
+}
+
+export function withCors(headers: Record<string, string>): Record<string, string> {
+  return {
+    ...corsHeaders,
+    ...headers,
+  };
 }

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client.ts";
 import { Copy, Lock, Shield, CheckCircle2, XCircle, Search } from "lucide-react";
 import { toast } from "sonner";
 
@@ -203,9 +203,9 @@ export default function CryptoInit() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {result.result.status === "ok" || result.result.status === "noop" ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-500" />
+                            <CheckCircle2 className="h-5 w-5 text-[hsl(142,85%,25%)]" />
                           ) : (
-                            <XCircle className="h-5 w-5 text-red-500" />
+                            <XCircle className="h-5 w-5 text-red-700" />
                           )}
                           <span className="font-semibold">
                             {result.action} - {new Date(result.timestamp).toLocaleString()}
@@ -287,9 +287,9 @@ export default function CryptoInit() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {gate1Result.gate_status === "PASS" ? (
-                          <CheckCircle2 className="h-6 w-6 text-green-500" />
+                          <CheckCircle2 className="h-6 w-6 text-[hsl(142,85%,25%)]" />
                         ) : (
-                          <XCircle className="h-6 w-6 text-red-500" />
+                          <XCircle className="h-6 w-6 text-red-700" />
                         )}
                         <div>
                           <span className="font-bold text-lg">Gate-1 Status: </span>
@@ -312,9 +312,9 @@ export default function CryptoInit() {
                       <div className="border-l-4 border-l-primary pl-3">
                         <div className="flex items-center gap-2 mb-1">
                           {gate1Result.checks.key_in_app_config.pass ? (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            <CheckCircle2 className="h-4 w-4 text-[hsl(142,85%,25%)]" />
                           ) : (
-                            <XCircle className="h-4 w-4 text-red-500" />
+                            <XCircle className="h-4 w-4 text-red-700" />
                           )}
                           <span className="font-semibold">Key in app_config</span>
                         </div>
@@ -324,7 +324,7 @@ export default function CryptoInit() {
                             <div>Version: {gate1Result.checks.key_in_app_config.version}</div>
                           )}
                           {gate1Result.checks.key_in_app_config.error && (
-                            <div className="text-red-500">Error: {gate1Result.checks.key_in_app_config.error}</div>
+                            <div className="text-red-700">Error: {gate1Result.checks.key_in_app_config.error}</div>
                           )}
                         </div>
                       </div>
@@ -332,9 +332,9 @@ export default function CryptoInit() {
                       <div className="border-l-4 border-l-primary pl-3">
                         <div className="flex items-center gap-2 mb-1">
                           {gate1Result.checks.accessor_function.service_role_access ? (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            <CheckCircle2 className="h-4 w-4 text-[hsl(142,85%,25%)]" />
                           ) : (
-                            <XCircle className="h-4 w-4 text-red-500" />
+                            <XCircle className="h-4 w-4 text-red-700" />
                           )}
                           <span className="font-semibold">Accessor Function</span>
                         </div>
@@ -342,7 +342,7 @@ export default function CryptoInit() {
                           <div>Service Role Access: {gate1Result.checks.accessor_function.service_role_access ? "✓" : "✗"}</div>
                           <div>Key Present: {gate1Result.checks.accessor_function.key_present ? "✓" : "✗"}</div>
                           {gate1Result.checks.accessor_function.error && (
-                            <div className="text-red-500">Error: {gate1Result.checks.accessor_function.error}</div>
+                            <div className="text-red-700">Error: {gate1Result.checks.accessor_function.error}</div>
                           )}
                         </div>
                       </div>
@@ -350,9 +350,9 @@ export default function CryptoInit() {
                       <div className="border-l-4 border-l-primary pl-3">
                         <div className="flex items-center gap-2 mb-1">
                           {gate1Result.checks.audit_trail.entries_found > 0 ? (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            <CheckCircle2 className="h-4 w-4 text-[hsl(142,85%,25%)]" />
                           ) : (
-                            <XCircle className="h-4 w-4 text-red-500" />
+                            <XCircle className="h-4 w-4 text-red-700" />
                           )}
                           <span className="font-semibold">Audit Trail</span>
                         </div>

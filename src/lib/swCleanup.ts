@@ -7,6 +7,7 @@
  * Controlled via VITE_SW_HOTFIX_ENABLED (default: true)
  * Deployment date: 2025-10-13
  */
+import { errorReporter } from '@/lib/errorReporter';
 
 const HOTFIX_DEPLOYMENT_DATE = new Date('2025-10-13T00:00:00Z');
 const HOTFIX_TTL_DAYS = 7;
@@ -63,7 +64,15 @@ export async function runSwCleanup(): Promise<void> {
     // Reload to get fresh assets
     window.location.reload();
   } catch (error) {
-    console.warn('[SW Cleanup] Cleanup failed (non-critical):', error);
+    errorReporter.report({
+      type: 'error',
+      message: `SW Cleanup failed (non-critical): ${error}`,
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      environment: errorReporter['getEnvironment']()
+    });
     // Mark as done anyway to prevent retry loops
     localStorage.setItem(cleanupKey, 'done');
   }

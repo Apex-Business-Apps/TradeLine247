@@ -35,7 +35,7 @@ The CanonicalRedirect component runs immediately on mount via `useEffect`, which
 ### 2. Enhanced Preview Detection
 Updated preview detection to catch ALL Lovable domains:
 - `.lovableproject.com`
-- `.https://tradeline247aicom.lovable.app/`
+- `.lovable.app/`
 - `.lovable.dev`
 - `.gptengineer.app`
 - Any subdomain containing `.lovable.`

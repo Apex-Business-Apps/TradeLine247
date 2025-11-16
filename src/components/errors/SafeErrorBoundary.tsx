@@ -25,7 +25,7 @@ class SafeErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('🚨 Error Boundary caught an error:', error, errorInfo);
+    // Use centralized error reporter instead of console.error
     reportReactError(error, errorInfo);
   }
 

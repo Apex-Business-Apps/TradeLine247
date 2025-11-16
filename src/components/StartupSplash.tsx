@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { errorReporter } from '@/lib/errorReporter';
 
 export default function StartupSplash() {
   const [show, setShow] = useState(false);
@@ -20,7 +21,14 @@ export default function StartupSplash() {
         return () => clearTimeout(t);
       } else {
         // App not mounted yet, dismiss splash to prevent blocking
-        console.warn('App not mounted, dismissing splash');
+        errorReporter.report({
+          type: 'error',
+          message: 'App not mounted, dismissing splash',
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         dismiss();
       }
     };
@@ -39,7 +47,14 @@ export default function StartupSplash() {
   useEffect(() => {
     if (show) {
       const emergency = setTimeout(() => {
-        console.warn('Startup splash auto-dismissed (emergency timeout)');
+        errorReporter.report({
+          type: 'error',
+          message: 'Startup splash auto-dismissed (emergency timeout)',
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         dismiss();
       }, 2000);
       return () => clearTimeout(emergency);
@@ -65,7 +80,7 @@ export default function StartupSplash() {
           loading="eager"
           fetchpriority="high"
         />
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground bg-gradient-to-r from-brand-orange-primary to-brand-orange-light bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground bg-gradient-to-r from-brand-orange-primary to-brand-orange-light  text-foreground">
           Your 24/7 AI Receptionist!
         </h1>
         <p className="text-lg text-muted-foreground mb-3 leading-relaxed">

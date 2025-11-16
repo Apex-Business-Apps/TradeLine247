@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
+import { errorReporter } from '@/lib/errorReporter';
 
 let analyticsGatedWarningLogged = false;
 
@@ -40,11 +41,28 @@ export const useAnalytics = () => {
         // Analytics may be gated in preview environments
         if (!analyticsGatedWarningLogged) {
           analyticsGatedWarningLogged = true;
-          console.warn('Analytics tracking disabled or gated:', error.message);
+          errorReporter.report({
+            type: 'error',
+            message: `Analytics tracking disabled or gated: ${error.message}`,
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            environment: errorReporter['getEnvironment'](),
+            metadata: { error }
+          });
         }
       }
     } catch (error) {
-      console.error('Analytics tracking failed:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Analytics tracking failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { error }
+      });
     }
   }, [getSessionId]);
 

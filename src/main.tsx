@@ -1,22 +1,19 @@
 // ===================================================================
 // SIMPLIFIED MOUNTING - Traditional approach with error handling
 // ===================================================================
-import { logger } from './lib/logger';
-
-logger.debug('🚀 TradeLine 24/7 - Starting main.tsx...');
+console.log('🚀 TradeLine 24/7 - Starting main.tsx...');
 
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 import "./index.css";
-import "./styles/header-align.css";
 import { initBootSentinel } from "./lib/bootSentinel";
 import { runSwCleanup } from "./lib/swCleanup";
 import { featureFlags } from "./config/featureFlags";
 import "./i18n/config";
 
-logger.debug('✅ Core modules loaded');
+console.log('✅ Core modules loaded');
 
 // H310-1: Dev-only error listener to capture React Error #310
 if (import.meta.env.DEV && featureFlags.H310_HARDENING) {
@@ -31,7 +28,7 @@ if (import.meta.env.DEV && featureFlags.H310_HARDENING) {
       });
     }
   });
-  logger.debug('🛡️ H310 Hardening: Error listener active');
+  console.log('🛡️ H310 Hardening: Error listener active');
 }
 
 // Initialize error observability for production
@@ -66,7 +63,7 @@ if (import.meta.env.DEV || /lovable/.test(location.hostname)) {
         healthCheckIntervalMs: 30000,
         enableFallback: true,
       });
-      logger.debug('✅ Lovable save failsafe initialized');
+      console.log('✅ Lovable save failsafe initialized');
     })
     .catch((error) => {
       console.warn('⚠️ Lovable save failsafe not available:', error);
@@ -86,12 +83,12 @@ if ('serviceWorker' in navigator) {
 }
 
 const root = document.getElementById('root');
-if (!root) { 
-  // Secure DOM manipulation - use textContent instead of innerHTML
-  const errorMsg = document.createElement('pre');
-  errorMsg.textContent = 'Missing #root';
-  document.body.appendChild(errorMsg); 
-  throw new Error('Missing #root'); 
+if (!root) {
+  // Safe DOM manipulation instead of innerHTML
+  const errorPre = document.createElement('pre');
+  errorPre.textContent = 'Missing #root';
+  document.body.appendChild(errorPre);
+  throw new Error('Missing #root');
 }
 
 // CRITICAL: Hide loading fallback immediately when this script executes (non-blocking, safe)
@@ -109,7 +106,7 @@ function diag(title: string, err: unknown) {
   if (!isPreview) throw err;
   const msg = err instanceof Error ? err.message : String(err);
   const stack = err instanceof Error && err.stack ? `\n\n${err.stack}` : '';
-  logger.error('[PreviewDiag]', err, { title });
+  console.error('[PreviewDiag]', title, err);
   createRoot(root!).render(
     React.createElement('pre', { style:{padding:'24px',whiteSpace:'pre-wrap'} }, `⚠️ ${title}\n${msg}${stack}`)
   );
@@ -132,18 +129,23 @@ function boot() {
         React.createElement(App)
       )
     );
-    
+
     // Ensure root is visible (CSS might hide it initially)
     root!.style.opacity = '1';
     root!.style.visibility = 'visible';
-    
+
     // Hide loading fallback immediately
     const loadingEl = document.getElementById('root-loading');
     if (loadingEl) {
       loadingEl.style.display = 'none';
     }
-    
-    logger.debug('✅ React mounted successfully');
+
+    console.log('✅ React mounted successfully');
+
+    // Signal to E2E tests that React hydration is complete
+    setTimeout(() => {
+      (window as any).__REACT_READY__ = true;
+    }, 0);
     
     // Run SW cleanup hotfix (one-time, auto-expires after 7 days)
     runSwCleanup().catch(err => console.warn('[SW Cleanup] Failed:', err));
@@ -154,7 +156,9 @@ function boot() {
     // Load optional features after mount (non-blocking)
     setTimeout(() => {
       import("./styles/roi-table.css").catch(e => console.warn('⚠️ ROI table CSS failed:', e));
-
+      // CRITICAL FIX: header-align.css must load synchronously to prevent layout shifts
+      // Moved to index.css import for synchronous loading
+      
       // Check for safe mode
       const urlParams = new URLSearchParams(window.location.search);
       const isSafeMode = urlParams.get('safe') === '1';
@@ -176,7 +180,7 @@ function boot() {
           }, 1500);
         });
       } else {
-        logger.debug('🛡️ Safe Mode: Optional features disabled');
+        console.log('🛡️ Safe Mode: Optional features disabled');
       }
     }, 100);
     

@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface PasswordCheckResult {
   isBreached: boolean;
@@ -24,7 +25,15 @@ export const usePasswordSecurity = () => {
       });
 
       if (error) {
-        console.error('Password breach check error:', error);
+        errorReporter.report({
+          type: 'error',
+          message: `Password breach check error: ${error.message}`,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment'](),
+          metadata: { error }
+        });
         return {
           isBreached: false,
           message: 'Password check service temporarily unavailable',
@@ -39,7 +48,16 @@ export const usePasswordSecurity = () => {
       };
 
     } catch (error) {
-      console.error('Password security check failed:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Password security check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { error }
+      });
       return {
         isBreached: false,
         message: 'Password check service error',

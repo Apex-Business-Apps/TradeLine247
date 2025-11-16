@@ -29,7 +29,7 @@
 ## Status
 
 ✅ **All fixes committed and pushed to branch**: `fix/ci-failures-lighthouse-and-tests`
-✅ **PR Ready**: https://github.com/apexbusiness-systems/tradeline247aicom/pull/new/fix/ci-failures-lighthouse-and-tests
+✅ **PR Ready**: https://github.com/apexbusiness-systems/tradeline247/pull/new/fix/ci-failures-lighthouse-and-tests
 
 ## Expected Results
 

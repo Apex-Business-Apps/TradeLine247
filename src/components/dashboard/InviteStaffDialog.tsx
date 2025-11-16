@@ -19,7 +19,8 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Mail, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
+import { errorReporter } from '@/lib/errorReporter';
 
 interface InviteStaffDialogProps {
   open: boolean;
@@ -43,7 +44,14 @@ export const InviteStaffDialog: React.FC<InviteStaffDialogProps> = ({
 
     setLoading(true);
     try {
-      // Create an invitation record in the database and send email invitation
+      // TODO: Implement actual invitation logic with your backend
+      // This is a placeholder that simulates the invitation
+      
+      // In a real implementation, you would:
+      // 1. Create an invitation record in the database
+      // 2. Send an email invitation via edge function
+      // 3. Generate a secure invitation token
+      
       const { data, error } = await supabase
         .from('team_invitations')
         .insert({
@@ -78,7 +86,16 @@ export const InviteStaffDialog: React.FC<InviteStaffDialogProps> = ({
       setName('');
       onOpenChange(false);
     } catch (error: any) {
-      console.error('Error inviting staff:', error);
+      errorReporter.report({
+        type: 'error',
+        message: `Error inviting staff: ${error.message || 'Unknown error'}`,
+        stack: error.stack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { email, role, error }
+      });
       toast.error('Failed to send invitation', {
         description: error.message || 'Please try again later',
       });

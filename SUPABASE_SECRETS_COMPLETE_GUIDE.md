@@ -8,7 +8,7 @@ This guide shows you **exactly** where to place each Supabase secret across all 
 
 ### **1. GitHub Secrets** (Required for CI/CD Deployment)
 
-**Location**: https://github.com/apexbusiness-systems/tradeline247aicom/settings/secrets/actions
+**Location**: https://github.com/apexbusiness-systems/tradeline247/settings/secrets/actions
 
 **Required Secrets:**
 - ✅ `SUPABASE_PROJECT_REF` = `hysvqdwmhxnblxfqnszn`
@@ -82,7 +82,7 @@ SUPABASE_ACCESS_TOKEN=your_access_token
 ### **✅ YES - Place DB Password Here:**
 
 1. **GitHub Secrets** (Required)
-   - https://github.com/apexbusiness-systems/tradeline247aicom/settings/secrets/actions
+   - https://github.com/apexbusiness-systems/tradeline247/settings/secrets/actions
    - Name: `SUPABASE_DB_PASSWORD`
    - This is the **only required place** for CI/CD deployment
 

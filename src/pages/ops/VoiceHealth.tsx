@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { RefreshCw, CheckCircle, XCircle, AlertTriangle, Phone, Key } from 'lucide-react';
 
 interface VoiceHealth {
@@ -114,9 +114,9 @@ export default function VoiceHealth() {
 
   const getHealthIcon = (healthy: boolean) => {
     return healthy ? (
-      <CheckCircle className="h-5 w-5 text-green-600" />
+      <CheckCircle className="h-5 w-5 text-success" />
     ) : (
-      <XCircle className="h-5 w-5 text-red-600" />
+      <XCircle className="h-5 w-5 text-error" />
     );
   };
 
@@ -162,19 +162,19 @@ export default function VoiceHealth() {
                 <h3 className="font-semibold text-sm">Test Checklist:</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-start gap-2 p-2 bg-muted rounded">
-                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 shrink-0" />
                     <span>Greeting: "Hi, you've reached TradeLine 24/7 — Your 24/7 AI Receptionist!"</span>
                   </div>
                   <div className="flex items-start gap-2 p-2 bg-muted rounded">
-                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 shrink-0" />
                     <span>LLM responds within 2 seconds</span>
                   </div>
                   <div className="flex items-start gap-2 p-2 bg-muted rounded">
-                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 shrink-0" />
                     <span>Press 0 → bridges to +14319900222</span>
                   </div>
                   <div className="flex items-start gap-2 p-2 bg-muted rounded">
-                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-success mt-0.5 shrink-0" />
                     <span>Transcript emailed to jrmendozaceo@apexbusiness-systems.com</span>
                   </div>
                 </div>
@@ -266,12 +266,12 @@ export default function VoiceHealth() {
                   <div className="flex items-center gap-2">
                     {health.config.panic_mode ? (
                       <>
-                        <AlertTriangle className="h-5 w-5 text-red-600" />
-                        <span className="font-semibold text-red-600">ACTIVE</span>
+                        <AlertTriangle className="h-5 w-5 text-error" />
+                        <span className="font-semibold text-error">ACTIVE</span>
                       </>
                     ) : (
                       <>
-                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <CheckCircle className="h-5 w-5 text-success" />
                         <span className="font-semibold">Off</span>
                       </>
                     )}
@@ -295,19 +295,19 @@ export default function VoiceHealth() {
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Success (2xx)</div>
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-2xl font-bold text-success">
                     {health.webhookStats.success_2xx}
                   </div>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Client Errors (4xx)</div>
-                  <div className="text-2xl font-bold text-yellow-600">
+                  <div className="text-2xl font-bold text-amber-800">
                     {health.webhookStats.error_4xx}
                   </div>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Server Errors (5xx)</div>
-                  <div className="text-2xl font-bold text-red-600">
+                  <div className="text-2xl font-bold text-error">
                     {health.webhookStats.error_5xx}
                   </div>
                 </div>
@@ -343,7 +343,7 @@ export default function VoiceHealth() {
                       key={idx}
                       className="flex items-start gap-3 p-3 bg-white rounded-lg border border-red-200"
                     >
-                      <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+                      <AlertTriangle className="h-5 w-5 text-red-700 mt-0.5" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold">{alert.metric}</span>
@@ -495,25 +495,25 @@ export default function VoiceHealth() {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               {health && Object.values(health.secrets).every(v => v) ? (
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <CheckCircle className="h-5 w-5 text-success" />
               ) : (
-                <XCircle className="h-5 w-5 text-red-600" />
+                <XCircle className="h-5 w-5 text-error" />
               )}
               <span>V-0: All environment secrets present</span>
             </div>
             <div className="flex items-center gap-2">
               {health && health.webhookStats.error_4xx === 0 && health.webhookStats.error_5xx === 0 ? (
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <CheckCircle className="h-5 w-5 text-success" />
               ) : (
-                <XCircle className="h-5 w-5 text-red-600" />
+                <XCircle className="h-5 w-5 text-error" />
               )}
               <span>V-0: No 4xx/5xx errors in last 15 minutes</span>
             </div>
             <div className="flex items-center gap-2">
               {sloData && sloData.alerts.length === 0 ? (
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <CheckCircle className="h-5 w-5 text-success" />
               ) : (
-                <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                <AlertTriangle className="h-5 w-5 text-amber-800" />
               )}
               <span>V-9: All SLOs within thresholds</span>
             </div>

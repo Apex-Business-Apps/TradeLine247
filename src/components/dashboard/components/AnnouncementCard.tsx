@@ -26,7 +26,7 @@ export const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           icon: CheckCircle,
           bgColor: 'bg-green-50 dark:bg-green-900/20',
           borderColor: 'border-green-200 dark:border-green-800',
-          iconColor: 'text-green-600 dark:text-green-400',
+          iconColor: 'text-success dark:text-green-400',
           titleColor: 'text-green-900 dark:text-green-100'
         };
       case 'warning':
@@ -34,7 +34,7 @@ export const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           icon: AlertTriangle,
           bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
           borderColor: 'border-yellow-200 dark:border-yellow-800',
-          iconColor: 'text-yellow-600 dark:text-yellow-400',
+          iconColor: 'text-amber-800 dark:text-yellow-400',
           titleColor: 'text-yellow-900 dark:text-yellow-100'
         };
       case 'error':
@@ -42,7 +42,7 @@ export const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           icon: AlertCircle,
           bgColor: 'bg-red-50 dark:bg-red-900/20',
           borderColor: 'border-red-200 dark:border-red-800',
-          iconColor: 'text-red-600 dark:text-red-400',
+          iconColor: 'text-red-700 dark:text-red-400',
           titleColor: 'text-red-900 dark:text-red-100'
         };
       default:
@@ -50,7 +50,7 @@ export const AnnouncementCard: React.FC<AnnouncementCardProps> = ({
           icon: Info,
           bgColor: 'bg-blue-50 dark:bg-blue-900/20',
           borderColor: 'border-blue-200 dark:border-blue-800',
-          iconColor: 'text-blue-600 dark:text-blue-400',
+          iconColor: 'text-info dark:text-blue-400',
           titleColor: 'text-blue-900 dark:text-blue-100'
         };
     }

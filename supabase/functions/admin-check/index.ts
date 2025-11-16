@@ -7,14 +7,19 @@ import { preflight, jsonResponse, unexpectedErrorResponse } from "../_shared/cor
  * Returns 200 only if user is authenticated and has admin role
  */
 serve(async (req) => {
-  const pf = preflight(req);
-  if (pf) return pf;
+  // CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
 
   try {
     const authHeader = req.headers.get('Authorization');
     
     if (!authHeader) {
-      return jsonResponse({ ok: false }, { status: 401 });
+      return new Response(
+        JSON.stringify({ ok: false }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const supabaseClient = createClient(
@@ -31,7 +36,10 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     
     if (authError || !user) {
-      return jsonResponse({ ok: false }, { status: 401 });
+      return new Response(
+        JSON.stringify({ ok: false }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Check admin role
@@ -43,14 +51,27 @@ serve(async (req) => {
       .maybeSingle();
 
     if (roleError || !roles) {
-      return jsonResponse({ ok: false }, { status: 403 });
+      return new Response(
+        JSON.stringify({ ok: false }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Success - user is admin
-    return jsonResponse({ ok: true });
+    return new Response(
+      JSON.stringify({ ok: true }),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
 
   } catch (error: any) {
-    return unexpectedErrorResponse(error, 'admin-check');
+    console.error('Admin check error:', error);
+    return new Response(
+      JSON.stringify({ ok: false }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });
 

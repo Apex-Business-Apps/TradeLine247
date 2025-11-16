@@ -11,10 +11,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { errorReporter } from '@/lib/errorReporter';
 import { Settings, Home, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { paths } from '@/routes/paths';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import { useDashboardStore } from '@/stores/dashboardStore';
 import { ThemeSwitcher } from '../ThemeSwitcher';
@@ -44,7 +45,14 @@ export const WelcomeHeader: React.FC = () => {
 
         // If there's a JWT error, clear the corrupted session silently
         if (error?.message?.includes('malformed') || error?.message?.includes('invalid')) {
-          console.warn('[WelcomeHeader] Detected malformed token, ignoring:', error.message);
+          errorReporter.report({
+            type: 'error',
+            message: `[WelcomeHeader] Detected malformed token, ignoring: ${error.message}`,
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            environment: errorReporter['getEnvironment']()
+          });
           return;
         }
 
@@ -62,7 +70,15 @@ export const WelcomeHeader: React.FC = () => {
           }
         }
       } catch (err) {
-        console.error('[WelcomeHeader] Error fetching user:', err);
+        errorReporter.report({
+          type: 'error',
+          message: `[WelcomeHeader] Error fetching user: ${err instanceof Error ? err.message : String(err)}`,
+          stack: err instanceof Error ? err.stack : undefined,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          environment: errorReporter['getEnvironment']()
+        });
         setUserName('there');
       }
     }
@@ -96,8 +112,8 @@ export const WelcomeHeader: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick Navigation - Hide some buttons on very small screens */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          {/* Quick Navigation */}
+          <div className="flex items-center gap-2">
             {/* Notifications */}
             <Button
               variant="ghost"
@@ -132,12 +148,12 @@ export const WelcomeHeader: React.FC = () => {
               <Settings className="h-4 w-4" />
             </Button>
 
-            {/* Home - Hidden on mobile to save space */}
+            {/* Home */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate(paths.home)}
-              className="hidden sm:flex h-9 w-9 hover:bg-accent"
+              className="h-9 w-9 hover:bg-accent"
               data-testid="home-button"
               aria-label="Go to homepage"
             >
@@ -148,7 +164,7 @@ export const WelcomeHeader: React.FC = () => {
 
         {/* Status indicator */}
         <div className="flex items-center gap-2 text-sm">
-          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+          <div className="h-2 w-2 rounded-full bg-[hsl(142,85%,35%)] animate-pulse" aria-hidden="true" role="presentation"></div>
           <span className="text-slate-600 dark:text-slate-400">AI receptionist is active</span>
         </div>
       </header>

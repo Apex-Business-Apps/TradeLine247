@@ -9,6 +9,7 @@
  */
 
 import { featureFlags } from '@/config/featureFlags';
+import { errorReporter } from '@/lib/errorReporter';
 
 const BOOT_TIMEOUT_MS = 3000;
 const TELEMETRY_ENDPOINT = '/api/telemetry';

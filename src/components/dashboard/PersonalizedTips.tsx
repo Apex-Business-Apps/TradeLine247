@@ -44,7 +44,7 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
         title: 'Morning Routine',
         description: 'Review your upcoming appointments for today to stay prepared.',
         action: 'View Calendar',
-        color: 'text-blue-600 dark:text-blue-400',
+        color: 'text-info dark:text-blue-400',
         bgColor: 'bg-blue-100 dark:bg-blue-900/30',
       });
     }
@@ -58,7 +58,7 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
         title: 'Boost Your Answer Rate',
         description: `Your answer rate is at ${answerRateKpi.value}%. Consider adjusting your AI settings to catch more calls.`,
         action: 'Optimize Settings',
-        color: 'text-orange-600 dark:text-orange-400',
+        color: 'text-brand-primary dark:text-orange-400',
         bgColor: 'bg-orange-100 dark:bg-orange-900/30',
       });
     }
@@ -71,7 +71,7 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
         title: 'Busy Schedule Ahead',
         description: `You have ${nextItemsCount} upcoming items. Review and prioritize to stay on track.`,
         action: 'Review Schedule',
-        color: 'text-purple-600 dark:text-purple-400',
+        color: 'text-neutral dark:text-purple-400',
         bgColor: 'bg-purple-100 dark:bg-purple-900/30',
       });
     }
@@ -85,7 +85,7 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
         title: 'Great Momentum!',
         description: `Bookings are up ${bookingsKpi.deltaPct}% this week. Keep up the excellent work!`,
         action: 'View Insights',
-        color: 'text-green-600 dark:text-green-400',
+        color: 'text-success dark:text-green-400',
         bgColor: 'bg-green-100 dark:bg-green-900/30',
       });
     }
@@ -98,7 +98,7 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
         title: 'Getting Started',
         description: 'Explore the Quick Actions menu to see what your AI receptionist can do.',
         action: 'Explore Features',
-        color: 'text-yellow-600 dark:text-yellow-400',
+        color: 'text-amber-800 dark:text-yellow-400',
         bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
       });
     }
@@ -111,7 +111,7 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
         title: 'Pro Tip',
         description: 'Review your recent call transcripts to identify common questions and improve your responses.',
         action: 'View Transcripts',
-        color: 'text-blue-600 dark:text-blue-400',
+        color: 'text-info dark:text-blue-400',
         bgColor: 'bg-blue-100 dark:bg-blue-900/30',
       });
     }
@@ -125,15 +125,14 @@ export const PersonalizedTips: React.FC<PersonalizedTipsProps> = ({
   const handleTipAction = (tipId: string) => {
     addRecentAction(`Clicked tip: ${tipId}`);
     // In a real implementation, this would navigate or trigger the appropriate action
-    // Tip action clicked - tracked via analytics
-    // (Removed debug console.log - use browser devtools if needed)
+    console.log(`[PersonalizedTips] Action clicked for tip: ${tipId}`);
   };
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-yellow-500" />
+          <Lightbulb className="h-5 w-5 text-amber-700" />
           <CardTitle className="text-lg">Tips for You</CardTitle>
         </div>
       </CardHeader>

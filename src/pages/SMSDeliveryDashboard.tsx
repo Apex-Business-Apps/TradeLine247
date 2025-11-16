@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client.ts";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -48,14 +48,14 @@ const ERROR_CODE_DESCRIPTIONS: Record<string, string> = {
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'delivered':
-      return <CheckCircle className="h-4 w-4 text-green-600" />;
+      return <CheckCircle className="h-4 w-4 text-success" />;
     case 'failed':
     case 'undelivered':
-      return <XCircle className="h-4 w-4 text-red-600" />;
+      return <XCircle className="h-4 w-4 text-error" />;
     case 'sent':
     case 'sending':
     case 'queued':
-      return <Clock className="h-4 w-4 text-yellow-600" />;
+      return <Clock className="h-4 w-4 text-amber-800" />;
     default:
       return <AlertCircle className="h-4 w-4 text-gray-600" />;
   }
@@ -168,17 +168,17 @@ export default function SMSDeliveryDashboard() {
         
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Delivered</div>
-          <div className="text-2xl font-bold text-green-600">{stats?.delivered || 0}</div>
+          <div className="text-2xl font-bold text-success">{stats?.delivered || 0}</div>
         </Card>
         
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Failed</div>
-          <div className="text-2xl font-bold text-red-600">{stats?.failed || 0}</div>
+          <div className="text-2xl font-bold text-error">{stats?.failed || 0}</div>
         </Card>
         
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Pending</div>
-          <div className="text-2xl font-bold text-yellow-600">{stats?.pending || 0}</div>
+          <div className="text-2xl font-bold text-amber-800">{stats?.pending || 0}</div>
         </Card>
         
         <Card className="p-4">
@@ -241,7 +241,7 @@ export default function SMSDeliveryDashboard() {
                     <TableCell>
                       {log.error_code ? (
                         <div className="space-y-1">
-                          <Badge variant="outline" className="text-red-600">
+                          <Badge variant="outline" className="text-error">
                             {log.error_code}
                           </Badge>
                           <div className="text-xs text-muted-foreground">

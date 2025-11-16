@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client.ts';
 import { Activity, Phone, Settings, Download, MessageSquare } from 'lucide-react';
+import { errorReporter } from '@/lib/errorReporter';
 
 export interface ActivityItem {
   id: string;
@@ -50,7 +51,15 @@ export function useRecentActivity() {
       setActivities(formattedActivities);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch recent activity:', err);
+      errorReporter.report({
+        type: 'error',
+        message: `Failed to fetch recent activity: ${err instanceof Error ? err.message : String(err)}`,
+        stack: err instanceof Error ? err.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment']()
+      });
       setError(err instanceof Error ? err.message : 'Failed to load activity');
     } finally {
       setIsLoading(false);

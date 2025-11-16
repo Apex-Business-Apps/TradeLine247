@@ -1,20 +1,33 @@
 import { test, expect } from '@playwright/test';
+import { gotoAndWait } from './helpers';
 
-const pages = [
-  { qa: /View Calls/i, h1: /Calls/i, path: '/calls' },
-  { qa: /Add Number/i, h1: /Add Number|Buy/i, path: '/numbers/new' },
-  { qa: /Invite Staff|Invite/i, h1: /Invite|Team/i, path: '/team/invite' },
-  { qa: /Integrations/i, h1: /Integrations/i, path: '/integrations' },
+const actions = [
+  { name: 'View Calls', h1: /Calls/i, path: '/calls' },
+  { name: 'Add Number', h1: /Add Number|Buy/i, path: '/numbers/new' },
+  { name: 'Invite Staff', h1: /Invite|Team/i, path: '/team/invite' },
+  { name: 'Integrations', h1: /Integrations/i, path: '/integrations' },
 ];
 
 test.describe('Nav & refresh', () => {
-  for (const p of pages) {
-    test(`Quick Action ${p.path} navigates & survives refresh`, async ({ page }) => {
-      await page.goto('/');
-      await page.getByRole('button', { name: p.qa }).click();
-      await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1);
-      await page.reload();
-      await expect(page.getByRole('heading', { level: 1 })).toHaveText(p.h1);
+  for (const action of actions) {
+    test(`Quick Action ${action.path} navigates & survives refresh`, async ({ page }) => {
+      // Navigate and wait for React hydration
+      await gotoAndWait(page, '/');
+
+      // Scroll quick action into view (below the fold), then assert visibility
+      const button = page.getByRole('button', { name: action.name, exact: true });
+      await expect(button).toHaveCount(1);
+      await button.scrollIntoViewIfNeeded();
+      await expect(button).toBeVisible({ timeout: 15000 });
+      await button.click();
+
+      // Wait for navigation and heading
+      await expect(page.getByRole('heading', { level: 1 }).first()).toHaveText(action.h1, { timeout: 30000 });
+
+      // Reload and verify persistence
+      await page.reload({ waitUntil: 'networkidle' });
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page.getByRole('heading', { level: 1 }).first()).toHaveText(action.h1, { timeout: 30000 });
     });
   }
 });

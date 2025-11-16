@@ -189,9 +189,13 @@ export function useEnhancedToast() {
       ...restOptions,
     };
     
-    // Show toast
+    // Show toast with proper type safety
     const toastType = options?.type || 'info';
-    const toastId = String((sonnerToast as any)[toastType](title, toastOptions));
+    type ToastFunction = (title: string, options?: any) => string | number;
+    // Safe access to dynamic toast method using Record indexing
+    const toastRecord = sonnerToast as unknown as Record<string, ToastFunction>;
+    const toastFn = toastRecord[toastType];
+    const toastId = String(toastFn(title, toastOptions));
     
     // Track grouped toasts
     if (groupId) {

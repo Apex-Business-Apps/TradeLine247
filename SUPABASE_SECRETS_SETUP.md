@@ -13,7 +13,7 @@ The Supabase deployment workflow requires three secrets to be configured in your
 ### Step-by-Step Setup
 
 #### 1. Navigate to Repository Secrets
-Go to: `https://github.com/apexbusiness-systems/tradeline247aicom/settings/secrets/actions`
+Go to: `https://github.com/apexbusiness-systems/tradeline247/settings/secrets/actions`
 
 #### 2. Add SUPABASE_PROJECT_REF
 - Click **"New repository secret"**

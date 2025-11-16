@@ -107,7 +107,7 @@ const MobileIntegration = () => {
           
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500/10 to-indigo-500/5">
-              <Smartphone className="h-6 w-6 text-indigo-600" />
+              <Smartphone className="h-6 w-6 text-info" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Mobile App Integration</h1>
@@ -139,7 +139,7 @@ const MobileIntegration = () => {
                       <p className="text-sm text-muted-foreground">Download from {store.name}</p>
                     </div>
                   </div>
-                  <Badge className="bg-green-500/10 text-green-800 border-green-500/20">
+                  <Badge className="bg-[hsl(142,85%,95%)] text-[hsl(142,85%,25%)] border-[hsl(142,85%,70%)]">
                     Available
                   </Badge>
                 </div>
@@ -251,7 +251,7 @@ const MobileIntegration = () => {
                         {feature.platforms.map((platform) => (
                           <Badge 
                             key={platform}
-                            className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs"
+                            className="bg-blue-500/10 text-info border-info text-xs"
                           >
                             {platform}
                           </Badge>

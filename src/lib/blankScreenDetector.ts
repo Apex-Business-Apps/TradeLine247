@@ -1,3 +1,5 @@
+import { errorReporter } from '@/lib/errorReporter';
+
 /**
  * BLANK SCREEN DETECTOR - ENHANCED WITH DATA PERSISTENCE
  * 
@@ -30,7 +32,15 @@ function storeDetectionEvent(event: DetectionEvent): void {
     const trimmed = history.slice(-MAX_HISTORY_SIZE);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
   } catch (e) {
-    console.warn('[BlankScreenDetector] Failed to store detection event:', e);
+    errorReporter.report({
+      type: 'error',
+      message: `[BlankScreenDetector] Failed to store detection event: ${e instanceof Error ? e.message : String(e)}`,
+      stack: e instanceof Error ? e.stack : undefined,
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      environment: errorReporter['getEnvironment']()
+    });
   }
 }
 
@@ -131,7 +141,15 @@ export function clearDetectionHistory(): void {
     localStorage.removeItem(STORAGE_KEY);
     console.log('[BlankScreenDetector] History cleared');
   } catch (e) {
-    console.warn('[BlankScreenDetector] Failed to clear history:', e);
+    errorReporter.report({
+      type: 'error',
+      message: `[BlankScreenDetector] Failed to clear history: ${e instanceof Error ? e.message : String(e)}`,
+      stack: e instanceof Error ? e.stack : undefined,
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      environment: errorReporter['getEnvironment']()
+    });
   }
 }
 

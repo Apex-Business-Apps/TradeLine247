@@ -3,14 +3,22 @@ import { defineConfig, devices } from '@playwright/test';
 const baseURL =
   process.env.E2E_BASE_URL ||
   process.env.BASE_URL ||
-  'http://localhost:5173';
+  'http://localhost:4173';
 
 const baseUse: Parameters<typeof defineConfig>[0]['use'] = {
   baseURL,
   trace: 'on-first-retry',
   screenshot: 'only-on-failure',
+  video: 'retain-on-failure',
   // Allow inline scripts/styles under test harnesses even when CSP forbids them in production.
   bypassCSP: true,
+  // Fixed viewport for deterministic layout tests
+  viewport: { width: 1366, height: 900 },
+  // Disable animations for stable element detection
+  reducedMotion: 'reduce',
+  // Extended timeout for CI environment + React hydration signal
+  actionTimeout: 45000,
+  navigationTimeout: 45000,
 };
 
 export default defineConfig({
@@ -31,7 +39,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run build && npm run preview -- --port 5173 --strictPort',
+    command: 'npm run preview',
     url: baseURL,
     reuseExistingServer: true,
     timeout: 120000,

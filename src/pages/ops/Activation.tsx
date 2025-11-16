@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2, UserPlus, Building2, CreditCard, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client.ts";
 
 export default function Activation() {
   const [loading, setLoading] = useState(false);
@@ -131,7 +131,7 @@ export default function Activation() {
           </Card>
         ) : (
           <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <CheckCircle2 className="h-4 w-4 text-success" />
             <AlertDescription>
               <div className="space-y-3">
                 <p className="font-semibold text-green-900 dark:text-green-100">

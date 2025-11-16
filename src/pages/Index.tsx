@@ -11,6 +11,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
+import { errorReporter } from "@/lib/errorReporter";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
@@ -23,12 +24,23 @@ const Index = () => {
   useEffect(() => {
     const img = new Image();
     img.src = backgroundImage;
-    img.onerror = () => console.error("Background image failed to load");
+    img.onerror = () => {
+      errorReporter.report({
+        type: 'error',
+        message: 'Background image failed to load',
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { imageSrc: backgroundImage }
+      });
+    };
   }, []);
 
   return (
     <>
       <div
+        id="app-home"
         className="min-h-screen flex flex-col relative"
         style={{
           backgroundImage: `url(${backgroundImage})`,
@@ -36,7 +48,7 @@ const Index = () => {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",
-          backgroundColor: "#f8f9fa", // Fallback color if image fails
+          backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
         }}
       >
         {/* Content with translucency - Optimized for performance */}
@@ -83,19 +95,20 @@ const Index = () => {
           />
 
           <main className="flex-1" style={{ minHeight: "60vh" }}>
-            <div className="bg-background/20 backdrop-blur-[2px]" style={{ willChange: "transform" }}>
+            {/* All sections now use 85% opacity to match secondary pages */}
+            <div className="bg-background/85 backdrop-blur-[2px]" style={{ willChange: "transform" }}>
               <HeroRoiDuo />
             </div>
-            <div className="bg-background/20 backdrop-blur-[2px]">
+            <div className="bg-background/85 backdrop-blur-[2px]">
               <BenefitsGrid />
             </div>
-            <div className="bg-background/25 backdrop-blur-[2px]">
+            <div className="bg-background/85 backdrop-blur-[2px]">
               <ImpactStrip />
             </div>
-            <div className="bg-background/25 backdrop-blur-[2px]">
+            <div className="bg-background/85 backdrop-blur-[2px]">
               <HowItWorks />
             </div>
-            <div className="bg-background/25 backdrop-blur-[2px]">
+            <div className="bg-background/85 backdrop-blur-[2px]">
               <div className="container mx-auto px-4 py-12">
                 <div className="mx-auto max-w-4xl space-y-6 text-center">
                   <h2 className="text-2xl font-semibold tracking-tight text-foreground">
@@ -110,15 +123,15 @@ const Index = () => {
             </div>
           </main>
 
-          <div className="bg-background/25 backdrop-blur-[2px]">
+          <div className="bg-background/85 backdrop-blur-[2px]">
             <TrustBadgesSlim />
           </div>
 
-          <div className="bg-background/25 backdrop-blur-[2px]">
+          <div className="bg-background/85 backdrop-blur-[2px]">
             <LeadCaptureForm />
           </div>
 
-          <div className="bg-background/30 backdrop-blur-[2px]">
+          <div className="bg-background/85 backdrop-blur-[2px]">
             <Footer />
           </div>
 
