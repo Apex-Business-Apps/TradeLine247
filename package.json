@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -21,7 +24,8 @@
     "test:a11y": "playwright test tests/accessibility",
     "test:security": "playwright test tests/security",
     "test:perf": "playwright test tests/performance",
-    "test:all": "npm run test:unit && npm run test:e2e"
+    "test:all": "npm run test:unit && npm run test:e2e",
+    "verify:env:public": "node -e \"if (!process.env.VITE_SUPABASE_URL || !process.env.VITE_SUPABASE_ANON_KEY) { console.error('Missing required public env vars: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY'); process.exit(1); } else { console.log('✅ Public env vars verified'); }\""
   },
   "dependencies": {
     "@axe-core/playwright": "^4.10.2",

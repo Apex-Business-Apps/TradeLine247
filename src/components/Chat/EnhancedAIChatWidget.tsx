@@ -23,7 +23,7 @@ interface EnhancedAIChatWidgetProps {
 }
 
 export function EnhancedAIChatWidget({ dealershipName, leadId }: EnhancedAIChatWidgetProps) {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);

@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { safeStorage } from '@/lib/storage/safeStorage';
 
-const SUPABASE_URL = "https://niorocndzcflrwdrofsp.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pb3JvY25kemNmbHJ3ZHJvZnNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyOTg2OTksImV4cCI6MjA3NDg3NDY5OX0.cQLjnpVEv-e1kz5nc2ntrB21KkJV4GwFT281_53HG4M";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://niorocndzcflrwdrofsp.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pb3JvY25kemNmbHJ3ZHJvZnNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyOTg2OTksImV4cCI6MjA3NDg3NDY5OX0.cQLjnpVEv-e1kz5nc2ntrB21KkJV4GwFT281_53HG4M";
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

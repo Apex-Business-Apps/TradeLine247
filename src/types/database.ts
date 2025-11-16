@@ -1,3 +1,5 @@
+import type { Json } from '@/integrations/supabase/types';
+
 export type UserRole = 'super_admin' | 'org_admin' | 'dealer_admin' | 'sales_manager' | 'sales_rep' | 'finance_manager' | 'viewer';
 export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'quoted' | 'negotiating' | 'credit_app' | 'sold' | 'lost' | 'archived';
 export type LeadSource = 'website' | 'chat' | 'sms' | 'whatsapp' | 'messenger' | 'email' | 'phone' | 'autotrader' | 'kijiji' | 'cargurus' | 'facebook' | 'walk_in' | 'referral' | 'other';
@@ -112,19 +114,19 @@ export interface LeadMetadata {
 export interface Lead {
   id: string;
   dealership_id: string;
-  assigned_to?: string;
+  assigned_to?: string | null;
   source: LeadSource;
   status: LeadStatus;
-  score: number;
-  first_name?: string;
-  last_name?: string;
-  email?: string;
-  phone?: string;
-  preferred_contact?: string;
-  vehicle_interest?: string;
+  score: number | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  preferred_contact?: string | null;
+  vehicle_interest?: string | null;
   trade_in?: TradeInData;
-  notes?: string;
-  metadata?: LeadMetadata;
+  notes?: string | null;
+  metadata?: LeadMetadata | Json | null;
   created_at: string;
   updated_at: string;
 }
@@ -232,9 +234,9 @@ export interface CreditApplication {
   lead_id: string;
   submitted_by?: string;
   status: CreditAppStatus;
-  applicant_data: ApplicantData;
-  co_applicant_data?: ApplicantData;
-  employment_data?: EmploymentData;
+  applicant_data: Json;
+  co_applicant_data?: Json;
+  employment_data?: Json;
   consent_timestamp?: string;
   consent_ip?: string;
   soft_pull: boolean;

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { MessageSquare, X, Send, Loader2 } from 'lucide-react';
+import { X, Send, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ChatbotAvatar } from '@/components/assistant/ChatbotAvatar';

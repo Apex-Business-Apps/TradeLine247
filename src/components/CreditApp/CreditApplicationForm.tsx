@@ -59,7 +59,7 @@ type FormStep = 'applicant' | 'employment' | 'consent' | 'review';
 export function CreditApplicationForm({ leadId, dealershipId, onComplete }: CreditApplicationFormProps) {
   const [step, setStep] = useState<FormStep>('applicant');
   const [applicantData, setApplicantData] = useState<Partial<ApplicantData>>({});
-  const [coApplicant, setCoApplicant] = useState(false);
+  const [coApplicant] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const applicantForm = useForm<ApplicantData>({
@@ -87,7 +87,7 @@ export function CreditApplicationForm({ leadId, dealershipId, onComplete }: Cred
     setStep('consent');
   };
 
-  const handleConsentSubmit = async (consentData: ConsentData) => {
+  const handleConsentSubmit = async (_consentData: ConsentData) => {
     setStep('review');
   };
 
