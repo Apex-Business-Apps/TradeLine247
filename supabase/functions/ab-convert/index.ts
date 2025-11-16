@@ -1,6 +1,5 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.79.0';
-import { preflight, jsonResponse, unexpectedErrorResponse, withCors } from '../_shared/cors.ts';
+import { preflight, jsonResponse, unexpectedErrorResponse, withCors, mergeHeaders, corsHeaders } from '../_shared/cors.ts';
 import { secureHeaders } from '../_shared/secure_headers.ts';
 
 interface ConvertRequest {
@@ -8,7 +7,7 @@ interface ConvertRequest {
   conversionValue?: number;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const pf = preflight(req);
   if (pf) return pf;
 

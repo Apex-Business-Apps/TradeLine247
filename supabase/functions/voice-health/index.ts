@@ -1,5 +1,4 @@
 // Health Check Endpoint for Telephony System
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -7,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -88,12 +87,13 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error: any) {
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return new Response(
       JSON.stringify({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: error.message,
+        error: errorMsg,
       }),
       {
         status: 503,

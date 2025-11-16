@@ -1,5 +1,4 @@
 // PROMPT D: SMS reply webhook - canonical path
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, preflight } from "../_shared/cors.ts";
 import { validateTwilioSignature } from "../_shared/twilio_sig.ts";
@@ -7,7 +6,7 @@ import { mergeHeaders, secureHeaders } from "../_shared/secure_headers.ts";
 
 const twimlHeaders = mergeHeaders(corsHeaders, secureHeaders, { "Content-Type": "text/xml" });
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const pf = preflight(req);
   if (pf) return pf;
 

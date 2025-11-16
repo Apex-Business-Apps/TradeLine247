@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
 
@@ -7,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -37,13 +36,15 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     // Update call log with action result
-    await supabase.from('call_logs').update({
+    const { error: updateError } = await supabase.from('call_logs').update({
       handoff: true,
       handoff_reason: `ai_timeout_or_fallback_${dialCallStatus}`,
       status: dialCallStatus === 'completed' ? 'completed' : 'routing_fallback'
-    }).eq('call_sid', callSid).catch(err => {
-      console.error('Failed to update call log:', err);
-    });
+    }).eq('call_sid', callSid);
+    
+    if (updateError) {
+      console.error('Failed to update call log:', updateError);
+    }
     
     // If AI didn't handle it, fallback to human
     if (dialCallStatus !== 'completed' && dialCallStatus !== 'in-progress') {

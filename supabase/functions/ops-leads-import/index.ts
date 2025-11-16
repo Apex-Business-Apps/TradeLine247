@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { parse } from "https://deno.land/std@0.224.0/csv/parse.ts";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
@@ -29,7 +28,7 @@ interface ImportRequest {
   organization_id?: string;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -178,10 +177,11 @@ serve(async (req) => {
       }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error in ops-leads-import:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMsg }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

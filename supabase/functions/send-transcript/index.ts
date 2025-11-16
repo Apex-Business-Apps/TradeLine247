@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 
@@ -24,7 +23,7 @@ const maskPII = (text: string): string => {
   return text;
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -143,7 +142,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error sending transcript:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

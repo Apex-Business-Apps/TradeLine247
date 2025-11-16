@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
 
@@ -7,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -40,16 +39,18 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     // Log call routing decision
-    await supabase.from('call_logs').insert({
+    const { error: routeError } = await supabase.from('call_logs').insert({
       call_sid: callSid,
       from_e164: from,
       to_e164: to,
       mode: aiWebhook || twilioStreamUrl ? 'ai_first' : 'direct_dial',
       consent_given: shouldRecord,
       status: 'routing'
-    }).catch(err => {
-      console.error('Failed to log call routing:', err);
     });
+    
+    if (routeError) {
+      console.error('Failed to log call routing:', routeError);
+    }
     
     // Determine recording attribute based on consent
     const recordAttr = shouldRecord ? 'record-from-answer-dual' : 'do-not-record';

@@ -96,9 +96,9 @@ describe('AuthLanding - P0 Fix: Form Validation and Handler', () => {
       const emailInput = screen.getByLabelText(/Email Address/i);
       const submitButton = screen.getByRole('button', { name: /Start My 14-Day Trial/i });
 
-      const longName = 'A'.repeat(101); // Too long
-      await user.type(businessNameInput, longName);
-      await user.type(emailInput, 'test@example.com');
+      const longName = 'A'.repeat(101); // Too long (max is 100)
+      fireEvent.change(businessNameInput, { target: { value: longName } });
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -131,9 +131,9 @@ describe('AuthLanding - P0 Fix: Form Validation and Handler', () => {
       const emailInput = screen.getByLabelText(/Email Address/i);
       const submitButton = screen.getByRole('button', { name: /Start My 14-Day Trial/i });
 
-      const longEmail = 'a'.repeat(250) + '@example.com'; // Too long
-      await user.type(businessNameInput, 'Test Company');
-      await user.type(emailInput, longEmail);
+      const longEmail = 'a'.repeat(250) + '@example.com'; // Too long (max is 255)
+      fireEvent.change(businessNameInput, { target: { value: 'Test Company' } });
+      fireEvent.change(emailInput, { target: { value: longEmail } });
       await user.click(submitButton);
 
       await waitFor(() => {

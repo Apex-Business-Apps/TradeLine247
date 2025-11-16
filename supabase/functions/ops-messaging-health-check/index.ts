@@ -1,15 +1,9 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { corsHeaders, preflight } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+Deno.serve(async (req) => {
+  const pf = preflight(req);
+  if (pf) return pf;
 
   try {
     const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
@@ -70,11 +64,12 @@ serve(async (req) => {
     const healthChecks = [];
 
     for (const number of allNumbers) {
-      const accountSid = number.subaccount_sid || TWILIO_ACCOUNT_SID;
+      const numberData = number as any; // Type assertion for database row
+      const accountSid = numberData.subaccount_sid || TWILIO_ACCOUNT_SID;
       
       // Check if number is in a messaging service
       let messagingServiceStatus = 'not_configured';
-      let messagingServiceSid = number.messaging_service_sid;
+      let messagingServiceSid = numberData.messaging_service_sid;
 
       if (!messagingServiceSid) {
         // Try to find messaging service for this number
@@ -110,7 +105,7 @@ serve(async (req) => {
 
       // Check A2P registration status
       let a2pStatus = 'not_registered';
-      if (number.a2p_brand_sid && number.a2p_campaign_sid) {
+      if (numberData.a2p_brand_sid && numberData.a2p_campaign_sid) {
         a2pStatus = 'registered';
       }
 
@@ -130,8 +125,8 @@ serve(async (req) => {
         pending: recentSms?.filter(s => s.status === 'sent' || s.status === 'queued').length || 0
       };
 
-      const deliveryRate = deliveryStats.total > 0 
-        ? (deliveryStats.delivered / deliveryStats.total * 100).toFixed(1) 
+      const deliveryRate = deliveryStats.total > 0
+        ? Number(((deliveryStats.delivered / deliveryStats.total) * 100).toFixed(1))
         : null;
 
       // Get recent errors
@@ -150,8 +145,8 @@ serve(async (req) => {
         messaging_service_status: messagingServiceStatus,
         messaging_service_sid: messagingServiceSid,
         a2p_status: a2pStatus,
-        a2p_brand_sid: number.a2p_brand_sid || null,
-        a2p_campaign_sid: number.a2p_campaign_sid || null,
+        a2p_brand_sid: numberData.a2p_brand_sid || null,
+        a2p_campaign_sid: numberData.a2p_campaign_sid || null,
         delivery_stats_24h: deliveryStats,
         delivery_rate_percent: deliveryRate,
         recent_errors: recentErrors || []
@@ -210,23 +205,30 @@ serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({
-      success: true,
-      tenant_id,
-      numbers_checked: healthChecks.length,
-      health_checks: healthChecks,
-      test_sms: testSmsResult,
-      checked_at: new Date().toISOString()
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        tenant_id,
+        numbers_checked: healthChecks.length,
+        health_checks: healthChecks,
+        test_sms: testSmsResult,
+        checked_at: new Date().toISOString()
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
 
   } catch (error) {
     console.error('Error in ops-messaging-health-check:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    const message = error instanceof Error ? error.message : 'Unexpected error';
+    return new Response(
+      JSON.stringify({ error: message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   }
 });
 

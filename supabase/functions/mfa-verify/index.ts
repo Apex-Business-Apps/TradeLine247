@@ -39,9 +39,10 @@ async function generateTOTP(secret: string, time: number): Promise<string> {
   timeView.setBigUint64(0, BigInt(time), false);
 
   // HMAC-SHA1
+  const keyBuffer = new Uint8Array(key);
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
-    key,
+    keyBuffer,
     {
       name: 'HMAC',
       hash: 'SHA-1'
@@ -150,7 +151,7 @@ Deno.serve(async (req) => {
     ctx.userId = user.id;
 
     // Rate limit check
-    const allowed = await checkRateLimit(supabase, user.id, ctx.ipAddress);
+    const allowed = await checkRateLimit(supabase, user.id, ctx.ipAddress || 'unknown');
     if (!allowed) {
       logWithContext(ctx, 'warn', 'MFA verification rate limited', { userId: user.id });
       return new Response(

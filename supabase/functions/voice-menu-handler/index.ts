@@ -1,6 +1,5 @@
 // DTMF Menu Handler - Routes calls based on user selection
 // Press 1: Sales, Press 2: Support, Press 9: Voicemail
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
 
@@ -9,7 +8,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -39,14 +38,18 @@ serve(async (req) => {
     // Route based on digit pressed
     if (Digits === '1') {
       // Sales
-      await supabase.from('call_logs').insert({
+      const { error: logError } = await supabase.from('call_logs').insert({
         call_sid: CallSid,
         from_e164: From,
         to_e164: To,
         mode: 'sales',
         status: 'routing',
         consent_given: true
-      }).catch(err => console.error('Log error:', err));
+    });
+    
+    if (logError) {
+      console.error('Log error:', logError);
+    }
 
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -59,14 +62,18 @@ serve(async (req) => {
 
     } else if (Digits === '2') {
       // Support
-      await supabase.from('call_logs').insert({
+      const { error: supportLogError } = await supabase.from('call_logs').insert({
         call_sid: CallSid,
         from_e164: From,
         to_e164: To,
         mode: 'support',
         status: 'routing',
         consent_given: true
-      }).catch(err => console.error('Log error:', err));
+      });
+      
+      if (supportLogError) {
+        console.error('Log error:', supportLogError);
+      }
 
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>

@@ -434,7 +434,7 @@ export const Header: React.FC = () => {
                     </>
                   )}
                   <DropdownMenuItem 
-                    onClick={() => signOut()}
+                    onClick={handleSignOut}
                     className="cursor-pointer text-primary focus:text-primary focus:bg-primary/10 dark:focus:bg-primary/20"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
@@ -447,7 +447,7 @@ export const Header: React.FC = () => {
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => signOut()} 
+                onClick={handleSignOut} 
                 className="lg:hidden hover:bg-accent transition-all duration-300"
                 aria-label="Sign out"
               >

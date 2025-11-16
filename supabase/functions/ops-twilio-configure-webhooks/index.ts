@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders, preflight } from "../_shared/cors.ts";
 import { withJSON } from "../_shared/secure_headers.ts";
 
@@ -9,7 +8,7 @@ function assertHttps(label: string, value?: string) {
   }
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const pf = preflight(req);
   if (pf) return pf;
 
@@ -83,8 +82,9 @@ serve(async (req) => {
     return new Response(JSON.stringify({ success: true }), {
       headers: withJSON(corsHeaders),
     });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message ?? String(error) }), {
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: errorMsg }), {
       status: 500,
       headers: withJSON(corsHeaders),
     });

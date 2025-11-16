@@ -2,7 +2,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Outlet, useLocation } from "react-router-dom";
 import { Header } from "./Header";
 import { ThemeProvider, useTheme } from "next-themes";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { useUserPreferencesStore } from "@/stores/userPreferencesStore";
 import { Toaster } from "@/components/ui/sonner";
 import { useKlaviyoAnalytics } from "@/hooks/useKlaviyoAnalytics";
@@ -49,7 +49,11 @@ const ThemeSync = () => {
   return null;
 };
 
-export const AppLayout = () => {
+interface AppLayoutProps {
+  children?: ReactNode;
+}
+
+export const AppLayout = ({ children }: AppLayoutProps) => {
   const { theme } = useUserPreferencesStore();
   const location = useLocation();
 
@@ -79,7 +83,7 @@ export const AppLayout = () => {
         <div className="flex min-h-screen flex-col">
           <Header />
           <main className="flex-1" id="main">
-            <Outlet />
+            {children ?? <Outlet />}
           </main>
         </div>
         {/* Lazy-loaded Global Chat Widget - uses startup splash robot icon */}

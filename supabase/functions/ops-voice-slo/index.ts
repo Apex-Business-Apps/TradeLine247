@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -6,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
@@ -230,9 +229,10 @@ serve(async (req) => {
     return new Response(JSON.stringify(response), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('SLO metrics error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: errorMsg }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

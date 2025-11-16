@@ -1,7 +1,6 @@
 // P13: Retention Enforcement Job - Automated data retention policy enforcement
 // Runs daily via pg_cron to delete old data per retention policies
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -9,7 +8,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -95,13 +94,13 @@ serve(async (req) => {
         event_type: 'retention_enforcement_job_failed',
         event_data: {
           executed_at: new Date().toISOString(),
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
         },
         severity: 'error',
       });
 
     return new Response(
-      JSON.stringify({ error: 'Job failed', message: error.message }),
+      JSON.stringify({ error: 'Job failed', message: error instanceof Error ? error.message : 'Unknown error' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

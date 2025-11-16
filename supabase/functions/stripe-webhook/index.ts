@@ -9,7 +9,6 @@
  * - Background processing
  */
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { verifyStripeWebhook, getStripeSignature } from "../_shared/stripeWebhookValidator.ts";
@@ -19,7 +18,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const STRIPE_WEBHOOK_SECRET = Deno.env.get("STRIPE_WEBHOOK_SECRET")!;
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -138,10 +137,12 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
 
-  } catch (error: any) {
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
     logWithContext(ctx, "error", "Webhook processing failed", { 
-      message: error.message,
-      stack: error.stack 
+      message: errorMsg,
+      stack: errorStack
     });
 
     return new Response(JSON.stringify({ 
@@ -225,17 +226,23 @@ async function processEventBackground(eventId: string, eventType: string): Promi
 
     console.log(`Event ${eventId} processed successfully`);
 
-  } catch (error: any) {
+  } catch (error) {
     console.error(`Error processing event ${eventId}:`, error);
 
     // Mark as failed and increment retry count
+    const { data: currentEvent } = await supabase
+      .from("billing_events")
+      .select("retry_count")
+      .eq("event_id", eventId)
+      .single();
+    
     await supabase
       .from("billing_events")
       .update({ 
         processing_status: "failed",
-        error_message: error.message,
+        error_message: error instanceof Error ? error.message : 'Unknown error',
         last_processed_at: new Date().toISOString(),
-        retry_count: supabase.raw("retry_count + 1")
+        retry_count: (currentEvent?.retry_count || 0) + 1
       })
       .eq("event_id", eventId);
   }

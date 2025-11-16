@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
@@ -19,7 +18,7 @@ interface SendRequest {
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -121,14 +120,15 @@ serve(async (req) => {
           results.throttled++;
         }
 
-      } catch (error: any) {
+      } catch (error) {
         console.error(`❌ Failed to send to ${member.email}:`, error);
         
+        const errorMsg = error instanceof Error ? error.message : String(error);
         await supabaseClient
           .from('campaign_members')
           .update({ 
             status: 'failed',
-            error_message: error.message 
+            error_message: errorMsg
           })
           .eq('id', member.member_id);
 
@@ -169,10 +169,11 @@ serve(async (req) => {
       }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error in ops-send-warm50:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMsg }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

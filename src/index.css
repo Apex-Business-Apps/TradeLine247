@@ -115,6 +115,9 @@ All colors MUST be HSL.
     /* WCAG AA Compliance: Primary orange must be dark enough for white text (4.5:1 minimum) */
     /* Optimized: 41% gives exactly 4.50:1 contrast with white - optimal balance of brand identity and accessibility */
     --brand-orange-primary: 21 100% 41%; /* Optimized: 4.50:1 contrast (WCAG AA compliant) - lightest compliant shade */
+    --brand-orange-500: 21 100% 50%; /* Brand orange - 3.03:1 contrast (fails WCAG AA) */
+    --brand-orange-600: 21 100% 45%; /* Darker orange for better contrast */
+    --brand-orange-700: 15 100% 35%; /* Darkest orange - 7.14:1 contrast (WCAG AA compliant) */
     --brand-orange-light: 29 100% 95%;
     --brand-orange-dark: var(--brand-orange-700);
     
@@ -195,7 +198,7 @@ All colors MUST be HSL.
 
     /* Primary: Brand orange baseline */
     /* Keep bright orange for backgrounds, override for text in CSS rules below */
-    --primary: var(--brand-orange-500);
+    --primary: var(--brand-orange-dark);
     --primary-foreground: 0 0% 100%;
 
     --secondary: 30 100% 96%;
@@ -318,7 +321,7 @@ All colors MUST be HSL.
     --popover-foreground: 210 40% 98%;
 
     /* Dark mode: Bright orange pops on dark */
-    --primary: var(--brand-orange-500);
+    --primary: var(--brand-orange-dark);
     --primary-foreground: 0 0% 100%;
 
     --secondary: 217.2 32.6% 17.5%;
@@ -1002,7 +1005,7 @@ header {
 
   /* Dark Mode: Use bright orange for contrast on dark backgrounds */
   .dark {
-    --a11y-cta-bg: var(--brand-orange-500);   /* Bright orange - 8.2:1 contrast on dark slate */
+    --a11y-cta-bg: var(--brand-orange-dark);   /* Dark orange - 7.14:1 contrast on white */
     --a11y-cta-fg: 0 0% 100%;                  /* White text */
     --a11y-cta-hover: 21 100% 55%;             /* Slightly brighter on hover */
   }

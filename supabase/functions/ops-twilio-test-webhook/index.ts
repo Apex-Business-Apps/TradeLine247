@@ -1,7 +1,6 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
@@ -47,10 +46,11 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error('Test webhook error:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMsg }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
