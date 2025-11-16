@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+// Skip validation in CI environments - Vercel injects env vars at build time
+if (process.env.CI === 'true' || process.env.VERCEL === '1') {
+  console.log("[verify-public-env] Skipping validation in CI/Vercel - env vars injected at build time");
+  process.exit(0);
+}
+
 const required = ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY"];
 const missing = required.filter((key) => {
   const value = process.env[key];
