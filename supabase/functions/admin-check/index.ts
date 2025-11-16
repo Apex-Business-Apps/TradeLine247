@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
       }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Admin check error:', error);
     return new Response(
       JSON.stringify({ ok: false }),

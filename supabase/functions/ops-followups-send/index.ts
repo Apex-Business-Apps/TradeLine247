@@ -151,14 +151,15 @@ Deno.serve(async (req) => {
         results.sent++;
         console.log(`✅ Sent follow-up #${followup.followup_number} to ${lead.email}`);
 
-      } catch (error: any) {
+      } catch (error) {
         console.error(`❌ Failed to send follow-up to ${lead?.email}:`, error);
         
+        const errorMsg = error instanceof Error ? error.message : String(error);
         await supabaseClient
           .from('campaign_followups')
           .update({ 
             status: 'failed',
-            halted_reason: error.message
+            halted_reason: errorMsg
           })
           .eq('id', followup.id);
 
@@ -190,10 +191,11 @@ Deno.serve(async (req) => {
       }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error in ops-followups-send:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMsg }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

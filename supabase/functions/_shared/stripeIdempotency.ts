@@ -48,8 +48,9 @@ export async function idempotentStripeCall<T>(
   
   try {
     return await callFn(options);
-  } catch (error: any) {
-    console.error(`Stripe API error (key: ${idempotencyKey}):`, error.message);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error(`Stripe API error (key: ${idempotencyKey}):`, errorMsg);
     throw error;
   }
 }

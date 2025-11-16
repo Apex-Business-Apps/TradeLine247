@@ -49,15 +49,19 @@ export async function withRetry<T>(
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       return await operation();
-    } catch (error: any) {
-      lastError = error;
+    } catch (error) {
+      if (error instanceof Error) {
+        lastError = error;
+      }
       
       // Check if it's a connection error
+      const errorMsg = error instanceof Error ? error.message : '';
+      const errorCode = (error as any)?.code;
       const isConnectionError = 
-        error.message?.includes('too many connections') ||
-        error.message?.includes('connection refused') ||
-        error.message?.includes('ECONNRESET') ||
-        error.code === '53300'; // too_many_connections
+        errorMsg.includes('too many connections') ||
+        errorMsg.includes('connection refused') ||
+        errorMsg.includes('ECONNRESET') ||
+        errorCode === '53300'; // too_many_connections
 
       if (!isConnectionError || attempt === MAX_RETRIES) {
         // Not a connection error or final attempt - throw
@@ -69,8 +73,8 @@ export async function withRetry<T>(
       if (now - lastConnectionErrorLog > LOG_THROTTLE_MS) {
         console.warn(`Connection error on attempt ${attempt}/${MAX_RETRIES}`, {
           context,
-          error: error.message,
-          code: error.code
+          error: errorMsg,
+          code: errorCode
         });
         lastConnectionErrorLog = now;
       }
@@ -145,11 +149,12 @@ export async function healthCheckQuery(): Promise<{
       healthy: true,
       db_ms: Date.now() - startMs
     };
-  } catch (error: any) {
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return {
       healthy: false,
       db_ms: Date.now() - startMs,
-      error: error.message
+      error: errorMsg
     };
   }
 }

@@ -120,14 +120,15 @@ Deno.serve(async (req) => {
           results.throttled++;
         }
 
-      } catch (error: any) {
+      } catch (error) {
         console.error(`❌ Failed to send to ${member.email}:`, error);
         
+        const errorMsg = error instanceof Error ? error.message : String(error);
         await supabaseClient
           .from('campaign_members')
           .update({ 
             status: 'failed',
-            error_message: error.message 
+            error_message: errorMsg
           })
           .eq('id', member.member_id);
 
@@ -168,10 +169,11 @@ Deno.serve(async (req) => {
       }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error in ops-send-warm50:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMsg }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
