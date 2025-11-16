@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
 
     let purchasedNumber = numRow?.e164_number as string | undefined;
     if (!purchasedNumber) {
-      const candidate = await findLocalNumber({ accountSid: TWILIO_ACCOUNT_SID, authToken: TWILIO_AUTH_TOKEN }, subSid, country, areaCode);
+      const candidate = await findLocalNumber({ accountSid: TWILIO_ACCOUNT_SID, authToken: TWILIO_AUTH_TOKEN }, subSid, country);
       const bought = await buyNumberAndBindWebhooks(
         { accountSid: TWILIO_ACCOUNT_SID, authToken: TWILIO_AUTH_TOKEN },
         subSid,

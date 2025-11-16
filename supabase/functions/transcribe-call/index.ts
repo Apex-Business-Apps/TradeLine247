@@ -14,9 +14,9 @@ interface TranscribeRequest {
   duration_seconds: number;
 }
 
-Deno.serve(async (req) => {
+Deno.serve(async (req): Promise<Response> => {
   if (req.method === 'OPTIONS') {
-    return handleCors(req);
+    return handleCors(req) || new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {

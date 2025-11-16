@@ -39,16 +39,18 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     // Log call routing decision
-    await supabase.from('call_logs').insert({
+    const { error: routeError } = await supabase.from('call_logs').insert({
       call_sid: callSid,
       from_e164: from,
       to_e164: to,
       mode: aiWebhook || twilioStreamUrl ? 'ai_first' : 'direct_dial',
       consent_given: shouldRecord,
       status: 'routing'
-    }).catch(err => {
-      console.error('Failed to log call routing:', err);
     });
+    
+    if (routeError) {
+      console.error('Failed to log call routing:', routeError);
+    }
     
     // Determine recording attribute based on consent
     const recordAttr = shouldRecord ? 'record-from-answer-dual' : 'do-not-record';
