@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_UlcOGlX3XBCnKDq5YTBcAydKWJDT",
+  "orgId": "team_zELTo1DsHkc4KOYL4uLDNBCV",
+  "projectName": "trade-line247",
+  "settings": {
+    "createdAt": 1760866772928,
+    "framework": "vite",
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "22.x"
+  }
+}
