@@ -5,248 +5,187 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { SEOHead } from "@/components/seo/SEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
+import { paths } from "@/routes/paths";
 
-const plans = [
+interface PlanCard {
+  name: string;
+  price: string;
+  description: string;
+  features: string[];
+  cta: string;
+  id: string;
+  planId: "default" | "core" | "commission";
+  badge?: string;
+}
+
+const plans: PlanCard[] = [
   {
-    name: "Zero-Monthly Plan (Pilot)",
-    price: "$149 CAD setup fee",
-    description: "One-time setup, then pay only for results",
+    name: "Starter (Solo Operators)",
+    price: "Free trial · $199/mo after",
+    description: "For trades, clinics, and solo operators who need 24/7 coverage without extra staff.",
     features: [
-      "$149 CAD one-time setup fee",
-      "No monthly fees - pay per qualified appointment",
-      "Prepaid wallet: $200 minimum (auto-recharge)",
-      "Qualified = unique caller • >60s talk time • in service area • not duplicate (30d) • real intent",
-      "Transcript emailed every time"
+      "Includes 300 answered minutes during trial",
+      "Hosted in Canada · SOC 2 posture · PIPEDA/PIPA-ready",
+      "Instant email summaries & CRM-ready exports",
+      "Forward from your cell or business line in minutes",
     ],
-    cta: "Start Zero-Monthly",
-    popular: false,
-    id: "no-monthly",
-    link: "/auth?plan=commission"
+    cta: "Start Starter Trial",
+    id: "starter",
+    planId: "default",
+    badge: "Best for solo",
   },
   {
-    name: "Predictable Plan",
-    price: "$69 CAD setup + $249 CAD/month", 
-    description: "Fixed monthly pricing with one-time setup",
+    name: "Predictable Plus",
+    price: "$69 setup · $249/mo",
+    description: "Flat-rate coverage for growing teams that need guaranteed 24/7 answering.",
     features: [
-      "$69 CAD one-time setup fee",
-      "$249 CAD per month",
-      "Includes AI minutes & routed calls",
-      "Simple overage pricing",  
-      "Add-ons: bilingual, human fallback, CRM push"
+      "Unlimited answered minutes with fair usage",
+      "Live agent fallback & bilingual options",
+      "Calendar + CRM pushes included",
+      "Dedicated success manager in Canada",
     ],
     cta: "Choose Predictable",
-    popular: true,
-    id: "monthly-core",
-    link: "/auth?plan=core"
-  }
+    id: "predictable",
+    planId: "core",
+    badge: "Most popular",
+  },
+  {
+    name: "Commission Accelerator",
+    price: "$149 setup · 12% per booked job",
+    description: "No monthly fee — only pay when TradeLine books qualified appointments for you.",
+    features: [
+      "Qualified = unique caller · >60s talk time · verified intent",
+      "Wallet auto-recharge (min $200) with live usage alerts",
+      "Ideal for seasonal peaks or expansion crews",
+      "Full transcripts & call recordings for every lead",
+    ],
+    cta: "Start Zero-Monthly",
+    id: "commission",
+    planId: "commission",
+    badge: "No monthly fee",
+  },
 ];
 
 const Pricing = () => {
   return (
-    <div 
-      className="min-h-screen flex flex-col relative"
+    <div
+      className="relative flex min-h-screen flex-col"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundAttachment: "fixed",
-        backgroundColor: "hsl(0, 0%, 97%)",
+        backgroundColor: "hsl(0 0% 97%)",
       }}
     >
-      <SEOHead 
+      <SEOHead
         title="Pricing - TradeLine 24/7 AI Receptionist Plans"
-        description="Simple, transparent pricing for 24/7 AI receptionist services. Commission-only or $249/month plans. No setup fees. Edmonton, AB business."
-        keywords="AI receptionist pricing, business automation cost, 24/7 customer service plans, AI phone answering pricing, Edmonton business"
-        canonical="https://www.tradeline247ai.com/pricing"
+        description="Simple, transparent pricing for 24/7 AI receptionist services. Choose starter, flat-rate, or commission plans — all hosted in Canada with compliance baked in."
+        keywords="AI receptionist pricing, business automation cost, 24/7 answering service plans, Canadian call answering"
+        canonical="https://tradeline247ai.com/pricing"
         structuredData={{
           "@context": "https://schema.org",
           "@type": "Product",
           "name": "TradeLine 24/7 AI Receptionist Service",
-          "description": "24/7 AI receptionist and customer service automation for businesses",
+          "description": "24/7 AI receptionist and customer service automation for service businesses",
           "brand": {
             "@type": "Organization",
-            "name": "Apex Business Systems"
+            "name": "Apex Business Systems",
           },
-          "offers": [
-            {
-              "@type": "Offer",
-              "name": "Zero-Monthly Plan (Pilot)",
-              "price": "149",
-              "priceCurrency": "CAD",
-              "priceSpecification": {
-                "@type": "UnitPriceSpecification",
-                "price": "149",
-                "priceCurrency": "CAD",
-                "unitText": "one-time setup fee"
-              },
-              "description": "One-time setup, then pay only for results",
-              "url": "https://www.tradeline247ai.com/auth?plan=commission"
-            },
-            {
-              "@type": "Offer", 
-              "name": "Predictable Plan",
-              "price": "318",
-              "priceCurrency": "CAD",
-              "priceSpecification": {
-                "@type": "AggregateOffer",
-                "lowPrice": "69",
-                "highPrice": "249",
-                "priceCurrency": "CAD",
-                "offers": [
-                  {
-                    "@type": "Offer",
-                    "price": "69",
-                    "priceCurrency": "CAD",
-                    "priceSpecification": {
-                      "@type": "UnitPriceSpecification",
-                      "price": "69",
-                      "priceCurrency": "CAD",
-                      "unitText": "one-time setup fee"
-                    }
-                  },
-                  {
-                    "@type": "Offer",
-                    "price": "249",
-                    "priceCurrency": "CAD",
-                    "priceSpecification": {
-                      "@type": "UnitPriceSpecification",
-                      "price": "249",
-                      "priceCurrency": "CAD",
-                      "unitText": "per month"
-                    }
-                  }
-                ]
-              },
-              "description": "Fixed monthly pricing with one-time setup",
-              "url": "https://www.tradeline247ai.com/auth?plan=core"
-            }
-          ]
+          "offers": plans.map((plan) => ({
+            "@type": "Offer",
+            "name": plan.name,
+            "price": plan.planId === "commission" ? "0" : plan.planId === "core" ? "249" : "199",
+            "priceCurrency": "CAD",
+            "description": plan.description,
+            "url": `https://tradeline247ai.com/auth?plan=${plan.planId}`,
+          })),
         }}
       />
-      
+
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
         <main className="flex-1">
-          {/* Hero Section */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <section style={{
-              paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
-              paddingLeft: 'env(safe-area-inset-left, 0)',
-              paddingRight: 'env(safe-area-inset-right, 0)'
-            }}>
-              <div className="container text-center">
-                <h1 className="text-4xl md:text-6xl font-bold mt-0 mb-8 bg-gradient-to-r from-primary to-accent  text-foreground">
-                  Simple, Transparent Pricing
+          <div className="bg-background/85 backdrop-blur-sm">
+            <section className="px-4 py-20">
+              <div className="container mx-auto text-center space-y-6">
+                <span className="inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-sm font-semibold text-success">
+                  <CheckCircle className="h-4 w-4" /> Free 7-day trial on every plan
+                </span>
+                <h1 className="mt-0 text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
+                  Simple, transparent pricing for 24/7 coverage
                 </h1>
-                <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-                  Choose the perfect plan for your business. All plans include our core AI receptionist features with 14-day free trial.
+                <p className="mx-auto max-w-3xl text-lg text-muted-foreground">
+                  TradeLine 24/7 is hosted in Canada with PIPEDA/PIPA readiness, SOC 2 posture, and support in 55+ languages.
+                  Pick the plan that matches your call volume and only pay for the protection you need.
                 </p>
               </div>
             </section>
           </div>
 
-          {/* Pricing Cards */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
+          <div className="bg-background/85 backdrop-blur-sm">
             <section className="py-20">
-              <div className="container">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                  {plans.map((plan, index) => (
-                    <Card key={index} id={plan.id} className={`relative ${plan.popular ? 'ring-2 ring-primary shadow-xl scale-105' : ''}`}>
-                      {plan.popular && (
+              <div className="container mx-auto">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                  {plans.map((plan) => (
+                    <Card
+                      key={plan.id}
+                      id={plan.id}
+                      className={`relative flex h-full flex-col border-border/60 bg-card/90 shadow-lg ${plan.badge === 'Most popular' ? 'ring-2 ring-primary' : ''}`}
+                    >
+                      {plan.badge && (
                         <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
-                          <Star className="w-4 h-4 mr-1" />
-                          Most Popular
+                          {plan.badge === 'Most popular' && <Star className="mr-1 h-4 w-4" />} {plan.badge}
                         </Badge>
                       )}
-                      <CardHeader className="text-center pb-8">
-                        <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                        <CardDescription className="text-base">
-                          {plan.description}
-                        </CardDescription>
-                        <div className="mt-4">
-                          <span className="text-4xl font-bold">{plan.price}</span>
-                        </div>
+                      <CardHeader>
+                        <CardTitle className="text-2xl text-foreground">{plan.name}</CardTitle>
+                        <CardDescription className="text-muted-foreground">{plan.description}</CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-6">
-                        <ul className="space-y-3">
-                          {plan.features.map((feature, idx) => (
-                            <li key={idx} className="flex items-start gap-3">
-                              <CheckCircle className="w-5 h-5 text-[hsl(142,85%,25%)] flex-shrink-0 mt-0.5" aria-hidden="true" />
-                              <span className="text-sm">{feature}</span>
+                      <CardContent className="flex flex-1 flex-col space-y-6">
+                        <div>
+                          <span className="text-3xl font-bold text-foreground">{plan.price}</span>
+                          <p className="mt-2 text-sm text-muted-foreground">Free 7-day trial · cancel anytime</p>
+                        </div>
+                        <ul className="space-y-3 text-sm text-muted-foreground">
+                          {plan.features.map((feature) => (
+                            <li key={feature} className="flex items-start gap-2">
+                              <CheckCircle className="mt-1 h-4 w-4 text-success" aria-hidden="true" />
+                              <span>{feature}</span>
                             </li>
                           ))}
                         </ul>
-                        <Button 
-                          className="w-full" 
-                          variant={plan.popular ? "default" : "outline"}
-                          size="lg"
-                          asChild
-                        >
-                          <a href={plan.link}>{plan.cta}</a>
+                        <Button asChild size="lg" className="mt-auto w-full">
+                          <a href={`${paths.auth}?plan=${plan.planId}`}>{plan.cta}</a>
                         </Button>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
 
-                {/* Additional Info */}
-                <div className="text-center mt-16 p-8 bg-muted/30 rounded-lg">
-                  <h3 className="text-2xl font-bold mb-4">All Plans Include</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                <div className="mt-16 rounded-3xl bg-muted/30 p-8 text-center">
+                  <h3 className="text-2xl font-bold text-foreground">Every plan includes</h3>
+                  <div className="mt-6 grid grid-cols-1 gap-6 text-sm text-muted-foreground md:grid-cols-3">
                     <div>
-                      <h4 className="font-semibold mb-2">
-                        <a href="/security" className="text-primary hover:underline">Security & Compliance</a>
-                      </h4>
-                      <p className="text-muted-foreground">SOC 2 compliant, GDPR ready, bank-level security</p>
+                      <h4 className="font-semibold text-foreground">Security & Compliance</h4>
+                      <p>SOC 2 posture, Canadian data residency, encryption end-to-end.</p>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-2">24/7 AI Coverage</h4>
-                      <p className="text-muted-foreground">Never miss a call or message, even on weekends</p>
+                      <h4 className="font-semibold text-foreground">AI + Human Handoff</h4>
+                      <p>Seamless escalation to your team with transcripts and call recordings.</p>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-2">
-                        <a href="/compare" className="text-primary hover:underline">Why Choose Us?</a>
-                      </h4>
-                      <p className="text-muted-foreground">See how we compare to traditional services</p>
+                      <h4 className="font-semibold text-foreground">Flexible Integrations</h4>
+                      <p>CRM pushes, calendar routing, and developer-friendly APIs.</p>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* FAQ Section */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <section className="py-20">
-              <div className="container text-center">
-                <h2 className="text-3xl md:text-4xl font-bold mb-12">Frequently Asked Questions</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto text-left">
-                  <div>
-                    <h3 className="font-semibold mb-2">Can I change plans anytime?</h3>
-                    <p className="text-muted-foreground text-sm">Yes, you can upgrade or downgrade your plan at any time. Changes take effect at your next billing cycle.</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">What are the setup fees?</h3>
-                    <p className="text-muted-foreground text-sm">Zero-Monthly Plan: $149 CAD one-time setup. Predictable Plan: $69 CAD one-time setup. All plans include onboarding and training.</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">What happens if I exceed my limits?</h3>
-                    <p className="text-muted-foreground text-sm">We'll notify you before limits are reached and help you upgrade to a plan that fits your needs.</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">Do you offer refunds?</h3>
-                    <p className="text-muted-foreground text-sm">Yes, we offer a 30-day money-back guarantee if you're not satisfied with our service.</p>
                   </div>
                 </div>
               </div>
             </section>
           </div>
         </main>
-        
-        <div className="bg-background/85 backdrop-blur-[2px]">
-          <Footer />
-        </div>
+
+        <Footer />
       </div>
     </div>
   );
