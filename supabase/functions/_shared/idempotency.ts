@@ -138,8 +138,9 @@ export async function withIdempotency<T>(
     const result = await operation();
     await completeIdempotency(supabase, idempotencyKey, result);
     return result;
-  } catch (error: any) {
-    await failIdempotency(supabase, idempotencyKey, error.message);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    await failIdempotency(supabase, idempotencyKey, errorMsg);
     throw error;
   }
 }

@@ -147,9 +147,10 @@ export class TelephonyTransaction {
       const result = await operation(tx);
       await tx.complete();
       return result;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Transaction operation failed:', error);
-      await tx.fail(error.message);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      await tx.fail(errorMsg);
 
       // Attempt rollback
       try {

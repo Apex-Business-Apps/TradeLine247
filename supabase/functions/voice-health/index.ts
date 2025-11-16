@@ -87,12 +87,13 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error: any) {
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     return new Response(
       JSON.stringify({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: error.message,
+        error: errorMsg,
       }),
       {
         status: 503,

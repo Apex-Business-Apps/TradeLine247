@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
 import { corsHeaders, preflight } from "../_shared/cors.ts";
 import { addDays, setHours, setMinutes, setSeconds } from "npm:date-fns@3.6.0";
-import { toZonedTime, fromZonedTime } from "https://esm.sh/date-fns-tz@2.0.1";
+import { toZonedTime, fromZonedTime } from "https://esm.sh/date-fns-tz@3.2.0";
 
 interface FollowupRequest {
   campaign_id: string;

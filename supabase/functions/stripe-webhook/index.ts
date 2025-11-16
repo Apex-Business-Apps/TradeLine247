@@ -137,10 +137,12 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
 
-  } catch (error: any) {
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
     logWithContext(ctx, "error", "Webhook processing failed", { 
-      message: error.message,
-      stack: error.stack 
+      message: errorMsg,
+      stack: errorStack
     });
 
     return new Response(JSON.stringify({ 
@@ -224,7 +226,7 @@ async function processEventBackground(eventId: string, eventType: string): Promi
 
     console.log(`Event ${eventId} processed successfully`);
 
-  } catch (error: any) {
+  } catch (error) {
     console.error(`Error processing event ${eventId}:`, error);
 
     // Mark as failed and increment retry count

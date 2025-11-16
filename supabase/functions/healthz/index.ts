@@ -54,13 +54,14 @@ Deno.serve(async (req) => {
       }
     });
 
-  } catch (error: any) {
-    console.error("Health check failed:", error.message);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error("Health check failed:", errorMsg);
     
     return new Response(JSON.stringify({
       status: "error",
       timestamp: new Date().toISOString(),
-      error: error.message,
+      error: errorMsg,
       cold_start: isColdStart
     }), {
       status: 503,
