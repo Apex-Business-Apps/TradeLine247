@@ -13,6 +13,7 @@ playwright-report/
 .nyc_output
 
 # Build outputs (Vercel builds these)
+dist/
 build/
 .next/
 out/
