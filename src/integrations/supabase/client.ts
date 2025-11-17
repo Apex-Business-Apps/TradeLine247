@@ -2,8 +2,10 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// CRITICAL FIX: Use hardcoded values as fallback (VITE_* env vars not supported in Lovable)
+// Supabase Project: hysvqdwmhxnblxfqnszn
+const url = import.meta.env.VITE_SUPABASE_URL || 'https://hysvqdwmhxnblxfqnszn.supabase.co';
+const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo';
 
 // Safely detect browser storage to avoid SSR/build ReferenceErrors
 const safeStorage: Storage | undefined =
