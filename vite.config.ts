@@ -79,8 +79,33 @@ export default defineConfig(({ mode }) => ({
     minify: 'terser',
     terserOptions: {
       compress: {
-        // SECURITY FIX: Keep console.error/warn in production for error monitoring
-        // Only drop console.log/debug to reduce noise
+        // ============================================================================
+        // CRITICAL LOGGING POLICY - DO NOT MODIFY WITHOUT REVIEW
+        // ============================================================================
+        // drop_console: false - Keeps ALL console methods by default
+        // pure_funcs: ['console.log', 'console.debug', 'console.trace']
+        //   - These specific methods are STRIPPED during minification
+        //   - They are treated as "pure functions" with no side effects
+        //
+        // PRESERVED METHODS (keep in production):
+        //   - console.info()  ✅ Use for critical initialization logs
+        //   - console.warn()  ✅ Use for warnings
+        //   - console.error() ✅ Use for errors
+        //
+        // REMOVED METHODS (stripped in production):
+        //   - console.log()   ❌ Removed - use console.info() for important logs
+        //   - console.debug() ❌ Removed - development only
+        //   - console.trace() ❌ Removed - development only
+        //
+        // WHY THIS MATTERS:
+        //   - Production builds MUST have diagnostic logs to debug bundle loading
+        //   - main.tsx uses console.info() for critical initialization tracking
+        //   - If you see "no console logs" in production, check this config
+        //
+        // REGRESSION PREVENTION:
+        //   - Run `npm run build` and check dist/ for console.info preservation
+        //   - Use verification script: `npm run verify:app`
+        // ============================================================================
         drop_console: false,
         drop_debugger: true,
         pure_funcs: ['console.log', 'console.debug', 'console.trace']

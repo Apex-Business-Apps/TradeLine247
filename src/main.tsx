@@ -1,7 +1,8 @@
 // ===================================================================
 // SIMPLIFIED MOUNTING - Traditional approach with error handling
 // ===================================================================
-console.log('🚀 TradeLine 24/7 - Starting main.tsx...');
+// CRITICAL: Use console.info instead of console.log to survive production minification
+console.info('🚀 TradeLine 24/7 - Starting main.tsx...');
 
 import React from "react";
 import { createRoot } from "react-dom/client";
@@ -13,7 +14,7 @@ import { runSwCleanup } from "./lib/swCleanup";
 import { featureFlags } from "./config/featureFlags";
 import "./i18n/config";
 
-console.log('✅ Core modules loaded');
+console.info('✅ Core modules loaded');
 
 // H310-1: Dev-only error listener to capture React Error #310
 if (import.meta.env.DEV && featureFlags.H310_HARDENING) {
@@ -28,7 +29,7 @@ if (import.meta.env.DEV && featureFlags.H310_HARDENING) {
       });
     }
   });
-  console.log('🛡️ H310 Hardening: Error listener active');
+  console.info('🛡️ H310 Hardening: Error listener active');
 }
 
 // Initialize error observability for production
@@ -63,7 +64,7 @@ if (import.meta.env.DEV || /lovable/.test(location.hostname)) {
         healthCheckIntervalMs: 30000,
         enableFallback: true,
       });
-      console.log('✅ Lovable save failsafe initialized');
+      console.info('✅ Lovable save failsafe initialized');
     })
     .catch((error) => {
       console.warn('⚠️ Lovable save failsafe not available:', error);
@@ -140,7 +141,7 @@ function boot() {
       loadingEl.style.display = 'none';
     }
 
-    console.log('✅ React mounted successfully');
+    console.info('✅ React mounted successfully');
 
     // Signal to E2E tests that React hydration is complete
     setTimeout(() => {
@@ -180,7 +181,7 @@ function boot() {
           }, 1500);
         });
       } else {
-        console.log('🛡️ Safe Mode: Optional features disabled');
+        console.info('🛡️ Safe Mode: Optional features disabled');
       }
     }, 100);
     
