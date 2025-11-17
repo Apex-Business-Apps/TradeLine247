@@ -451,19 +451,10 @@ export const Header: React.FC = () => {
                 className="lg:hidden hover:bg-accent transition-all duration-300"
                 aria-label="Sign out"
               >
-                <LogOut className="h-5 w-5" />
-              </Button>
-            </>
-          ) : (
-            <Button 
-              variant="success" 
-              size={isScrolled ? 'sm' : 'default'} 
-              onClick={() => handleNavigation(paths.auth, 'Login')}
-              className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
-            >
-              Login
+              <LogOut className="h-5 w-5" />
             </Button>
-          )}
+          </>
+        ) : null}
         </div>
       </div>
 
