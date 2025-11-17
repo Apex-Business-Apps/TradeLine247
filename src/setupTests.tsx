@@ -1,5 +1,12 @@
 import '@testing-library/jest-dom/vitest';
-import { vi } from 'vitest';
+import { vi, beforeEach } from 'vitest';
+
+// Mock Supabase environment variables for tests using vi.stubEnv
+// This is the correct way to mock env vars in Vitest (not Object.defineProperty)
+beforeEach(() => {
+  vi.stubEnv('VITE_SUPABASE_URL', 'https://test-project.supabase.co');
+  vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'test-anon-key');
+});
 
 // Mock Supabase environment variables for tests
 // This allows Supabase client tests to run without real credentials
