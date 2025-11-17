@@ -12,6 +12,8 @@ if (missing.length === 0) {
   process.exit(0);
 }
 
+// Default to soft failure (warning only) for CI/preview builds
+// Only hard fail if explicitly set to '1'
 const hardFail = process.env.REQUIRE_PUBLIC_ENV === '1';
 const msg = `[verify-public-env] Missing required environment variables: ${missing.join(', ')}`;
 
@@ -19,6 +21,7 @@ if (hardFail) {
   console.error(msg + ' (REQUIRE_PUBLIC_ENV=1, failing build)');
   process.exit(1);
 } else {
-  console.warn(msg + ' (soft warning only; continuing for ephemeral/preview builds)');
+  console.warn(msg + ' (soft warning only; continuing for CI/preview builds)');
+  // Exit with success code to allow builds to continue
   process.exit(0);
 }
