@@ -386,11 +386,14 @@ export const Header: React.FC = () => {
       <nav
         id="mobile-menu"
         aria-label="Mobile"
-        aria-hidden={!isMobileMenuOpen}
         className={cn(
           'border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden',
-          isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+          isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
         )}
+        {...(!isMobileMenuOpen && {
+          inert: '' as any,
+          'aria-hidden': 'true'
+        })}
       >
         <div className="container py-4 space-y-1">
           {/* Marketing Links */}
