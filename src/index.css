@@ -1461,3 +1461,40 @@ button[class*="bg-primary"] span {
 }
 
 /* ========== END A11Y FIXES ========== */
+
+
+/* ========== A11Y FIXES - OPACITY OPTIMIZED ========== */
+
+/* Badges: Must use white text (1.12:1 too low for opacity fix) */
+.px-2\.5[class*="bg-primary"],
+[class*="px-2.5"][class*="bg-primary"],
+.px-2\.5[class*="absolute"][class*="-top-3"],
+[class*="absolute"][class*="-top-3"][class*="bg-primary"],
+[class*="group"] > [class*="-top-4"][class*="rounded-full"][class*="w-8"],
+[class*="-top-4"][class*="left-1/2"][class*="rounded-full"],
+.font-mono[class*="text-primary"],
+.font-mono[class*="bg-primary"],
+code[class*="bg-primary"] {
+  color: #ffffff !important;
+}
+
+/* Dashboard LIGHT mode - 12% darkening filter (3.98 → 4.5) */
+[class*="text-xs"][class*="text-muted-foreground"]:not(.dark *) {
+  filter: brightness(0.88);
+}
+
+/* Dashboard DARK mode - 8% brightening (4.27 → 4.6) */
+.dark [class*="text-xs"][class*="text-muted-foreground"],
+.dark [class*="text-xs"][class*="text-foreground\/70"],
+.dark [class*="text-xs"][class*="text-foreground\/80"] {
+  filter: brightness(1.08);
+}
+
+/* Nav DARK mode - 6% brightening (4.35 → 4.6) */
+.dark nav a[class*="text-muted-foreground"],
+.dark [role="navigation"] a[class*="text-muted-foreground"],
+.dark header a[class*="text-muted-foreground"] {
+  filter: brightness(1.06);
+}
+
+/* ========== END A11Y FIXES ========== */
