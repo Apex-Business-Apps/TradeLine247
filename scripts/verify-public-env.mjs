@@ -1,14 +1,24 @@
 #!/usr/bin/env node
 
-const required = ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY"];
-const missing = required.filter((key) => {
-  const value = process.env[key];
-  return typeof value !== "string" || value.trim().length === 0;
-});
+const REQUIRED_PUBLIC_ENV = [
+  'VITE_SUPABASE_URL',
+  'VITE_SUPABASE_ANON_KEY',
+];
 
-if (missing.length > 0) {
-  console.error(`[verify-public-env] Missing required environment variables: ${missing.join(', ')}`);
-  process.exit(1);
+const missing = REQUIRED_PUBLIC_ENV.filter((name) => !process.env[name]);
+
+if (missing.length === 0) {
+  console.info('[verify-public-env] All required env vars are present.');
+  process.exit(0);
 }
 
-console.log("[verify-public-env] All required public environment variables are set.");
+const hardFail = process.env.REQUIRE_PUBLIC_ENV === '1';
+const msg = `[verify-public-env] Missing required environment variables: ${missing.join(', ')}`;
+
+if (hardFail) {
+  console.error(msg + ' (REQUIRE_PUBLIC_ENV=1, failing build)');
+  process.exit(1);
+} else {
+  console.warn(msg + ' (soft warning only; continuing for ephemeral/preview builds)');
+  process.exit(0);
+}

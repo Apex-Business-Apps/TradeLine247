@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { paths } from '@/routes/paths';
-import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client.ts';
+import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,7 +30,7 @@ const Auth = () => {
   const { validatePassword: secureValidatePassword } = usePasswordSecurity();
 
   useEffect(() => {
-    if (!isSupabaseEnabled) {
+    if (!isSupabaseEnabled || !supabase) {
       setLoading(false);
       return () => undefined;
     }
