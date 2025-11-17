@@ -11,6 +11,7 @@
     "// verify & quality": "────────────────────────────────────────",
     "verify:app": "node scripts/verify-app.cjs",
     "verify:icons": "node scripts/verify_icons.mjs",
+    "verify:console": "node scripts/verify-console-usage.mjs",
     "verify:env:public": "node scripts/verify-public-env.mjs",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0 && node scripts/check-edge-imports.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -31,7 +32,7 @@
     "cap:sync": "npx cap sync",
     "ios:open": "npx cap open ios",
     "// npm lifecycle hooks": "────────────────────────────────────",
-    "postbuild": "npm run verify:app && npm run verify:icons",
+    "postbuild": "npm run verify:app && npm run verify:icons && npm run verify:console",
     "capacitor:sync:before": "npm run build"
   },
   "dependencies": {
