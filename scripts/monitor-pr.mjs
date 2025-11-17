@@ -43,9 +43,9 @@ function checkBranchStatus() {
   }
 }
 
-function checkBuildStatus() {
+async function checkBuildStatus() {
   console.log('\n🔍 Checking build status...\n');
-  
+
   try {
     // Check if production rubric exists
     const fs = await import('node:fs/promises');
@@ -62,16 +62,16 @@ function checkBuildStatus() {
   }
 }
 
-function main() {
+async function main() {
   console.log('📊 PR Monitoring Dashboard\n');
   console.log(`Branch: ${PR_BRANCH}`);
   console.log(`Repo: ${REPO}\n`);
   console.log('='.repeat(50));
-  
+
   const branchExists = checkBranchStatus();
-  
+
   if (branchExists) {
-    checkBuildStatus();
+    await checkBuildStatus();
     
     console.log('\n' + '='.repeat(50));
     console.log('\n📋 Next Steps:');

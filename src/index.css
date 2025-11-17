@@ -1355,4 +1355,37 @@ button[class*="btn-aa"] {
   color: hsl(var(--foreground)) !important;
 }
 
+/* Fix 4: Dark mode foreground colors for WCAG AA compliance */
+.dark .text-foreground,
+.dark [class*="text-foreground"] {
+  color: #d4dce4 !important; /* Lighter foreground for 7:1 contrast on dark bg */
+}
+
+/* Fix 5: Dark mode slate colors */
+.dark .text-slate-400,
+.dark .text-slate-600,
+.dark [class*="text-slate-400"],
+.dark [class*="text-slate-600"] {
+  color: #b8c5d0 !important; /* Lighter slate for 4.5:1+ contrast */
+}
+
+/* Fix 6: Dark mode headings */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark .text-3xl,
+.dark .text-2xl,
+.dark .text-lg,
+.dark [class*="text-3xl"],
+.dark [class*="text-2xl"],
+.dark [class*="text-lg"] {
+  color: #d4dce4 !important; /* High contrast headings */
+}
+
+/* Fix 7: Dark mode buttons and interactive elements */
+.dark button.bg-background,
+.dark [class*="bg-background"].border-input {
+  color: #d4dce4 !important;
+}
+
 /* ========== END A11Y FIXES ========== */
