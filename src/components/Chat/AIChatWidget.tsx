@@ -36,6 +36,15 @@ export function AIChatWidget() {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    if (!supabase) {
+      toast({
+        title: 'Service Unavailable',
+        description: 'Chat service is not configured. Please check your environment settings.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const userMessage = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);

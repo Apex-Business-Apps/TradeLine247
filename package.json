@@ -25,7 +25,7 @@
     "test:security": "playwright test tests/security",
     "test:perf": "playwright test tests/performance",
     "test:all": "npm run test:unit && npm run test:e2e",
-    "verify:env:public": "node -e \"if (!process.env.VITE_SUPABASE_URL || !process.env.VITE_SUPABASE_ANON_KEY) { console.error('Missing required public env vars: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY'); process.exit(1); } else { console.log('✅ Public env vars verified'); }\""
+    "verify:env:public": "node scripts/verify-public-env.mjs"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.10.2",
