@@ -10,7 +10,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { SUPPORTED_LOCALES } from '@/i18n/config';
 
-export const LanguageSwitcher: React.FC = () => {
+interface LanguageSwitcherProps {
+  className?: string;
+}
+
+export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
   const { t, i18n } = useTranslation('common');
 
   const changeLanguage = (lng: string) => {
@@ -23,6 +27,7 @@ export const LanguageSwitcher: React.FC = () => {
         <Button 
           variant="ghost" 
           size="icon"
+          className={className}
           aria-label={t('language.switch')}
         >
           <Globe className="h-5 w-5" />
