@@ -32,7 +32,7 @@
     "cap:sync": "npx cap sync",
     "ios:open": "npx cap open ios",
     "// npm lifecycle hooks": "────────────────────────────────────",
-    "prebuild": "node scripts/check-required-files.mjs",
+    "prebuild": "node -e \"const fs = require('fs'); const files = ['src/integrations/supabase/client.ts', 'src/App.tsx', 'src/main.tsx', 'package.json', 'vite.config.ts']; let missing = []; files.forEach(f => { try { fs.accessSync(f, fs.constants.F_OK); } catch { missing.push(f); } }); if (missing.length) { console.error('❌ Missing required files:', missing.join(', ')); process.exit(1); } console.log('✅ All required files found');\"",
     "postbuild": "npm run verify:app && npm run verify:icons && npm run verify:console",
     "capacitor:sync:before": "npm run build"
   },

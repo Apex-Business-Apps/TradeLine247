@@ -1,6 +1,17 @@
 import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
 
+// Mock Supabase environment variables for tests
+// This allows Supabase client tests to run without real credentials
+Object.defineProperty(import.meta.env, 'VITE_SUPABASE_URL', {
+  value: 'https://test-project.supabase.co',
+  writable: true,
+});
+Object.defineProperty(import.meta.env, 'VITE_SUPABASE_ANON_KEY', {
+  value: 'test-anon-key-12345',
+  writable: true,
+});
+
 // Mock react-helmet-async for test environment
 // This prevents "Cannot read properties of undefined (reading 'add')" errors in jsdom
 vi.mock('react-helmet-async', async () => {
