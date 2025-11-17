@@ -1327,3 +1327,32 @@ button[class*="btn-aa"] {
   .hero-gradient { animation: none; }
   .hero-cta-button:hover, .feature-badge:hover { transform: none; }
 }
+/* ========== A11Y FIXES - DO NOT MODIFY ========== */
+
+/* Fix 1: Step badge text (01, 02, 03) */
+[class*="group"] > [class*="-top-4"][class*="rounded-full"][class*="w-8"],
+[class*="-top-4"][class*="left-1/2"][class*="rounded-full"] {
+  color: #ffffff !important;
+}
+
+/* Fix 2: Dashboard text in dark mode */
+.dark [class*="text-xs"][class*="text-muted-foreground\/70"],
+.dark [class*="text-xs"][class*="text-foreground\/70"],
+.dark [class*="text-xs"][class*="text-foreground\/80"] {
+  opacity: 0.95 !important;
+}
+
+/* Fix 3: Nav links in dark mode */
+.dark nav a[class*="text-muted-foreground"],
+.dark [role="navigation"] a[class*="text-muted-foreground"],
+.dark header a[class*="text-muted-foreground"] {
+  color: #8793a3 !important;
+}
+
+.dark nav a[class*="text-muted-foreground"]:hover,
+.dark [role="navigation"] a[class*="text-muted-foreground"]:hover,
+.dark header a[class*="text-muted-foreground"]:hover {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ========== END A11Y FIXES ========== */
