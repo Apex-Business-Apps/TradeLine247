@@ -386,7 +386,8 @@ export const Header: React.FC = () => {
       {isMobileMenuOpen && (
         <nav
           id="mobile-menu"
-          aria-label="Mobile"
+          aria-label="Mobile navigation"
+          aria-hidden="false"
           className="border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden"
         >
           <div className="container py-4 space-y-1">

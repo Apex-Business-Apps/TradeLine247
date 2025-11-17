@@ -59,7 +59,10 @@ android/
 capacitor.config.ts
 
 # Supabase (deployed separately)
+# Exclude root-level supabase/ directory (migrations, functions, etc.)
 supabase/
+# BUT explicitly include src/integrations/supabase/ (needed for build)
+!src/integrations/supabase/
 
 # K6 tests
 k6/
