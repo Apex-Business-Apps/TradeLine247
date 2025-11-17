@@ -1418,4 +1418,46 @@ button[class*="btn-aa"] {
   color: #ffffff !important;
 }
 
+/* Fix 11: LIGHT MODE - Badges on primary backgrounds */
+.bg-primary,
+[class*="bg-primary"],
+.px-2\.5.py-0\.5,
+[class*="px-2.5"][class*="py-0.5"] {
+  background-color: #c2410c !important; /* Dark orange: 5.1:1 contrast with white */
+  color: #ffffff !important;
+}
+
+/* Fix 12: LIGHT MODE - All text on primary backgrounds must be white */
+.bg-primary *,
+[class*="bg-primary"] *,
+.bg-primary span,
+[class*="bg-primary"] span {
+  color: #ffffff !important;
+}
+
+/* Fix 13: LIGHT MODE - Button text on primary backgrounds */
+button.btn-aa,
+button.bg-primary,
+button[class*="bg-primary"],
+button.btn-aa span,
+button.bg-primary span,
+button[class*="bg-primary"] span {
+  background-color: #c2410c !important;
+  color: #ffffff !important;
+}
+
+/* Fix 14: LIGHT MODE - Font-mono and code text on primary backgrounds */
+.bg-primary .font-mono,
+[class*="bg-primary"] .font-mono,
+.bg-primary code,
+[class*="bg-primary"] code {
+  color: #ffffff !important;
+}
+
+/* Fix 15: LIGHT MODE - Text-primary-foreground override */
+.text-primary-foreground,
+[class*="text-primary-foreground"] {
+  color: #ffffff !important;
+}
+
 /* ========== END A11Y FIXES ========== */
