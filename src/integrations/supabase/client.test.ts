@@ -19,20 +19,19 @@ describe('Supabase Client', () => {
     const { isSupabaseEnabled } = await import('./client');
 
     expect(typeof isSupabaseEnabled).toBe('boolean');
-    // In test environment, env vars are mocked so should be true
-    // In CI/production without env vars, this will be false - both are valid
-    expect(isSupabaseEnabled).toBeDefined();
+    // Client has hardcoded fallback values, so it should always be enabled
+    // Even if env vars are not set, fallbacks ensure supabase is created
+    expect(isSupabaseEnabled).toBe(true);
   });
 
   it('should export supabase client', async () => {
     const { supabase, isSupabaseEnabled } = await import('./client');
 
-    if (isSupabaseEnabled) {
-      expect(supabase).toBeDefined();
-      expect(typeof supabase.auth).toBe('object');
-    } else {
-      expect(supabase).toBeNull();
-    }
+    // Client has fallback values, so supabase should always be created
+    expect(isSupabaseEnabled).toBe(true);
+    expect(supabase).toBeDefined();
+    expect(supabase).not.toBeNull();
+    expect(typeof supabase?.auth).toBe('object');
   });
 
   it('should have valid Supabase URL configured', () => {
@@ -42,6 +41,9 @@ describe('Supabase Client', () => {
     // Verify that the file references the correct environment variable names
     expect(content).toContain('VITE_SUPABASE_URL');
     expect(content).toContain('VITE_SUPABASE_ANON_KEY');
+    // Check that it has fallback values (either env vars with || fallback or hardcoded URL)
+    const hasFallback = content.includes('||') || content.includes('supabase.co');
+    expect(hasFallback).toBe(true);
   });
 
   it('should have valid Supabase key configured', () => {
