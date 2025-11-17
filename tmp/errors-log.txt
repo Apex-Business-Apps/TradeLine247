@@ -1,0 +1,213 @@
+a11y/accessibility
+failed 3 minutes ago in 4m 0s
+Search logs
+1s
+1s
+4s
+8s
+41s
+12s
+2m 51s
+Run npx playwright test tests/e2e/a11y-comprehensive.spec.ts --reporter=line
+
+Running 25 tests using 1 worker
+
+[1/25] [chromium] › tests/e2e/a11y-comprehensive.spec.ts:67:3 › Public Pages Accessibility › Home page - WCAG AA compliant
+[chromium] › tests/e2e/a11y-comprehensive.spec.ts:67:3 › Public Pages Accessibility › Home page - WCAG AA compliant
+
+❌ Accessibility violations found on: Home
+
+
+  Rule: aria-hidden-focus
+
+  Impact: serious
+
+  Description: Ensure aria-hidden elements are not focusable nor contain focusable elements
+
+  Help: https://dequeuniversity.com/rules/axe/4.10/aria-hidden-focus?application=axeAPI
+
+  Affected elements: 1
+
+    1. #mobile-menu
+
+
+  Rule: color-contrast
+
+  Impact: serious
+
+  Description: Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds
+
+  Help: https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=axeAPI
+
+  Affected elements: 5
+
+    1. .px-2\.5
+
+    2. .bg-card.hover\:shadow-lg.group:nth-child(1) > .-top-4.left-1\/2.-translate-x-1\/2
+
+    3. .bg-card.hover\:shadow-lg.group:nth-child(2) > .-top-4.left-1\/2.-translate-x-1\/2
+
+
+  Rule: landmark-main-is-top-level
+
+  Impact: moderate
+
+  Description: Ensure the main landmark is at top level
+
+  Help: https://dequeuniversity.com/rules/axe/4.10/landmark-main-is-top-level?application=axeAPI
+
+
+
+
+
+
+
+
+
+=========================================================================================================================================================================
+
+
+
+
+
+
+
+
+ci/test
+failed 5 minutes ago in 25s
+Search logs
+1s
+1s
+3s
+9s
+8s
+Run npm run test:ci --if-present
+
+> vite_react_shadcn_ts@0.0.0 test:ci
+> node scripts/ci-vitest-run.mjs
+
+
+ RUN  v2.1.9 /home/runner/work/tradeline247aicom/tradeline247aicom
+
+ ❯ src/pages/__tests__/AuthLanding.test.tsx (0 test)
+ ❯ src/hooks/__tests__/useSecureFormSubmission.test.ts (0 test)
+ ❯ src/lib/__tests__/errorReporter.test.ts (0 test)
+ ❯ src/lib/__tests__/ensureMembership.test.ts (0 test)
+ ❯ src/hooks/__tests__/usePasswordSecurity.test.ts (0 test)
+ ❯ src/hooks/__tests__/useAuth.test.ts (0 test)
+ ❯ src/lib/__tests__/reportError.fallback.test.ts (0 test)
+ ❯ src/components/errors/__tests__/ErrorBoundary.test.tsx (0 test)
+ ❯ src/stores/__tests__/userPreferencesStore.test.ts (0 test)
+ ❯ src/lib/__tests__/errorReporter.enhanced.test.ts (0 test)
+ ❯ src/pages/__tests__/routes.smoke.test.tsx (0 test)
+ ❯ src/stores/__tests__/dashboardStore.test.ts (0 test)
+ ❯ src/utils/__tests__/errorObservability.test.ts (0 test)
+ ❯ src/integrations/supabase/client.test.ts (0 test)
+ ❯ src/components/errors/__tests__/SafeErrorBoundary.test.tsx (0 test)
+ ❯ src/utils/__tests__/utils.test.ts (0 test)
+ ❯ supabase/functions/_shared/__tests__/http-security.test.ts (0 test)
+ ❯ src/components/ui/ChatIcon.test.tsx (0 test)
+ ❯ src/components/layout/__tests__/Header.spec.tsx (0 test)
+ ❯ src/pages/__tests__/Index.spec.tsx (0 test)
+ ❯ src/utils/__tests__/runtime.test.ts (0 test)
+ ❯ src/utils/__tests__/env.test.ts (0 test)
+ ❯ src/pages/__tests__/Contact.spec.tsx (0 test)
+ ❯ src/__tests__/routes/paths.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 24 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/routes/paths.test.ts [ src/__tests__/routes/paths.test.ts ]
+ FAIL  src/hooks/__tests__/useAuth.test.ts [ src/hooks/__tests__/useAuth.test.ts ]
+ FAIL  src/hooks/__tests__/usePasswordSecurity.test.ts [ src/hooks/__tests__/usePasswordSecurity.test.ts ]
+ FAIL  src/hooks/__tests__/useSecureFormSubmission.test.ts [ src/hooks/__tests__/useSecureFormSubmission.test.ts ]
+ FAIL  src/components/ui/ChatIcon.test.tsx [ src/components/ui/ChatIcon.test.tsx ]
+ FAIL  src/integrations/supabase/client.test.ts [ src/integrations/supabase/client.test.ts ]
+ FAIL  src/lib/__tests__/ensureMembership.test.ts [ src/lib/__tests__/ensureMembership.test.ts ]
+ FAIL  src/lib/__tests__/errorReporter.enhanced.test.ts [ src/lib/__tests__/errorReporter.enhanced.test.ts ]
+ FAIL  src/lib/__tests__/errorReporter.test.ts [ src/lib/__tests__/errorReporter.test.ts ]
+ FAIL  src/lib/__tests__/reportError.fallback.test.ts [ src/lib/__tests__/reportError.fallback.test.ts ]
+ FAIL  src/pages/__tests__/AuthLanding.test.tsx [ src/pages/__tests__/AuthLanding.test.tsx ]
+ FAIL  src/pages/__tests__/Contact.spec.tsx [ src/pages/__tests__/Contact.spec.tsx ]
+ FAIL  src/pages/__tests__/Index.spec.tsx [ src/pages/__tests__/Index.spec.tsx ]
+ FAIL  src/pages/__tests__/routes.smoke.test.tsx [ src/pages/__tests__/routes.smoke.test.tsx ]
+ FAIL  src/stores/__tests__/dashboardStore.test.ts [ src/stores/__tests__/dashboardStore.test.ts ]
+ FAIL  src/stores/__tests__/userPreferencesStore.test.ts [ src/stores/__tests__/userPreferencesStore.test.ts ]
+ FAIL  src/utils/__tests__/env.test.ts [ src/utils/__tests__/env.test.ts ]
+ FAIL  src/utils/__tests__/errorObservability.test.ts [ src/utils/__tests__/errorObservability.test.ts ]
+ FAIL  src/utils/__tests__/runtime.test.ts [ src/utils/__tests__/runtime.test.ts ]
+ FAIL  src/utils/__tests__/utils.test.ts [ src/utils/__tests__/utils.test.ts ]
+ FAIL  src/components/errors/__tests__/ErrorBoundary.test.tsx [ src/components/errors/__tests__/ErrorBoundary.test.tsx ]
+ FAIL  src/components/errors/__tests__/SafeErrorBoundary.test.tsx [ src/components/errors/__tests__/SafeErrorBoundary.test.tsx ]
+ FAIL  src/components/layout/__tests__/Header.spec.tsx [ src/components/layout/__tests__/Header.spec.tsx ]
+ FAIL  supabase/functions/_shared/__tests__/http-security.test.ts [ supabase/functions/_shared/__tests__/http-security.test.ts ]
+TypeError: 'process.env' only accepts a configurable, writable, and enumerable data descriptor
+ ❯ src/setupTests.tsx:6:8
+      4| // Mock Supabase environment variables for tests
+      5| // This allows Supabase client tests to run without real credentials
+      6| Object.defineProperty(import.meta.env, 'VITE_SUPABASE_URL', {
+       |        ^
+      7|   value: 'https://test-project.supabase.co',
+      8|   writable: true,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/24]⎯
+
+ Test Files  24 failed (24)
+      Tests  no tests
+   Start at  17:40:18
+   Duration  7.46s (transform 61ms, setup 0ms, collect 0ms, tests 0ms, environment 13.47s, prepare 1.95s)
+
+Error: Process completed with exit code 1.
+
+
+
+
+=========================================================================================================================================================================
+
+
+VERCEL ERROR:
+
+
+Running build in Washington, D.C., USA (East) – iad1
+Build machine configuration: 4 cores, 8 GB
+Cloning github.com/apexbusiness-systems/tradeline247aicom (Branch: fix/build-loop-hardening-v2, Commit: 2ebc1c9)
+Cloning completed: 1.123s
+Found .vercelignore
+Removed 584 ignored files defined in .vercelignore
+  /.git/config
+  /.git/description
+  /.git/FETCH_HEAD
+  /.git/HEAD
+  /.git/hooks/applypatch-msg.sample
+  /.git/hooks/commit-msg.sample
+  /.git/hooks/fsmonitor-watchman.sample
+  /.git/hooks/post-update.sample
+  /.git/hooks/pre-applypatch.sample
+  /.git/hooks/pre-commit.sample
+Restored build cache from previous deployment (CELEEMba7TM4DJgoNXieihzKxPmZ)
+Running "vercel build"
+Vercel CLI 48.10.2
+Running "install" command: `npm ci`...01:14:16.803
+ 
+Running "install" command: `npm ci`...
+01:14:31.153
+ 
+01:14:31.153
+ 
+added 759 packages in 14s
+01:14:31.615
+ 
+01:14:31.615
+ 
+> vite_react_shadcn_ts@0.0.0 prebuild
+01:14:31.615
+ 
+> node -e "const fs = require('fs'); const files = ['src/integrations/supabase/client.ts', 'src/App.tsx', 'src/main.tsx', 'package.json', 'vite.config.ts']; let missing = []; files.forEach(f => { try { fs.accessSync(f, fs.constants.F_OK); } catch { missing.push(f); } }); if (missing.length) { console.error('❌ Missing required files:', missing.join(', ')); process.exit(1); } console.log('✅ All required files found');"
+01:14:31.615
+ 
+01:14:31.652
+ 
+❌ Missing required files: src/integrations/supabase/client.ts
+01:14:31.664
+ 
+Error: Command "npm run build" exited with 1
+solve this isssue
