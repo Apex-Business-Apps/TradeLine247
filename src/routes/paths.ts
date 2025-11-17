@@ -18,5 +18,6 @@ export const paths = {
   phoneApps: "/phone-apps",
   forwardingWizard: "/ops/forwarding",
   voiceSettings: "/ops/voice",
+  kidsStory: "/kids/story",
   notFound: "*",
 } as const;

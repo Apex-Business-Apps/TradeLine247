@@ -6,6 +6,7 @@ import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { useUserPreferencesStore } from "@/stores/userPreferencesStore";
 import { Toaster } from "@/components/ui/sonner";
 import { useKlaviyoAnalytics } from "@/hooks/useKlaviyoAnalytics";
+import { stopJubeeNarration } from "@/hooks/useJubeeNarrator";
 
 // Lazy load non-critical UI components to reduce initial bundle size
 const MiniChat = lazy(() => import("@/components/ui/MiniChat").then(module => ({ default: module.MiniChat })));
@@ -68,6 +69,12 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     } else {
       document.body.removeAttribute('data-page');
     }
+  }, [location.pathname]);
+
+  // Stop any ongoing Jubee narration whenever the route changes so
+  // narration never bleeds across screens.
+  useEffect(() => {
+    stopJubeeNarration();
   }, [location.pathname]);
 
   return (

@@ -26,6 +26,7 @@ const TeamInvite = lazy(() => import("./pages/TeamInvite"));
 const PhoneApps = lazy(() => import("./pages/PhoneApps"));
 const ForwardingWizard = lazy(() => import("./routes/ForwardingWizard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const KidsStory = lazy(() => import("./pages/KidsStory"));
 
 const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.home, element: <Index /> },
@@ -47,6 +48,7 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.integrations, element: <Integrations /> },
   { path: paths.phoneApps, element: <PhoneApps /> },
   { path: paths.forwardingWizard, element: <ForwardingWizard /> },
+  { path: paths.kidsStory, element: <KidsStory /> },
   { path: paths.notFound, element: <NotFound /> },
 ];
 
