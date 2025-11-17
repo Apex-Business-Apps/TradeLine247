@@ -47,7 +47,7 @@ export default function TeamInvite() {
         description="Invite colleagues and set their access to the TradeLine 24/7 operations console."
         keywords="invite team, add staff, collaboration"
       />
-      <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/10">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/10">
         <div className="container mx-auto px-4 py-10 max-w-4xl">
           <div className="mb-8 space-y-2 text-center sm:text-left">
             <Badge variant="secondary" className="text-sm uppercase tracking-wide">

@@ -19,7 +19,7 @@ const NotFound = () => {
         noIndex={true}
       />
       
-      <main className="flex-1 flex items-center justify-center py-20">
+      <div className="flex-1 flex items-center justify-center py-20">
         <div className="container text-center">
           <Card 
             className="max-w-lg mx-auto border-0"
@@ -73,35 +73,35 @@ const NotFound = () => {
               <div className="pt-6 border-t border-border/50">
                 <h3 className="font-semibold mb-4 text-foreground/90">Popular pages</h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => navigate(paths.features)}
-                    className="h-10 justify-start hover:bg-primary/5"
+                    className="h-10 justify-start hover:bg-accent hover:text-accent-foreground"
                   >
                     Features
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => navigate(paths.pricing)}
-                    className="h-10 justify-start hover:bg-primary/5"
+                    className="h-10 justify-start hover:bg-accent hover:text-accent-foreground"
                   >
                     Pricing
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => navigate(paths.faq)}
-                    className="h-10 justify-start hover:bg-primary/5"
+                    className="h-10 justify-start hover:bg-accent hover:text-accent-foreground"
                   >
                     FAQ
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => navigate(paths.contact)}
-                    className="h-10 justify-start hover:bg-primary/5"
+                    className="h-10 justify-start hover:bg-accent hover:text-accent-foreground"
                   >
                     Contact
                   </Button>

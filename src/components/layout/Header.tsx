@@ -229,13 +229,13 @@ export const Header: React.FC = () => {
                             e.preventDefault();
                             handleNavigation(item.href, item.name);
                           }}
-                          className={cn(
-                            'inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2',
-                            'text-sm font-semibold text-primary transition-all duration-300',
-                            'hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary',
-                            'focus:outline-none disabled:pointer-events-none disabled:opacity-50',
-                            'data-[active]:bg-primary/20 data-[state=open]:bg-primary/20 hover-scale'
-                          )}
+                    className={cn(
+                        'inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2',
+                        'text-sm font-semibold text-foreground transition-all duration-300',
+                        'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+                        'focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+                        'data-[active]:bg-accent data-[state=open]:bg-accent hover-scale'
+                      )}
                           aria-label={`Navigate to ${item.name}`}
                         >
                           {item.name}
@@ -382,93 +382,86 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation Drawer - Now visible on all screen sizes */}
-      <nav
-        id="mobile-menu"
-        aria-label="Mobile"
-        aria-hidden={!isMobileMenuOpen}
-        inert={!isMobileMenuOpen ? true : undefined}
-        className={cn(
-          'border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden',
-          isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
-        )}
-        {...(!isMobileMenuOpen && {
-          inert: '' as any,
-          'aria-hidden': 'true'
-        })}
-      >
-        <div className="container py-4 space-y-1">
-          {/* Marketing Links */}
-          <div className="px-2 py-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
-              Information
-            </p>
-            {MARKETING_NAV.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="block px-4 py-2.5 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300"
-                onClick={() => handleNavigation(item.href, item.name, true)}
-                aria-current={isActivePath(item.href) ? 'page' : undefined}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
+      {/* Mobile Navigation Drawer - Conditionally rendered to avoid aria-hidden-focus violations */}
+      {isMobileMenuOpen && (
+        <nav
+          id="mobile-menu"
+          aria-label="Mobile"
+          className="border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden"
+        >
+          <div className="container py-4 space-y-1">
+            {/* Marketing Links */}
+            <div className="px-2 py-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
+                Information
+              </p>
+              {MARKETING_NAV.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="block px-4 py-2.5 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300"
+                  onClick={() => handleNavigation(item.href, item.name, true)}
+                  aria-current={isActivePath(item.href) ? 'page' : undefined}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
 
-          {/* Admin Links (Admin Only, NOT on marketing home) */}
-          {isUserAdmin && !isMarketingHome && (
-            <>
-              <div className="border-t border-border my-2" />
-              <div className="px-2 py-2">
-                <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 px-2">
-                  Application
-                </p>
-                {ADMIN_NAV.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNavigation(item.href, item.name, true);
-                    }}
-                    className="block px-4 py-2.5 text-sm font-semibold rounded-md bg-primary/5 hover:bg-primary/10 text-primary transition-all duration-300"
-                    aria-label={`Navigate to ${item.name}`}
-                    aria-current={isActivePath(item.href) ? 'page' : undefined}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </div>
-            </>
-          )}
-          <div className="border-t border-border" />
-          <div className="space-y-3">
-            <LanguageSwitcher className="w-full" />
-            {user ? (
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  handleSignOut();
-                }}
-                className="w-full justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-semibold text-red-600 transition-all duration-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </Button>
-            ) : (
-              <Button
-                variant="success"
-                onClick={() => handleNavigation(paths.auth, 'Login', true)}
-                className="w-full justify-center px-4 py-2.5 text-sm font-semibold"
-              >
-                Login
-              </Button>
+            {/* Admin Links (Admin Only, NOT on marketing home) */}
+            {isUserAdmin && !isMarketingHome && (
+              <>
+                <div className="border-t border-border my-2" />
+                <div className="px-2 py-2">
+                  <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 px-2">
+                    Application
+                  </p>
+                  {ADMIN_NAV.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavigation(item.href, item.name, true);
+                      }}
+                      className="block px-4 py-2.5 text-sm font-semibold rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300"
+                      aria-label={`Navigate to ${item.name}`}
+                      aria-current={isActivePath(item.href) ? 'page' : undefined}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              </>
             )}
+            <div className="border-t border-border" />
+            <div className="space-y-3">
+              {isMobileMenuOpen && <LanguageSwitcher className="w-full" />}
+              {user ? (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleSignOut();
+                  }}
+                  className="w-full justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-semibold text-red-600 transition-all duration-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              ) : (
+                <Button
+                  variant="success"
+                  onClick={() => handleNavigation(paths.auth, 'Login', true)}
+                  className="w-full justify-center px-4 py-2.5 text-sm font-semibold"
+                >
+                  Login
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
     </header>
   );
 };

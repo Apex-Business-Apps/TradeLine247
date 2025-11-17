@@ -266,7 +266,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
 
-      <main className="flex-1 container py-8 px-4 flex items-center justify-center">
+      <div className="flex-1 container py-8 px-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Welcome to TradeLine 24/7</CardTitle>
@@ -416,7 +416,7 @@ const Auth = () => {
             </Tabs>
           </CardContent>
         </Card>
-      </main>
+      </div>
       
       <Footer />
     </div>

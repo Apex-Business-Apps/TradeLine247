@@ -201,7 +201,7 @@ const Contact = () => {
       <LocalBusinessSchema />
       
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
-        <main className="flex-1">
+        <div className="flex-1">
           {/* Hero Section */}
           <div className="bg-background/85 backdrop-blur-[2px]">
             <section className="py-20">
@@ -233,7 +233,7 @@ const Contact = () => {
                     <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
                       <method.icon className="w-6 h-6 text-primary" />
                     </div>
-                    <CardTitle className="text-lg">{method.title}</CardTitle>
+                    <h2 className="text-lg font-semibold leading-none tracking-tight">{method.title}</h2>
                     <CardDescription>{method.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -443,7 +443,7 @@ const Contact = () => {
           </div>
             </section>
           </div>
-        </main>
+        </div>
         
         <div className="bg-background/85 backdrop-blur-[2px]">
           <Footer />

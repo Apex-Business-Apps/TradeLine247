@@ -12,7 +12,7 @@ const Privacy = () => {
         canonical="https://www.tradeline247ai.com/privacy"
       />
       
-      <main className="flex-1 py-20">
+      <div className="flex-1 py-20">
         <div className="container">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">

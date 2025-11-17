@@ -25,7 +25,7 @@ const ThankYou = () => {
       
       <div className="min-h-screen flex flex-col bg-background">
 
-        <main className="flex-1 container py-16 px-4">
+        <div className="flex-1 container py-16 px-4">
           <div className="max-w-2xl mx-auto">
             <Card className="border-primary/20 shadow-xl">
               <CardHeader className="text-center pb-4">

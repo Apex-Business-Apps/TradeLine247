@@ -12,7 +12,7 @@ export default function SecurityMonitoring() {
   if (error) {
     return (
       <div className="min-h-screen flex flex-col">
-        <main className="flex-1 container mx-auto px-4 py-8">
+        <div className="flex-1 container mx-auto px-4 py-8">
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Access Denied</AlertTitle>

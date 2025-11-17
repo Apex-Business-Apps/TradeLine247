@@ -83,11 +83,11 @@ const MessagingHealth = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <main className="flex-1 container py-8">
+        <div className="flex-1 container py-8">
           <div className="flex items-center justify-center h-64">
             <p className="text-muted-foreground">Loading messaging health data...</p>
           </div>
-        </main>
+        </div>
         <Footer />
       </div>
     );
@@ -95,7 +95,7 @@ const MessagingHealth = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 container py-8">
+      <div className="flex-1 container py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Messaging Health</h1>
           <p className="text-muted-foreground">

@@ -27,7 +27,7 @@ export default function Compare() {
     >
       {/* Simple title/description to avoid SEOHead until we're stable */}
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
-        <main className="flex-1">
+        <div className="flex-1">
           <div className="bg-background/85 backdrop-blur-[2px]">
             <section className="py-20">
               <div className="container text-center">
