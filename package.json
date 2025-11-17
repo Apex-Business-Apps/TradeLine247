@@ -17,6 +17,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "// web dev/build": "────────────────────────────────────────",
     "dev": "vite",
+    "prebuild": "node scripts/check-required-files.mjs",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
@@ -104,6 +105,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "file:tests/e2e/vendor/axe-core-playwright",
+    "@capacitor/ios": "^7.4.4",
     "@eslint/js": "^9.37.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",

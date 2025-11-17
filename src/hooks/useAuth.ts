@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client.ts';
+import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
 import { ensureMembership } from '@/lib/ensureMembership';
 import { toast } from '@/hooks/use-toast';
 import { errorReporter } from '@/lib/errorReporter';
@@ -121,21 +121,18 @@ export const useAuth = () => {
       }
       
       setLoading(false);
-    }).catch(async (err) => {
+    }).catch((err) => {
       // Report auth errors to centralized monitoring
-      if (typeof window !== 'undefined') {
-        const { errorReporter } = await import('@/lib/errorReporter');
-        errorReporter.report({
-          type: 'error',
-          message: err instanceof Error ? err.message : 'Auth session check failed',
-          stack: err instanceof Error ? err.stack : undefined,
-          timestamp: new Date().toISOString(),
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-          environment: errorReporter['getEnvironment'](),
-          metadata: { context: 'useAuth_session_check' }
-        });
-      }
+      errorReporter.report({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Auth session check failed',
+        stack: err instanceof Error ? err.stack : undefined,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+        environment: errorReporter['getEnvironment'](),
+        metadata: { context: 'useAuth_session_check' }
+      });
       if (supabase.auth?.signOut) {
         supabase.auth.signOut().catch(() => {/* ignore */});
       }

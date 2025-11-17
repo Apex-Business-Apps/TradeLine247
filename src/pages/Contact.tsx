@@ -9,7 +9,7 @@ import { Mail, Phone, Clock, MessageCircle, Loader2 } from "lucide-react";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { LocalBusinessSchema } from "@/components/seo/LocalBusinessSchema";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client.ts";
+import { supabase } from "@/integrations/supabase/client";
 import { FormErrorFallback } from "@/components/errors/FormErrorFallback";
 import { z } from "zod";
 import { PUBLIC_HELPLINE_E164, PUBLIC_HELPLINE_DISPLAY, PUBLIC_EMAIL } from "@/config/public";

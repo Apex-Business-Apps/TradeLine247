@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client.ts';
+import { supabase } from '@/integrations/supabase/client';
 import { useOptimizedData } from './useOptimizedData';
 import { Kpi, NextItem, Transcript } from '@/types/dashboard';
 import { errorReporter } from '@/lib/errorReporter';

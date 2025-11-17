@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client.ts';
+import { supabase } from '@/integrations/supabase/client';
 import { errorReporter } from '@/lib/errorReporter';
 
 let analyticsGatedWarningLogged = false;
