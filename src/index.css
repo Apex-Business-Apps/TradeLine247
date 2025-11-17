@@ -1388,4 +1388,34 @@ button[class*="btn-aa"] {
   color: #d4dce4 !important;
 }
 
+/* Fix 8: Phone number and call-to-action text in dark mode */
+.dark a[href^="tel"] span,
+.dark a[href^="tel"] .uppercase,
+.dark .px-6 > span {
+  color: #1e556b !important; /* Navy for contrast on white bg */
+}
+
+/* Fix 9: Badges and small text on colored backgrounds */
+.dark .px-2\.5.py-0\.5,
+.dark [class*="px-2.5"][class*="py-0.5"],
+.dark .bg-primary.text-white,
+.dark [class*="bg-primary"] {
+  color: #ffffff !important;
+  background-color: #c2410c !important; /* Darker orange for 4.5:1 contrast */
+}
+
+/* Fix 10: Button text on primary backgrounds */
+.dark button.btn-aa,
+.dark button.bg-primary,
+.dark button[class*="bg-primary"] {
+  background-color: #c2410c !important; /* Dark orange: 5.1:1 contrast */
+  color: #ffffff !important;
+}
+
+.dark button.btn-aa span,
+.dark button.bg-primary span,
+.dark button[class*="bg-primary"] span {
+  color: #ffffff !important;
+}
+
 /* ========== END A11Y FIXES ========== */
