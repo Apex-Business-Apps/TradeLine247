@@ -213,7 +213,7 @@ export default function CallCenter() {
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
     </>
   );
 }

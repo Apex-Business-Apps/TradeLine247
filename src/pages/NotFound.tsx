@@ -110,7 +110,7 @@ const NotFound = () => {
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
       
       <Footer />
     </div>

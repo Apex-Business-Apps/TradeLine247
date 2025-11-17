@@ -171,7 +171,7 @@ const Demo = () => {
             </div>
           </div>
         </section>
-      </main>
+      </div>
       
       <Footer />
     </div>

@@ -134,7 +134,7 @@ export default function TeamInvite() {
             </Card>
           </div>
         </div>
-      </main>
+      </div>
     </>
   );
 }

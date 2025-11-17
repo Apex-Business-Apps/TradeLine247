@@ -381,7 +381,7 @@ const AutomationIntegration = () => {
             </div>
           </CardContent>
         </Card>
-      </main>
+      </div>
       
       <Footer />
     </div>

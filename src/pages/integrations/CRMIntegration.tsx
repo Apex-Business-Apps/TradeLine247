@@ -227,7 +227,7 @@ const CRMIntegration = () => {
             </Button>
           </CardContent>
         </Card>
-      </main>
+      </div>
       
       <Footer />
     </div>

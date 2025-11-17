@@ -255,7 +255,7 @@ TradeLine 24/7 Team`);
             </Button>
           </CardContent>
         </Card>
-      </main>
+      </div>
       
       <Footer />
     </div>

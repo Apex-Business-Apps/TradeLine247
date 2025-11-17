@@ -285,7 +285,7 @@ const MessagingIntegration = () => {
             </Button>
           </CardContent>
         </Card>
-      </main>
+      </div>
       
       <Footer />
     </div>

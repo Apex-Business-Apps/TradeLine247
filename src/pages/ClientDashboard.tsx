@@ -68,7 +68,7 @@ const ClientDashboard = () => {
         <Suspense fallback={<DashboardSkeletons layout={dashboardLayout || 'comfortable'} />}>
           <NewDashboard />
         </Suspense>
-      </main>
+      </div>
 
       <Footer />
     </div>

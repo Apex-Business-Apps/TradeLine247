@@ -298,7 +298,7 @@ const PhoneIntegration = () => {
             ))}
           </div>
         </div>
-      </main>
+      </div>
       
       <Footer />
     </div>

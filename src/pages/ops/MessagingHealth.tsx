@@ -269,7 +269,7 @@ const MessagingHealth = () => {
             </a>
           </CardContent>
         </Card>
-      </main>
+      </div>
       <Footer />
     </div>
   );

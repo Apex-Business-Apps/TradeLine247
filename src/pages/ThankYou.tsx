@@ -90,7 +90,7 @@ const ThankYou = () => {
               </CardContent>
             </Card>
           </div>
-        </main>
+        </div>
         
         <Footer />
       </div>

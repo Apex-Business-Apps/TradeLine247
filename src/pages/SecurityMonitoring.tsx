@@ -20,7 +20,7 @@ export default function SecurityMonitoring() {
               You don't have permission to view this page. Security monitoring is only available to administrators.
             </AlertDescription>
           </Alert>
-        </main>
+        </div>
         <Footer />
       </div>
     );

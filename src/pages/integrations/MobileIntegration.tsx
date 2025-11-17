@@ -322,7 +322,7 @@ const MobileIntegration = () => {
             </div>
           </CardContent>
         </Card>
-      </main>
+      </div>
       
       <Footer />
     </div>

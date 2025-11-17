@@ -93,7 +93,7 @@ const Terms = () => {
             </Card>
           </div>
         </div>
-      </main>
+      </div>
       
       <Footer />
     </div>

@@ -114,7 +114,7 @@ export default function Compare() {
               </div>
             </section>
           </div>
-        </main>
+        </div>
 
         <div className="bg-background/85 backdrop-blur-[2px]">
           <Footer />
