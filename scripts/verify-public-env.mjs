@@ -28,4 +28,13 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-console.log("[verify-public-env] All required public environment variables are set.");
+const hardFail = process.env.REQUIRE_PUBLIC_ENV === '1';
+const msg = `[verify-public-env] Missing required environment variables: ${missing.join(', ')}`;
+
+if (hardFail) {
+  console.error(msg + ' (REQUIRE_PUBLIC_ENV=1, failing build)');
+  process.exit(1);
+} else {
+  console.warn(msg + ' (soft warning only; continuing for ephemeral/preview builds)');
+  process.exit(0);
+}

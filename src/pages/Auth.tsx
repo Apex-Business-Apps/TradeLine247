@@ -30,7 +30,7 @@ const Auth = () => {
   const { validatePassword: secureValidatePassword } = usePasswordSecurity();
 
   useEffect(() => {
-    if (!isSupabaseEnabled) {
+    if (!isSupabaseEnabled || !supabase) {
       setLoading(false);
       return () => undefined;
     }
