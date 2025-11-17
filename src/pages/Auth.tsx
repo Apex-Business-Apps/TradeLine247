@@ -265,7 +265,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-
+      <h1 className="sr-only">TradeLine 24/7 Authentication</h1>
       <div className="flex-1 container py-8 px-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">

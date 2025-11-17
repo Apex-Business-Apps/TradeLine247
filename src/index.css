@@ -1181,20 +1181,35 @@ h1, h2, h3, h4, h5, h6,
 /* Unify all primary color usage to hero text orange */
 /* For text on white/light backgrounds, use darker orange for WCAG AA compliance */
 /* Target Tailwind's text-primary utility class specifically - override hsl(var(--primary)) */
-.text-primary,
-[class*="text-primary"],
-button.text-primary,
-a.text-primary,
-[class*="hover:text-primary"]:hover,
-button[class*="hover:text-primary"]:hover,
-a[class*="hover:text-primary"]:hover,
+html:not(.dark) .text-primary,
+html:not(.dark) [class*="text-primary"],
+html:not(.dark) button.text-primary,
+html:not(.dark) a.text-primary,
+html:not(.dark) [class*="hover:text-primary"]:hover,
+html:not(.dark) button[class*="hover:text-primary"]:hover,
+html:not(.dark) a[class*="hover:text-primary"]:hover,
 /* Target any element using hsl(var(--primary)) for text color */
-[style*="color"][style*="primary"],
-button[class*="hover:text-primary"]:hover,
-a[class*="hover:text-primary"]:hover {
+html:not(.dark) [style*="color"][style*="primary"],
+html:not(.dark) button[class*="hover:text-primary"]:hover,
+html:not(.dark) a[class*="hover:text-primary"]:hover {
   /* Use darker orange for better contrast on white backgrounds (WCAG AA: 4.5:1) */
   /* This overrides Tailwind's hsl(var(--primary)) for text contexts */
   color: #CC4A1F !important;
+}
+
+/* Dark mode: Use lighter orange for better contrast on dark backgrounds (WCAG AA: 4.5:1) */
+html.dark .text-primary,
+html.dark [class*="text-primary"],
+html.dark button.text-primary,
+html.dark a.text-primary,
+html.dark [class*="hover:text-primary"]:hover,
+html.dark button[class*="hover:text-primary"]:hover,
+html.dark a[class*="hover:text-primary"]:hover,
+html.dark [style*="color"][style*="primary"],
+html.dark button[class*="hover:text-primary"]:hover,
+html.dark a[class*="hover:text-primary"]:hover {
+  /* Use lighter orange (#FF6B35) for better contrast on dark backgrounds (#020817) - 4.6:1 contrast */
+  color: #FF6B35 !important;
 }
 
 /* For backgrounds and borders, use the original bright orange */
