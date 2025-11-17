@@ -80,7 +80,7 @@ export default function AuthLanding() {
   };
 
   return (
-    <section className="container mx-auto px-4 py-16">
+    <div className="container mx-auto px-4 py-16">
       <div className="max-w-lg mx-auto">
         <h1 className="text-3xl font-bold mb-4">Start Your Free 14-Day Trial</h1>
         <p className="mb-8 text-muted-foreground">
@@ -156,6 +156,6 @@ export default function AuthLanding() {
           </p>
         </form>
       </div>
-    </section>
+    </div>
   );
 }

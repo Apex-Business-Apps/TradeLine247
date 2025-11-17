@@ -142,7 +142,7 @@ const AutomationIntegration = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       
-      <main className="flex-1 container py-6 space-y-6">
+      <div className="flex-1 container py-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button
@@ -381,7 +381,7 @@ const AutomationIntegration = () => {
             </div>
           </CardContent>
         </Card>
-      </main>
+      </div>
       
       <Footer />
     </div>

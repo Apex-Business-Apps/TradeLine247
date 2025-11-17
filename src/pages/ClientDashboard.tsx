@@ -22,7 +22,7 @@ const ClientDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       
-      <main className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
@@ -68,7 +68,7 @@ const ClientDashboard = () => {
         <Suspense fallback={<DashboardSkeletons layout={dashboardLayout || 'comfortable'} />}>
           <NewDashboard />
         </Suspense>
-      </main>
+      </div>
 
       <Footer />
     </div>

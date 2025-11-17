@@ -33,6 +33,11 @@ export default defineConfig({
         ],
       },
     },
+    // Set up environment variables for tests
+    environmentVariables: {
+      VITE_SUPABASE_URL: 'https://test-project.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'test-anon-key-12345',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'lcov', 'html'],

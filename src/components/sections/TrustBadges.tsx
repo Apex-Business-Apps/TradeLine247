@@ -39,8 +39,8 @@ export const TrustBadges = () => {
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <Icon className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold text-card-foreground mb-2">{badge.title}</h3>
-                <p className="text-sm text-muted-foreground">{badge.description}</p>
+                <h3 className="font-semibold text-foreground mb-2">{badge.title}</h3>
+                <p className="text-sm text-foreground/80">{badge.description}</p>
               </div>
             );
           })}

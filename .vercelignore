@@ -43,8 +43,9 @@ Thumbs.db
 docs/
 audit/
 
-# Scripts (not needed in deployment)
-scripts/
+# Scripts (some needed for build process)
+# Include check-required-files.mjs needed for build
+!scripts/check-required-files.mjs
 *.ps1
 *.sh
 

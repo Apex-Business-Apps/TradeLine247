@@ -13,7 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
-        with: { version: latest }
+        with:
+          version: latest
       - name: Analyze drift (read-only)
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}

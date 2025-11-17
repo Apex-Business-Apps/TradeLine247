@@ -22,12 +22,19 @@ if (url && anonKey) {
       storage: safeStorage,
       persistSession: typeof window !== 'undefined',
       autoRefreshToken: true,
+      detectSessionInUrl: true,
     }
   });
 } else {
-  console.info(
-    '[supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY; Supabase client disabled for this build.'
-  );
+  if (typeof window !== 'undefined') {
+    console.error(
+      '[supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY! Check your .env or Vercel settings.'
+    );
+  } else {
+    console.info(
+      '[supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY; Supabase client disabled for this build.'
+    );
+  }
 }
 
 // Import the supabase client like this:

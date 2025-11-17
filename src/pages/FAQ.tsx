@@ -70,7 +70,7 @@ const FAQ = () => {
       />
       
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
-        <main className="flex-1">
+        <div className="flex-1">
           {/* Hero Section */}
           <div className="bg-background/85 backdrop-blur-[2px]">
             <section style={{
@@ -160,7 +160,7 @@ const FAQ = () => {
               </div>
             </section>
           </div>
-        </main>
+        </div>
         
         <div className="bg-background/85 backdrop-blur-[2px]">
           <Footer />

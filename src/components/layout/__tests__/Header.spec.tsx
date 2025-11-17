@@ -41,11 +41,16 @@ describe('Header', () => {
     expect(burgerButton).toHaveAttribute('aria-controls', 'mobile-menu');
     expect(burgerButton).toHaveAttribute('aria-expanded', 'false');
 
+    // Mobile menu should not be in DOM when closed
+    let mobileMenu = document.getElementById('mobile-menu');
+    expect(mobileMenu).toBeNull();
+
     await user.click(burgerButton);
 
     expect(burgerButton).toHaveAttribute('aria-expanded', 'true');
-    const mobileMenu = document.getElementById('mobile-menu');
+    // Mobile menu should now be in DOM when open
+    mobileMenu = document.getElementById('mobile-menu');
     expect(mobileMenu).not.toBeNull();
-    expect(mobileMenu).toHaveAttribute('aria-hidden', 'false');
+    expect(mobileMenu).toHaveAttribute('aria-label', 'Mobile');
   });
 });

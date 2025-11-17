@@ -16,6 +16,7 @@ const Compare = lazy(() => import("./pages/Compare"));
 const Security = lazy(() => import("./pages/Security"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth"));
+const AuthLanding = lazy(() => import("./pages/AuthLanding"));
 const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
 const CallCenter = lazy(() => import("./pages/CallCenter"));
 const CallLogs = lazy(() => import("./pages/CallLogs"));
@@ -36,6 +37,7 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.security, element: <Security /> },
   { path: paths.contact, element: <Contact /> },
   { path: paths.auth, element: <Auth /> },
+  { path: '/auth-landing', element: <AuthLanding /> },
   { path: paths.dashboard, element: <ClientDashboard /> },
   { path: paths.calls, element: <CallCenter /> },
   { path: paths.callCenterLegacy, element: <CallCenter /> },

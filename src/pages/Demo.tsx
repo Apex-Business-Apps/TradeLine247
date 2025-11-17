@@ -16,7 +16,7 @@ const Demo = () => {
         canonical="https://www.tradeline247ai.com/demo"
       />
       
-      <main className="flex-1">
+      <div className="flex-1">
         {/* Hero Section */}
         <section 
           className="hero-section py-20 relative"
@@ -171,7 +171,7 @@ const Demo = () => {
             </div>
           </div>
         </section>
-      </main>
+      </div>
       
       <Footer />
     </div>

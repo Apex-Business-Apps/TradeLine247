@@ -94,7 +94,7 @@ const Index = () => {
             ]}
           />
 
-          <main className="flex-1" style={{ minHeight: "60vh" }}>
+          <div className="flex-1" style={{ minHeight: "60vh" }}>
             {/* All sections now use 85% opacity to match secondary pages */}
             <div className="bg-background/85 backdrop-blur-[2px]" style={{ willChange: "transform" }}>
               <HeroRoiDuo />
@@ -121,7 +121,7 @@ const Index = () => {
                 </div>
               </div>
             </div>
-          </main>
+          </div>
 
           <div className="bg-background/85 backdrop-blur-[2px]">
             <TrustBadgesSlim />
