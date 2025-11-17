@@ -51,6 +51,6 @@ describe('Header', () => {
     // Mobile menu should now be in DOM when open
     mobileMenu = document.getElementById('mobile-menu');
     expect(mobileMenu).not.toBeNull();
-    expect(mobileMenu).toHaveAttribute('aria-label', 'Mobile');
+    expect(mobileMenu).toHaveAttribute('aria-label', 'Mobile navigation');
   });
 });

@@ -387,7 +387,6 @@ export const Header: React.FC = () => {
         <nav
           id="mobile-menu"
           aria-label="Mobile navigation"
-          aria-hidden="false"
           className="border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden"
         >
           <div className="container py-4 space-y-1">
@@ -437,7 +436,7 @@ export const Header: React.FC = () => {
             )}
             <div className="border-t border-border" />
             <div className="space-y-3">
-              {isMobileMenuOpen && <LanguageSwitcher className="w-full" />}
+              <LanguageSwitcher className="w-full" />
               {user ? (
                 <Button
                   variant="ghost"
