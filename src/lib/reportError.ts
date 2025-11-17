@@ -2,7 +2,8 @@
 // Swallows failures so that UI UX is unaffected.
 export async function reportError(err: unknown, orgId?: string) {
   try {
-    const base = import.meta.env.VITE_FUNCTIONS_BASE;
+    // CRITICAL: Hardcoded fallback for production (VITE_* env vars not supported in Lovable)
+    const base = import.meta.env.VITE_FUNCTIONS_BASE || 'https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1';
     if (!base) return;
 
     let serialized: Record<string, unknown> = {};
