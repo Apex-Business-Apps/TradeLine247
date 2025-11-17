@@ -44,8 +44,12 @@ docs/
 audit/
 
 # Scripts (some needed for build process)
-# Include check-required-files.mjs needed for build
+# Explicitly include scripts folder and required build scripts
+!scripts/
 !scripts/check-required-files.mjs
+!scripts/verify-app.cjs
+!scripts/verify_icons.mjs
+!scripts/verify-console-usage.mjs
 *.ps1
 *.sh
 
