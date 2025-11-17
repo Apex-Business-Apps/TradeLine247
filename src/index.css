@@ -488,6 +488,12 @@ body.session-warning::before {
 }
 
 /* Dark mode override: Use lighter colors for readability on dark backgrounds */
+/* Fix text-muted-foreground in dark mode for WCAG AA contrast (4.5:1 minimum) */
+html.dark .text-muted-foreground,
+html.dark [class*="text-muted-foreground"] {
+  color: hsl(215.4 16.3% 70%) !important; /* Lighter gray for 4.5:1+ contrast on dark background */
+}
+
 html.dark .text-slate-400,
 html.dark .text-slate-500,
 html.dark .text-slate-600,

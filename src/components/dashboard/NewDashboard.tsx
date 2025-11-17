@@ -135,9 +135,9 @@ export const NewDashboard = () => {
               <Card key={i} className="relative overflow-hidden border-0 opacity-70 hover:opacity-90 transition-opacity">
                 <CardContent className="p-3">
                   <div className="space-y-2">
-                    <div className="text-2xl font-bold text-muted-foreground">0</div>
-                    <p className="text-xs font-medium text-muted-foreground">{configs[i].title}</p>
-                    <p className="text-xs text-muted-foreground/70">{configs[i].subtitle}</p>
+                    <div className="text-2xl font-bold text-muted-foreground dark:text-foreground/60">0</div>
+                    <p className="text-xs font-medium text-muted-foreground dark:text-foreground/80">{configs[i].title}</p>
+                    <p className="text-xs text-muted-foreground/70 dark:text-foreground/70">{configs[i].subtitle}</p>
                   </div>
                 </CardContent>
               </Card>
