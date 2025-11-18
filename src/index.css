@@ -1461,3 +1461,50 @@ button[class*="bg-primary"] span {
 }
 
 /* ========== END A11Y FIXES ========== */
+
+
+/* ==================== A11Y FIXES ==================== */
+
+/* Fix 1: Pricing badges - white text (fixes 1.12:1 contrast) */
+.px-2\.5,
+.px-2\.5[class*="bg-primary"],
+[class*="px-2.5"][class*="bg-primary"],
+.px-2\.5[class*="absolute"],
+[class*="absolute"][class*="-top-3"] {
+  color: #ffffff !important;
+}
+
+/* Fix 2: Step number badges - white text (fixes 2.53:1 contrast) */
+[class*="group"] > [class*="-top-4"][class*="rounded-full"],
+[class*="-top-4"][class*="left-1/2"][class*="rounded-full"] {
+  color: #ffffff !important;
+}
+
+/* Fix 3: Dashboard text light mode - darker (fixes 3.98:1 contrast) */
+[class*="text-xs"][class*="text-muted-foreground"],
+[class*="text-xs"].text-muted-foreground\/70,
+[class*="text-xs"].text-muted-foreground\/80 {
+  color: #5a6270 !important;
+}
+
+/* Fix 4: Dashboard text dark mode - brighter (fixes 4.27:1 contrast) */
+.dark [class*="text-xs"][class*="text-muted-foreground"],
+.dark [class*="text-xs"][class*="text-foreground"] {
+  filter: brightness(1.15);
+}
+
+/* Fix 5: Font-mono elements - white text (fixes 1.15:1 contrast) */
+.font-mono[class*="text-primary"],
+.font-mono[class*="bg-primary"],
+code[class*="bg-primary"] {
+  color: #ffffff !important;
+}
+
+/* Fix 6: Nav links dark mode - brighter (fixes 4.35:1 contrast) */
+.dark nav a[class*="text-muted-foreground"],
+.dark [role="navigation"] a[class*="text-muted-foreground"],
+.dark header a[class*="text-muted-foreground"] {
+  filter: brightness(1.1);
+}
+
+/* ==================== END A11Y FIXES ==================== */
