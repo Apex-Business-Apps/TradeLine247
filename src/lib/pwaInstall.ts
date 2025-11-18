@@ -68,12 +68,10 @@ function mountPWABanner() {
   document.body.appendChild(banner);
   
   // Import and render component dynamically
-  Promise.all([
-    import('react'),
-    import('react-dom/client'),
-    import('../components/PWAInstallBanner')
-  ]).then(([React, ReactDOM, { PWAInstallBanner }]) => {
-    const root = ReactDOM.createRoot(banner);
+  import('../components/PWAInstallBanner').then(({ PWAInstallBanner }) => {
+    const React = require('react');
+    const { createRoot } = require('react-dom/client');
+    const root = createRoot(banner);
     root.render(React.createElement(PWAInstallBanner));
   });
 }

@@ -5,13 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Play, CheckCircle, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
-import { createBrandGradientStyle } from "@/styles/brandGradients";
 
 const Demo = () => {
-  const gradientBackgroundStyle = createBrandGradientStyle(backgroundImage);
-
   return (
-    <div className="min-h-screen flex flex-col relative" style={gradientBackgroundStyle}>
+    <div className="min-h-screen flex flex-col">
       <SEOHead 
         title="Demo - TradeLine 24/7 AI Receptionist"
         description="See TradeLine 24/7 AI receptionist in action. Watch demo videos, schedule a live demo, and experience how our 24/7 AI handles customer calls."
@@ -19,7 +16,7 @@ const Demo = () => {
         canonical="https://www.tradeline247ai.com/demo"
       />
       
-      <div className="flex-1 relative z-10">
+      <div className="flex-1">
         {/* Hero Section */}
         <section 
           className="hero-section py-20 relative"
