@@ -120,6 +120,13 @@ All colors MUST be HSL.
     --brand-orange-700: 15 100% 35%; /* Darkest orange - 7.14:1 contrast (WCAG AA compliant) */
     --brand-orange-light: 29 100% 95%;
     --brand-orange-dark: var(--brand-orange-700);
+
+    /* Brand Blue Palette derived from TradeLine handset mark */
+    --brand-blue-primary: 199 84% 58%;
+    --brand-blue-500: 199 82% 64%;
+    --brand-blue-600: 201 84% 45%;
+    --brand-blue-light: 199 90% 92%;
+    --brand-blue-dark: 204 86% 32%;
     
     /* Green Colors for Login/Success Actions */
     --brand-green-primary: 142 76% 36%;
@@ -1575,3 +1582,84 @@ a[href*="/auth"] {
 }
 
 /* ======================================== */
+
+/* ================================================
+   HERO OVERLAY FIX - Applied 2025-11-17
+   Brand: #e55a2b orange, #68B6E9 blue
+   ================================================ */
+
+/* Target muddy orange gradient sections on hero headings */
+/* These create the dark orange bars on internal pages */
+h1.bg-gradient-to-r,
+h1[class*="bg-gradient"],
+.bg-gradient-to-r.from-primary,
+.from-primary.to-accent {
+  background: none !important;
+  background-image: none !important;
+  background-clip: border-box !important;
+  -webkit-background-clip: border-box !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Ensure h1 text uses foreground color on internal pages */
+section h1,
+.container h1 {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Removed global text shadows - they were causing WCAG AA color-contrast failures */
+/* White shadows on orange buttons reduced contrast below 4.5:1 threshold */
+
+/* LOGO COLOR GRADIENT - Orange to Blue overlay with 15% white tint */
+/* Landing page: 25% opacity */
+/* Internal pages: 35% opacity */
+
+/* Default (Landing page): 25% opacity gradient + 15% white */
+.bg-background\/85 {
+  background: 
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
+    linear-gradient(
+      to bottom,
+      rgba(255, 107, 53, 0.25) 0%,       /* Logo orange #FF6B35 - 25% */
+      rgba(104, 182, 233, 0.25) 100%     /* Logo blue #68B6E9 - 25% */
+    ) !important;
+}
+
+/* Same for backdrop-blur layer */
+.backdrop-blur-\[2px\] {
+  background: 
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
+    linear-gradient(
+      to bottom,
+      rgba(255, 107, 53, 0.25) 0%,       /* Logo orange - 25% */
+      rgba(104, 182, 233, 0.25) 100%     /* Logo blue - 25% */
+    ) !important;
+}
+
+/* Internal pages ONLY: 35% opacity + 15% white */
+body:not(:has(#app-home)) .bg-background\/85,
+body:not(:has(#app-home)) .backdrop-blur-\[2px\] {
+  background: 
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
+    linear-gradient(
+      to bottom,
+      rgba(255, 107, 53, 0.35) 0%,       /* Logo orange - 35% */
+      rgba(104, 182, 233, 0.35) 100%     /* Logo blue - 35% */
+    ) !important;
+}
+
+/* FIX A11Y: White text on orange CTA (3.6:1 contrast) */
+a[href*="/auth"],
+a[href*="plan="],
+button[class*="orange"] {
+  background-color: #e55a2b !important;
+  color: #ffffff !important;
+  border-color: #e55a2b !important;
+}
+
+a[href*="/auth"]:hover,
+button[class*="orange"]:hover {
+  background-color: #d14d2a !important;
+}
+
+/* ================================================ */
