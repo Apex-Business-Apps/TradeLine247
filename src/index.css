@@ -1473,8 +1473,11 @@ button[class*="bg-primary"] span {
 [class*="group"] > [class*="-top-4"][class*="rounded-full"][class*="w-8"],
 [class*="-top-4"][class*="left-1/2"][class*="rounded-full"],
 .font-mono[class*="text-primary"],
+.font-mono.text-primary,
 .font-mono[class*="bg-primary"],
-code[class*="bg-primary"] {
+code[class*="bg-primary"],
+[class*="bg-primary"] .font-mono,
+[class*="bg-primary"] .text-primary.font-mono {
   color: #ffffff !important;
 }
 
