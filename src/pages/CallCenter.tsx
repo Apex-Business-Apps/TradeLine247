@@ -6,6 +6,8 @@ import { Phone, RefreshCw, Download, ExternalLink, PhoneCall } from 'lucide-reac
 import { useTwilioCallData } from '@/hooks/useTwilioCallData';
 import { TwilioStats } from '@/components/dashboard/TwilioStats';
 import { SEOHead } from '@/components/seo/SEOHead';
+import backgroundImage from '@/assets/BACKGROUND_IMAGE1.svg';
+import { createBrandGradientStyle } from '@/styles/brandGradients';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -26,6 +28,7 @@ const getStatusColor = (status: string) => {
 
 export default function CallCenter() {
   const { calls, loading, error, refresh, formatDuration, formatTimeAgo } = useTwilioCallData();
+  const gradientBackgroundStyle = createBrandGradientStyle(backgroundImage);
 
   const handleExportCalls = () => {
     if (calls.length === 0) return;
@@ -65,8 +68,11 @@ export default function CallCenter() {
         keywords="call center, Twilio, voice calls, call monitoring, phone system"
       />
       
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-        <div className="container mx-auto px-4 py-8">
+      <div 
+        className="min-h-screen flex flex-col relative"
+        style={gradientBackgroundStyle}
+      >
+        <div className="relative z-10 container mx-auto px-4 py-8">
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
@@ -145,7 +151,7 @@ export default function CallCenter() {
                     Your Twilio integration is ready! Test it by calling:
                   </p>
                   <div className="inline-block p-3 bg-primary/10 rounded-lg border border-primary/20">
-                    <span className="text-lg font-mono text-primary">+1-587-742-8885</span>
+                    <span className="text-lg font-mono font-semibold" style={{ color: 'hsl(15, 100%, 35%)' }}>+1-587-742-8885</span>
                   </div>
                   <div className="mt-4 space-y-2 text-sm text-muted-foreground">
                     <p>✓ Voice webhooks configured</p>

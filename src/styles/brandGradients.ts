@@ -8,7 +8,7 @@ import { CSSProperties } from "react";
  */
 export const createBrandGradientStyle = (image: string): CSSProperties => ({
   backgroundImage: `
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.28)),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)),
     linear-gradient(
       to bottom,
       rgba(255, 107, 53, 0.52) 0%,

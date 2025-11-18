@@ -1652,17 +1652,38 @@ body:not(:has(#app-home)) .backdrop-blur-\[2px\] {
 }
 */
 
-/* FIX A11Y: White text on orange CTA (3.6:1 contrast) */
-a[href*="/auth"],
-a[href*="plan="],
-button[class*="orange"] {
+/* FIX A11Y: Brand color variations for WCAG AA compliance */
+/* Solid buttons: Orange background with white text */
+a[href*="/auth"]:not([class*="border-input"]):not([class*="border"]),
+a[href*="plan="]:not([class*="border-input"]):not([class*="border"]),
+button[class*="orange"]:not([class*="outline"]) {
   background-color: #e55a2b !important;
   color: #ffffff !important;
   border-color: #e55a2b !important;
 }
 
-a[href*="/auth"]:hover,
-button[class*="orange"]:hover {
+/* Outline buttons: Dark orange text (brand variation) for 4.5:1+ contrast */
+/* Target links with border-input class (outline variant) containing auth links */
+a[href*="/auth"][class*="border-input"],
+a[href*="plan="][class*="border-input"],
+button[class*="outline"] a[href*="/auth"],
+button[class*="outline"] a[href*="plan="] {
+  color: hsl(15, 100%, 35%) !important; /* --brand-orange-dark: 7.14:1 contrast on white */
+  border-color: #FF6B35 !important; /* Brand orange border */
+}
+
+/* Outline button hover: Orange background with white text */
+a[href*="/auth"][class*="border-input"]:hover,
+a[href*="plan="][class*="border-input"]:hover,
+button[class*="outline"]:hover a[href*="/auth"],
+button[class*="outline"]:hover a[href*="plan="] {
+  background-color: #FF6B35 !important; /* Brand orange */
+  color: #ffffff !important;
+  border-color: #FF6B35 !important;
+}
+
+a[href*="/auth"]:hover:not([class*="border-input"]),
+button[class*="orange"]:hover:not([class*="outline"]) {
   background-color: #d14d2a !important;
 }
 
