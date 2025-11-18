@@ -151,7 +151,7 @@ export default function CallCenter() {
                     Your Twilio integration is ready! Test it by calling:
                   </p>
                   <div className="inline-block p-3 bg-primary/10 rounded-lg border border-primary/20">
-                    <span className="text-lg font-mono font-semibold" style={{ color: 'hsl(15, 100%, 35%)' }}>+1-587-742-8885</span>
+                    <span className="text-lg font-mono font-semibold" style={{ color: 'hsl(15, 100%, 35%)', textShadow: 'none' }}>+1-587-742-8885</span>
                   </div>
                   <div className="mt-4 space-y-2 text-sm text-muted-foreground">
                     <p>✓ Voice webhooks configured</p>
