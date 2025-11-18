@@ -154,7 +154,7 @@ const Pricing = () => {
                   {plans.map((plan, index) => (
                     <Card key={index} id={plan.id} className={`relative ${plan.popular ? 'ring-2 ring-primary shadow-xl scale-105' : ''}`}>
                       {plan.popular && (
-                        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
+                        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 text-white" style={{ backgroundColor: 'hsl(21 100% 20%)' }}>
                           <Star className="w-4 h-4 mr-1" />
                           Most Popular
                         </Badge>
