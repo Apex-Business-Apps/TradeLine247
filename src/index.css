@@ -1515,9 +1515,9 @@ code[class*="bg-primary"],
    Applied: 2025-11-17
    ======================================== */
 
-/* REPLACE these selectors with YOUR discovered selectors from Phase 1 */
+/* REPLACED: This section was overriding the orange→blue gradient - commented out to show blue gradient */
 
-.hero-gradient,
+/* .hero-gradient,
 [data-testid="hero-bg"],
 .page-hero {
   background: linear-gradient(90deg,
@@ -1525,8 +1525,6 @@ code[class*="bg-primary"],
     rgba(229, 90, 43, 0.08) 100%) !important;
   position: relative;
 }
-
-/* Section 2/4: Accent line */
 
 .hero-gradient::after,
 [data-testid="hero-bg"]::after,
@@ -1544,8 +1542,6 @@ code[class*="bg-primary"],
   pointer-events: none;
 }
 
-/* Section 3/4: Typography */
-
 .hero-gradient h1,
 [data-testid="hero-bg"] h1,
 .page-hero h1 {
@@ -1559,17 +1555,11 @@ code[class*="bg-primary"],
   color: #374151 !important;
 }
 
-/* Section 4/4: Safeguards */
-
-/* SACRED: Preserve brand orange */
-
 button[class*="bg-primary"],
 .btn-aa,
 a[href*="/auth"] {
   background: #e55a2b !important;
 }
-
-/* EXCLUSION: Landing page protection */
 
 [data-page="home"] .hero-gradient,
 .landing-hero {
@@ -1579,7 +1569,7 @@ a[href*="/auth"] {
 [data-page="home"] .hero-gradient::after,
 .landing-hero::after {
   content: none !important;
-}
+} */
 
 /* ======================================== */
 
@@ -1607,55 +1597,60 @@ section h1,
   color: hsl(var(--foreground)) !important;
 }
 
-/* Add subtle white shadow globally to all headings and text for better readability */
-h1, h2, h3, h4, h5, h6 {
-  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.6), 
-               0 1px 3px rgba(255, 255, 255, 0.4) !important;
+/* Add brand blue shadow to hero text for depth and readability */
+.hero-gradient h1,
+.hero-gradient h2,
+[data-testid="hero-bg"] h1,
+[data-testid="hero-bg"] h2,
+.page-hero h1,
+.page-hero h2 {
+  text-shadow: 0 3px 8px rgba(104, 182, 233, 0.45), 
+               0 1px 4px rgba(104, 182, 233, 0.35) !important;
 }
 
-/* Add subtle white shadow to all paragraphs and text */
-p, span, div, a, label, li {
-  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.4), 
-               0 1px 2px rgba(255, 255, 255, 0.3) !important;
+/* Add brand blue shadow to hero subtext */
+.hero-gradient p,
+[data-testid="hero-bg"] p,
+.page-hero p {
+  text-shadow: 0 2px 6px rgba(104, 182, 233, 0.35), 
+               0 1px 3px rgba(104, 182, 233, 0.25) !important;
 }
 
-/* LOGO COLOR GRADIENT - Orange to Blue overlay with 15% white tint */
-/* Landing page: 25% opacity */
-/* Internal pages: 35% opacity */
+/* LOGO COLOR GRADIENT - Removed these duplicate layers that were obscuring the blue gradient */
+/* The gradient is already applied on parent divs in Index.tsx and brandGradients.ts */
 
-/* Default (Landing page): 25% opacity gradient + 15% white */
+/* COMMENTED OUT - These were adding extra layers on top that hid the blue gradient
 .bg-background\/85 {
   background: 
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
     linear-gradient(
       to bottom,
-      rgba(255, 107, 53, 0.25) 0%,       /* Logo orange #FF6B35 - 25% */
-      rgba(104, 182, 233, 0.25) 100%     /* Logo blue #68B6E9 - 25% */
+      rgba(255, 107, 53, 0.25) 0%,
+      rgba(104, 182, 233, 0.25) 100%
     ) !important;
 }
 
-/* Same for backdrop-blur layer */
 .backdrop-blur-\[2px\] {
   background: 
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
     linear-gradient(
       to bottom,
-      rgba(255, 107, 53, 0.25) 0%,       /* Logo orange - 25% */
-      rgba(104, 182, 233, 0.25) 100%     /* Logo blue - 25% */
+      rgba(255, 107, 53, 0.25) 0%,
+      rgba(104, 182, 233, 0.25) 100%
     ) !important;
 }
 
-/* Internal pages ONLY: 35% opacity + 15% white */
 body:not(:has(#app-home)) .bg-background\/85,
 body:not(:has(#app-home)) .backdrop-blur-\[2px\] {
   background: 
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
     linear-gradient(
       to bottom,
-      rgba(255, 107, 53, 0.35) 0%,       /* Logo orange - 35% */
-      rgba(104, 182, 233, 0.35) 100%     /* Logo blue - 35% */
+      rgba(255, 107, 53, 0.35) 0%,
+      rgba(104, 182, 233, 0.35) 100%
     ) !important;
 }
+*/
 
 /* FIX A11Y: White text on orange CTA (3.6:1 contrast) */
 a[href*="/auth"],
