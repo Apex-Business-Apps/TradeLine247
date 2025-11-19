@@ -18,9 +18,11 @@ test.describe('Lead Capture Flow', () => {
     await expect(page).toHaveURL('/auth');
 
     // Sign up flow
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'TestPass123!');
-    await page.click('button:has-text("Sign Up")');
+    await page.getByRole('tab', { name: /sign up/i }).click();
+    await page.fill('#signup-name', 'Test User');
+    await page.fill('#signup-email', 'test@example.com');
+    await page.fill('#signup-password', 'TestPass123!');
+    await page.getByRole('button', { name: /create account/i }).click();
 
     // Wait for redirect to dashboard
     await page.waitForURL('/dashboard', { timeout: 10000 });
@@ -60,13 +62,13 @@ test.describe('Lead Capture Flow', () => {
     
     // Tab through form fields
     await page.keyboard.press('Tab'); // Email field
-    await expect(page.locator('input[type="email"]')).toBeFocused();
+    await expect(page.getByLabel(/email/i).first()).toBeFocused();
     
     await page.keyboard.press('Tab'); // Password field
-    await expect(page.locator('input[type="password"]')).toBeFocused();
+    await expect(page.getByLabel(/password/i).first()).toBeFocused();
     
     await page.keyboard.press('Tab'); // Submit button
-    await expect(page.locator('button[type="submit"]')).toBeFocused();
+    await expect(page.getByRole('button', { name: /sign in/i })).toBeFocused();
 
     // Enter key should submit
     await page.keyboard.press('Enter');
@@ -76,9 +78,9 @@ test.describe('Lead Capture Flow', () => {
   test('should display error for invalid email format', async ({ page }) => {
     await page.goto('/auth');
     
-    await page.fill('input[type="email"]', 'invalid-email');
-    await page.fill('input[type="password"]', 'TestPass123!');
-    await page.click('button[type="submit"]');
+    await page.getByLabel(/email/i).first().fill('invalid-email');
+    await page.getByLabel(/password/i).first().fill('TestPass123!');
+    await page.getByRole('button', { name: /sign in/i }).click();
 
     // Verify validation message
     await expect(page.locator('text=Invalid email')).toBeVisible();

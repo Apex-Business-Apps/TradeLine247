@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loginTestUser } from '../utils/auth';
 
 test.describe('Security Validation & Regression Guards', () => {
   test.beforeEach(async ({ page }) => {
@@ -29,11 +30,7 @@ test.describe('Security Validation & Regression Guards', () => {
 
   test('Encryption keys are never exposed in responses', async ({ page }) => {
     // Login first
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'testpassword123');
-    await page.click('button[type="submit"]');
-    
-    await page.waitForURL('/dashboard', { timeout: 10000 });
+    await loginTestUser(page, { password: process.env.TEST_USER_PASSWORD || 'testpassword123' });
 
     // Monitor all network responses
     const responses: any[] = [];
@@ -70,11 +67,7 @@ test.describe('Security Validation & Regression Guards', () => {
   });
 
   test('Client IP capture degrades gracefully', async ({ page }) => {
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'testpassword123');
-    await page.click('button[type="submit"]');
-    
-    await page.waitForURL('/dashboard', { timeout: 10000 });
+    await loginTestUser(page, { password: process.env.TEST_USER_PASSWORD || 'testpassword123' });
 
     // Block the capture-client-ip function
     await page.route('**/functions/v1/capture-client-ip', route => route.abort());
@@ -87,11 +80,7 @@ test.describe('Security Validation & Regression Guards', () => {
   });
 
   test('Consent records require valid data', async ({ page }) => {
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'testpassword123');
-    await page.click('button[type="submit"]');
-    
-    await page.waitForURL('/dashboard', { timeout: 10000 });
+    await loginTestUser(page, { password: process.env.TEST_USER_PASSWORD || 'testpassword123' });
 
     // This validates that the consent flow requires proper IP and timestamp
     // Actual implementation would need to attempt a consent submission
@@ -132,10 +121,10 @@ test.describe('Regression Guards', () => {
 
   test('RLS policies prevent privilege escalation', async ({ page }) => {
     // Login as regular user
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'user@example.com');
-    await page.fill('input[type="password"]', 'testpassword123');
-    await page.click('button[type="submit"]');
+    await loginTestUser(page, {
+      email: 'user@example.com',
+      password: 'testpassword123',
+    });
 
     // Attempt to access admin-only resources
     const response = await page.request.get('https://niorocndzcflrwdrofsp.supabase.co/rest/v1/encryption_keys', {

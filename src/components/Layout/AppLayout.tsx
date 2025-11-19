@@ -38,6 +38,7 @@ const navigation = [
 
 export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
+  const currentYear = new Date().getFullYear();
 
   const NavLinks = () => (
     <>
@@ -64,12 +65,26 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-4 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+      >
+        Skip to main content
+      </a>
       {/* Mobile header */}
-      <div className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:hidden">
+      <header
+        className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:hidden"
+        role="banner"
+      >
         <div className="flex h-14 items-center px-4">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="mr-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="mr-2"
+                aria-label="Open navigation menu"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -87,7 +102,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </Sheet>
           <Logo size="md" />
         </div>
-      </div>
+      </header>
 
       <div className="flex">
         {/* Desktop sidebar */}
@@ -97,7 +112,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <Logo size="lg" />
               <LogoText className="text-lg" />
             </div>
-            <nav className="flex flex-1 flex-col">
+            <nav className="flex flex-1 flex-col" aria-label="Primary navigation">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
                   <ul role="list" className="space-y-1">
@@ -110,12 +125,15 @@ export function AppLayout({ children }: AppLayoutProps) {
         </aside>
 
         {/* Main content */}
-        <main className="lg:pl-64 flex-1">
+        <main id="main-content" role="main" tabIndex={-1} className="lg:pl-64 flex-1">
           <div className="px-4 py-6 sm:px-6 lg:px-8">
             {children}
           </div>
         </main>
       </div>
+      <footer role="contentinfo" className="border-t bg-background px-4 py-6 text-sm text-muted-foreground lg:pl-64">
+        © {currentYear} AutoRepAi. All rights reserved.
+      </footer>
     </div>
   );
 }

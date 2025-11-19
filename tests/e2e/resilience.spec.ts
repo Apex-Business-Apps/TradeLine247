@@ -5,14 +5,11 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { loginTestUser } from '../utils/auth';
 
 test.describe('Offline Queue Resilience', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'TestPass123!');
-    await page.click('button:has-text("Sign In")');
-    await page.waitForURL('/dashboard');
+    await loginTestUser(page);
   });
 
   test('should queue operations when offline', async ({ page, context }) => {
@@ -46,11 +43,7 @@ test.describe('Offline Queue Resilience', () => {
 
 test.describe('Circuit Breaker Pattern', () => {
   test('should handle connector failures gracefully', async ({ page }) => {
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'TestPass123!');
-    await page.click('button:has-text("Sign In")');
-    await page.waitForURL('/dashboard');
+    await loginTestUser(page);
 
     // Navigate to settings to check connector status
     await page.goto('/settings');
@@ -64,6 +57,7 @@ test.describe('Circuit Breaker Pattern', () => {
   });
 
   test('should display circuit breaker states', async ({ page }) => {
+    await loginTestUser(page);
     await page.goto('/settings');
     
     // Should show circuit states: CLOSED, OPEN, or HALF_OPEN
@@ -74,11 +68,7 @@ test.describe('Circuit Breaker Pattern', () => {
 
 test.describe('Graceful Degradation', () => {
   test('should maintain core functionality when connectors are down', async ({ page }) => {
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'TestPass123!');
-    await page.click('button:has-text("Sign In")');
-    await page.waitForURL('/dashboard');
+    await loginTestUser(page);
 
     // Even with connector issues, should still:
     // 1. Capture leads

@@ -6,6 +6,7 @@
 
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { loginTestUser } from '../utils/auth';
 
 test.describe('WCAG 2.2 AA Compliance', () => {
   test('landing page should have no accessibility violations', async ({ page }) => {
@@ -30,11 +31,7 @@ test.describe('WCAG 2.2 AA Compliance', () => {
 
   test('dashboard should have no accessibility violations', async ({ page }) => {
     // Authenticate first
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'TestPass123!');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('/dashboard');
+    await loginTestUser(page);
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag22aa'])

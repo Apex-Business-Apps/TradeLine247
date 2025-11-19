@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { loginTestUser } from '../utils/auth';
 
 test.describe('AI Assistant - AutoRepAi', () => {
   test.beforeEach(async ({ page }) => {
@@ -39,11 +40,7 @@ test.describe('AI Assistant - AutoRepAi', () => {
 
   test('should log interactions to lead timeline', async ({ page }) => {
     // Authenticate first
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'TestPass123!');
-    await page.click('button:has-text("Sign In")');
-    await page.waitForURL('/dashboard');
+    await loginTestUser(page);
 
     // Navigate to a lead detail page (assuming lead ID 1 exists)
     await page.goto('/leads/1');

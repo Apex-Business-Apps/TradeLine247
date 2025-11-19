@@ -42,9 +42,11 @@ test.describe('Complete WCAG 2.2 AA Compliance', () => {
       // If authentication required, perform login first
       if (pageInfo.requiresAuth) {
         await page.goto('/auth', { timeout: 5000 });
-        await page.fill('input[type="email"]', process.env.TEST_USER_EMAIL || 'test@example.com', { timeout: 3000 });
-        await page.fill('input[type="password"]', process.env.TEST_USER_PASSWORD || 'TestPass123!', { timeout: 3000 });
-        await page.click('button:has-text("Sign In")', { timeout: 3000 });
+        const emailInput = page.getByLabel(/email/i).first();
+        const passwordInput = page.getByLabel(/password/i).first();
+        await emailInput.fill(process.env.TEST_USER_EMAIL || 'test@example.com', { timeout: 3000 });
+        await passwordInput.fill(process.env.TEST_USER_PASSWORD || 'TestPass123!', { timeout: 3000 });
+        await page.getByRole('button', { name: /sign in/i }).click({ timeout: 3000 });
         await page.waitForURL('/dashboard', { timeout: 5000 });
       }
 
@@ -63,7 +65,7 @@ test.describe('Complete WCAG 2.2 AA Compliance', () => {
   test('should have proper heading hierarchy', async ({ page }) => {
     await page.goto('/');
     
-    const headings = await page.locator('h1, h2, h3, h4, h5, h6').all();
+    const headings = await page.locator('main h1, main h2, main h3, main h4, main h5, main h6').all();
     const levels: number[] = [];
     
     for (const heading of headings) {
@@ -106,30 +108,21 @@ test.describe('Complete WCAG 2.2 AA Compliance', () => {
     await page.goto('/auth');
     
     // Tab through focusable elements
-    const focusableSelectors = [
-      'input[type="email"]',
-      'input[type="password"]',
-      'button[type="submit"]'
-    ];
-    
-    for (let i = 0; i < focusableSelectors.length; i++) {
-      await page.keyboard.press('Tab');
-      const focused = await page.evaluate(() => {
-        const el = document.activeElement;
-        return el ? el.tagName + (el.getAttribute('type') ? `[type="${el.getAttribute('type')}"]` : '') : '';
-      });
-      
-      console.log(`Focus ${i}: ${focused}`);
-    }
-    
-    // Verify last element is focused
-    await expect(page.locator('button[type="submit"]')).toBeFocused();
+    const emailField = page.getByLabel(/email/i).first();
+    const passwordField = page.getByLabel(/password/i).first();
+    const submitButton = page.getByRole('button', { name: /sign in/i });
+
+    await emailField.focus();
+    await page.keyboard.press('Tab');
+    await expect(passwordField).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(submitButton).toBeFocused();
   });
 
   test('should have visible focus indicators', async ({ page }) => {
     await page.goto('/auth');
     
-    const button = page.locator('button').first();
+    const button = page.getByRole('button', { name: /sign in/i });
     await button.focus();
     
     const outline = await button.evaluate(el => {

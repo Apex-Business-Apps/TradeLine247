@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { loginTestUser } from '../utils/auth';
 
 const SUPABASE_URL = 'https://niorocndzcflrwdrofsp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pb3JvY25kemNmbHJ3ZHJvZnNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkyOTg2OTksImV4cCI6MjA3NDg3NDY5OX0.cQLjnpVEv-e1kz5nc2ntrB21KkJV4GwFT281_53HG4M';
@@ -140,15 +141,12 @@ test.describe('Edge Function Error Handling', () => {
   });
 
   test('Rate limiting works on send-sms', async ({ request, page }) => {
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'testpassword123');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('/dashboard', { timeout: 10000 });
+    await loginTestUser(page, { password: process.env.TEST_USER_PASSWORD || 'testpassword123' });
 
     // Get auth token
     const authToken = await page.evaluate(() => {
-      return localStorage.getItem('supabase.auth.token');
+      const key = Object.keys(localStorage).find(k => k.includes('supabase') && k.includes('auth-token'));
+      return key ? localStorage.getItem(key) : null;
     });
 
     if (!authToken) return;
@@ -173,14 +171,11 @@ test.describe('Edge Function Error Handling', () => {
 
 test.describe('Edge Function Data Validation', () => {
   test('vehicles-search validates input parameters', async ({ page }) => {
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'testpassword123');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('/dashboard', { timeout: 10000 });
+    await loginTestUser(page, { password: process.env.TEST_USER_PASSWORD || 'testpassword123' });
 
     const authToken = await page.evaluate(() => {
-      return localStorage.getItem('supabase.auth.token');
+      const key = Object.keys(localStorage).find(k => k.includes('supabase') && k.includes('auth-token'));
+      return key ? localStorage.getItem(key) : null;
     });
 
     if (!authToken) return;
@@ -200,14 +195,11 @@ test.describe('Edge Function Data Validation', () => {
   });
 
   test('ai-chat validates message structure', async ({ page }) => {
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'testpassword123');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('/dashboard', { timeout: 10000 });
+    await loginTestUser(page, { password: process.env.TEST_USER_PASSWORD || 'testpassword123' });
 
     const authToken = await page.evaluate(() => {
-      return localStorage.getItem('supabase.auth.token');
+      const key = Object.keys(localStorage).find(k => k.includes('supabase') && k.includes('auth-token'));
+      return key ? localStorage.getItem(key) : null;
     });
 
     if (!authToken) return;

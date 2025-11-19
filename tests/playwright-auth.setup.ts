@@ -6,6 +6,7 @@
  */
 
 import { test as setup } from '@playwright/test';
+import { loginTestUser } from './utils/auth';
 
 const authFile = 'tests/.auth/user.json';
 
@@ -53,11 +54,7 @@ setup('authenticate', async ({ page, context }) => {
   } else {
     // In local environment with real Supabase, perform actual login
     try {
-      await page.goto('/auth');
-      await page.fill('input[type="email"]', 'test@example.com');
-      await page.fill('input[type="password"]', 'TestPass123!');
-      await page.click('button:has-text("Sign In")');
-      await page.waitForURL('/dashboard', { timeout: 5000 });
+      await loginTestUser(page);
       console.log('✓ Real authentication successful');
     } catch (error) {
       console.log('⚠ Real authentication failed, falling back to mock');

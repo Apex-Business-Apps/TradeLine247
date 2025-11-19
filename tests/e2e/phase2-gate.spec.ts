@@ -52,8 +52,9 @@ test.describe('Phase 2 Gate - Critical Flows', () => {
     await enforceSecurityHeaders(page, '/auth');
     
     // Verify auth form loads
-    await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByLabel(/email/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByLabel(/password/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible({ timeout: 10000 });
     
     errorTracker.assertNoErrors();
     console.log('✅ Phase 2: Auth flow passed');

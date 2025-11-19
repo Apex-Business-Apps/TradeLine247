@@ -5,14 +5,11 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { loginTestUser } from '../utils/auth';
 
 test.describe('Bilingual PDF Quote Generation', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/auth');
-    await page.fill('input[type="email"]', 'test@example.com');
-    await page.fill('input[type="password"]', 'TestPass123!');
-    await page.click('button:has-text("Sign In")');
-    await page.waitForURL('/dashboard');
+    await loginTestUser(page);
   });
 
   test('should generate English PDF quote', async ({ page }) => {

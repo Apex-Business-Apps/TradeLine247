@@ -96,18 +96,22 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center items-center gap-2 mb-4">
-            <Logo size="lg" />
-            <LogoText className="text-2xl" />
-          </div>
-          <CardDescription>
-            Sign in to access your dealership platform
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <main className="min-h-screen flex items-center justify-center bg-background p-4" role="main" aria-labelledby="auth-heading">
+      <section aria-label="Authentication" className="w-full max-w-md">
+        <Card>
+          <CardHeader className="text-center space-y-2">
+            <div className="flex justify-center items-center gap-2">
+              <Logo size="lg" aria-hidden="true" />
+              <LogoText className="text-2xl" />
+            </div>
+            <h1 id="auth-heading" className="text-3xl font-bold">
+              Access AutoRepAi
+            </h1>
+            <CardDescription>
+              Sign in or create an account to manage your dealership platform.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
           <Tabs defaultValue="signin">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -193,8 +197,9 @@ export default function Auth() {
               </form>
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+      </section>
+    </main>
   );
 }
