@@ -52,10 +52,7 @@ const Index = () => {
             ),
             url(${backgroundImage})
           `,
-          backgroundSize: "auto, auto, cover",
-          backgroundPosition: "center, center, center",
           backgroundRepeat: "no-repeat, no-repeat, no-repeat",
-          backgroundAttachment: "scroll, scroll, fixed",
           backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
         }}
       >
