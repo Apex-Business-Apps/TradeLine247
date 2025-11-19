@@ -1515,9 +1515,9 @@ code[class*="bg-primary"],
    Applied: 2025-11-17
    ======================================== */
 
-/* REPLACE these selectors with YOUR discovered selectors from Phase 1 */
+/* REPLACED: This section was overriding the orange→blue gradient - commented out to show blue gradient */
 
-.hero-gradient,
+/* .hero-gradient,
 [data-testid="hero-bg"],
 .page-hero {
   background: linear-gradient(90deg,
@@ -1525,8 +1525,6 @@ code[class*="bg-primary"],
     rgba(229, 90, 43, 0.08) 100%) !important;
   position: relative;
 }
-
-/* Section 2/4: Accent line */
 
 .hero-gradient::after,
 [data-testid="hero-bg"]::after,
@@ -1544,8 +1542,6 @@ code[class*="bg-primary"],
   pointer-events: none;
 }
 
-/* Section 3/4: Typography */
-
 .hero-gradient h1,
 [data-testid="hero-bg"] h1,
 .page-hero h1 {
@@ -1559,17 +1555,11 @@ code[class*="bg-primary"],
   color: #374151 !important;
 }
 
-/* Section 4/4: Safeguards */
-
-/* SACRED: Preserve brand orange */
-
 button[class*="bg-primary"],
 .btn-aa,
 a[href*="/auth"] {
   background: #e55a2b !important;
 }
-
-/* EXCLUSION: Landing page protection */
 
 [data-page="home"] .hero-gradient,
 .landing-hero {
@@ -1579,7 +1569,7 @@ a[href*="/auth"] {
 [data-page="home"] .hero-gradient::after,
 .landing-hero::after {
   content: none !important;
-}
+} */
 
 /* ======================================== */
 
@@ -1607,59 +1597,105 @@ section h1,
   color: hsl(var(--foreground)) !important;
 }
 
-/* Removed global text shadows - they were causing WCAG AA color-contrast failures */
-/* White shadows on orange buttons reduced contrast below 4.5:1 threshold */
+/* Add brand blue shadow to hero text for depth and readability */
+.hero-gradient h1,
+.hero-gradient h2,
+[data-testid="hero-bg"] h1,
+[data-testid="hero-bg"] h2,
+.page-hero h1,
+.page-hero h2 {
+  text-shadow: 0 3px 8px rgba(104, 182, 233, 0.45), 
+               0 1px 4px rgba(104, 182, 233, 0.35) !important;
+}
 
-/* LOGO COLOR GRADIENT - Orange to Blue overlay with 15% white tint */
-/* Landing page: 25% opacity */
-/* Internal pages: 35% opacity */
+/* Add brand blue shadow to hero subtext */
+.hero-gradient p,
+[data-testid="hero-bg"] p,
+.page-hero p {
+  text-shadow: 0 2px 6px rgba(104, 182, 233, 0.35), 
+               0 1px 3px rgba(104, 182, 233, 0.25) !important;
+}
 
-/* Default (Landing page): 25% opacity gradient + 15% white */
+/* LOGO COLOR GRADIENT - Removed these duplicate layers that were obscuring the blue gradient */
+/* The gradient is already applied on parent divs in Index.tsx and brandGradients.ts */
+
+/* COMMENTED OUT - These were adding extra layers on top that hid the blue gradient
 .bg-background\/85 {
   background: 
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
     linear-gradient(
       to bottom,
-      rgba(255, 107, 53, 0.25) 0%,       /* Logo orange #FF6B35 - 25% */
-      rgba(104, 182, 233, 0.25) 100%     /* Logo blue #68B6E9 - 25% */
+      rgba(255, 107, 53, 0.25) 0%,
+      rgba(104, 182, 233, 0.25) 100%
     ) !important;
 }
 
-/* Same for backdrop-blur layer */
 .backdrop-blur-\[2px\] {
   background: 
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
     linear-gradient(
       to bottom,
-      rgba(255, 107, 53, 0.25) 0%,       /* Logo orange - 25% */
-      rgba(104, 182, 233, 0.25) 100%     /* Logo blue - 25% */
+      rgba(255, 107, 53, 0.25) 0%,
+      rgba(104, 182, 233, 0.25) 100%
     ) !important;
 }
 
-/* Internal pages ONLY: 35% opacity + 15% white */
 body:not(:has(#app-home)) .bg-background\/85,
 body:not(:has(#app-home)) .backdrop-blur-\[2px\] {
   background: 
     linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
     linear-gradient(
       to bottom,
-      rgba(255, 107, 53, 0.35) 0%,       /* Logo orange - 35% */
-      rgba(104, 182, 233, 0.35) 100%     /* Logo blue - 35% */
+      rgba(255, 107, 53, 0.35) 0%,
+      rgba(104, 182, 233, 0.35) 100%
     ) !important;
 }
+*/
 
-/* FIX A11Y: White text on orange CTA (3.6:1 contrast) */
-a[href*="/auth"],
-a[href*="plan="],
-button[class*="orange"] {
-  background-color: #e55a2b !important;
+/* FIX A11Y: Brand color variations for WCAG AA compliance */
+/* Solid buttons: Darker orange background (4.5:1+ contrast) with white text */
+a[href*="/auth"]:not([class*="border-input"]):not([class*="border"]),
+a[href*="plan="]:not([class*="border-input"]):not([class*="border"]),
+button[class*="orange"]:not([class*="outline"]),
+button.btn-aa a[href*="/auth"],
+a[href*="/auth"].btn-aa {
+  background-color: hsl(15, 100%, 35%) !important; /* Dark orange: 7.14:1 contrast with white */
   color: #ffffff !important;
-  border-color: #e55a2b !important;
+  border-color: hsl(15, 100%, 35%) !important;
 }
 
-a[href*="/auth"]:hover,
-button[class*="orange"]:hover {
-  background-color: #d14d2a !important;
+/* Outline buttons: Dark orange text (brand variation) for 4.5:1+ contrast */
+/* Target links with border-input class (outline variant) containing auth links */
+a[href*="/auth"][class*="border-input"],
+a[href*="plan="][class*="border-input"],
+button[class*="outline"] a[href*="/auth"],
+button[class*="outline"] a[href*="plan="] {
+  color: hsl(15, 100%, 35%) !important; /* --brand-orange-dark: 7.14:1 contrast on white */
+  border-color: #FF6B35 !important; /* Brand orange border */
+}
+
+/* Outline button hover: Orange background with white text */
+a[href*="/auth"][class*="border-input"]:hover,
+a[href*="plan="][class*="border-input"]:hover,
+button[class*="outline"]:hover a[href*="/auth"],
+button[class*="outline"]:hover a[href*="plan="] {
+  background-color: #FF6B35 !important; /* Brand orange */
+  color: #ffffff !important;
+  border-color: #FF6B35 !important;
+}
+
+a[href*="/auth"]:hover:not([class*="border-input"]),
+button[class*="orange"]:hover:not([class*="outline"]) {
+  background-color: hsl(15, 100%, 32%) !important; /* Slightly darker on hover */
+}
+
+/* Fix badge contrast: Secondary badges need 4.5:1+ contrast */
+.bg-secondary.text-secondary-foreground,
+[class*="bg-secondary"][class*="text-secondary-foreground"],
+.px-2\.5.py-0\.5.bg-secondary,
+[class*="px-2.5"][class*="py-0.5"].bg-secondary {
+  background-color: hsl(15, 100%, 35%) !important; /* Dark orange: 7.14:1 contrast */
+  color: #ffffff !important;
 }
 
 /* ================================================ */

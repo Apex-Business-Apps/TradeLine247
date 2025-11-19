@@ -189,7 +189,7 @@ const RoiCalculator = () => {
                   <a href="/auth?plan=commission">Start Zero-Monthly</a>
                 </Button>
 
-                <Button size="lg" variant="outline" className="w-full hover:text-white" style={{ borderColor: '#FF6B35', color: '#FF6B35' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FF6B35'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }} asChild>
+                <Button size="lg" variant="outline" className="w-full hover:text-white" style={{ borderColor: '#FF6B35', color: 'hsl(15, 100%, 35%)' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#FF6B35'; e.currentTarget.style.color = '#ffffff'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'hsl(15, 100%, 35%)'; }} asChild>
                   <a href="/auth?plan=core">Choose Predictable</a>
                 </Button>
               </div>

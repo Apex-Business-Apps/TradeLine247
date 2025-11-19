@@ -44,11 +44,11 @@ const Index = () => {
         className="min-h-screen flex flex-col relative"
         style={{
           backgroundImage: `
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.23), rgba(255, 255, 255, 0.23)),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
             linear-gradient(
               to bottom,
-              rgba(255, 107, 53, 0.35) 0%,
-              rgba(104, 182, 233, 0.35) 100%
+              rgba(255, 107, 53, 0.62) 0%,
+              rgba(104, 182, 233, 0.72) 100%
             ),
             url(${backgroundImage})
           `,
