@@ -53,7 +53,11 @@ const Index = () => {
             url(${backgroundImage})
           `,
           backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+          backgroundSize: "cover, cover, cover",
+          backgroundPosition: "center, center, center",
+          backgroundAttachment: "scroll, scroll, fixed",
           backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
+          minHeight: "100vh",
         }}
       >
         {/* Content with translucency - Optimized for performance */}
