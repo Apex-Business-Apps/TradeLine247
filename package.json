@@ -24,6 +24,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:web": "vite build",
+    "build:windows": "powershell -ExecutionPolicy Bypass -File ./scripts/build-windows.ps1",
     "build:android": "npm run build:web && npx cap sync android && cd android && ./gradlew bundleRelease",
     "build:ios": "npm run build:web && npx cap sync ios && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archivePath ./build/App.xcarchive archive",
     "build:dev": "vite build --mode development",
