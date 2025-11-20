@@ -18,7 +18,6 @@ test('a11y on home', async ({ page }) => {
 
   // Run axe scan - timeout is handled at the test level via test.describe.configure
   const results = await new AxeBuilder({ page })
-    .exclude('#some-third-party-widget') // Exclude if needed
     .analyze();
 
   // DEBUG: Log specific low-contrast nodes for targeted fixes
