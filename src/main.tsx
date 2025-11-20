@@ -6,6 +6,7 @@ console.info('🚀 TradeLine 24/7 - Starting main.tsx...');
 
 import React from "react";
 import { createRoot } from "react-dom/client";
+import "./safe-mode";
 import App from "./App.tsx";
 import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 import "./index.css";
@@ -13,6 +14,7 @@ import { initBootSentinel } from "./lib/bootSentinel";
 import { runSwCleanup } from "./lib/swCleanup";
 import { featureFlags } from "./config/featureFlags";
 import "./i18n/config";
+import { detectSafeModeFromSearch } from "./lib/safeMode";
 
 console.info('✅ Core modules loaded');
 
@@ -92,6 +94,8 @@ if (!root) {
   throw new Error('Missing #root');
 }
 
+const safeModeActive = detectSafeModeFromSearch(window.location.search);
+
 // CRITICAL: Hide loading fallback immediately when this script executes (non-blocking, safe)
 const loadingEl = document.getElementById('root-loading');
 if (loadingEl) {
@@ -161,10 +165,7 @@ function boot() {
       // Moved to index.css import for synchronous loading
       
       // Check for safe mode
-      const urlParams = new URLSearchParams(window.location.search);
-      const isSafeMode = urlParams.get('safe') === '1';
-      
-      if (!isSafeMode) {
+      if (!safeModeActive) {
         import("./lib/roiTableFix")
           .then(m => m.watchRoiTableCanon())
           .catch(e => console.warn('⚠️ ROI watcher failed:', e));

@@ -20,6 +20,18 @@ class SafeErrorBoundary extends Component<Props, State> {
     this.state = { hasError: false, error: null };
   }
 
+  componentDidMount(): void {
+    if (typeof window !== 'undefined') {
+      (window as any).__ERROR_BOUNDARY_ACTIVE__ = true;
+    }
+  }
+
+  componentWillUnmount(): void {
+    if (typeof window !== 'undefined') {
+      (window as any).__ERROR_BOUNDARY_ACTIVE__ = false;
+    }
+  }
+
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
