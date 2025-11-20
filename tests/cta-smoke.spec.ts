@@ -4,7 +4,7 @@ test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(10_000);
 });
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:4173';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:4176';
 
 // CTA definitions with their expected destinations
 const CTAS = [

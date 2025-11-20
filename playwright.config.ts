@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const LOCAL_BASE_URL = 'http://localhost:4173';
+const LOCAL_BASE_URL = 'http://localhost:4176';
 
 const baseURL =
   process.env.E2E_BASE_URL ||
@@ -19,8 +19,6 @@ const baseUse: Parameters<typeof defineConfig>[0]['use'] = {
   bypassCSP: true,
   // Fixed viewport for deterministic layout tests
   viewport: { width: 1366, height: 900 },
-  // Disable animations for stable element detection
-  reducedMotion: 'reduce',
   // Extended timeout for CI environment + React hydration signal
   actionTimeout: 45000,
   navigationTimeout: 45000,
@@ -34,8 +32,8 @@ const webServer = shouldStartLocalServer
       reuseExistingServer: true,
       timeout: 120_000,
       // Kill server on exit in CI to prevent port conflicts
-      stdout: 'pipe',
-      stderr: 'pipe',
+      stdout: 'pipe' as const,
+      stderr: 'pipe' as const,
     }
   : undefined;
 
