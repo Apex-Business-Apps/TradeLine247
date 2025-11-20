@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:4173";
+const BASE_URL = process.env.BASE_URL || "http://localhost:4176";
 
 const PAGES = [
   { path: "/", h1: /Your 24\/7 Ai Receptionist!/i },

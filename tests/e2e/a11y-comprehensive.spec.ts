@@ -27,8 +27,8 @@ test.describe.configure({
 
 async function analyzeAccessibility(page: any, routeName: string) {
   // Use basic accessibility scan without specific tags for compatibility
+  // Timeout is handled at the test level via test.describe.configure
   const results = await new AxeBuilder({ page })
-    .withTimeout(30000) // 30s for scan
     .analyze();
   
   // Log violations for debugging
@@ -39,10 +39,11 @@ async function analyzeAccessibility(page: any, routeName: string) {
       console.log(`  Impact: ${violation.impact}`);
       console.log(`  Description: ${violation.description}`);
       console.log(`  Help: ${violation.helpUrl}`);
-      console.log(`  Affected elements: ${violation.nodes.length}`);
+      const nodes = violation.nodes as Array<{ target?: string[] }>;
+      console.log(`  Affected elements: ${nodes.length}`);
       
       // Log first 3 affected elements
-      violation.nodes.slice(0, 3).forEach((node, idx) => {
+      nodes.slice(0, 3).forEach((node, idx) => {
         const selector = node.target?.[0] ?? 'unknown';
         console.log(`    ${idx + 1}. ${selector}`);
       });
@@ -72,6 +73,10 @@ function expectNoViolations(results: any, severity: 'critical' | 'serious' | 'mo
 // ==========================================
 
 test.describe('Public Pages Accessibility', () => {
+  test.beforeEach((_context, testInfo) => {
+    testInfo.setTimeout(60000); // Extended timeout for accessibility scans
+  });
+
   test('Home page - WCAG AA compliant', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
@@ -117,6 +122,10 @@ test.describe('Public Pages Accessibility', () => {
 // ==========================================
 
 test.describe('Authentication Accessibility', () => {
+  test.beforeEach((_context, testInfo) => {
+    testInfo.setTimeout(60000); // Extended timeout for accessibility scans
+  });
+
   test('Auth landing page - WCAG AA compliant', async ({ page }) => {
     await page.goto('/auth-landing');
     await page.waitForLoadState('networkidle');
@@ -146,6 +155,10 @@ test.describe('Authentication Accessibility', () => {
 // ==========================================
 
 test.describe('Dashboard Accessibility', () => {
+  test.beforeEach((_context, testInfo) => {
+    testInfo.setTimeout(60000); // Extended timeout for accessibility scans
+  });
+
   test.skip(!CAN_TEST_AUTH_ROUTES, 'Dashboard routes require an authenticated session to render headings.');
   test('Client dashboard - WCAG AA compliant', async ({ page }) => {
     await page.goto('/dashboard');
@@ -180,6 +193,10 @@ test.describe('Dashboard Accessibility', () => {
 // ==========================================
 
 test.describe('Integration Pages Accessibility', () => {
+  test.beforeEach((_context, testInfo) => {
+    testInfo.setTimeout(60000); // Extended timeout for accessibility scans
+  });
+
   test.skip(!CAN_TEST_AUTH_ROUTES, 'Integration pages require an authenticated session.');
   test('Integrations hub - WCAG AA compliant', async ({ page }) => {
     await page.goto('/integrations');
@@ -243,6 +260,10 @@ test.describe('Integration Pages Accessibility', () => {
 // ==========================================
 
 test.describe('Operations Pages Accessibility', () => {
+  test.beforeEach((_context, testInfo) => {
+    testInfo.setTimeout(60000); // Extended timeout for accessibility scans
+  });
+
   test.skip(!CAN_TEST_AUTH_ROUTES, 'Operations pages require an authenticated session.');
   test('Messaging health - WCAG AA compliant', async ({ page }) => {
     await page.goto('/ops/messaging-health');
@@ -278,6 +299,10 @@ test.describe('Operations Pages Accessibility', () => {
 
 test.describe('Dark Mode Accessibility', () => {
   test.use({ colorScheme: 'dark' });
+
+  test.beforeEach((_context, testInfo) => {
+    testInfo.setTimeout(60000); // Extended timeout for accessibility scans
+  });
 
   test('Home page dark mode - WCAG AA compliant', async ({ page }) => {
     await page.goto('/');
@@ -364,6 +389,10 @@ test.describe('Keyboard Navigation', () => {
 // ==========================================
 
 test.describe('Form Accessibility', () => {
+  test.beforeEach((_context, testInfo) => {
+    testInfo.setTimeout(60000); // Extended timeout for accessibility scans
+  });
+
   test('Contact form - all inputs labeled', async ({ page }) => {
     await page.goto('/contact');
     await page.waitForLoadState('networkidle');
