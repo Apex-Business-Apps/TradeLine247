@@ -14,7 +14,7 @@ workflows:
         bundle_identifier: $BUNDLE_ID
       node: 20.11.1
       npm: 10
-      xcode: 15.4
+      xcode: latest
       cocoapods: default
     cache:
       cache_paths:
