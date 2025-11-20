@@ -16,9 +16,8 @@ test('a11y on home', async ({ page }) => {
   // Wait for critical content to load
   await page.waitForSelector('main', { state: 'visible', timeout: 10000 });
 
-  // Run axe scan with timeout
+  // Run axe scan - timeout is handled at the test level via test.describe.configure
   const results = await new AxeBuilder({ page })
-    .withTimeout(30000) // 30s for scan
     .exclude('#some-third-party-widget') // Exclude if needed
     .analyze();
 

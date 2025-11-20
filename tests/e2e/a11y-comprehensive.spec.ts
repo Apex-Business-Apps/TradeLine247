@@ -29,7 +29,6 @@ async function analyzeAccessibility(page: any, routeName: string) {
   // Use basic accessibility scan without specific tags for compatibility
   // Timeout is handled at the test level via test.describe.configure
   const results = await new AxeBuilder({ page })
-    .withTimeout(30000) // 30s for scan
     .analyze();
   
   // Log violations for debugging
@@ -74,7 +73,8 @@ function expectNoViolations(results: any, severity: 'critical' | 'serious' | 'mo
 // ==========================================
 
 test.describe('Public Pages Accessibility', () => {
-  test.beforeEach((_context, testInfo) => {
+  // eslint-disable-next-line no-empty-pattern
+  test.beforeEach(({}, testInfo) => {
     testInfo.setTimeout(60000); // Extended timeout for accessibility scans
   });
 
@@ -123,7 +123,8 @@ test.describe('Public Pages Accessibility', () => {
 // ==========================================
 
 test.describe('Authentication Accessibility', () => {
-  test.beforeEach((_context, testInfo) => {
+  // eslint-disable-next-line no-empty-pattern
+  test.beforeEach(({}, testInfo) => {
     testInfo.setTimeout(60000); // Extended timeout for accessibility scans
   });
 
@@ -156,7 +157,8 @@ test.describe('Authentication Accessibility', () => {
 // ==========================================
 
 test.describe('Dashboard Accessibility', () => {
-  test.beforeEach((_context, testInfo) => {
+  // eslint-disable-next-line no-empty-pattern
+  test.beforeEach(({}, testInfo) => {
     testInfo.setTimeout(60000); // Extended timeout for accessibility scans
   });
 
@@ -194,7 +196,8 @@ test.describe('Dashboard Accessibility', () => {
 // ==========================================
 
 test.describe('Integration Pages Accessibility', () => {
-  test.beforeEach((_context, testInfo) => {
+  // eslint-disable-next-line no-empty-pattern
+  test.beforeEach(({}, testInfo) => {
     testInfo.setTimeout(60000); // Extended timeout for accessibility scans
   });
 
@@ -261,7 +264,8 @@ test.describe('Integration Pages Accessibility', () => {
 // ==========================================
 
 test.describe('Operations Pages Accessibility', () => {
-  test.beforeEach((_context, testInfo) => {
+  // eslint-disable-next-line no-empty-pattern
+  test.beforeEach(({}, testInfo) => {
     testInfo.setTimeout(60000); // Extended timeout for accessibility scans
   });
 
@@ -301,7 +305,8 @@ test.describe('Operations Pages Accessibility', () => {
 test.describe('Dark Mode Accessibility', () => {
   test.use({ colorScheme: 'dark' });
 
-  test.beforeEach((_context, testInfo) => {
+  // eslint-disable-next-line no-empty-pattern
+  test.beforeEach(({}, testInfo) => {
     testInfo.setTimeout(60000); // Extended timeout for accessibility scans
   });
 
@@ -390,7 +395,8 @@ test.describe('Keyboard Navigation', () => {
 // ==========================================
 
 test.describe('Form Accessibility', () => {
-  test.beforeEach((_context, testInfo) => {
+  // eslint-disable-next-line no-empty-pattern
+  test.beforeEach(({}, testInfo) => {
     testInfo.setTimeout(60000); // Extended timeout for accessibility scans
   });
 
