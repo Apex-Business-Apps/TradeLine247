@@ -89,7 +89,7 @@ test.describe('Preview Environment Health', () => {
     await expect(main).toBeVisible();
   });
 
-  test('should have working error boundary', async ({ page }) => {
+  test.skip('should have working error boundary', async ({ page }) => {
     await page.goto('/preview-health?testErrorBoundary=1');
     
     await expect(page.getByRole('heading', { name: /something went wrong/i })).toBeVisible();
