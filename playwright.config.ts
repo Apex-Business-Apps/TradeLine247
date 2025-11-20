@@ -37,12 +37,29 @@ const webServer = shouldStartLocalServer
 
 export default defineConfig({
   testDir: './tests',
+
+  // CI-specific settings
+  timeout: process.env.CI ? 60000 : 30000, // 60s in CI, 30s local
+  expect: {
+    timeout: process.env.CI ? 10000 : 5000, // 10s in CI, 5s local
+  },
+
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined, // throttle on CI, use all cores locally
-  reporter: 'html',
-  use: baseUse,
+
+  reporter: process.env.CI
+    ? [['github'], ['html']]
+    : [['list'], ['html']],
+
+  use: {
+    ...baseUse,
+    // CI-specific browser settings
+    launchOptions: {
+      slowMo: process.env.CI ? 100 : 0, // Add delay in CI
+    },
+  },
   projects: [
     {
       name: 'chromium',

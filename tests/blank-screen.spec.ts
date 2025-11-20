@@ -48,12 +48,16 @@ test.describe('Blank Screen Prevention', () => {
     const logs: string[] = [];
     page.on('console', msg => logs.push(msg.text()));
 
-    await page.goto('/?safe=1');
-    
+    await page.goto('/?safe=1', { waitUntil: 'load' });
+
     await expect(page.locator('#root')).toBeVisible({ timeout: 2000 });
-    
-    await page.waitForTimeout(1000);
-    
+
+    // CRITICAL: Wait for Safe Mode detection to complete
+    await page.waitForFunction(
+      () => document.body.hasAttribute('data-safe-mode'),
+      { timeout: process.env.CI ? 10000 : 5000 }
+    );
+
     const safeAttr = await page.getAttribute('body', 'data-safe-mode');
     expect(safeAttr).toBe('true');
 

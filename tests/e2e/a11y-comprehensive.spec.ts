@@ -3,6 +3,11 @@ import AxeBuilder from '@axe-core/playwright';
 
 const CAN_TEST_AUTH_ROUTES = !!process.env.E2E_DASHBOARD_SESSION;
 
+// CI-specific timeout settings
+test.describe.configure({
+  timeout: process.env.CI ? 120000 : 60000, // 2 minutes in CI, 1 minute local
+});
+
 /**
  * Comprehensive Accessibility Test Suite
  * 
@@ -23,6 +28,7 @@ const CAN_TEST_AUTH_ROUTES = !!process.env.E2E_DASHBOARD_SESSION;
 async function analyzeAccessibility(page: any, routeName: string) {
   // Use basic accessibility scan without specific tags for compatibility
   const results = await new AxeBuilder({ page })
+    .withTimeout(30000) // 30s for scan
     .analyze();
   
   // Log violations for debugging

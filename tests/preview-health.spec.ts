@@ -102,13 +102,17 @@ test.describe('Preview Environment Health', () => {
       logs.push(msg.text());
     });
 
-    await page.goto('/?safe=1');
-    
-    await page.waitForTimeout(1000);
+    await page.goto('/?safe=1', { waitUntil: 'load' });
+
+    // CRITICAL: Wait for Safe Mode detection to complete
+    await page.waitForFunction(
+      () => document.body.hasAttribute('data-safe-mode'),
+      { timeout: process.env.CI ? 10000 : 5000 }
+    );
 
     const safeAttr = await page.getAttribute('body', 'data-safe-mode');
     expect(safeAttr).toBe('true');
-    
+
     const hasSafeModeLog = logs.some(log => log.includes(SAFE_MODE_LOG));
     expect(hasSafeModeLog).toBeTruthy();
   });
