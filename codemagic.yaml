@@ -1,3 +1,21 @@
+- name: Debug start — verify scripts execute
+  script: |
+    set -e
+    echo "==== Debug start: CM_BUILD_DIR=$CM_BUILD_DIR ===="
+    echo "Workflow: $CM_WORKFLOW_ID"
+    echo "---- env vars (filtered) ----"
+    env | grep -E 'BUNDLE_ID|TEAM_ID|XCODE_WORKSPACE|XCODE_SCHEME|APP_VERSION|APP_BUILD' || true
+    echo "---- top-level repo listing ----"
+    pwd
+    ls -la
+    echo "---- ios listing ----"
+    ls -la ios || true
+    echo "---- ios/App listing ----"
+    ls -la ios/App || true
+    echo "---- package.json head ----"
+    head -n 30 package.json || true
+    echo "==== Debug end ===="
+
 workflows:
   ios_capacitor_testflight:
     name: iOS - Capacitor -> TestFlight (single run)
