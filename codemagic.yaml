@@ -8,7 +8,6 @@ workflows:
     max_build_duration: 75
     environment:
       groups:
-        - shared_ci
         - ios_config
       ios_signing:
         distribution_type: app_store
@@ -58,7 +57,6 @@ workflows:
     max_build_duration: 60
     environment:
       groups:
-        - shared_ci
         - android_signing
       node: 20.11.1
       npm: 10
@@ -94,8 +92,6 @@ workflows:
     instance_type: linux
     max_build_duration: 45
     environment:
-      groups:
-        - shared_ci
       node: 20.11.1
       npm: 10
     cache:
