@@ -1,9 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const LOCAL_BASE_URL = 'http://localhost:4173';
+
 const baseURL =
   process.env.E2E_BASE_URL ||
   process.env.BASE_URL ||
-  'http://localhost:4173';
+  LOCAL_BASE_URL;
+
+const shouldStartLocalServer =
+  !process.env.E2E_BASE_URL && !process.env.BASE_URL;
 
 const baseUse: Parameters<typeof defineConfig>[0]['use'] = {
   baseURL,
@@ -20,6 +25,15 @@ const baseUse: Parameters<typeof defineConfig>[0]['use'] = {
   actionTimeout: 45000,
   navigationTimeout: 45000,
 };
+
+const webServer = shouldStartLocalServer
+  ? {
+      command: 'npm run preview:test',
+      url: LOCAL_BASE_URL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    }
+  : undefined;
 
 export default defineConfig({
   testDir: './tests',
@@ -38,10 +52,5 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: 'npm run preview',
-    url: baseURL,
-    reuseExistingServer: true,
-    timeout: 120000,
-  },
+  ...(webServer ? { webServer } : {}),
 });

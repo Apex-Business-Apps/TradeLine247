@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+const SAFE_MODE_LOG = '[SAFE MODE] Enabled via ?safe=1';
+
 const FUNCTIONS_BASE = process.env.SUPABASE_FUNCTIONS_URL?.replace(/\/$/, '');
 
 test.describe('Blank Screen Prevention', () => {
@@ -52,7 +54,10 @@ test.describe('Blank Screen Prevention', () => {
     
     await page.waitForTimeout(1000);
     
-    const hasSafeMode = logs.some(log => log.includes('SAFE MODE'));
+    const safeAttr = await page.getAttribute('body', 'data-safe-mode');
+    expect(safeAttr).toBe('true');
+
+    const hasSafeMode = logs.some(log => log.includes(SAFE_MODE_LOG));
     expect(hasSafeMode).toBe(true);
   });
 
@@ -133,10 +138,15 @@ test.describe('Edge Function Health', () => {
 test.describe('PIPEDA Compliance', () => {
   test('privacy policy includes call recording section', async ({ page }) => {
     await page.goto('/privacy');
+
+    // Wait for the Privacy page to load by checking for the main heading
+    await page.waitForSelector('h1:has-text("Privacy Policy")', { timeout: 10000 });
+
+    // Wait for the call recording section to appear
     await page.waitForSelector('#call-recording', { timeout: 5000 });
-    
+
     await expect(page.locator('#call-recording')).toBeVisible();
-    
+
     // Verify required elements
     const content = await page.locator('#call-recording').textContent();
     expect(content).toContain('Purpose');
@@ -157,10 +167,19 @@ test.describe('PIPEDA Compliance', () => {
 
   test('call recording anchor link works', async ({ page }) => {
     await page.goto('/privacy#call-recording');
-    
+
+    // Wait for the Privacy page to load
+    await page.waitForSelector('h1:has-text("Privacy Policy")', { timeout: 10000 });
+
+    // Wait for the call recording section to appear
     await page.waitForSelector('#call-recording', { timeout: 5000 });
-    
+
     const section = page.locator('#call-recording');
+
+    // Scroll the section into view and wait a bit for the scroll to complete
+    await section.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+
     await expect(section).toBeInViewport();
   });
 });

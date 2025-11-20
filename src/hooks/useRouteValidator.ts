@@ -23,6 +23,7 @@ export const VALID_ROUTES = [
   '/phone-apps',
   '/ops/forwarding',
   '/ops/voice',
+  '/preview-health',
   '/dashboard/integrations/crm',
   '/dashboard/integrations/email',
   '/dashboard/integrations/phone',

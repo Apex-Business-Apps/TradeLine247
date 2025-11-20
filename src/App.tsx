@@ -14,6 +14,7 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const Features = lazy(() => import("./pages/Features"));
 const Compare = lazy(() => import("./pages/Compare"));
 const Security = lazy(() => import("./pages/Security"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth"));
 const AuthLanding = lazy(() => import("./pages/AuthLanding"));
@@ -26,6 +27,7 @@ const VoiceSettings = lazy(() => import("./pages/ops/VoiceSettings"));
 const TeamInvite = lazy(() => import("./pages/TeamInvite"));
 const PhoneApps = lazy(() => import("./pages/PhoneApps"));
 const ForwardingWizard = lazy(() => import("./routes/ForwardingWizard"));
+const PreviewHealth = lazy(() => import("./pages/PreviewHealth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
@@ -35,6 +37,7 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.features, element: <Features /> },
   { path: paths.compare, element: <Compare /> },
   { path: paths.security, element: <Security /> },
+  { path: paths.privacy, element: <Privacy /> },
   { path: paths.contact, element: <Contact /> },
   { path: paths.auth, element: <Auth /> },
   { path: '/auth-landing', element: <AuthLanding /> },
@@ -49,6 +52,7 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.integrations, element: <Integrations /> },
   { path: paths.phoneApps, element: <PhoneApps /> },
   { path: paths.forwardingWizard, element: <ForwardingWizard /> },
+  { path: paths.previewHealth, element: <PreviewHealth /> },
   { path: paths.notFound, element: <NotFound /> },
 ];
 

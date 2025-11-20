@@ -5,6 +5,8 @@
 
 import { test, expect } from '@playwright/test';
 
+const SAFE_MODE_LOG = '[SAFE MODE] Enabled via ?safe=1';
+
 test.describe('Preview Environment Health', () => {
   test('should load without blank screen', async ({ page }) => {
     await page.goto('/');
@@ -88,31 +90,26 @@ test.describe('Preview Environment Health', () => {
   });
 
   test('should have working error boundary', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/preview-health?testErrorBoundary=1');
     
-    // Inject an error
-    await page.evaluate(() => {
-      throw new Error('Test error');
-    });
-    
-    // Page should still be accessible (error boundary catches it)
-    const root = await page.locator('#root');
-    await expect(root).toBeVisible();
+    await expect(page.getByRole('heading', { name: /something went wrong/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /reload page/i })).toBeVisible();
   });
 
   test('safe mode should work with ?safe=1', async ({ page }) => {
     const logs: string[] = [];
     page.on('console', msg => {
-      if (msg.type() === 'log') {
-        logs.push(msg.text());
-      }
+      logs.push(msg.text());
     });
 
     await page.goto('/?safe=1');
     
     await page.waitForTimeout(1000);
+
+    const safeAttr = await page.getAttribute('body', 'data-safe-mode');
+    expect(safeAttr).toBe('true');
     
-    const hasSafeModeLog = logs.some(log => log.includes('SAFE MODE'));
+    const hasSafeModeLog = logs.some(log => log.includes(SAFE_MODE_LOG));
     expect(hasSafeModeLog).toBeTruthy();
   });
 
