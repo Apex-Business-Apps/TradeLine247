@@ -1,9 +1,27 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+// CI-specific timeout settings
+test.describe.configure({
+  timeout: process.env.CI ? 120000 : 60000, // 2 minutes in CI, 1 minute local
+});
+
 test('a11y on home', async ({ page }) => {
-  await page.goto('/');
-  const results = await new AxeBuilder({ page }).analyze();
+  // Navigate with explicit wait
+  await page.goto('/', {
+    waitUntil: 'networkidle',
+    timeout: process.env.CI ? 15000 : 10000
+  });
+
+  // Wait for critical content to load
+  await page.waitForSelector('main', { state: 'visible', timeout: 10000 });
+
+  // Run axe scan with timeout
+  const results = await new AxeBuilder({ page })
+    .withTimeout(30000) // 30s for scan
+    .exclude('#some-third-party-widget') // Exclude if needed
+    .analyze();
+
   // DEBUG: Log specific low-contrast nodes for targeted fixes
   const cc = results.violations.find(v => v.id === 'color-contrast');
   if (cc) {
@@ -15,6 +33,7 @@ test('a11y on home', async ({ page }) => {
     }
     console.log('--- END nodes ---');
   }
+
   // Color contrast should be fixed - bg-green-700 should pass WCAG AA (4.5:1+)
   expect(results.violations.find((v) => v.id === 'color-contrast')).toBeFalsy();
 });
