@@ -16,12 +16,15 @@ workflows:
         script: npm ci
       - name: Lint, typecheck, unit tests
         script: npm run lint && npm run typecheck && npm run test:unit
-      - name: Playwright smoke
-        script: |
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
+      - name: Build web bundle
+        script: npm run build:web
+      - name: Install Playwright browsers
+        script: npm run test:install-browsers
+      - name: Run full Playwright test suite
+        script: npx playwright test --reporter=html
     artifacts:
       - playwright-report/**/*
+      - dist/**/*
 
   android-capacitor-release:
     name: Android • Capacitor bundleRelease
