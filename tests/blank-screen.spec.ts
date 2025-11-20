@@ -43,7 +43,7 @@ test.describe('Blank Screen Prevention', () => {
     await expect(page.locator('#main')).toBeVisible({ timeout: 2000 });
   });
 
-  test.skip('safe mode unblanks screen', async ({ page }) => {
+  test('safe mode unblanks screen', async ({ page }) => {
     await page.goto('/?safe=1');
     
     // Safe mode should force visibility
@@ -106,7 +106,7 @@ test.describe('Blank Screen Prevention', () => {
 });
 
 test.describe('Edge Function Health', () => {
-  test.skip('healthz endpoint responds quickly', async ({ request }) => {
+  test('healthz endpoint responds quickly', async ({ request }) => {
     const start = Date.now();
     const response = await request.get('/functions/v1/healthz');
     const duration = Date.now() - start;
@@ -118,7 +118,7 @@ test.describe('Edge Function Health', () => {
     expect(data).toHaveProperty('healthy');
   });
 
-  test.skip('prewarm job succeeds', async ({ request }) => {
+  test('prewarm job succeeds', async ({ request }) => {
     const response = await request.post('/functions/v1/prewarm-cron');
     
     expect(response.ok()).toBe(true);
@@ -130,7 +130,7 @@ test.describe('Edge Function Health', () => {
 });
 
 test.describe('PIPEDA Compliance', () => {
-  test.skip('privacy policy includes call recording section', async ({ page }) => {
+  test('privacy policy includes call recording section', async ({ page }) => {
     await page.goto('/privacy');
     
     // Check for call recording section
@@ -154,7 +154,7 @@ test.describe('PIPEDA Compliance', () => {
     await expect(page).toHaveURL('/privacy');
   });
 
-  test.skip('call recording anchor link works', async ({ page }) => {
+  test('call recording anchor link works', async ({ page }) => {
     await page.goto('/privacy#call-recording');
     
     // Should scroll to section

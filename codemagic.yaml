@@ -78,6 +78,14 @@ scripts:
       node scripts/verify-app.cjs
       node scripts/verify_icons.mjs
 
+  - name: Install Playwright browsers
+    script: |
+      npx playwright install --with-deps chromium
+
+  - name: Run E2E smoke tests (pre-iOS build verification)
+    script: |
+      npm run test:e2e:smoke || { echo "E2E smoke tests failed - iOS build blocked"; exit 1; }
+
   - name: Sync Capacitor iOS
     script: |
       npx cap sync ios

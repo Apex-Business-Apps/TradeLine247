@@ -86,7 +86,7 @@ test.describe('Preview Environment Health', () => {
     await expect(main).toBeVisible();
   });
 
-  test.skip('should have working error boundary', async ({ page }) => {
+  test('should have working error boundary', async ({ page }) => {
     await page.goto('/');
     
     // Inject an error
@@ -99,7 +99,7 @@ test.describe('Preview Environment Health', () => {
     await expect(root).toBeVisible();
   });
 
-  test.skip('safe mode should work with ?safe=1', async ({ page }) => {
+  test('safe mode should work with ?safe=1', async ({ page }) => {
     await page.goto('/?safe=1');
     
     // Should log safe mode activation
