@@ -7,14 +7,14 @@ test.describe.configure({
 });
 
 test('a11y on home', async ({ page }) => {
-  // Navigate with explicit wait
+  // Navigate with explicit wait - increased timeout for Windows CI
   await page.goto('/', {
     waitUntil: 'networkidle',
-    timeout: process.env.CI ? 15000 : 10000
+    timeout: process.env.CI ? 30000 : 20000
   });
 
-  // Wait for critical content to load
-  await page.waitForSelector('main', { state: 'visible', timeout: 10000 });
+  // Wait for React to mount completely
+  await page.waitForFunction(() => (window as any).__REACT_READY__ === true, { timeout: 15000 });
 
   // Run axe scan - timeout is handled at the test level via test.describe.configure
   const results = await new AxeBuilder({ page })
