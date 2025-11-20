@@ -30,8 +30,12 @@ const webServer = shouldStartLocalServer
   ? {
       command: 'npm run preview:test',
       url: LOCAL_BASE_URL,
-      reuseExistingServer: !process.env.CI,
+      // In CI: reuse if available, start if not. Locally: reuse to avoid conflicts.
+      reuseExistingServer: true,
       timeout: 120_000,
+      // Kill server on exit in CI to prevent port conflicts
+      stdout: 'pipe',
+      stderr: 'pipe',
     }
   : undefined;
 
