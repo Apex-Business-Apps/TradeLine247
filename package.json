@@ -29,7 +29,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "test": "node scripts/run-vitest.mjs",
-    "test:ci": "npm run lint && npm run typecheck && npm run test:unit && npm run build:web && npx playwright test --reporter=html",
+    "test:ci": "npm run lint && npm run typecheck && npm run test:unit && npm run build:web && npx playwright install --with-deps chromium && npx playwright test --reporter=html",
     "test:ci:coverage": "node scripts/run-vitest.mjs --coverage",
     "test:e2e": "playwright test tests/e2e/",
     "test:e2e:smoke": "playwright test tests/smoke.spec.ts tests/blank-screen.spec.ts tests/cta-smoke.spec.ts tests/preview-health.spec.ts",
