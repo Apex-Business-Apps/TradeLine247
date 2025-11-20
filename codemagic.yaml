@@ -3,29 +3,33 @@ workflows:
     name: iOS - Capacitor -> TestFlight
     instance_type: mac_mini_m2
     max_build_duration: 60
-    integrations:
-      app_store_connect: Created via API
-    environment:
-      groups:
-        - ios_config
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: $BUNDLE_ID
-      vars:
-        APP_VERSION: "1.0.0"
-        APP_BUILD: "1"
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-      xcode: latest
-      node: 20.11.1
-      npm: 10
-      cocoapods: default
-    cache:
-      cache_paths:
-        - ~/.npm
-        - ~/.cocoapods
-        - ios/Pods
-    scripts:
+
+integrations:
+  app_store_connect: Created via API
+
+environment:
+  groups:
+    - ios_config
+  ios_signing:
+    distribution_type: app_store
+    bundle_identifier: $BUNDLE_ID
+  vars:
+    APP_VERSION: "1.0.0"
+    APP_BUILD: "1"
+    XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+    XCODE_SCHEME: "App"
+  xcode: latest
+  node: 20.11.1
+  npm: 10
+  cocoapods: default
+
+cache:
+  cache_paths:
+    - ~/.npm
+    - ~/.cocoapods
+    - ios/Pods
+
+scripts:
   - name: Sanitize package.json (remove npm/Capacitor hooks)
     script: |
       node --input-type=module -e "
@@ -202,10 +206,12 @@ workflows:
         -archivePath "$CM_BUILD_DIR/TradeLine247.xcarchive" \
         -exportOptionsPlist exportOptions.plist \
         -exportPath "$CM_BUILD_DIR/export"
-    artifacts:
-      - $CM_BUILD_DIR/export/*.ipa
-      - $CM_BUILD_DIR/TradeLine247.xcarchive
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
+
+artifacts:
+  - $CM_BUILD_DIR/export/*.ipa
+  - $CM_BUILD_DIR/TradeLine247.xcarchive
+
+publishing:
+  app_store_connect:
+    auth: integration
+    submit_to_testflight: true
