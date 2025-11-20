@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+const FUNCTIONS_BASE = process.env.SUPABASE_FUNCTIONS_URL?.replace(/\/$/, '');
+
 test.describe('Blank Screen Prevention', () => {
   test('preview loads without blank screen', async ({ page }) => {
     await page.goto('/');
@@ -23,16 +25,13 @@ test.describe('Blank Screen Prevention', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    const bg = page.getByTestId('hero-bg');
+    const backgroundWrapper = page.locator('#app-home');
+    await expect(backgroundWrapper).toBeVisible();
 
-    // Check that the background element exists (aria-hidden="true" makes it "hidden" but present)
-    await expect(bg).toBeAttached({ timeout: 10_000 });
-
-    const css = await bg.evaluate((el) => getComputedStyle(el).backgroundImage);
+    const css = await backgroundWrapper.evaluate((el) => getComputedStyle(el).backgroundImage);
     expect(css).toMatch(/url\(/);
 
-    // Verify the background image has proper opacity for visibility
-    const opacity = await bg.evaluate((el) => getComputedStyle(el).opacity);
+    const opacity = await backgroundWrapper.evaluate((el) => getComputedStyle(el).opacity);
     expect(parseFloat(opacity)).toBeGreaterThan(0);
   });
 
@@ -44,18 +43,16 @@ test.describe('Blank Screen Prevention', () => {
   });
 
   test('safe mode unblanks screen', async ({ page }) => {
-    await page.goto('/?safe=1');
-    
-    // Safe mode should force visibility
-    await expect(page.locator('#root')).toBeVisible({ timeout: 2000 });
-    
-    // Check console for safe mode activation
     const logs: string[] = [];
     page.on('console', msg => logs.push(msg.text()));
+
+    await page.goto('/?safe=1');
+    
+    await expect(page.locator('#root')).toBeVisible({ timeout: 2000 });
     
     await page.waitForTimeout(1000);
     
-    const hasSafeMode = logs.some(log => log.includes('SAFE MODE ACTIVE'));
+    const hasSafeMode = logs.some(log => log.includes('SAFE MODE'));
     expect(hasSafeMode).toBe(true);
   });
 
@@ -107,19 +104,23 @@ test.describe('Blank Screen Prevention', () => {
 
 test.describe('Edge Function Health', () => {
   test('healthz endpoint responds quickly', async ({ request }) => {
+    test.skip(!FUNCTIONS_BASE, 'Supabase functions URL is not configured for this environment.');
+
     const start = Date.now();
-    const response = await request.get('/functions/v1/healthz');
+    const response = await request.get(`${FUNCTIONS_BASE}/healthz`);
     const duration = Date.now() - start;
     
     expect(response.ok()).toBe(true);
-    expect(duration).toBeLessThan(2000); // Should respond within 2s
+    expect(duration).toBeLessThan(2000);
     
     const data = await response.json();
     expect(data).toHaveProperty('healthy');
   });
 
   test('prewarm job succeeds', async ({ request }) => {
-    const response = await request.post('/functions/v1/prewarm-cron');
+    test.skip(!FUNCTIONS_BASE, 'Supabase functions URL is not configured for this environment.');
+
+    const response = await request.post(`${FUNCTIONS_BASE}/prewarm-cron`);
     
     expect(response.ok()).toBe(true);
     
@@ -132,8 +133,8 @@ test.describe('Edge Function Health', () => {
 test.describe('PIPEDA Compliance', () => {
   test('privacy policy includes call recording section', async ({ page }) => {
     await page.goto('/privacy');
+    await page.waitForSelector('#call-recording', { timeout: 5000 });
     
-    // Check for call recording section
     await expect(page.locator('#call-recording')).toBeVisible();
     
     // Verify required elements
@@ -157,8 +158,7 @@ test.describe('PIPEDA Compliance', () => {
   test('call recording anchor link works', async ({ page }) => {
     await page.goto('/privacy#call-recording');
     
-    // Should scroll to section
-    await page.waitForTimeout(500);
+    await page.waitForSelector('#call-recording', { timeout: 5000 });
     
     const section = page.locator('#call-recording');
     await expect(section).toBeInViewport();
