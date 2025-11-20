@@ -1,90 +1,53 @@
 workflows:
   # ────────────────────────────────────────────────────────────────────────────
-  # WINDOWS DESKTOP BUILD (PRIMARY FOCUS)
+  # iOS BUILD FOR APP STORE CONNECT (PRIMARY)
   # ────────────────────────────────────────────────────────────────────────────
-  windows-desktop-pwa:
-    name: Windows Desktop • PWA Bundle
-    instance_type: windows_x2
-    max_build_duration: 60
+  ios-capacitor-testflight:
+    name: iOS • Capacitor -> TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 75
     environment:
       groups:
         - shared_ci
+        - ios_config
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: $BUNDLE_ID
       node: 20.11.1
       npm: 10
+      xcode: 15.4
+      cocoapods: default
     cache:
       cache_paths:
-        - ~\AppData\Roaming\npm-cache
+        - ~/.npm
+        - ~/.cocoapods
+        - ios/Pods
     scripts:
       - name: Install dependencies
         script: npm ci
       - name: Quality gates
         script: npm run lint && npm run typecheck && npm run test:unit
-      - name: Install Playwright browsers
-        script: npx playwright install --with-deps chromium
-      - name: Playwright smoke tests
-        script: npm run test:e2e:smoke
-      - name: Build production web bundle
-        script: npm run build:web
-      - name: Verify build artifacts
+      - name: Playwright smoke
         script: |
-          if (!(Test-Path "dist/index.html")) {
-            throw "Build failed - dist/index.html not found"
-          }
-          Write-Host "✅ Windows build artifacts verified"
-      - name: Create Windows package metadata
-        script: |
-          $metadata = @{
-            platform = "windows"
-            buildNumber = $env:BUILD_NUMBER
-            commitHash = git rev-parse --short HEAD
-            buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-          } | ConvertTo-Json
-          $metadata | Out-File -FilePath "dist/build-info.json" -Encoding UTF8
-          Write-Host "Package metadata created"
+          npx playwright install --with-deps chromium
+          npm run test:e2e:smoke
+      - name: Build archive & IPA
+        script: bash scripts/build-ios.sh
+      - name: Upload to TestFlight
+        script: fastlane ios upload
+      - name: Verify artifacts
+        script: bash scripts/verify-codemagic.sh
     artifacts:
-      - dist/**/*
+      - ios/build/export/*.ipa
+      - ios/build/TradeLine247.xcarchive
       - playwright-report/**/*
+      - dist/**/*
+      - build-artifacts-sha256.txt
     triggering:
       events:
         - push
       branch_patterns:
         - pattern: 'main'
-        - pattern: 'fix/**'
-        - pattern: 'feature/**'
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # WEB TESTS (LINUX) - FAST CI VALIDATION
-  # ────────────────────────────────────────────────────────────────────────────
-  web-tests-only:
-    name: Web Tests & Smoke
-    instance_type: linux
-    max_build_duration: 45
-    environment:
-      groups:
-        - shared_ci
-      node: 20.11.1
-      npm: 10
-    cache:
-      cache_paths:
-        - ~/.npm
-    scripts:
-      - name: Install dependencies
-        script: npm ci
-      - name: Lint, typecheck, unit tests
-        script: npm run lint && npm run typecheck && npm run test:unit
-      - name: Build web bundle
-        script: npm run build:web
-      - name: Install Playwright browsers
-        script: npm run test:install-browsers
-      - name: Run full Playwright test suite
-        script: npx playwright test --reporter=html
-    artifacts:
-      - playwright-report/**/*
-      - dist/**/*
-    triggering:
-      events:
-        - pull_request
-        - push
 
   # ────────────────────────────────────────────────────────────────────────────
   # ANDROID BUILD (OPTIONAL)
@@ -122,17 +85,33 @@ workflows:
       - playwright-report/**/*
       - dist/**/*
       - build-artifacts-sha256.txt
-    triggering:
-      events:
-        - tag
-      tag_patterns:
-        - pattern: 'android-*'
 
   # ────────────────────────────────────────────────────────────────────────────
-  # iOS BUILD - REMOVED (No Mac instance available)
+  # WEB TESTS (LINUX) - CI VALIDATION
   # ────────────────────────────────────────────────────────────────────────────
-  # To re-enable iOS builds:
-  # 1. Uncomment workflow in separate file: .codemagic/ios-workflow.yaml
-  # 2. Ensure BUNDLE_ID exists in 'ios_appstore' group (currently in 'ios_config')
-  # 3. Verify Mac mini instance availability
-  # ────────────────────────────────────────────────────────────────────────────
+  web-tests-only:
+    name: Web Tests & Smoke
+    instance_type: linux
+    max_build_duration: 45
+    environment:
+      groups:
+        - shared_ci
+      node: 20.11.1
+      npm: 10
+    cache:
+      cache_paths:
+        - ~/.npm
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Lint, typecheck, unit tests
+        script: npm run lint && npm run typecheck && npm run test:unit
+      - name: Build web bundle
+        script: npm run build:web
+      - name: Install Playwright browsers
+        script: npm run test:install-browsers
+      - name: Run full Playwright test suite
+        script: npx playwright test --reporter=html
+    artifacts:
+      - playwright-report/**/*
+      - dist/**/*
