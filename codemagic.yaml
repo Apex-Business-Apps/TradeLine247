@@ -1,3 +1,4 @@
+workflows:
 - name: Debug start — verify scripts execute
   script: |
     set -e
@@ -15,9 +16,8 @@
     echo "---- package.json head ----"
     head -n 30 package.json || true
     echo "==== Debug end ===="
-
-workflows:
-  ios_capacitor_testflight:
+    
+ios_capacitor_testflight:
     name: iOS - Capacitor -> TestFlight (single run)
     instance_type: mac_mini_m2
     max_build_duration: 60
