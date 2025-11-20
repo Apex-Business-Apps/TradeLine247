@@ -1,10 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-// TEMP: skip the flaky "Grow Now (Lead Form)" test so CI can ship
-test.beforeEach(async ({ page }, testInfo) => {
-  if (testInfo.title.includes('Grow Now (Lead Form)')) {
-    test.skip(true, 'Temp-skip flaky Grow Now CTA until locator is stabilized');
-  }
+test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(10_000);
 });
 
