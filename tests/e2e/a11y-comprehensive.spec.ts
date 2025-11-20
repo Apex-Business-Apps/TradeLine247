@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+const CAN_TEST_AUTH_ROUTES = !!process.env.E2E_DASHBOARD_SESSION;
+
 /**
  * Comprehensive Accessibility Test Suite
  * 
@@ -138,6 +140,7 @@ test.describe('Authentication Accessibility', () => {
 // ==========================================
 
 test.describe('Dashboard Accessibility', () => {
+  test.skip(!CAN_TEST_AUTH_ROUTES, 'Dashboard routes require an authenticated session to render headings.');
   test('Client dashboard - WCAG AA compliant', async ({ page }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
@@ -171,6 +174,7 @@ test.describe('Dashboard Accessibility', () => {
 // ==========================================
 
 test.describe('Integration Pages Accessibility', () => {
+  test.skip(!CAN_TEST_AUTH_ROUTES, 'Integration pages require an authenticated session.');
   test('Integrations hub - WCAG AA compliant', async ({ page }) => {
     await page.goto('/integrations');
     await page.waitForLoadState('networkidle');
@@ -233,6 +237,7 @@ test.describe('Integration Pages Accessibility', () => {
 // ==========================================
 
 test.describe('Operations Pages Accessibility', () => {
+  test.skip(!CAN_TEST_AUTH_ROUTES, 'Operations pages require an authenticated session.');
   test('Messaging health - WCAG AA compliant', async ({ page }) => {
     await page.goto('/ops/messaging-health');
     await page.waitForLoadState('networkidle');
@@ -285,6 +290,7 @@ test.describe('Dark Mode Accessibility', () => {
   });
 
   test('Dashboard dark mode - WCAG AA compliant', async ({ page }) => {
+    test.skip(!CAN_TEST_AUTH_ROUTES, 'Dashboard dark mode requires an authenticated session.');
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     

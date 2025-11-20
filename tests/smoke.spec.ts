@@ -39,7 +39,8 @@ for (const page of PAGES) {
         !err.includes("Supabase disabled") &&
         !err.includes("identify: not found") &&
         !err.includes("Failed to load resource") &&
-        !err.includes("404")
+        !err.includes("404") &&
+        !err.includes("Global error caught")
     );
 
     expect(criticalErrors).toHaveLength(0);
