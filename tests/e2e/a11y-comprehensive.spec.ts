@@ -29,6 +29,7 @@ async function analyzeAccessibility(page: any, routeName: string) {
   // Use basic accessibility scan without specific tags for compatibility
   // Timeout is handled at the test level via test.describe.configure
   const results = await new AxeBuilder({ page })
+    .withTimeout(30000) // 30s for scan
     .analyze();
   
   // Log violations for debugging
