@@ -6,6 +6,9 @@ import './i18n/config';
 import { telemetry } from './lib/observability/telemetry';
 import App from './App';
 
+console.info('🚀 TradeLine 24/7 - Starting main.tsx');
+console.info('✅ Core modules loaded');
+
 const loadStart = performance.now();
 window.addEventListener('load', () => {
   const loadTime = performance.now() - loadStart;
@@ -19,3 +22,5 @@ createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </StrictMode>,
 );
+
+console.info('✅ React mounted successfully');
