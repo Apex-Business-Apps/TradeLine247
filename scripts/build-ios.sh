@@ -2,11 +2,14 @@
 # =============================================================================
 # TradeLine 24/7 - iOS Build Script for Codemagic
 # =============================================================================
-# Version: 3.1.0 (Merged: Manual signing with workspace detection)
+# Version: 4.0.0 (Complete Manual Signing Fix)
 #
-# FIX: Provisioning profile is now committed in project.pbxproj, so we don't
-#      mutate it at runtime. The App target uses manual signing with explicit
-#      PROVISIONING_PROFILE_SPECIFIER for Codemagic builds.
+# FIX: Complete manual signing configuration with all parameters:
+#      - CODE_SIGN_STYLE=Manual in project.pbxproj and xcodebuild
+#      - CODE_SIGN_IDENTITY="Apple Distribution"
+#      - PROVISIONING_PROFILE_SPECIFIER explicitly set
+#      - Proper exit codes 65 (archive) and 70 (export)
+#      - ExportOptions.plist with manual signing
 # =============================================================================
 
 set -euo pipefail
@@ -84,53 +87,50 @@ ls ~/Library/MobileDevice/Provisioning\ Profiles/ || true
 # CREATE EXPORT OPTIONS (Provisioning profile specified here for IPA export)
 # =============================================================================
 echo ""
-echo "📝 Creating ExportOptions.plist..."
+echo "[build-ios] Creating ExportOptions.plist"
 
-cat > "$EXPORT_OPTIONS_PLIST" <<EOF
+cat > "$EXPORT_OPTIONS_PLIST" << 'EXPORTEOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>app-store-connect</string>
+    <string>app-store</string>
     <key>teamID</key>
-    <string>${TEAM_ID}</string>
-    <key>destination</key>
-    <string>upload</string>
+    <string>NWGUYF42KW</string>
+    <key>uploadBitcode</key>
+    <false/>
+    <key>uploadSymbols</key>
+    <true/>
     <key>signingStyle</key>
     <string>manual</string>
     <key>provisioningProfiles</key>
     <dict>
-        <key>${BUNDLE_ID}</key>
-        <string>${PROVISIONING_PROFILE_NAME}</string>
+        <key>com.apex.tradeline</key>
+        <string>TL247_mobpro_tradeline_01</string>
     </dict>
-    <key>stripSwiftSymbols</key>
-    <true/>
-    <key>uploadSymbols</key>
-    <true/>
-    <key>compileBitcode</key>
-    <false/>
 </dict>
 </plist>
-EOF
+EXPORTEOF
 
 # =============================================================================
 # BUILD ARCHIVE
 # The App target now has manual signing committed in project.pbxproj with
 # PROVISIONING_PROFILE_SPECIFIER set, so we don't need to mutate the project.
-# We just reinforce the same values here for deterministic Codemagic output.
+# We reinforce all signing parameters for deterministic Codemagic output.
 # =============================================================================
 echo ""
-echo "[build-ios] Workspace: $XCODE_WORKSPACE"
-echo "[build-ios] Scheme: $XCODE_SCHEME"
-echo "[build-ios] Configuration: Release"
-echo "[build-ios] Signing: Manual (Team: $TEAM_ID, Profile: $PROVISIONING_PROFILE_NAME)"
+echo "[build-ios] Running xcodebuild archive"
+echo "  Workspace: $XCODE_WORKSPACE"
+echo "  Scheme: $XCODE_SCHEME"
+echo "  Configuration: Release"
+echo "  Team ID: $TEAM_ID"
+echo "  Bundle ID: $BUNDLE_ID"
+echo "  Signing: Manual (Profile: $PROVISIONING_PROFILE_NAME)"
 echo ""
-echo "🏗  Running xcodebuild archive..."
+echo "🏗  Building archive..."
 
-# The project file has Manual signing with PROVISIONING_PROFILE_SPECIFIER set for the App target.
-# We explicitly pass PROVISIONING_PROFILE_SPECIFIER to ensure xcodebuild finds the profile.
-# Pods/Capacitor targets use Automatic signing and will ignore this flag.
+# Pass all signing parameters explicitly to xcodebuild for deterministic behavior
 xcodebuild archive \
   -workspace "$XCODE_WORKSPACE" \
   -scheme "$XCODE_SCHEME" \
@@ -138,14 +138,22 @@ xcodebuild archive \
   -archivePath "$ARCHIVE_PATH" \
   -destination "generic/platform=iOS" \
   -allowProvisioningUpdates \
+  CODE_SIGN_STYLE=Manual \
+  CODE_SIGN_IDENTITY="Apple Distribution" \
   DEVELOPMENT_TEAM="$TEAM_ID" \
   PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
   PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+  clean archive \
   2>&1 | tee "$LOG_DIR/xcodebuild.log"
+
+if [ $? -ne 0 ]; then
+  echo "❌ Archive failed"
+  exit 65
+fi
 
 if [ ! -d "$ARCHIVE_PATH" ]; then
     echo "❌ ERROR: Archive was not created"
-    exit 1
+    exit 65
 fi
 
 echo "✅ Archive created successfully"
@@ -154,7 +162,7 @@ echo "✅ Archive created successfully"
 # EXPORT IPA
 # =============================================================================
 echo ""
-echo "📦 Exporting IPA..."
+echo "[build-ios] Exporting IPA..."
 
 xcodebuild -exportArchive \
   -archivePath "$ARCHIVE_PATH" \
@@ -163,11 +171,17 @@ xcodebuild -exportArchive \
   -allowProvisioningUpdates \
   2>&1 | tee "$LOG_DIR/export.log"
 
+if [ $? -ne 0 ]; then
+  echo "❌ Export failed"
+  exit 70
+fi
+echo "✅ IPA exported"
+
 IPA_PATH=$(find "$EXPORT_DIR" -name "*.ipa" 2>/dev/null | head -1)
 
 if [[ -z "$IPA_PATH" || ! -f "$IPA_PATH" ]]; then
   echo "❌ ERROR: IPA not found in $EXPORT_DIR" >&2
-  exit 1
+  exit 70
 fi
 
 echo ""
