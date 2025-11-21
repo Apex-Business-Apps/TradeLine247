@@ -123,10 +123,14 @@ EOF
 echo ""
 echo "[build-ios] Workspace: $XCODE_WORKSPACE"
 echo "[build-ios] Scheme: $XCODE_SCHEME"
-echo "[build-ios] Signing (Release): Manual • Team $TEAM_ID • Profile $PROVISIONING_PROFILE_NAME"
+echo "[build-ios] Configuration: Release"
+echo "[build-ios] Signing: Manual (Team: $TEAM_ID, Profile: $PROVISIONING_PROFILE_NAME)"
 echo ""
 echo "🏗  Running xcodebuild archive..."
 
+# The project file has Manual signing with PROVISIONING_PROFILE_SPECIFIER set for the App target.
+# We explicitly pass PROVISIONING_PROFILE_SPECIFIER to ensure xcodebuild finds the profile.
+# Pods/Capacitor targets use Automatic signing and will ignore this flag.
 xcodebuild archive \
   -workspace "$XCODE_WORKSPACE" \
   -scheme "$XCODE_SCHEME" \
@@ -134,9 +138,8 @@ xcodebuild archive \
   -archivePath "$ARCHIVE_PATH" \
   -destination "generic/platform=iOS" \
   -allowProvisioningUpdates \
-  CODE_SIGN_STYLE=Manual \
   DEVELOPMENT_TEAM="$TEAM_ID" \
-  CODE_SIGN_IDENTITY="iPhone Distribution" \
+  PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
   PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
   2>&1 | tee "$LOG_DIR/xcodebuild.log"
 
