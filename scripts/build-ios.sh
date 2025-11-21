@@ -4,6 +4,17 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# Validate required environment variables
+if [[ -z "${TEAM_ID:-}" ]]; then
+  echo "❌ ERROR: TEAM_ID environment variable is not set" >&2
+  echo "   Required for iOS code signing. Check Codemagic environment configuration." >&2
+  exit 1
+fi
+
+echo "[build-ios] Configuration"
+echo "  TEAM_ID: $TEAM_ID"
+echo "  BUNDLE_ID: ${CM_BUNDLE_ID:-$BUNDLE_ID}"
+
 XCODE_WORKSPACE="${XCODE_WORKSPACE:-ios/App/App.xcworkspace}"
 XCODE_SCHEME="${XCODE_SCHEME:-App}"
 ARCHIVE_PATH="${ARCHIVE_PATH:-$ROOT/ios/build/TradeLine247.xcarchive}"
@@ -43,6 +54,10 @@ if command -v xcpretty >/dev/null; then
     -configuration Release \
     -sdk iphoneos \
     -archivePath "$ARCHIVE_PATH" \
+    -allowProvisioningUpdates \
+    -allowProvisioningDeviceRegistration \
+    CODE_SIGN_STYLE=Automatic \
+    DEVELOPMENT_TEAM="$TEAM_ID" \
     clean archive | xcpretty
 else
   xcodebuild \
@@ -51,6 +66,10 @@ else
     -configuration Release \
     -sdk iphoneos \
     -archivePath "$ARCHIVE_PATH" \
+    -allowProvisioningUpdates \
+    -allowProvisioningDeviceRegistration \
+    CODE_SIGN_STYLE=Automatic \
+    DEVELOPMENT_TEAM="$TEAM_ID" \
     clean archive
 fi
 
