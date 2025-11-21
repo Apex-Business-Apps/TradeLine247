@@ -43,6 +43,10 @@ if command -v xcpretty >/dev/null; then
     -configuration Release \
     -sdk iphoneos \
     -archivePath "$ARCHIVE_PATH" \
+    -allowProvisioningUpdates \
+    -allowProvisioningDeviceRegistration \
+    CODE_SIGN_STYLE=Automatic \
+    DEVELOPMENT_TEAM="$TEAM_ID" \
     clean archive | xcpretty
 else
   xcodebuild \
@@ -51,6 +55,10 @@ else
     -configuration Release \
     -sdk iphoneos \
     -archivePath "$ARCHIVE_PATH" \
+    -allowProvisioningUpdates \
+    -allowProvisioningDeviceRegistration \
+    CODE_SIGN_STYLE=Automatic \
+    DEVELOPMENT_TEAM="$TEAM_ID" \
     clean archive
 fi
 
