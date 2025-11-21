@@ -6,7 +6,6 @@ cd "$ROOT"
 
 TEAM_ID="${TEAM_ID:-NWGUYF42KW}"
 BUNDLE_ID="${BUNDLE_ID:-com.apex.tradeline}"
-APP_STORE_ID="${APP_STORE_ID:-5XDRL75994}"
 XCODE_WORKSPACE="${XCODE_WORKSPACE:-ios/App/App.xcworkspace}"
 XCODE_SCHEME="${XCODE_SCHEME:-App}"
 PROVISIONING_PROFILE_NAME="${PROVISIONING_PROFILE_NAME:-TL247_mobpro_tradeline_01}"
@@ -35,27 +34,6 @@ popd >/dev/null
 
 echo "🧰 Ensuring codemagic-cli-tools..."
 pip3 install --quiet --upgrade codemagic-cli-tools
-
-PBXPROJ=""
-if [[ -f "ios/App/App.xcodeproj/project.pbxproj" ]]; then
-  PBXPROJ="ios/App/App.xcodeproj/project.pbxproj"
-elif [[ -f "ios/App.xcodeproj/project.pbxproj" ]]; then
-  PBXPROJ="ios/App.xcodeproj/project.pbxproj"
-fi
-
-if [[ -z "$PBXPROJ" ]]; then
-  echo "❌ ERROR: project.pbxproj not found"
-  exit 1
-fi
-
-cp "$PBXPROJ" "${PBXPROJ}.backup"
-
-echo "🛠️ Forcing manual signing in $PBXPROJ"
-/usr/bin/sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$PBXPROJ"
-/usr/bin/sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' "$PBXPROJ"
-/usr/bin/sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = ${BUNDLE_ID};/g" "$PBXPROJ"
-/usr/bin/sed -i '' "s/DEVELOPMENT_TEAM = .*;/DEVELOPMENT_TEAM = ${TEAM_ID};/g" "$PBXPROJ"
-/usr/bin/sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = ""/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution"/g' "$PBXPROJ"
 
 cat > "$EXPORT_OPTIONS_PLIST" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -90,6 +68,15 @@ security find-identity -v -p codesigning || true
 echo "📱 Provisioning profiles:"
 ls ~/Library/MobileDevice/Provisioning\ Profiles/ || true
 
+# Print explicit build context so debugging exit code 65 is easier.
+echo "[build-ios] Workspace: $XCODE_WORKSPACE"
+echo "[build-ios] Scheme: $XCODE_SCHEME"
+echo "[build-ios] Signing (Release): Manual • Team $TEAM_ID • Profile $PROVISIONING_PROFILE_NAME"
+
+# The App target was previously missing a provisioning profile which triggered:
+#   "App requires a provisioning profile. Select a provisioning profile..."
+# After committing the manual-signing settings to the project we simply
+# reinforce the same values here to keep Codemagic output deterministic.
 echo "🏗  Running xcodebuild archive..."
 xcodebuild archive \
   -workspace "$XCODE_WORKSPACE" \
@@ -101,7 +88,6 @@ xcodebuild archive \
   CODE_SIGN_STYLE=Manual \
   DEVELOPMENT_TEAM="$TEAM_ID" \
   CODE_SIGN_IDENTITY="iPhone Distribution" \
-  PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
   PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
   2>&1 | tee "$LOG_DIR/xcodebuild.log"
 
