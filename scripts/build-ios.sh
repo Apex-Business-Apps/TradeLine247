@@ -2,11 +2,11 @@
 # =============================================================================
 # TradeLine 24/7 - iOS Build Script for Codemagic
 # =============================================================================
-# Version: 3.0.0 (Fixed: Provisioning profile scope)
+# Version: 4.0.0 (Manual signing with explicit provisioning profile)
 #
-# FIX: Provisioning profile must NOT be passed globally to xcodebuild.
-#      Pods/frameworks don't support provisioning profiles.
-#      Profile is specified ONLY in ExportOptions.plist for IPA export.
+# FIX: Use Manual signing configured in project.pbxproj with explicit
+#      PROVISIONING_PROFILE_SPECIFIER to prevent "requires provisioning profile"
+#      and export failures.
 # =============================================================================
 
 set -e
@@ -15,28 +15,30 @@ set -o pipefail
 # Configuration
 BUNDLE_ID="${BUNDLE_ID:-com.apex.tradeline}"
 TEAM_ID="${TEAM_ID:-NWGUYF42KW}"
-SCHEME="${XCODE_SCHEME:-App}"
+XCODE_WORKSPACE="${XCODE_WORKSPACE:-ios/App/App.xcworkspace}"
+XCODE_SCHEME="${XCODE_SCHEME:-App}"
 PROVISIONING_PROFILE_NAME="${PROVISIONING_PROFILE_NAME:-TL247_mobpro_tradeline_01}"
 
-# Detect workspace
-if [ -f "ios/App/App.xcworkspace/contents.xcworkspacedata" ]; then
-    WORKSPACE="ios/App/App.xcworkspace"
-elif [ -f "ios/App.xcworkspace/contents.xcworkspacedata" ]; then
-    WORKSPACE="ios/App.xcworkspace"
+# Use Codemagic build dir if available
+if [ -n "$CM_BUILD_DIR" ]; then
+    BUILD_DIR="$CM_BUILD_DIR"
 else
-    echo "❌ ERROR: Could not find Xcode workspace"
-    find ios -name "*.xcworkspace" -type d 2>/dev/null || true
-    exit 1
+    BUILD_DIR="$(pwd)/build"
 fi
+
+ARCHIVE_PATH="$BUILD_DIR/TradeLine247.xcarchive"
+EXPORT_DIR="$BUILD_DIR/ipa"
+EXPORT_OPTIONS_PLIST="$BUILD_DIR/ExportOptions.plist"
 
 echo "=============================================="
 echo "🏗️  TradeLine 24/7 iOS Build"
 echo "=============================================="
 echo "Bundle ID:    $BUNDLE_ID"
 echo "Team ID:      $TEAM_ID"
-echo "Scheme:       $SCHEME"
-echo "Workspace:    $WORKSPACE"
+echo "Scheme:       $XCODE_SCHEME"
+echo "Workspace:    $XCODE_WORKSPACE"
 echo "Profile:      $PROVISIONING_PROFILE_NAME"
+echo "Build Dir:    $BUILD_DIR"
 echo "=============================================="
 
 # Build web assets
@@ -59,20 +61,7 @@ cd ../..
 # Ensure codemagic-cli-tools
 echo ""
 echo "🧰 Ensuring codemagic-cli-tools..."
-pip install codemagic-cli-tools 2>/dev/null || true
-
-# Fix Xcode project signing
-echo ""
-echo "🛠️ Forcing manual signing in ios/App/App.xcodeproj/project.pbxproj"
-
-PBXPROJ="ios/App/App.xcodeproj/project.pbxproj"
-if [ -f "$PBXPROJ" ]; then
-    cp "$PBXPROJ" "${PBXPROJ}.backup"
-    sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$PBXPROJ"
-    sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' "$PBXPROJ"
-    sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = ${BUNDLE_ID};/g" "$PBXPROJ"
-    sed -i '' "s/DEVELOPMENT_TEAM = .*;/DEVELOPMENT_TEAM = ${TEAM_ID};/g" "$PBXPROJ"
-fi
+pip3 install --quiet --upgrade codemagic-cli-tools 2>/dev/null || pip install codemagic-cli-tools 2>/dev/null || true
 
 # Diagnostic output
 echo ""
@@ -81,105 +70,115 @@ security find-identity -v -p codesigning || true
 
 echo ""
 echo "📱 Provisioning profiles:"
-ls ~/Library/MobileDevice/Provisioning\ Profiles/ || true
+ls ~/Library/MobileDevice/Provisioning\ Profiles/ 2>/dev/null || true
 
 # Create build directory
-mkdir -p build
+mkdir -p "$BUILD_DIR" "$EXPORT_DIR"
 
 # =============================================================================
-# BUILD ARCHIVE
-# CRITICAL: Do NOT pass PROVISIONING_PROFILE_SPECIFIER here!
-# It applies to ALL targets including Pods which don't support it.
+# BUILD ARCHIVE with Manual signing
 # =============================================================================
 echo ""
-echo "🏗  Running xcodebuild archive..."
+echo "[build-ios] Running xcodebuild archive"
+echo "  Workspace: $XCODE_WORKSPACE"
+echo "  Scheme: $XCODE_SCHEME"
+echo "  Team ID: $TEAM_ID"
+echo "  Bundle ID: $BUNDLE_ID"
 
 xcodebuild archive \
-    -workspace "$WORKSPACE" \
-    -scheme "$SCHEME" \
-    -configuration Release \
-    -archivePath "build/App.xcarchive" \
-    -destination "generic/platform=iOS" \
-    -allowProvisioningUpdates \
-    CODE_SIGN_STYLE=Manual \
-    DEVELOPMENT_TEAM="$TEAM_ID" \
-    CODE_SIGN_IDENTITY="iPhone Distribution" \
-    PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
-    2>&1 | tee build/xcodebuild.log
+  -workspace "$XCODE_WORKSPACE" \
+  -scheme "$XCODE_SCHEME" \
+  -configuration Release \
+  -destination "generic/platform=iOS" \
+  -archivePath "$ARCHIVE_PATH" \
+  DEVELOPMENT_TEAM="$TEAM_ID" \
+  PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+  CODE_SIGN_STYLE=Manual \
+  CODE_SIGN_IDENTITY="Apple Distribution" \
+  PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
+  clean archive
 
-if [ ! -d "build/App.xcarchive" ]; then
-    echo "❌ ERROR: Archive was not created"
-    exit 1
+if [ $? -ne 0 ]; then
+  echo "❌ Archive failed"
+  exit 65
+fi
+echo "✅ Archive succeeded"
+
+if [ ! -d "$ARCHIVE_PATH" ]; then
+    echo "❌ ERROR: Archive was not created at $ARCHIVE_PATH"
+    exit 65
 fi
 
-echo "✅ Archive created successfully"
-
 # =============================================================================
-# CREATE EXPORT OPTIONS (Provisioning profile goes HERE, not in archive step)
+# CREATE EXPORT OPTIONS with Manual signing
 # =============================================================================
 echo ""
-echo "📝 Creating ExportOptions.plist..."
-
-cat > build/ExportOptions.plist << EOF
+echo "[build-ios] Creating ExportOptions.plist"
+cat > "$EXPORT_OPTIONS_PLIST" << 'EXPORTEOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>app-store-connect</string>
+    <string>app-store</string>
     <key>teamID</key>
-    <string>${TEAM_ID}</string>
-    <key>destination</key>
-    <string>upload</string>
+    <string>NWGUYF42KW</string>
+    <key>uploadBitcode</key>
+    <false/>
+    <key>uploadSymbols</key>
+    <true/>
     <key>signingStyle</key>
     <string>manual</string>
     <key>provisioningProfiles</key>
     <dict>
-        <key>${BUNDLE_ID}</key>
-        <string>${PROVISIONING_PROFILE_NAME}</string>
+        <key>com.apex.tradeline</key>
+        <string>TL247_mobpro_tradeline_01</string>
     </dict>
-    <key>stripSwiftSymbols</key>
-    <true/>
-    <key>uploadSymbols</key>
-    <true/>
-    <key>compileBitcode</key>
-    <false/>
 </dict>
 </plist>
-EOF
+EXPORTEOF
 
 # =============================================================================
 # EXPORT IPA
 # =============================================================================
 echo ""
-echo "📦 Exporting IPA..."
-
+echo "[build-ios] Exporting IPA"
 xcodebuild -exportArchive \
-    -archivePath "build/App.xcarchive" \
-    -exportPath "build/ipa" \
-    -exportOptionsPlist "build/ExportOptions.plist" \
-    -allowProvisioningUpdates \
-    2>&1 | tee build/export.log
+  -archivePath "$ARCHIVE_PATH" \
+  -exportPath "$EXPORT_DIR" \
+  -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
+  -allowProvisioningUpdates
 
-IPA_FILE=$(find build/ipa -name "*.ipa" 2>/dev/null | head -1)
+if [ $? -ne 0 ]; then
+  echo "❌ Export failed"
+  exit 70
+fi
+echo "✅ IPA exported"
+
+IPA_FILE=$(find "$EXPORT_DIR" -name "*.ipa" 2>/dev/null | head -1)
 
 if [ -z "$IPA_FILE" ]; then
     echo "❌ ERROR: IPA was not created"
-    exit 1
+    exit 70
 fi
 
 echo ""
 echo "=============================================="
 echo "✅ BUILD SUCCESSFUL"
 echo "=============================================="
-echo "Archive: build/App.xcarchive"
+echo "Archive: $ARCHIVE_PATH"
 echo "IPA:     $IPA_FILE"
 echo "=============================================="
 
-# Copy artifacts to expected locations
+# Copy artifacts to expected locations for Codemagic
 mkdir -p ios/build/export
-cp "$IPA_FILE" ios/build/export/
-cp -r build/App.xcarchive ios/build/TradeLine247.xcarchive 2>/dev/null || true
+cp "$IPA_FILE" ios/build/export/ 2>/dev/null || true
+cp -r "$ARCHIVE_PATH" ios/build/TradeLine247.xcarchive 2>/dev/null || true
 
 echo "📁 Artifacts ready for upload"
-ls -la ios/build/export/
+ls -la ios/build/export/ 2>/dev/null || ls -la "$EXPORT_DIR"
+
+# Set IPA_PATH for Fastlane/Codemagic
+if [ -n "${CM_ENV:-}" ]; then
+  echo "IPA_PATH=$IPA_FILE" >> "$CM_ENV"
+fi
