@@ -29,6 +29,9 @@ npm run build:web
 echo "[build-ios] Syncing Capacitor iOS project"
 npx cap sync ios
 
+echo "[build-ios] Fixing Xcode signing configuration"
+bash scripts/fix-xcode-signing.sh
+
 echo "[build-ios] Installing CocoaPods"
 pushd ios/App >/dev/null
 pod install --repo-update
@@ -47,30 +50,57 @@ cat > "$EXPORT_OPTIONS_PLIST" <<EOF
 EOF
 
 echo "[build-ios] Running xcodebuild archive"
+echo "  Workspace: $XCODE_WORKSPACE"
+echo "  Scheme: $XCODE_SCHEME"
+echo "  Team ID: $TEAM_ID"
+echo "  Bundle ID: ${BUNDLE_ID:-$CM_BUNDLE_ID}"
+
 if command -v xcpretty >/dev/null; then
   xcodebuild \
     -workspace "$XCODE_WORKSPACE" \
     -scheme "$XCODE_SCHEME" \
     -configuration Release \
     -sdk iphoneos \
+    -destination "generic/platform=iOS" \
     -archivePath "$ARCHIVE_PATH" \
     -allowProvisioningUpdates \
     -allowProvisioningDeviceRegistration \
     CODE_SIGN_STYLE=Automatic \
+    CODE_SIGN_IDENTITY="iPhone Distribution" \
     DEVELOPMENT_TEAM="$TEAM_ID" \
-    clean archive | xcpretty
+    PRODUCT_BUNDLE_IDENTIFIER="${BUNDLE_ID:-$CM_BUNDLE_ID}" \
+    clean archive \
+    2>&1 | tee /tmp/xcodebuild.log | xcpretty
+  
+  XCODE_EXIT_CODE=${PIPESTATUS[0]}
 else
   xcodebuild \
     -workspace "$XCODE_WORKSPACE" \
     -scheme "$XCODE_SCHEME" \
     -configuration Release \
     -sdk iphoneos \
+    -destination "generic/platform=iOS" \
     -archivePath "$ARCHIVE_PATH" \
     -allowProvisioningUpdates \
     -allowProvisioningDeviceRegistration \
     CODE_SIGN_STYLE=Automatic \
+    CODE_SIGN_IDENTITY="iPhone Distribution" \
     DEVELOPMENT_TEAM="$TEAM_ID" \
-    clean archive
+    PRODUCT_BUNDLE_IDENTIFIER="${BUNDLE_ID:-$CM_BUNDLE_ID}" \
+    clean archive \
+    2>&1 | tee /tmp/xcodebuild.log
+  
+  XCODE_EXIT_CODE=$?
+fi
+
+if [[ $XCODE_EXIT_CODE -ne 0 ]]; then
+  echo "" >&2
+  echo "❌ xcodebuild archive failed with exit code $XCODE_EXIT_CODE" >&2
+  echo "" >&2
+  echo "=== Last 50 lines of xcodebuild log ===" >&2
+  tail -50 /tmp/xcodebuild.log >&2
+  echo "" >&2
+  exit $XCODE_EXIT_CODE
 fi
 
 IPA_PATH="$EXPORT_DIR/TradeLine247.ipa"
