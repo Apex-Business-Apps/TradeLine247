@@ -1,13 +1,9 @@
 import React, { lazy, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { paths } from '@/routes/paths';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { Home } from 'lucide-react';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import { DashboardSkeletons } from '@/components/dashboard/DashboardSkeletons';
 
@@ -15,7 +11,6 @@ import { DashboardSkeletons } from '@/components/dashboard/DashboardSkeletons';
 const NewDashboard = lazy(() => import('@/components/dashboard/NewDashboard').then(module => ({ default: module.NewDashboard })));
 
 const ClientDashboard = () => {
-  const navigate = useNavigate();
   const { error, lastUpdated, refresh } = useDashboardData();
   const { dashboardLayout } = useUserPreferencesStore();
 
@@ -23,19 +18,11 @@ const ClientDashboard = () => {
     <div className="min-h-screen bg-background">
       
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <LanguageSwitcher />
-            <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          </div>
-          <Button 
-            onClick={() => navigate(paths.home)}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Home className="h-4 w-4" />
-            Back to Home
-          </Button>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Your AI receptionist is working hard for you today
+          </p>
         </div>
 
         {/* Error Banner */}
