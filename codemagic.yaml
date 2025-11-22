@@ -35,11 +35,19 @@ workflows:
         script: bash scripts/build-ios.sh
       - name: Write ASC API Key to file
         script: |
+          if [ -z "$APP_STORE_CONNECT_PRIVATE_KEY" ]; then
+            echo "❌ ERROR: APP_STORE_CONNECT_PRIVATE_KEY is not set"
+            exit 1
+          fi
           echo "$APP_STORE_CONNECT_PRIVATE_KEY" > /tmp/AuthKey.p8
           chmod 600 /tmp/AuthKey.p8
+          if [ ! -s /tmp/AuthKey.p8 ]; then
+            echo "❌ ERROR: Key file is empty or not created"
+            exit 1
+          fi
           echo "✅ Key ID: $APP_STORE_CONNECT_KEY_IDENTIFIER"
           echo "✅ Issuer: $APP_STORE_CONNECT_ISSUER_ID"
-          echo "✅ Key file ready"
+          echo "✅ Key file ready: $(wc -c < /tmp/AuthKey.p8) bytes"
       - name: Upload to TestFlight
         script: fastlane ios upload
       - name: Verify artifacts
