@@ -3,8 +3,15 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { useSecureFormSubmission } from '../useSecureFormSubmission';
+
+vi.mock('@/lib/errorReporter', () => ({
+  errorReporter: {
+    report: vi.fn(),
+    getEnvironment: vi.fn(() => 'test'),
+  },
+}));
 
 // Mock Supabase - use async mock factory for CI compatibility
 vi.mock('@/integrations/supabase/client', async () => {
@@ -63,20 +70,53 @@ describe('useSecureFormSubmission', () => {
   });
 
   describe('CSRF token generation', () => {
-    it('should generate CSRF token if none exists', () => {
+    it('should generate CSRF token if none exists', async () => {
+      mockInvoke.mockResolvedValue({
+        data: { success: true },
+        error: null,
+      });
+
       const { result } = renderHook(() => useSecureFormSubmission());
-      
-      // Token should be generated on first access
+
       expect(sessionStorage.getItem('csrf-token')).toBeNull();
+
+      await act(async () => {
+        await result.current.secureSubmit('test-endpoint', {});
+      });
+
+      const storedToken = sessionStorage.getItem('csrf-token');
+
+      expect(storedToken).toMatch(/^[0-9a-f-]{36}$/);
+      expect(mockInvoke).toHaveBeenCalledWith(
+        'test-endpoint',
+        expect.objectContaining({
+          body: expect.objectContaining({ _csrf: storedToken }),
+          headers: expect.objectContaining({ 'X-CSRF-Token': storedToken }),
+        })
+      );
     });
 
-    it('should reuse existing CSRF token from sessionStorage', () => {
+    it('should reuse existing CSRF token from sessionStorage', async () => {
       sessionStorage.setItem('csrf-token', 'existing-token-456');
-      
+
+      mockInvoke.mockResolvedValue({
+        data: { success: true },
+        error: null,
+      });
+
       const { result } = renderHook(() => useSecureFormSubmission());
-      
-      // Token should be retrieved from storage
-      expect(sessionStorage.getItem('csrf-token')).toBe('existing-token-456');
+
+      await act(async () => {
+        await result.current.secureSubmit('test-endpoint', {});
+      });
+
+      expect(mockInvoke).toHaveBeenCalledWith(
+        'test-endpoint',
+        expect.objectContaining({
+          body: expect.objectContaining({ _csrf: 'existing-token-456' }),
+          headers: expect.objectContaining({ 'X-CSRF-Token': 'existing-token-456' }),
+        })
+      );
     });
   });
 
@@ -101,7 +141,11 @@ describe('useSecureFormSubmission', () => {
         maxAttemptsPerHour: 5,
       }));
 
-      const allowed = await result.current.checkRateLimit();
+      let allowed = false;
+
+      await act(async () => {
+        allowed = await result.current.checkRateLimit();
+      });
 
       expect(allowed).toBe(true);
       expect(mockRpc).toHaveBeenCalledWith('secure_rate_limit', {
@@ -124,8 +168,12 @@ describe('useSecureFormSubmission', () => {
       const { result } = renderHook(() => useSecureFormSubmission({
         rateLimitKey: 'test-key',
       }));
-      
-      const allowed = await result.current.checkRateLimit();
+
+      let allowed = false;
+
+      await act(async () => {
+        allowed = await result.current.checkRateLimit();
+      });
       
       expect(allowed).toBe(false);
     });
@@ -151,8 +199,12 @@ describe('useSecureFormSubmission', () => {
       const { result } = renderHook(() => useSecureFormSubmission({
         rateLimitKey: 'test-key',
       }));
-      
-      const allowed = await result.current.checkRateLimit();
+
+      let allowed = false;
+
+      await act(async () => {
+        allowed = await result.current.checkRateLimit();
+      });
       
       expect(allowed).toBe(false);
     });
@@ -166,10 +218,14 @@ describe('useSecureFormSubmission', () => {
       });
 
       const { result } = renderHook(() => useSecureFormSubmission());
-      
-      const response = await result.current.secureSubmit('test-endpoint', {
-        name: 'Test',
-        email: 'test@example.com',
+
+      let response;
+
+      await act(async () => {
+        response = await result.current.secureSubmit('test-endpoint', {
+          name: 'Test',
+          email: 'test@example.com',
+        });
       });
 
       expect(response).toEqual({ success: true, id: '123' });
@@ -201,13 +257,19 @@ describe('useSecureFormSubmission', () => {
 
       const { result } = renderHook(() => useSecureFormSubmission());
 
-      const submitPromise = result.current.secureSubmit('test-endpoint', {});
+      let submitPromise!: Promise<any>;
+
+      await act(async () => {
+        submitPromise = result.current.secureSubmit('test-endpoint', {});
+      });
 
       await waitFor(() => {
         expect(result.current.isSubmitting).toBe(true);
       });
 
-      resolvePromise!({ data: { success: true }, error: null });
+      await act(async () => {
+        resolvePromise!({ data: { success: true }, error: null });
+      });
       await submitPromise;
 
       await waitFor(() => {
@@ -228,9 +290,11 @@ describe('useSecureFormSubmission', () => {
 
       const { result } = renderHook(() => useSecureFormSubmission());
       
-      await result.current.secureSubmit('test-endpoint', {
-        name: 'Test',
-      }, { sanitizeData });
+      await act(async () => {
+        await result.current.secureSubmit('test-endpoint', {
+          name: 'Test',
+        }, { sanitizeData });
+      });
       
       expect(sanitizeData).toHaveBeenCalledWith({
         name: 'Test',
@@ -256,8 +320,10 @@ describe('useSecureFormSubmission', () => {
 
       const { result } = renderHook(() => useSecureFormSubmission());
       
-      await result.current.secureSubmit('test-endpoint', {}, {
-        validateResponse,
+      await act(async () => {
+        await result.current.secureSubmit('test-endpoint', {}, {
+          validateResponse,
+        });
       });
       
       expect(validateResponse).toHaveBeenCalledWith({ success: true });
@@ -273,11 +339,13 @@ describe('useSecureFormSubmission', () => {
 
       const { result } = renderHook(() => useSecureFormSubmission());
       
-      await expect(
-        result.current.secureSubmit('test-endpoint', {}, {
-          validateResponse,
-        })
-      ).rejects.toThrow('Invalid response received');
+      await act(async () => {
+        await expect(
+          result.current.secureSubmit('test-endpoint', {}, {
+            validateResponse,
+          })
+        ).rejects.toThrow('Invalid response received');
+      });
     });
 
     it('should throw error if rate limit exceeded', async () => {
@@ -290,9 +358,11 @@ describe('useSecureFormSubmission', () => {
         rateLimitKey: 'test-key',
       }));
       
-      await expect(
-        result.current.secureSubmit('test-endpoint', {})
-      ).rejects.toThrow('Rate limit exceeded');
+      await act(async () => {
+        await expect(
+          result.current.secureSubmit('test-endpoint', {})
+        ).rejects.toThrow('Rate limit exceeded');
+      });
 
       expect(mockInvoke).not.toHaveBeenCalled();
     });
@@ -305,9 +375,11 @@ describe('useSecureFormSubmission', () => {
 
       const { result } = renderHook(() => useSecureFormSubmission());
       
-      await expect(
-        result.current.secureSubmit('test-endpoint', {})
-      ).rejects.toThrow('Function error');
+      await act(async () => {
+        await expect(
+          result.current.secureSubmit('test-endpoint', {})
+        ).rejects.toThrow('Function error');
+      });
     });
 
     it('should always reset isSubmitting even on error', async () => {
@@ -315,9 +387,11 @@ describe('useSecureFormSubmission', () => {
 
       const { result } = renderHook(() => useSecureFormSubmission());
       
-      await expect(
-        result.current.secureSubmit('test-endpoint', {})
-      ).rejects.toThrow();
+      await act(async () => {
+        await expect(
+          result.current.secureSubmit('test-endpoint', {})
+        ).rejects.toThrow();
+      });
       
       expect(result.current.isSubmitting).toBe(false);
     });
@@ -335,7 +409,9 @@ describe('useSecureFormSubmission', () => {
         maxAttemptsPerHour: 5,
       }));
 
-      await result.current.checkRateLimit();
+      await act(async () => {
+        await result.current.checkRateLimit();
+      });
 
       await waitFor(() => {
         expect(result.current.getRemainingAttempts()).toBe(3);
