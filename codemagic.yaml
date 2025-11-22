@@ -33,6 +33,13 @@ workflows:
           npm run test:e2e:smoke
       - name: Build archive & IPA
         script: bash scripts/build-ios.sh
+      - name: Write ASC API Key to file
+        script: |
+          echo "$APP_STORE_CONNECT_PRIVATE_KEY" > /tmp/AuthKey.p8
+          chmod 600 /tmp/AuthKey.p8
+          echo "✅ Key ID: $APP_STORE_CONNECT_KEY_IDENTIFIER"
+          echo "✅ Issuer: $APP_STORE_CONNECT_ISSUER_ID"
+          echo "✅ Key file ready"
       - name: Upload to TestFlight
         script: fastlane ios upload
       - name: Verify artifacts
