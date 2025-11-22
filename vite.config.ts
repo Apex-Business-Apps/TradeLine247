@@ -7,6 +7,28 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
+    mode === 'production' && {
+      name: 'csp-headers',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          res.setHeader(
+            'Content-Security-Policy',
+            [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: https:",
+              "connect-src 'self' https://*.supabase.co https://api.openai.com https://api.twilio.com",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'"
+            ].join('; ')
+          );
+          next();
+        });
+      }
+    }
   ].filter(Boolean),
   base: "/",
   server: { 
@@ -16,7 +38,7 @@ export default defineConfig(({ mode }) => ({
     cors: true
   },
   preview: { 
-    port: 4173, 
+    port: 4176, 
     strictPort: true,
     host: true,
     cors: true

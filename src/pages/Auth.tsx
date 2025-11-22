@@ -13,6 +13,8 @@ import { Session, User } from '@supabase/supabase-js';
 import { Footer } from '@/components/layout/Footer';
 import { usePasswordSecurity } from '@/hooks/usePasswordSecurity';
 import { errorReporter } from '@/lib/errorReporter';
+import backgroundImage from '@/assets/BACKGROUND_IMAGE1.svg';
+import { createBrandGradientStyle } from '@/styles/brandGradients';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -263,10 +265,12 @@ const Auth = () => {
     }
   };
 
+  const gradientBackgroundStyle = createBrandGradientStyle(backgroundImage);
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col relative" style={gradientBackgroundStyle}>
       <h1 className="sr-only">TradeLine 24/7 Authentication</h1>
-      <div className="flex-1 container py-8 px-4 flex items-center justify-center">
+      <div className="relative z-10 flex-1 container py-8 px-4 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Welcome to TradeLine 24/7</CardTitle>

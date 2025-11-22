@@ -6,6 +6,8 @@ export const paths = {
   compare: "/compare",
   security: "/security",
   contact: "/contact",
+  privacy: "/privacy",
+  previewHealth: "/preview-health",
   auth: "/auth",
   dashboard: "/dashboard",
   calls: "/calls",

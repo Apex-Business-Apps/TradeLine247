@@ -141,6 +141,7 @@ export const Header: React.FC = () => {
       id="app-header"
       data-site-header
       data-testid="app-header"
+      role="banner"
       className={cn(
         'sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur',
         'supports-[backdrop-filter]:bg-background/60 transition-all duration-300 isolate',
@@ -181,7 +182,8 @@ export const Header: React.FC = () => {
         {/* Center: Desktop Marketing Navigation */}
         <nav 
           data-slot="center" 
-          aria-label="Primary" 
+          aria-label="Primary"
+          role="navigation"
           className="hidden lg:flex items-center gap-1"
         >
           <NavigationMenu>

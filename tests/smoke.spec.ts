@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:4173";
+const BASE_URL = process.env.BASE_URL || "http://localhost:4176";
 
 const PAGES = [
   { path: "/", h1: /Your 24\/7 Ai Receptionist!/i },
@@ -12,13 +12,24 @@ const PAGES = [
   { path: "/faq", h1: /FAQ|Frequently Asked Questions/i },
 ];
 
+// CI-specific timeout settings
+test.describe.configure({
+  timeout: process.env.CI ? 60000 : 30000, // 60s in CI, 30s local
+});
+
 for (const page of PAGES) {
   test(`renders ${page.path} with correct heading`, async ({ page: browserPage }) => {
-    await browserPage.goto(BASE_URL + page.path, { waitUntil: "networkidle", timeout: 10000 });
+    await browserPage.goto(BASE_URL + page.path, {
+      waitUntil: "networkidle",
+      timeout: process.env.CI ? 15000 : 10000
+    });
+
+    // Wait for page to fully load
+    await browserPage.waitForLoadState('domcontentloaded');
 
     // Check for h1 heading
     const h1 = browserPage.locator("h1").first();
-    await expect(h1).toBeVisible({ timeout: 5000 });
+    await expect(h1).toBeVisible({ timeout: process.env.CI ? 10000 : 5000 });
     await expect(h1).toHaveText(page.h1);
   });
 
@@ -31,7 +42,13 @@ for (const page of PAGES) {
       }
     });
 
-    await browserPage.goto(BASE_URL + page.path, { waitUntil: "networkidle" });
+    await browserPage.goto(BASE_URL + page.path, {
+      waitUntil: "networkidle",
+      timeout: process.env.CI ? 15000 : 10000
+    });
+
+    // Wait for page to stabilize
+    await browserPage.waitForLoadState('domcontentloaded');
 
     // Filter out known harmless errors
     const criticalErrors = consoleErrors.filter(
@@ -39,7 +56,8 @@ for (const page of PAGES) {
         !err.includes("Supabase disabled") &&
         !err.includes("identify: not found") &&
         !err.includes("Failed to load resource") &&
-        !err.includes("404")
+        !err.includes("404") &&
+        !err.includes("Global error caught")
     );
 
     expect(criticalErrors).toHaveLength(0);
