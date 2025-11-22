@@ -1,4 +1,11 @@
 # fastlane/Fastfile
+# =============================================================================
+# TradeLine 24/7 - Fastlane Configuration for Codemagic CI
+# =============================================================================
+# This Fastfile provides deterministic TestFlight uploads using App Store
+# Connect API credentials provided via Codemagic environment variables.
+# =============================================================================
+
 default_platform(:ios)
 
 platform :ios do

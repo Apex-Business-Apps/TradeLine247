@@ -131,7 +131,14 @@ jobs:
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps
       - run: npm run -s build
-      - run: npx playwright test tests/cta-smoke.spec.ts --reporter=line
+      - name: Ensure port 4173 is free
+        run: |
+          lsof -ti:4173 | xargs kill -9 || true
+          sleep 2
+      - name: Run smoke tests
+        run: npx playwright test tests/cta-smoke.spec.ts --reporter=line
+        env:
+          CI: true
 
   e2e-full:
     name: e2e/full
@@ -148,7 +155,14 @@ jobs:
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps
       - run: npm run -s build
-      - run: npx playwright test --reporter=line
+      - name: Ensure port 4173 is free
+        run: |
+          lsof -ti:4173 | xargs kill -9 || true
+          sleep 2
+      - name: Run full E2E tests
+        run: npx playwright test --reporter=line
+        env:
+          CI: true
   
   a11y:
     name: a11y/accessibility
@@ -164,8 +178,14 @@ jobs:
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps
       - run: npm run -s build
+      - name: Ensure port 4173 is free
+        run: |
+          lsof -ti:4173 | xargs kill -9 || true
+          sleep 2
       - name: Run comprehensive accessibility tests
         run: npx playwright test tests/e2e/a11y-comprehensive.spec.ts --reporter=line
+        env:
+          CI: true
       - name: Upload accessibility report
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,14 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-// TEMP: skip the flaky "Grow Now (Lead Form)" test so CI can ship
-test.beforeEach(async ({ page }, testInfo) => {
-  if (testInfo.title.includes('Grow Now (Lead Form)')) {
-    test.skip(true, 'Temp-skip flaky Grow Now CTA until locator is stabilized');
-  }
+test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(10_000);
 });
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:4173';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:4176';
 
 // CTA definitions with their expected destinations
 const CTAS = [

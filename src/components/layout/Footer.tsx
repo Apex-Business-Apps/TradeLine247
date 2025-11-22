@@ -3,7 +3,7 @@ import { Logo } from '@/components/ui/logo';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="border-t bg-background mt-auto">
+    <footer className="border-t bg-background mt-auto" role="contentinfo">
       <div className="container py-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-center md:text-left">

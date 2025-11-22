@@ -43,12 +43,21 @@ const Index = () => {
         id="app-home"
         className="min-h-screen flex flex-col relative"
         style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
+          backgroundImage: `
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
+            linear-gradient(
+              to bottom,
+              rgba(255, 107, 53, 0.62) 0%,
+              rgba(104, 182, 233, 0.72) 100%
+            ),
+            url(${backgroundImage})
+          `,
+          backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+          backgroundSize: "cover, cover, cover",
+          backgroundPosition: "center, center, center",
+          backgroundAttachment: "scroll, scroll, fixed",
           backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
+          minHeight: "100vh",
         }}
       >
         {/* Content with translucency - Optimized for performance */}
@@ -95,45 +104,26 @@ const Index = () => {
           />
 
           <div className="flex-1" style={{ minHeight: "60vh" }}>
-            {/* All sections now use 85% opacity to match secondary pages */}
-            <div className="bg-background/85 backdrop-blur-[2px]" style={{ willChange: "transform" }}>
-              <HeroRoiDuo />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <BenefitsGrid />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <ImpactStrip />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <HowItWorks />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <div className="container mx-auto px-4 py-12">
-                <div className="mx-auto max-w-4xl space-y-6 text-center">
-                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                    Quick actions for operators
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-                  </p>
-                  <QuickActionsCard />
-                </div>
+            <HeroRoiDuo />
+            <BenefitsGrid />
+            <ImpactStrip />
+            <HowItWorks />
+            <div className="container mx-auto px-4 py-12">
+              <div className="mx-auto max-w-4xl space-y-6 text-center">
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                  Quick actions for operators
+                </h2>
+                <p className="text-muted-foreground">
+                  Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+                </p>
+                <QuickActionsCard />
               </div>
             </div>
           </div>
 
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <TrustBadgesSlim />
-          </div>
-
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <LeadCaptureForm />
-          </div>
-
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <Footer />
-          </div>
+          <TrustBadgesSlim />
+          <LeadCaptureForm />
+          <Footer />
 
           <NoAIHypeFooter />
         </div>

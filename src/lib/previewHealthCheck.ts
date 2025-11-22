@@ -3,6 +3,8 @@
  * Runs comprehensive diagnostics on preview environments
  */
 
+import { detectSafeModeFromSearch } from '@/lib/safeMode';
+
 export interface HealthCheckResult {
   status: 'healthy' | 'warning' | 'error';
   checks: {
@@ -66,8 +68,7 @@ export async function runPreviewHealthCheck(): Promise<HealthCheckResult> {
   }
 
   // Check 4: Safe mode
-  const urlParams = new URLSearchParams(window.location.search);
-  const safeMode = urlParams.get('safe') === '1';
+  const safeMode = detectSafeModeFromSearch(window.location.search);
   
   checks.push({
     name: 'Safe Mode',

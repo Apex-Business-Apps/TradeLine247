@@ -120,6 +120,13 @@ All colors MUST be HSL.
     --brand-orange-700: 15 100% 35%; /* Darkest orange - 7.14:1 contrast (WCAG AA compliant) */
     --brand-orange-light: 29 100% 95%;
     --brand-orange-dark: var(--brand-orange-700);
+
+    /* Brand Blue Palette derived from TradeLine handset mark */
+    --brand-blue-primary: 199 84% 58%;
+    --brand-blue-500: 199 82% 64%;
+    --brand-blue-600: 201 84% 45%;
+    --brand-blue-light: 199 90% 92%;
+    --brand-blue-dark: 204 86% 32%;
     
     /* Green Colors for Login/Success Actions */
     --brand-green-primary: 142 76% 36%;
@@ -1326,4 +1333,391 @@ button[class*="btn-aa"] {
 @media (prefers-reduced-motion: reduce) {
   .hero-gradient { animation: none; }
   .hero-cta-button:hover, .feature-badge:hover { transform: none; }
+}
+/* ========== A11Y FIXES - DO NOT MODIFY ========== */
+
+/* Fix 1: Step badge text (01, 02, 03) */
+[class*="group"] > [class*="-top-4"][class*="rounded-full"][class*="w-8"],
+[class*="-top-4"][class*="left-1/2"][class*="rounded-full"] {
+  color: #ffffff !important;
+}
+
+/* Fix 2: Dashboard text in dark mode */
+.dark [class*="text-xs"][class*="text-muted-foreground\/70"],
+.dark [class*="text-xs"][class*="text-foreground\/70"],
+.dark [class*="text-xs"][class*="text-foreground\/80"] {
+  opacity: 0.95 !important;
+}
+
+/* Fix 3: Nav links in dark mode */
+.dark nav a[class*="text-muted-foreground"],
+.dark [role="navigation"] a[class*="text-muted-foreground"],
+.dark header a[class*="text-muted-foreground"] {
+  color: #8793a3 !important;
+}
+
+.dark nav a[class*="text-muted-foreground"]:hover,
+.dark [role="navigation"] a[class*="text-muted-foreground"]:hover,
+.dark header a[class*="text-muted-foreground"]:hover {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Fix 4: Dark mode foreground colors for WCAG AA compliance */
+.dark .text-foreground,
+.dark [class*="text-foreground"] {
+  color: #d4dce4 !important; /* Lighter foreground for 7:1 contrast on dark bg */
+}
+
+/* Fix 5: Dark mode slate colors */
+.dark .text-slate-400,
+.dark .text-slate-600,
+.dark [class*="text-slate-400"],
+.dark [class*="text-slate-600"] {
+  color: #b8c5d0 !important; /* Lighter slate for 4.5:1+ contrast */
+}
+
+/* Fix 6: Dark mode headings */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark .text-3xl,
+.dark .text-2xl,
+.dark .text-lg,
+.dark [class*="text-3xl"],
+.dark [class*="text-2xl"],
+.dark [class*="text-lg"] {
+  color: #d4dce4 !important; /* High contrast headings */
+}
+
+/* Fix 7: Dark mode buttons and interactive elements */
+.dark button.bg-background,
+.dark [class*="bg-background"].border-input {
+  color: #d4dce4 !important;
+}
+
+/* Fix 8: Phone number and call-to-action text in dark mode */
+.dark a[href^="tel"] span,
+.dark a[href^="tel"] .uppercase,
+.dark .px-6 > span {
+  color: #1e556b !important; /* Navy for contrast on white bg */
+}
+
+/* Fix 9: Badges and small text on colored backgrounds */
+.dark .px-2\.5.py-0\.5,
+.dark [class*="px-2.5"][class*="py-0.5"],
+.dark .bg-primary.text-white,
+.dark [class*="bg-primary"] {
+  color: #ffffff !important;
+  background-color: #c2410c !important; /* Darker orange for 4.5:1 contrast */
+}
+
+/* Fix 10: Button text on primary backgrounds */
+.dark button.btn-aa,
+.dark button.bg-primary,
+.dark button[class*="bg-primary"] {
+  background-color: #c2410c !important; /* Dark orange: 5.1:1 contrast */
+  color: #ffffff !important;
+}
+
+.dark button.btn-aa span,
+.dark button.bg-primary span,
+.dark button[class*="bg-primary"] span {
+  color: #ffffff !important;
+}
+
+/* Fix 11: LIGHT MODE - Badges on primary backgrounds */
+.bg-primary,
+[class*="bg-primary"],
+.px-2\.5.py-0\.5,
+[class*="px-2.5"][class*="py-0.5"] {
+  background-color: #c2410c !important; /* Dark orange: 5.1:1 contrast with white */
+  color: #ffffff !important;
+}
+
+/* Fix 12: LIGHT MODE - All text on primary backgrounds must be white */
+.bg-primary *,
+[class*="bg-primary"] *,
+.bg-primary span,
+[class*="bg-primary"] span {
+  color: #ffffff !important;
+}
+
+/* Fix 13: LIGHT MODE - Button text on primary backgrounds */
+button.btn-aa,
+button.bg-primary,
+button[class*="bg-primary"],
+button.btn-aa span,
+button.bg-primary span,
+button[class*="bg-primary"] span {
+  background-color: #c2410c !important;
+  color: #ffffff !important;
+}
+
+/* Fix 14: LIGHT MODE - Font-mono and code text on primary backgrounds */
+.bg-primary .font-mono,
+[class*="bg-primary"] .font-mono,
+.bg-primary code,
+[class*="bg-primary"] code {
+  color: #ffffff !important;
+}
+
+/* Fix 15: LIGHT MODE - Text-primary-foreground override */
+.text-primary-foreground,
+[class*="text-primary-foreground"] {
+  color: #ffffff !important;
+}
+
+/* ========== END A11Y FIXES ========== */
+
+
+/* ========== A11Y FIXES - OPACITY OPTIMIZED ========== */
+
+/* Badges: Must use white text (1.12:1 too low for opacity fix) */
+.px-2\.5[class*="bg-primary"],
+[class*="px-2.5"][class*="bg-primary"],
+.px-2\.5[class*="absolute"][class*="-top-3"],
+[class*="absolute"][class*="-top-3"][class*="bg-primary"],
+[class*="group"] > [class*="-top-4"][class*="rounded-full"][class*="w-8"],
+[class*="-top-4"][class*="left-1/2"][class*="rounded-full"],
+.font-mono[class*="text-primary"],
+.font-mono.text-primary,
+.font-mono[class*="bg-primary"],
+code[class*="bg-primary"],
+[class*="bg-primary"] .font-mono,
+[class*="bg-primary"] .text-primary.font-mono {
+  color: #ffffff !important;
+}
+
+/* Dashboard LIGHT mode - 12% darkening filter (3.98 → 4.5) */
+[class*="text-xs"][class*="text-muted-foreground"]:not(.dark *) {
+  filter: brightness(0.88);
+}
+
+/* Dashboard DARK mode - 8% brightening (4.27 → 4.6) */
+.dark [class*="text-xs"][class*="text-muted-foreground"],
+.dark [class*="text-xs"][class*="text-foreground\/70"],
+.dark [class*="text-xs"][class*="text-foreground\/80"] {
+  filter: brightness(1.08);
+}
+
+/* Nav DARK mode - 6% brightening (4.35 → 4.6) */
+.dark nav a[class*="text-muted-foreground"],
+.dark [role="navigation"] a[class*="text-muted-foreground"],
+.dark header a[class*="text-muted-foreground"] {
+  filter: brightness(1.06);
+}
+
+/* ========== END A11Y FIXES ========== */
+
+/* ========================================
+   HERO REDESIGN - OPTION 2: REFINED ORANGE
+   Section 1/4: Base gradient
+   Applied: 2025-11-17
+   ======================================== */
+
+/* REPLACED: This section was overriding the orange→blue gradient - commented out to show blue gradient */
+
+/* .hero-gradient,
+[data-testid="hero-bg"],
+.page-hero {
+  background: linear-gradient(90deg,
+    rgba(229, 90, 43, 0.15) 0%,
+    rgba(229, 90, 43, 0.08) 100%) !important;
+  position: relative;
+}
+
+.hero-gradient::after,
+[data-testid="hero-bg"]::after,
+.page-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    #e55a2b 0%,
+    rgba(229, 90, 43, 0.5) 100%);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.hero-gradient h1,
+[data-testid="hero-bg"] h1,
+.page-hero h1 {
+  color: #1f2937 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+}
+
+.hero-gradient p,
+[data-testid="hero-bg"] p,
+.page-hero p {
+  color: #374151 !important;
+}
+
+button[class*="bg-primary"],
+.btn-aa,
+a[href*="/auth"] {
+  background: #e55a2b !important;
+}
+
+[data-page="home"] .hero-gradient,
+.landing-hero {
+  background: revert !important;
+}
+
+[data-page="home"] .hero-gradient::after,
+.landing-hero::after {
+  content: none !important;
+} */
+
+/* ======================================== */
+
+/* ================================================
+   HERO OVERLAY FIX - Applied 2025-11-17
+   Brand: #e55a2b orange, #68B6E9 blue
+   ================================================ */
+
+/* Target muddy orange gradient sections on hero headings */
+/* These create the dark orange bars on internal pages */
+h1.bg-gradient-to-r,
+h1[class*="bg-gradient"],
+.bg-gradient-to-r.from-primary,
+.from-primary.to-accent {
+  background: none !important;
+  background-image: none !important;
+  background-clip: border-box !important;
+  -webkit-background-clip: border-box !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Ensure h1 text uses foreground color on internal pages */
+section h1,
+.container h1 {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Add brand blue shadow to hero text for depth and readability */
+.hero-gradient h1,
+.hero-gradient h2,
+[data-testid="hero-bg"] h1,
+[data-testid="hero-bg"] h2,
+.page-hero h1,
+.page-hero h2 {
+  text-shadow: 0 3px 8px rgba(104, 182, 233, 0.45), 
+               0 1px 4px rgba(104, 182, 233, 0.35) !important;
+}
+
+/* Add brand blue shadow to hero subtext */
+.hero-gradient p,
+[data-testid="hero-bg"] p,
+.page-hero p {
+  text-shadow: 0 2px 6px rgba(104, 182, 233, 0.35), 
+               0 1px 3px rgba(104, 182, 233, 0.25) !important;
+}
+
+/* LOGO COLOR GRADIENT - Removed these duplicate layers that were obscuring the blue gradient */
+/* The gradient is already applied on parent divs in Index.tsx and brandGradients.ts */
+
+/* COMMENTED OUT - These were adding extra layers on top that hid the blue gradient
+.bg-background\/85 {
+  background: 
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
+    linear-gradient(
+      to bottom,
+      rgba(255, 107, 53, 0.25) 0%,
+      rgba(104, 182, 233, 0.25) 100%
+    ) !important;
+}
+
+.backdrop-blur-\[2px\] {
+  background: 
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
+    linear-gradient(
+      to bottom,
+      rgba(255, 107, 53, 0.25) 0%,
+      rgba(104, 182, 233, 0.25) 100%
+    ) !important;
+}
+
+body:not(:has(#app-home)) .bg-background\/85,
+body:not(:has(#app-home)) .backdrop-blur-\[2px\] {
+  background: 
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)),
+    linear-gradient(
+      to bottom,
+      rgba(255, 107, 53, 0.35) 0%,
+      rgba(104, 182, 233, 0.35) 100%
+    ) !important;
+}
+*/
+
+/* FIX A11Y: Brand color variations for WCAG AA compliance */
+/* Solid buttons: Darker orange background (4.5:1+ contrast) with white text */
+a[href*="/auth"]:not([class*="border-input"]):not([class*="border"]),
+a[href*="plan="]:not([class*="border-input"]):not([class*="border"]),
+button[class*="orange"]:not([class*="outline"]),
+button.btn-aa a[href*="/auth"],
+a[href*="/auth"].btn-aa {
+  background-color: hsl(15, 100%, 35%) !important; /* Dark orange: 7.14:1 contrast with white */
+  color: #ffffff !important;
+  border-color: hsl(15, 100%, 35%) !important;
+}
+
+/* Outline buttons: Dark orange text (brand variation) for 4.5:1+ contrast */
+/* Target links with border-input class (outline variant) containing auth links */
+a[href*="/auth"][class*="border-input"],
+a[href*="plan="][class*="border-input"],
+button[class*="outline"] a[href*="/auth"],
+button[class*="outline"] a[href*="plan="] {
+  color: hsl(15, 100%, 35%) !important; /* --brand-orange-dark: 7.14:1 contrast on white */
+  border-color: #FF6B35 !important; /* Brand orange border */
+}
+
+/* Outline button hover: Orange background with white text */
+a[href*="/auth"][class*="border-input"]:hover,
+a[href*="plan="][class*="border-input"]:hover,
+button[class*="outline"]:hover a[href*="/auth"],
+button[class*="outline"]:hover a[href*="plan="] {
+  background-color: #FF6B35 !important; /* Brand orange */
+  color: #ffffff !important;
+  border-color: #FF6B35 !important;
+}
+
+a[href*="/auth"]:hover:not([class*="border-input"]),
+button[class*="orange"]:hover:not([class*="outline"]) {
+  background-color: hsl(15, 100%, 32%) !important; /* Slightly darker on hover */
+}
+
+/* Fix badge contrast: Secondary badges need 4.5:1+ contrast */
+.bg-secondary.text-secondary-foreground,
+[class*="bg-secondary"][class*="text-secondary-foreground"],
+.px-2\.5.py-0\.5.bg-secondary,
+[class*="px-2.5"][class*="py-0.5"].bg-secondary {
+  background-color: hsl(15, 100%, 35%) !important; /* Dark orange: 7.14:1 contrast */
+  color: #ffffff !important;
+}
+
+/* ================================================ */
+
+#app-home {
+  background-size: auto, auto, cover;
+  background-position: center, center, center;
+  background-attachment: scroll, scroll, fixed;
+}
+
+@media (max-width: 600px) {
+  #app-home {
+    background-size: auto, auto, contain;
+    background-position: center, center, center top;
+    background-attachment: scroll, scroll, scroll;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  #app-home {
+    background-size: auto, auto, cover;
+    background-position: center, center, center top;
+    background-attachment: scroll, scroll, scroll;
+  }
 }
