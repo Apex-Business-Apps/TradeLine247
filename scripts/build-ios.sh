@@ -214,6 +214,13 @@ fi
 
 export IPA_PATH
 echo "✅ IPA ready: $IPA_PATH"
+
+# Write IPA_PATH to file for Fastlane (persists across Codemagic script steps)
+IPA_PATH_FILE="${CM_BUILD_DIR:-$ROOT/build}/ipa_path.txt"
+mkdir -p "$(dirname "$IPA_PATH_FILE")"
+echo "$IPA_PATH" > "$IPA_PATH_FILE"
+echo "📝 IPA_PATH written to: $IPA_PATH_FILE"
+
 echo ""
 echo "=============================================="
 echo "✅ BUILD SUCCESSFUL"
