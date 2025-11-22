@@ -202,17 +202,35 @@ scripts:
 
   - name: Locate exported IPA and set IPA_PATH
     script: |
-      IPA=$(ls "$CM_BUILD_DIR/export"/*.ipa | head -n1)
-      [ -n "$IPA" ] || { echo "ERROR: No IPA found in $CM_BUILD_DIR/export"; exit 1; }
+      set -euo pipefail
+      # Find the exported IPA file (xcodebuild creates it in the export directory)
+      IPA=$(find "$CM_BUILD_DIR/export" -name "*.ipa" -type f | head -1)
+      if [ -z "$IPA" ]; then
+        echo "ERROR: No IPA found in $CM_BUILD_DIR/export"
+        echo "Contents of export directory:"
+        ls -la "$CM_BUILD_DIR/export" || true
+        exit 1
+      fi
+      if [ ! -f "$IPA" ]; then
+        echo "ERROR: IPA path exists but is not a file: $IPA"
+        exit 1
+      fi
       echo "IPA_PATH=$IPA" >> "$CM_ENV"
-      echo "Found IPA: $IPA"
+      echo "✅ Found IPA: $IPA ($(du -h "$IPA" | cut -f1))"
 
   - name: Install Fastlane
     script: |
-      gem install fastlane
+      set -euo pipefail
+      # Install Fastlane gem (required for upload_to_testflight action)
+      gem install fastlane --no-document
+      # Verify installation
+      fastlane --version
 
   - name: Upload to TestFlight via Fastlane
     script: |
+      set -euo pipefail
+      # Upload IPA to TestFlight using Fastlane
+      # Fastlane will use APP_STORE_CONNECT_* environment variables from appstore_credentials group
       fastlane ios upload
 
 artifacts:

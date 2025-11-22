@@ -1,52 +1,98 @@
 # fastlane/Fastfile
+# Fastlane configuration for TradeLine 24/7 iOS TestFlight uploads
+# This file handles uploading pre-built IPAs to TestFlight using App Store Connect API key authentication
+
 default_platform(:ios)
 
 platform :ios do
   # Helper method to create App Store Connect API key from Codemagic environment variables
+  # 
+  # Reads the following environment variables (provided by Codemagic's appstore_credentials group):
+  # - APP_STORE_CONNECT_KEY_IDENTIFIER: The API key ID (e.g., "5XDRL75994")
+  # - APP_STORE_CONNECT_ISSUER_ID: The issuer UUID (e.g., "7efaf094-3c6f-4c6c-afdb-d6e2c84871c7")
+  # - APP_STORE_CONNECT_PRIVATE_KEY: The full .p8 private key content (including BEGIN/END markers)
+  #
+  # Returns: An authenticated API key object for use with Fastlane actions
   def tradeline_api_key
     key_id    = ENV["APP_STORE_CONNECT_KEY_IDENTIFIER"]
     issuer_id = ENV["APP_STORE_CONNECT_ISSUER_ID"]
     key_data  = ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
 
+    # Validate required environment variables are present
     UI.user_error!("Missing APP_STORE_CONNECT_KEY_IDENTIFIER") if key_id.to_s.strip.empty?
     UI.user_error!("Missing APP_STORE_CONNECT_ISSUER_ID")      if issuer_id.to_s.strip.empty?
     UI.user_error!("Missing APP_STORE_CONNECT_PRIVATE_KEY")    if key_data.to_s.strip.empty?
 
-    UI.important("Using App Store Connect API key authentication")
-    UI.important("Bundle ID: #{ENV['BUNDLE_ID'].to_s.gsub(/(.{10}).*(.{4})/, '\1*****\2')}") if ENV["BUNDLE_ID"]
-    UI.important("App Store ID: #{ENV['APP_STORE_ID'].to_s.gsub(/(.{5}).*(.{4})/, '\1*****\2')}") if ENV["APP_STORE_ID"]
+    # Validate private key format (should contain BEGIN/END markers)
+    unless key_data.include?("BEGIN PRIVATE KEY") || key_data.include?("BEGIN RSA PRIVATE KEY")
+      UI.user_error!("APP_STORE_CONNECT_PRIVATE_KEY appears invalid (missing BEGIN marker)")
+    end
 
+    # Log authentication method (with masked identifiers for security)
+    UI.important("Using App Store Connect API key authentication")
+    if ENV["BUNDLE_ID"]
+      masked_bundle = ENV["BUNDLE_ID"].length > 14 ? 
+        "#{ENV["BUNDLE_ID"][0..9]}*****#{ENV["BUNDLE_ID"][-4..-1]}" : 
+        "*****"
+      UI.important("Bundle ID: #{masked_bundle}")
+    end
+    if ENV["APP_STORE_ID"]
+      masked_app_id = ENV["APP_STORE_ID"].length > 9 ? 
+        "#{ENV["APP_STORE_ID"][0..4]}*****#{ENV["APP_STORE_ID"][-4..-1]}" : 
+        "*****"
+      UI.important("App Store ID: #{masked_app_id}")
+    end
+
+    # Create and return the API key object
     app_store_connect_api_key(
       key_id: key_id,
       issuer_id: issuer_id,
       key_content: key_data,
-      duration: 1200 # seconds, reasonable but not excessive
+      duration: 1200 # 20 minutes - reasonable duration for upload operations
     )
   end
 
-  desc "Build is already archived by CI; just upload IPA to TestFlight"
+  desc "Upload pre-built IPA to TestFlight"
+  desc "This lane assumes the IPA has already been built and signed by CI (Codemagic)"
+  desc "It only handles the upload step using App Store Connect API key authentication"
   lane :upload do
-    # Resolve IPA path
+    # Resolve IPA path with fallback logic
     ipa_path = ENV["IPA_PATH"]
+    
     if ipa_path.to_s.strip.empty?
-      # Look for IPA in standard export location (Codemagic exports to $CM_BUILD_DIR/export)
+      # Fallback: Look for IPA in standard Codemagic export location
       export_dir = ENV["CM_BUILD_DIR"] ? "#{ENV['CM_BUILD_DIR']}/export" : "export"
-      ipa_path = Dir["#{export_dir}/*.ipa"].first || Dir["**/*.ipa"].first
+      
+      # Try multiple search patterns for robustness
+      ipa_path = Dir["#{export_dir}/*.ipa"].first || 
+                 Dir["#{export_dir}/**/*.ipa"].first || 
+                 Dir["**/*.ipa"].first
     end
     
-    UI.user_error!("IPA not found. Expected at $CM_BUILD_DIR/export/*.ipa or set IPA_PATH") unless ipa_path && File.exist?(ipa_path)
-    UI.success("Found IPA: #{ipa_path}")
+    # Validate IPA file exists and is readable
+    unless ipa_path && File.exist?(ipa_path)
+      UI.user_error!("IPA not found. Expected at $CM_BUILD_DIR/export/*.ipa or set IPA_PATH environment variable")
+    end
+    
+    unless File.readable?(ipa_path)
+      UI.user_error!("IPA file exists but is not readable: #{ipa_path}")
+    end
+    
+    UI.success("Found IPA: #{ipa_path} (#{File.size(ipa_path) / 1024 / 1024} MB)")
 
-    # Build API key object
+    # Build API key object (validates credentials)
     api_key = tradeline_api_key
 
     # Upload to TestFlight
+    UI.important("Uploading to TestFlight...")
     upload_to_testflight(
       api_key: api_key,
       ipa: ipa_path,
       app_identifier: ENV["BUNDLE_ID"],
       apple_id: ENV["APP_STORE_ID"],
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: true # Don't wait for processing to complete
     )
+    
+    UI.success("✅ Successfully uploaded to TestFlight!")
   end
 end
