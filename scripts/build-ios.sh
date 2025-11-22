@@ -19,10 +19,12 @@ TEAM_ID="${TEAM_ID:-NWGUYF42KW}"
 BUNDLE_ID="${BUNDLE_ID:-com.apex.tradeline}"
 PROVISIONING_PROFILE_NAME="${PROVISIONING_PROFILE_NAME:-TL247_mobpro_tradeline_01}"
 XCODE_SCHEME="${XCODE_SCHEME:-App}"
-ARCHIVE_PATH="${ARCHIVE_PATH:-$ROOT/build/App.xcarchive}"
-EXPORT_DIR="$ROOT/build/ipa"
-LOG_DIR="$ROOT/build"
-EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-$ROOT/build/ExportOptions.plist}"
+# Use CM_BUILD_DIR if available (Codemagic), otherwise use ROOT/build
+BUILD_DIR="${CM_BUILD_DIR:-$ROOT/build}"
+ARCHIVE_PATH="${ARCHIVE_PATH:-$BUILD_DIR/TradeLine247.xcarchive}"
+EXPORT_DIR="$BUILD_DIR/ipa"
+LOG_DIR="$BUILD_DIR"
+EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-$BUILD_DIR/ExportOptions.plist}"
 
 # Detect workspace
 if [ -f "ios/App/App.xcworkspace/contents.xcworkspacedata" ]; then
@@ -68,6 +70,19 @@ pod install --repo-update
 popd >/dev/null
 
 echo ""
+echo "🔍 Verifying Capacitor Pods signing configuration..."
+# Verify that Capacitor Pods targets have Automatic signing set
+if [ -f "ios/App/Pods/Pods.xcodeproj/project.pbxproj" ]; then
+  CAPACITOR_TARGETS=$(grep -c "Capacitor.*CODE_SIGN_STYLE = Automatic" ios/App/Pods/Pods.xcodeproj/project.pbxproj 2>/dev/null || echo "0")
+  if [ "$CAPACITOR_TARGETS" -eq "0" ]; then
+    echo "⚠️  WARNING: Capacitor targets may not have Automatic signing configured"
+    echo "   This should be handled by Podfile post_install hook"
+  else
+    echo "✅ Capacitor Pods targets configured with Automatic signing"
+  fi
+fi
+
+echo ""
 echo "🧰 Ensuring codemagic-cli-tools..."
 pip3 install --quiet --upgrade codemagic-cli-tools 2>/dev/null || pip install codemagic-cli-tools 2>/dev/null || true
 
@@ -81,74 +96,83 @@ echo "📱 Provisioning profiles:"
 ls ~/Library/MobileDevice/Provisioning\ Profiles/ || true
 
 # =============================================================================
-# CREATE EXPORT OPTIONS (Provisioning profile specified here for IPA export)
+# CREATE EXPORT OPTIONS
+# Critical: provisioningProfiles dict must ONLY contain the App's bundle ID.
+# Do NOT add entries for Capacitor, CapacitorCordova, or Pods-App.
 # =============================================================================
 echo ""
 echo "📝 Creating ExportOptions.plist..."
 
-cat > "$EXPORT_OPTIONS_PLIST" <<EOF
+# EXPORT_OPTIONS_PLIST already set in Configuration section above
+mkdir -p "$(dirname "$EXPORT_OPTIONS_PLIST")"
+
+cat > "$EXPORT_OPTIONS_PLIST" <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>app-store-connect</string>
+    <string>app-store</string>
     <key>teamID</key>
-    <string>${TEAM_ID}</string>
-    <key>destination</key>
-    <string>upload</string>
+    <string>NWGUYF42KW</string>
+    <key>uploadBitcode</key>
+    <false/>
+    <key>uploadSymbols</key>
+    <true/>
     <key>signingStyle</key>
     <string>manual</string>
     <key>provisioningProfiles</key>
     <dict>
-        <key>${BUNDLE_ID}</key>
-        <string>${PROVISIONING_PROFILE_NAME}</string>
+        <key>com.apex.tradeline</key>
+        <string>TL247_mobpro_tradeline_01</string>
     </dict>
-    <key>stripSwiftSymbols</key>
-    <true/>
-    <key>uploadSymbols</key>
-    <true/>
-    <key>compileBitcode</key>
-    <false/>
 </dict>
 </plist>
 EOF
 
 # =============================================================================
 # BUILD ARCHIVE
-# The App target now has manual signing committed in project.pbxproj with
-# PROVISIONING_PROFILE_SPECIFIER set, so we don't need to mutate the project.
-# We just reinforce the same values here for deterministic Codemagic output.
+# Pods targets (CapacitorCordova, Capacitor, Pods-App) do not support
+# provisioning profiles. We rely on Codemagic ios_signing + -allowProvisioningUpdates
+# to apply profile only to App target. Do NOT pass PROVISIONING_PROFILE_SPECIFIER
+# globally as it breaks Pods targets.
 # =============================================================================
 echo ""
-echo "[build-ios] Workspace: $XCODE_WORKSPACE"
-echo "[build-ios] Scheme: $XCODE_SCHEME"
-echo "[build-ios] Configuration: Release"
-echo "[build-ios] Signing: Manual (Team: $TEAM_ID, Profile: $PROVISIONING_PROFILE_NAME)"
-echo ""
-echo "🏗  Running xcodebuild archive..."
+echo "[build-ios] Running xcodebuild archive"
+echo "  Workspace: $XCODE_WORKSPACE"
+echo "  Scheme:    $XCODE_SCHEME"
+echo "  Team ID:   $TEAM_ID"
+echo "  Bundle ID: $BUNDLE_ID"
 
-# The project file has Manual signing with PROVISIONING_PROFILE_SPECIFIER set for the App target.
-# We explicitly pass PROVISIONING_PROFILE_SPECIFIER to ensure xcodebuild finds the profile.
-# Pods/Capacitor targets use Automatic signing and will ignore this flag.
+# ARCHIVE_PATH already set in Configuration section above
+mkdir -p "$(dirname "$ARCHIVE_PATH")"
+
 xcodebuild archive \
   -workspace "$XCODE_WORKSPACE" \
   -scheme "$XCODE_SCHEME" \
   -configuration Release \
-  -archivePath "$ARCHIVE_PATH" \
   -destination "generic/platform=iOS" \
-  -allowProvisioningUpdates \
+  -archivePath "$ARCHIVE_PATH" \
   DEVELOPMENT_TEAM="$TEAM_ID" \
-  PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" \
-  PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+  CODE_SIGN_STYLE="Manual" \
+  CODE_SIGN_IDENTITY="Apple Distribution" \
+  -allowProvisioningUpdates \
+  clean archive \
   2>&1 | tee "$LOG_DIR/xcodebuild.log"
 
-if [ ! -d "$ARCHIVE_PATH" ]; then
-    echo "❌ ERROR: Archive was not created"
-    exit 1
+ARCHIVE_EXIT=$?
+
+if [ $ARCHIVE_EXIT -ne 0 ]; then
+  echo "❌ Archive failed with exit code $ARCHIVE_EXIT"
+  exit $ARCHIVE_EXIT
 fi
 
-echo "✅ Archive created successfully"
+if [ ! -d "$ARCHIVE_PATH" ]; then
+  echo "❌ ERROR: Archive was not created"
+  exit 1
+fi
+
+echo "✅ Archive succeeded"
 
 # =============================================================================
 # EXPORT IPA
