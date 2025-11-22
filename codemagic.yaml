@@ -10,6 +10,7 @@ integrations:
 environment:
   groups:
     - ios_config
+    - appstore_credentials
   ios_signing:
     distribution_type: app_store
     bundle_identifier: $BUNDLE_ID
@@ -199,11 +200,27 @@ scripts:
         -exportOptionsPlist exportOptions.plist \
         -exportPath "$CM_BUILD_DIR/export"
 
+  - name: Locate exported IPA and set IPA_PATH
+    script: |
+      IPA=$(ls "$CM_BUILD_DIR/export"/*.ipa | head -n1)
+      [ -n "$IPA" ] || { echo "ERROR: No IPA found in $CM_BUILD_DIR/export"; exit 1; }
+      echo "IPA_PATH=$IPA" >> "$CM_ENV"
+      echo "Found IPA: $IPA"
+
+  - name: Install Fastlane
+    script: |
+      gem install fastlane
+
+  - name: Upload to TestFlight via Fastlane
+    script: |
+      fastlane ios upload
+
 artifacts:
   - $CM_BUILD_DIR/export/*.ipa
   - $CM_BUILD_DIR/TradeLine247.xcarchive
 
 publishing:
-  app_store_connect:
-    auth: integration
-    submit_to_testflight: true
+  # Disabled: Using Fastlane upload_to_testflight instead
+  # app_store_connect:
+  #   auth: integration
+  #   submit_to_testflight: true

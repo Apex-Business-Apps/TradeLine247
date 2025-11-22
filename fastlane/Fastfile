@@ -2,18 +2,50 @@
 default_platform(:ios)
 
 platform :ios do
+  # Helper method to create App Store Connect API key from Codemagic environment variables
+  def tradeline_api_key
+    key_id    = ENV["APP_STORE_CONNECT_KEY_IDENTIFIER"]
+    issuer_id = ENV["APP_STORE_CONNECT_ISSUER_ID"]
+    key_data  = ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
+
+    UI.user_error!("Missing APP_STORE_CONNECT_KEY_IDENTIFIER") if key_id.to_s.strip.empty?
+    UI.user_error!("Missing APP_STORE_CONNECT_ISSUER_ID")      if issuer_id.to_s.strip.empty?
+    UI.user_error!("Missing APP_STORE_CONNECT_PRIVATE_KEY")    if key_data.to_s.strip.empty?
+
+    UI.important("Using App Store Connect API key authentication")
+    UI.important("Bundle ID: #{ENV['BUNDLE_ID'].to_s.gsub(/(.{10}).*(.{4})/, '\1*****\2')}") if ENV["BUNDLE_ID"]
+    UI.important("App Store ID: #{ENV['APP_STORE_ID'].to_s.gsub(/(.{5}).*(.{4})/, '\1*****\2')}") if ENV["APP_STORE_ID"]
+
+    app_store_connect_api_key(
+      key_id: key_id,
+      issuer_id: issuer_id,
+      key_content: key_data,
+      duration: 1200 # seconds, reasonable but not excessive
+    )
+  end
+
   desc "Build is already archived by CI; just upload IPA to TestFlight"
   lane :upload do
-    api_key = app_store_connect_api_key(
-      key_id: ENV["ASC_API_KEY_ID"],
-      issuer_id: ENV["ASC_API_ISSUER_ID"],
-      key_content: ENV["ASC_API_KEY"],    # the .p8 private key content
-      in_house: false
-    )
+    # Resolve IPA path
+    ipa_path = ENV["IPA_PATH"]
+    if ipa_path.to_s.strip.empty?
+      # Look for IPA in standard export location (Codemagic exports to $CM_BUILD_DIR/export)
+      export_dir = ENV["CM_BUILD_DIR"] ? "#{ENV['CM_BUILD_DIR']}/export" : "export"
+      ipa_path = Dir["#{export_dir}/*.ipa"].first || Dir["**/*.ipa"].first
+    end
+    
+    UI.user_error!("IPA not found. Expected at $CM_BUILD_DIR/export/*.ipa or set IPA_PATH") unless ipa_path && File.exist?(ipa_path)
+    UI.success("Found IPA: #{ipa_path}")
+
+    # Build API key object
+    api_key = tradeline_api_key
+
+    # Upload to TestFlight
     upload_to_testflight(
       api_key: api_key,
-      ipa: ENV["IPA_PATH"],               # set by CI
-      skip_submission: true,
+      ipa: ipa_path,
+      app_identifier: ENV["BUNDLE_ID"],
+      apple_id: ENV["APP_STORE_ID"],
       skip_waiting_for_build_processing: true
     )
   end
