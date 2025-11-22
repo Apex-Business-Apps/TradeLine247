@@ -21,10 +21,14 @@ workflows:
       cache_paths:
         - ~/.npm
         - ~/.cocoapods
-        - ios/Pods
+        -       ios/Pods
     scripts:
       - name: Install dependencies
         script: npm ci
+      - name: Install Fastlane
+        script: |
+          gem install bundler
+          bundle install
       - name: Quality gates
         script: npm run lint && npm run typecheck && npm run test:unit
       - name: Playwright smoke
@@ -47,7 +51,7 @@ workflows:
           chmod 600 /tmp/AuthKey.p8
           echo "✅ API key also copied to /tmp/AuthKey.p8"
       - name: Upload to TestFlight
-        script: fastlane ios upload
+        script: bundle exec fastlane ios upload
       - name: Verify artifacts
         script: bash scripts/verify-codemagic.sh
     artifacts:
