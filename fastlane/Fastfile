@@ -10,10 +10,17 @@ default_platform(:ios)
 
 platform :ios do
   lane :upload do
-    # Validate API key file exists and is readable
-    key_filepath = "/tmp/AuthKey.p8"
-    unless File.exist?(key_filepath)
-      UI.user_error!("❌ API key file not found: #{key_filepath}. Ensure 'Write ASC API Key to file' step ran successfully.")
+    # PRIORITY 2: Check CM_BUILD_DIR first, fallback to /tmp
+    key_filepath = if ENV["CM_BUILD_DIR"] && File.exist?(File.join(ENV["CM_BUILD_DIR"], "AuthKey.p8"))
+      File.join(ENV["CM_BUILD_DIR"], "AuthKey.p8")
+    elsif File.exist?("/tmp/AuthKey.p8")
+      "/tmp/AuthKey.p8"
+    else
+      nil
+    end
+    
+    unless key_filepath && File.exist?(key_filepath)
+      UI.user_error!("❌ API key file not found. Checked: #{ENV["CM_BUILD_DIR"]}/AuthKey.p8, /tmp/AuthKey.p8. Ensure 'Write ASC API Key to file' step ran successfully.")
     end
     
     unless File.readable?(key_filepath)
@@ -28,13 +35,23 @@ platform :ios do
     
     UI.message("✅ API key file validated: #{key_filepath} (#{key_content.lines.count} lines)")
     
-    # Validate environment variables
-    key_id = ENV.fetch("APP_STORE_CONNECT_KEY_IDENTIFIER") do
-      UI.user_error!("❌ APP_STORE_CONNECT_KEY_IDENTIFIER environment variable is not set")
+    # PRIORITY 1: Variable name fallbacks (handle different Codemagic formats)
+    key_id = ENV["APP_STORE_CONNECT_KEY_IDENTIFIER"] ||
+             ENV["APP_STORE_CONNECT_API_KEY_ID"] ||
+             ENV["ASC_API_KEY_ID"] ||
+             ENV["APP_STORE_CONNECT_KEY_ID"]
+    
+    issuer_id = ENV["APP_STORE_CONNECT_ISSUER_ID"] ||
+                ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"] ||
+                ENV["ASC_API_ISSUER_ID"] ||
+                ENV["APP_STORE_CONNECT_ISSUER"]
+    
+    if key_id.nil? || key_id.empty?
+      UI.user_error!("❌ Key ID not found. Checked: APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_API_KEY_ID, ASC_API_KEY_ID, APP_STORE_CONNECT_KEY_ID")
     end
     
-    issuer_id = ENV.fetch("APP_STORE_CONNECT_ISSUER_ID") do
-      UI.user_error!("❌ APP_STORE_CONNECT_ISSUER_ID environment variable is not set")
+    if issuer_id.nil? || issuer_id.empty?
+      UI.user_error!("❌ Issuer ID not found. Checked: APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_API_KEY_ISSUER_ID, ASC_API_ISSUER_ID, APP_STORE_CONNECT_ISSUER")
     end
     
     UI.message("🔑 Key ID: #{key_id}")
