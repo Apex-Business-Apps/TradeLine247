@@ -2,11 +2,12 @@
 # =============================================================================
 # TradeLine 24/7 - iOS Build Script for Codemagic
 # =============================================================================
-# Version: 3.1.0 (Merged: Manual signing with workspace detection)
+# Version: 4.1.0 (Fixed: Removed global PROVISIONING_PROFILE_SPECIFIER)
 #
-# FIX: Provisioning profile is now committed in project.pbxproj, so we don't
-#      mutate it at runtime. The App target uses manual signing with explicit
-#      PROVISIONING_PROFILE_SPECIFIER for Codemagic builds.
+# FIX: Pods targets (CapacitorCordova, Capacitor, Pods-App) do not support
+#      provisioning profiles. Removed global PROVISIONING_PROFILE_SPECIFIER
+#      and rely on Codemagic ios_signing + -allowProvisioningUpdates to apply
+#      profile only to App target.
 # =============================================================================
 
 set -euo pipefail
@@ -103,7 +104,6 @@ ls ~/Library/MobileDevice/Provisioning\ Profiles/ || true
 echo ""
 echo "📝 Creating ExportOptions.plist..."
 
-# EXPORT_OPTIONS_PLIST already set in Configuration section above
 mkdir -p "$(dirname "$EXPORT_OPTIONS_PLIST")"
 
 cat > "$EXPORT_OPTIONS_PLIST" <<'EOF'
@@ -144,7 +144,6 @@ echo "  Scheme:    $XCODE_SCHEME"
 echo "  Team ID:   $TEAM_ID"
 echo "  Bundle ID: $BUNDLE_ID"
 
-# ARCHIVE_PATH already set in Configuration section above
 mkdir -p "$(dirname "$ARCHIVE_PATH")"
 
 xcodebuild archive \
@@ -169,7 +168,7 @@ fi
 
 if [ ! -d "$ARCHIVE_PATH" ]; then
   echo "❌ ERROR: Archive was not created"
-  exit 1
+  exit 65
 fi
 
 echo "✅ Archive succeeded"
@@ -178,7 +177,7 @@ echo "✅ Archive succeeded"
 # EXPORT IPA
 # =============================================================================
 echo ""
-echo "📦 Exporting IPA..."
+echo "[build-ios] Exporting IPA..."
 
 xcodebuild -exportArchive \
   -archivePath "$ARCHIVE_PATH" \
@@ -187,11 +186,20 @@ xcodebuild -exportArchive \
   -allowProvisioningUpdates \
   2>&1 | tee "$LOG_DIR/export.log"
 
+EXPORT_EXIT=$?
+
+if [ $EXPORT_EXIT -ne 0 ]; then
+  echo "❌ Export failed with exit code $EXPORT_EXIT"
+  exit $EXPORT_EXIT
+fi
+
+echo "✅ IPA exported"
+
 IPA_PATH=$(find "$EXPORT_DIR" -name "*.ipa" 2>/dev/null | head -1)
 
 if [[ -z "$IPA_PATH" || ! -f "$IPA_PATH" ]]; then
   echo "❌ ERROR: IPA not found in $EXPORT_DIR" >&2
-  exit 1
+  exit 70
 fi
 
 echo ""
