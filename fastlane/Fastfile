@@ -1,20 +1,47 @@
 # fastlane/Fastfile
+# =============================================================================
+# TradeLine 24/7 - Fastlane Configuration for Codemagic CI
+# =============================================================================
+# This Fastfile provides deterministic TestFlight uploads using App Store
+# Connect API credentials provided via Codemagic environment variables.
+# =============================================================================
+
 default_platform(:ios)
 
 platform :ios do
-  desc "Build is already archived by CI; just upload IPA to TestFlight"
+  # =============================================================================
+  # Initialize App Store Connect API key using environment variables provided by Codemagic
+  # =============================================================================
+  # The API key is initialized at the platform level (outside lane definitions)
+  # to ensure it's available to all lanes and follows Fastlane best practices
+  # for credential management. All secrets are read from Codemagic environment
+  # variables (ios_config or appstore_credentials group).
+  # =============================================================================
+  api_key = app_store_connect_api_key(
+    key_id:      ENV["APP_STORE_CONNECT_KEY_IDENTIFIER"], # Codemagic: .env or variable group
+    issuer_id:   ENV["APP_STORE_CONNECT_ISSUER_ID"],     # Codemagic: .env or variable group
+    key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"]     # Codemagic: .env or variable group. Use key_filepath only if referencing a local file.
+  )
+
+  # =============================================================================
+  # Upload lane for TestFlight using the API key and .ipa path provided by CI
+  # =============================================================================
+  # This lane uploads the IPA built by the CI/CD pipeline to TestFlight.
+  # The IPA path is set by build-ios.sh and exported as IPA_PATH environment variable.
+  # Only essential parameters (api_key and ipa) are used to ensure compatibility
+  # with latest Fastlane versions and minimize potential errors.
+  # =============================================================================
+  desc "Upload IPA to TestFlight (CI/CD pipeline)"
   lane :upload do
-    api_key = app_store_connect_api_key(
-      key_id: ENV["APP_STORE_CONNECT_KEY_IDENTIFIER"],
-      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
-      key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"],
-      in_house: false
-    )
     upload_to_testflight(
-      api_key: api_key,
-      ipa: ENV["IPA_PATH"],               # set by CI
-      skip_submission: true,
-      skip_waiting_for_build_processing: true
+      api_key: api_key,               # Authenticates with App Store Connect using the API key initialized above
+      ipa: ENV["IPA_PATH"]            # Path to IPA built in CI/CD pipeline (set by build-ios.sh)
+      # Optional parameters (uncomment as needed):
+      # skip_submission: true,                    # Skip automatic submission to App Store review
+      # skip_waiting_for_build_processing: true, # Don't wait for build processing to complete (faster CI)
+      # groups: ["Internal Testers"],             # Specific TestFlight groups to notify
+      # notify_external_testers: false,           # Don't notify external testers automatically
+      # changelog: "CI build from #{ENV['CM_COMMIT']}" # Build changelog message
     )
   end
 end
