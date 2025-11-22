@@ -205,7 +205,10 @@ fi
 # Export IPA_PATH for Fastlane (ensure IPA is at expected location)
 if [[ -n "${CM_BUILD_DIR:-}" ]]; then
   mkdir -p "$CM_BUILD_DIR/ipa"
-  cp "$IPA_PATH" "$CM_BUILD_DIR/ipa/App.ipa"
+  # Only copy if source and destination are different
+  if [[ "$IPA_PATH" != "$CM_BUILD_DIR/ipa/App.ipa" ]]; then
+    cp "$IPA_PATH" "$CM_BUILD_DIR/ipa/App.ipa" 2>/dev/null || true
+  fi
   export IPA_PATH="$CM_BUILD_DIR/ipa/App.ipa"
 else
   export IPA_PATH="$IPA_PATH"
@@ -221,7 +224,10 @@ echo "=============================================="
 
 # Copy artifacts to expected locations for Fastlane
 mkdir -p ios/build/export
-cp "$IPA_PATH" ios/build/export/
+# Only copy if source and destination are different
+if [[ "$IPA_PATH" != "ios/build/export/$(basename "$IPA_PATH")" ]]; then
+  cp "$IPA_PATH" ios/build/export/ 2>/dev/null || true
+fi
 cp -r "$ARCHIVE_PATH" ios/build/TradeLine247.xcarchive 2>/dev/null || true
 
 echo ""
