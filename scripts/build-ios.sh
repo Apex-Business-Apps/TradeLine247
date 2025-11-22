@@ -202,17 +202,18 @@ if [[ -z "$IPA_PATH" || ! -f "$IPA_PATH" ]]; then
   exit 70
 fi
 
-# Export IPA_PATH for Fastlane (ensure IPA is at expected location)
+# Export IPA_PATH for Fastlane
 if [[ -n "${CM_BUILD_DIR:-}" ]]; then
   mkdir -p "$CM_BUILD_DIR/ipa"
-  # Only copy if source and destination are different
+  # Copy to expected location only if different
   if [[ "$IPA_PATH" != "$CM_BUILD_DIR/ipa/App.ipa" ]]; then
-    cp "$IPA_PATH" "$CM_BUILD_DIR/ipa/App.ipa" 2>/dev/null || true
+    cp "$IPA_PATH" "$CM_BUILD_DIR/ipa/App.ipa"
   fi
-  export IPA_PATH="$CM_BUILD_DIR/ipa/App.ipa"
-else
-  export IPA_PATH="$IPA_PATH"
+  IPA_PATH="$CM_BUILD_DIR/ipa/App.ipa"
 fi
+
+export IPA_PATH
+echo "✅ IPA ready: $IPA_PATH"
 
 echo ""
 echo "=============================================="
@@ -224,9 +225,8 @@ echo "=============================================="
 
 # Copy artifacts to expected locations for Fastlane
 mkdir -p ios/build/export
-# Only copy if source and destination are different
 if [[ "$IPA_PATH" != "ios/build/export/$(basename "$IPA_PATH")" ]]; then
-  cp "$IPA_PATH" ios/build/export/ 2>/dev/null || true
+  cp "$IPA_PATH" ios/build/export/
 fi
 cp -r "$ARCHIVE_PATH" ios/build/TradeLine247.xcarchive 2>/dev/null || true
 
@@ -234,7 +234,4 @@ echo ""
 echo "📁 Artifacts ready for upload"
 ls -la ios/build/export/
 
-# Export IPA_PATH for Fastlane
-if [[ -n "${CM_ENV:-}" ]]; then
-  echo "IPA_PATH=$IPA_PATH" >> "$CM_ENV"
-fi
+exit 0
