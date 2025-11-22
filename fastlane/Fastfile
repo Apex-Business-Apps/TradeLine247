@@ -10,10 +10,40 @@ default_platform(:ios)
 
 platform :ios do
   lane :upload do
+    # Validate API key file exists and is readable
+    key_filepath = "/tmp/AuthKey.p8"
+    unless File.exist?(key_filepath)
+      UI.user_error!("❌ API key file not found: #{key_filepath}. Ensure 'Write ASC API Key to file' step ran successfully.")
+    end
+    
+    unless File.readable?(key_filepath)
+      UI.user_error!("❌ API key file not readable: #{key_filepath}. Check file permissions.")
+    end
+    
+    # Verify key format (should start with BEGIN PRIVATE KEY)
+    key_content = File.read(key_filepath)
+    unless key_content.include?("BEGIN PRIVATE KEY") && key_content.include?("END PRIVATE KEY")
+      UI.user_error!("❌ API key file has invalid format. Expected BEGIN/END PRIVATE KEY markers.")
+    end
+    
+    UI.message("✅ API key file validated: #{key_filepath} (#{key_content.lines.count} lines)")
+    
+    # Validate environment variables
+    key_id = ENV.fetch("APP_STORE_CONNECT_KEY_IDENTIFIER") do
+      UI.user_error!("❌ APP_STORE_CONNECT_KEY_IDENTIFIER environment variable is not set")
+    end
+    
+    issuer_id = ENV.fetch("APP_STORE_CONNECT_ISSUER_ID") do
+      UI.user_error!("❌ APP_STORE_CONNECT_ISSUER_ID environment variable is not set")
+    end
+    
+    UI.message("🔑 Key ID: #{key_id}")
+    UI.message("🔑 Issuer ID: #{issuer_id}")
+    
     api_key = app_store_connect_api_key(
-      key_id: ENV.fetch("APP_STORE_CONNECT_KEY_IDENTIFIER"),
-      issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
-      key_filepath: "/tmp/AuthKey.p8",
+      key_id: key_id,
+      issuer_id: issuer_id,
+      key_filepath: key_filepath,
       in_house: false
     )
 

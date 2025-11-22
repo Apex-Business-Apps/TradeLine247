@@ -35,12 +35,17 @@ workflows:
         script: bash scripts/build-ios.sh
       - name: Write ASC API Key to file
         script: |
-          echo "$APP_STORE_CONNECT_PRIVATE_KEY" > /tmp/AuthKey.p8
-          chmod 600 /tmp/AuthKey.p8
-          echo "✅ API key written to /tmp/AuthKey.p8"
+          KEY_FILE="${CM_BUILD_DIR:-/tmp}/AuthKey.p8"
+          echo "$APP_STORE_CONNECT_PRIVATE_KEY" > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          echo "✅ API key written to $KEY_FILE"
           # Debug: verify key format (first/last lines only)
-          head -1 /tmp/AuthKey.p8
-          tail -1 /tmp/AuthKey.p8
+          head -1 "$KEY_FILE"
+          tail -1 "$KEY_FILE"
+          # Also write to /tmp for Fastlane (both locations for reliability)
+          cp "$KEY_FILE" /tmp/AuthKey.p8
+          chmod 600 /tmp/AuthKey.p8
+          echo "✅ API key also copied to /tmp/AuthKey.p8"
       - name: Upload to TestFlight
         script: fastlane ios upload
       - name: Verify artifacts
