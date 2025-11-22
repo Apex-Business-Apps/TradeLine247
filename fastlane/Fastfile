@@ -10,88 +10,35 @@ default_platform(:ios)
 
 platform :ios do
   lane :upload do
-    # PRIORITY 2: Check CM_BUILD_DIR first, fallback to /tmp
-    key_filepath = if ENV["CM_BUILD_DIR"] && File.exist?(File.join(ENV["CM_BUILD_DIR"], "AuthKey.p8"))
-      File.join(ENV["CM_BUILD_DIR"], "AuthKey.p8")
-    elsif File.exist?("/tmp/AuthKey.p8")
-      "/tmp/AuthKey.p8"
-    else
-      nil
-    end
-    
-    unless key_filepath && File.exist?(key_filepath)
-      UI.user_error!("❌ API key file not found. Checked: #{ENV["CM_BUILD_DIR"]}/AuthKey.p8, /tmp/AuthKey.p8. Ensure 'Write ASC API Key to file' step ran successfully.")
-    end
-    
-    unless File.readable?(key_filepath)
-      UI.user_error!("❌ API key file not readable: #{key_filepath}. Check file permissions.")
-    end
-    
-    # Verify key format (should start with BEGIN PRIVATE KEY)
-    key_content = File.read(key_filepath)
-    unless key_content.include?("BEGIN PRIVATE KEY") && key_content.include?("END PRIVATE KEY")
-      UI.user_error!("❌ API key file has invalid format. Expected BEGIN/END PRIVATE KEY markers.")
-    end
-    
-    UI.message("✅ API key file validated: #{key_filepath} (#{key_content.lines.count} lines)")
-    
-    # PRIORITY 1: Variable name fallbacks (handle different Codemagic formats)
-    key_id = ENV["APP_STORE_CONNECT_KEY_IDENTIFIER"] ||
-             ENV["APP_STORE_CONNECT_API_KEY_ID"] ||
-             ENV["ASC_API_KEY_ID"] ||
-             ENV["APP_STORE_CONNECT_KEY_ID"]
-    
-    issuer_id = ENV["APP_STORE_CONNECT_ISSUER_ID"] ||
-                ENV["APP_STORE_CONNECT_API_KEY_ISSUER_ID"] ||
-                ENV["ASC_API_ISSUER_ID"] ||
-                ENV["APP_STORE_CONNECT_ISSUER"]
-    
-    if key_id.nil? || key_id.empty?
-      UI.user_error!("❌ Key ID not found. Checked: APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_API_KEY_ID, ASC_API_KEY_ID, APP_STORE_CONNECT_KEY_ID")
-    end
-    
-    if issuer_id.nil? || issuer_id.empty?
-      UI.user_error!("❌ Issuer ID not found. Checked: APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_API_KEY_ISSUER_ID, ASC_API_ISSUER_ID, APP_STORE_CONNECT_ISSUER")
-    end
-    
-    UI.message("🔑 Key ID: #{key_id}")
-    UI.message("🔑 Issuer ID: #{issuer_id}")
-    
+    # Hardcoded ASC API credentials (verified working)
     api_key = app_store_connect_api_key(
-      key_id: key_id,
-      issuer_id: issuer_id,
-      key_filepath: key_filepath,
+      key_id: "5XDRL75994",
+      issuer_id: "7efaf094-3c6f-4c6c-afdb-d6e2c84871c7",
+      key_filepath: "/Users/builder/clone/AuthKey.p8",
       in_house: false
     )
 
-    # Get IPA_PATH from environment or file (Codemagic script steps are isolated)
+    # Get IPA_PATH from environment or find it
     ipa_path = ENV["IPA_PATH"]
     if ipa_path.nil? || ipa_path.empty?
-      # Try reading from file written by build-ios.sh
-      ipa_path_file = File.join(ENV["CM_BUILD_DIR"] || "build", "ipa_path.txt")
-      if File.exist?(ipa_path_file)
-        ipa_path = File.read(ipa_path_file).strip
-        UI.message("📖 Read IPA_PATH from file: #{ipa_path}")
-      else
-        # Fallback: find IPA in expected locations
-        possible_paths = [
-          File.join(ENV["CM_BUILD_DIR"] || "build", "ipa", "App.ipa"),
-          "ios/build/export/*.ipa",
-          "build/ipa/*.ipa"
-        ]
-        
-        possible_paths.each do |pattern|
-          found = Dir.glob(pattern).first
-          if found && File.exist?(found)
-            ipa_path = found
-            UI.message("🔍 Found IPA at: #{ipa_path}")
-            break
-          end
+      # Fallback: find IPA in expected locations
+      possible_paths = [
+        "/Users/builder/clone/build/ios/ipa/*.ipa",
+        "ios/build/export/*.ipa",
+        "build/ipa/*.ipa"
+      ]
+
+      possible_paths.each do |pattern|
+        found = Dir.glob(pattern).first
+        if found && File.exist?(found)
+          ipa_path = found
+          UI.message("🔍 Found IPA at: #{ipa_path}")
+          break
         end
-        
-        if ipa_path.nil? || ipa_path.empty?
-          UI.user_error!("❌ IPA_PATH not found. Checked: #{possible_paths.join(', ')}")
-        end
+      end
+
+      if ipa_path.nil? || ipa_path.empty?
+        UI.user_error!("❌ IPA_PATH not found. Checked: #{possible_paths.join(', ')}")
       end
     end
 
