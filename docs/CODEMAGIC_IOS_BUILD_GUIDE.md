@@ -92,6 +92,11 @@ After successful build, download these artifacts from Codemagic:
 ### **Option 1: Automatic (via Codemagic)**
 Workflow includes `fastlane ios upload` step which automatically uploads to TestFlight.
 
+**Fastlane lane + auth expectations**
+- Lane invoked: `ios upload` from `fastlane/Fastfile`.
+- Authentication: `app_store_connect_api_key` reads existing Codemagic secrets `APP_STORE_CONNECT_KEY_IDENTIFIER`, `APP_STORE_CONNECT_ISSUER_ID`, and `APP_STORE_CONNECT_PRIVATE_KEY` (raw .p8 contents—no file writing required).
+- IPA location: `scripts/build-ios.sh` exports `IPA_PATH` (or writes `ipa_path.txt`) that Fastlane consumes directly.
+
 ### **Option 2: Manual (from Windows PC)**
 
 1. **Download .ipa** from Codemagic artifacts
