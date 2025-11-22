@@ -202,6 +202,15 @@ if [[ -z "$IPA_PATH" || ! -f "$IPA_PATH" ]]; then
   exit 70
 fi
 
+# Export IPA_PATH for Fastlane (ensure IPA is at expected location)
+if [[ -n "${CM_BUILD_DIR:-}" ]]; then
+  mkdir -p "$CM_BUILD_DIR/ipa"
+  cp "$IPA_PATH" "$CM_BUILD_DIR/ipa/App.ipa"
+  export IPA_PATH="$CM_BUILD_DIR/ipa/App.ipa"
+else
+  export IPA_PATH="$IPA_PATH"
+fi
+
 echo ""
 echo "=============================================="
 echo "✅ BUILD SUCCESSFUL"
