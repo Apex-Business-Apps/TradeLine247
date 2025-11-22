@@ -214,7 +214,6 @@ fi
 
 export IPA_PATH
 echo "✅ IPA ready: $IPA_PATH"
-
 echo ""
 echo "=============================================="
 echo "✅ BUILD SUCCESSFUL"
