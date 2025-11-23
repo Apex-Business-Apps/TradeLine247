@@ -34,7 +34,10 @@ workflows:
       - name: Build archive & IPA
         script: bash scripts/build-ios.sh
       - name: Upload to TestFlight
-        script: fastlane ios upload
+        script: |
+          bundle install --path vendor/bundle
+          export IPA_PATH=ipa/App.ipa
+          bundle exec fastlane ios upload
       - name: Verify artifacts
         script: bash scripts/verify-codemagic.sh
     artifacts:

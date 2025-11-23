@@ -19,28 +19,35 @@ def normalize_private_key(key_content)
   end
 end
 
+def tradeline_app_store_api_key
+  key_id = ENV.fetch("APP_STORE_CONNECT_KEY_IDENTIFIER")
+  issuer_id = ENV.fetch("APP_STORE_CONNECT_ISSUER_ID")
+  key_content_raw = ENV.fetch("APP_STORE_CONNECT_PRIVATE_KEY")
+  key_content = normalize_private_key(key_content_raw)
+
+  UI.message("🔐 Using App Store Connect API key (ID: #{key_id.to_s[0, 4]}…, Issuer: #{issuer_id.to_s[0, 8]}…)")
+  UI.message("🔑 Private key includes header? #{key_content&.include?('BEGIN PRIVATE KEY') ? 'yes' : 'no'}")
+
+  app_store_connect_api_key(
+    key_id: key_id,
+    issuer_id: issuer_id,
+    key_content: key_content,
+    duration: 1200,
+    in_house: false
+  )
+end
+
 platform :ios do
   lane :upload do
-    # Get API key components directly from environment variables
-    key_id = ENV.fetch("APP_STORE_CONNECT_KEY_IDENTIFIER")
-    issuer_id = ENV.fetch("APP_STORE_CONNECT_ISSUER_ID")
-    key_content = normalize_private_key(ENV.fetch("APP_STORE_CONNECT_PRIVATE_KEY"))
+    UI.message("🚀 Uploading TradeLine 24/7 build to TestFlight")
 
-    # Redacted debug logging (never prints full secrets)
-    UI.message("ASC key_id  (APP_STORE_CONNECT_KEY_IDENTIFIER): #{key_id.to_s[0,4]}…")
-    UI.message("ASC issuer (APP_STORE_CONNECT_ISSUER_ID): #{issuer_id.to_s[0,8]}…")
-    UI.message("ASC private key present? #{key_content&.include?('BEGIN PRIVATE KEY') ? 'yes' : 'no'}")
-
-    api_key = app_store_connect_api_key(
-      issuer_id: issuer_id,
-      key: key_content,
-      duration: 1200,
-      in_house: false
-    )
+    api_key = tradeline_app_store_api_key
 
     # Get IPA_PATH from environment or file (Codemagic script steps are isolated)
-    ipa_path = ENV["IPA_PATH"]
-    if ipa_path.nil? || ipa_path.empty?
+    ipa_path = ENV["IPA_PATH"]&.strip
+    ipa_path = "ipa/App.ipa" if ipa_path.nil? || ipa_path.empty?
+
+    if ipa_path.nil? || ipa_path.empty? || !File.exist?(ipa_path)
       # Try reading from file written by build-ios.sh
       ipa_path_file = File.join(ENV["CM_BUILD_DIR"] || "build", "ipa_path.txt")
       if File.exist?(ipa_path_file)
@@ -53,7 +60,7 @@ platform :ios do
           "ios/build/export/*.ipa",
           "build/ipa/*.ipa"
         ]
-        
+
         possible_paths.each do |pattern|
           found = Dir.glob(pattern).first
           if found && File.exist?(found)
@@ -62,18 +69,22 @@ platform :ios do
             break
           end
         end
-        
+
         if ipa_path.nil? || ipa_path.empty?
           UI.user_error!("❌ IPA_PATH not found. Checked: #{possible_paths.join(', ')}")
         end
       end
     end
 
+    UI.message("📦 IPA path: #{ipa_path}")
+    UI.message("📱 Bundle ID: com.apex.tradeline")
+
     upload_to_testflight(
       api_key: api_key,
       ipa: ipa_path,
+      app_identifier: "com.apex.tradeline",
       skip_submission: true,
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: false
     )
   end
 end
