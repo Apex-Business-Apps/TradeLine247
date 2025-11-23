@@ -22,12 +22,12 @@ end
 platform :ios do
   lane :upload do
     # Get API key components directly from environment variables
-    key_id = ENV.fetch("APP_STORE_CONNECT_KEY_IDENTIFIER")
+    key_id = ENV.fetch("APP_STORE_ID")  # Contains the actual Key ID (5XDRL75994)
     issuer_id = ENV.fetch("APP_STORE_CONNECT_ISSUER_ID")
     key_content = normalize_private_key(ENV.fetch("APP_STORE_CONNECT_PRIVATE_KEY"))
 
     # Redacted debug logging (never prints full secrets)
-    UI.message("ASC key_id  (APP_STORE_CONNECT_KEY_IDENTIFIER): #{key_id.to_s[0,4]}…")
+    UI.message("ASC key_id (APP_STORE_ID): #{key_id}")
     UI.message("ASC issuer (APP_STORE_CONNECT_ISSUER_ID): #{issuer_id.to_s[0,8]}…")
     UI.message("ASC private key present? #{key_content&.include?('BEGIN PRIVATE KEY') ? 'yes' : 'no'}")
 
