@@ -21,14 +21,10 @@ workflows:
       cache_paths:
         - ~/.npm
         - ~/.cocoapods
-        -       ios/Pods
+        - ios/Pods
     scripts:
       - name: Install dependencies
         script: npm ci
-      - name: Install Fastlane
-        script: |
-          gem install bundler
-          bundle install
       - name: Quality gates
         script: npm run lint && npm run typecheck && npm run test:unit
       - name: Playwright smoke
@@ -38,7 +34,10 @@ workflows:
       - name: Build archive & IPA
         script: bash scripts/build-ios.sh
       - name: Upload to TestFlight
-        script: bundle exec fastlane ios upload
+        script: |
+          bundle install --path vendor/bundle
+          export IPA_PATH=ipa/App.ipa
+          bundle exec fastlane ios upload
       - name: Verify artifacts
         script: bash scripts/verify-codemagic.sh
     artifacts:
