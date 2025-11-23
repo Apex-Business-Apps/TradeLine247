@@ -8,20 +8,34 @@
 
 default_platform(:ios)
 
+def normalize_private_key(key_content)
+  # If the env value contains literal \n sequences (single-line encoded key),
+  # convert them back to real newlines. If the key already includes real newlines
+  # and the -----BEGIN PRIVATE KEY----- header, leave it unchanged.
+  if key_content.include?("\\n") && !key_content.include?("\n")
+    key_content.gsub("\\n", "\n")
+  else
+    key_content
+  end
+end
+
 platform :ios do
   lane :upload do
     # Get API key components directly from environment variables
+    key_id = ENV.fetch("APP_STORE_CONNECT_KEY_IDENTIFIER")
     issuer_id = ENV.fetch("APP_STORE_CONNECT_ISSUER_ID")
-    key_id = ENV.fetch("APP_STORE_ID")
-    key = ENV.fetch("APP_STORE_CONNECT_PRIVATE_KEY")
+    key_content = normalize_private_key(ENV.fetch("APP_STORE_CONNECT_PRIVATE_KEY"))
 
-    UI.message("🔑 Key ID: #{key_id}")
-    UI.message("🔑 Issuer ID: #{issuer_id}")
+    # Redacted debug logging (never prints full secrets)
+    UI.message("ASC key_id  (APP_STORE_CONNECT_KEY_IDENTIFIER): #{key_id.to_s[0,4]}…")
+    UI.message("ASC issuer (APP_STORE_CONNECT_ISSUER_ID): #{issuer_id.to_s[0,8]}…")
+    UI.message("ASC private key present? #{key_content&.include?('BEGIN PRIVATE KEY') ? 'yes' : 'no'}")
 
     api_key = app_store_connect_api_key(
       issuer_id: issuer_id,
-      key_id: key_id,
-      key: key
+      key: key_content,
+      duration: 1200,
+      in_house: false
     )
 
     # Get IPA_PATH from environment or file (Codemagic script steps are isolated)
@@ -58,6 +72,7 @@ platform :ios do
     upload_to_testflight(
       api_key: api_key,
       ipa: ipa_path,
+      skip_submission: true,
       skip_waiting_for_build_processing: true
     )
   end
