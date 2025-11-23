@@ -35,6 +35,17 @@ Export:    ${EXPORT_PATH}
 ==============================================
 INFO
 
+echo "[build-ios] Building web assets..."
+npm run build
+
+echo "[build-ios] Syncing Capacitor iOS project..."
+npx cap sync ios
+
+echo "[build-ios] Installing CocoaPods dependencies..."
+pushd ios/App >/dev/null
+pod install --repo-update
+popd >/dev/null
+
 echo "[build-ios] Archiving app..."
 xcodebuild archive \
   -workspace "ios/${XCODE_WORKSPACE}" \

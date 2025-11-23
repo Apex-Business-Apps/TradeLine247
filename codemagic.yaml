@@ -37,7 +37,8 @@ workflows:
           scripts/build-ios.sh
       - name: Upload to TestFlight
         script: |
-          bundle install --path vendor/bundle
+          bundle config set path 'vendor/bundle'
+          bundle install
           cd ios
           BUNDLE_GEMFILE=../Gemfile BUNDLE_PATH=../vendor/bundle bundle exec fastlane ios upload
       - name: Verify artifacts
