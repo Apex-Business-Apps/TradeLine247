@@ -33,7 +33,7 @@ def tradeline_app_store_api_key
   app_store_connect_api_key(
     key_id: key_id,
     issuer_id: issuer_id,
-    key: key_content,  # Correct parameter name for Fastlane
+    key_content: key_content,  # Fastlane expects 'key_content', not 'key'
     duration: 1200,
     in_house: false
   )
