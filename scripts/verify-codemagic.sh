@@ -2,47 +2,35 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ARTIFACTS=()
-OUTPUT_FILE="$ROOT/build-artifacts-sha256.txt"
-: > "$OUTPUT_FILE"
+ARCHIVE_PATH="${ARCHIVE_PATH:-$ROOT/ios/build/TradeLine247.xcarchive}"
+EXPORT_PATH="${EXPORT_PATH:-$ROOT/ios/build/export}"
+IPA_GLOB="${IPA_GLOB:-$EXPORT_PATH/*.ipa}"
+OUTPUT_FILE="${OUTPUT_FILE:-$ROOT/build-artifacts-sha256.txt}"
 
-android_aab="$ROOT/android/app/build/outputs/bundle/release/app-release.aab"
-ios_ipa="$ROOT/ios/build/export/TradeLine247.ipa"
-web_dist="$ROOT/dist"
+shopt -s nullglob
+ipas=( $IPA_GLOB )
 
-if [[ -f "$android_aab" ]]; then
-  ARTIFACTS+=("$android_aab")
-else
-  echo "[verify-codemagic] Android bundle missing at $android_aab"
-fi
-
-if [[ -f "$ios_ipa" ]]; then
-  ARTIFACTS+=("$ios_ipa")
-else
-  echo "[verify-codemagic] iOS IPA missing at $ios_ipa"
-fi
-
-if [[ -d "$web_dist" ]]; then
-  ARTIFACTS+=("$web_dist")
-else
-  echo "[verify-codemagic] Web dist folder missing at $web_dist"
-fi
-
-if [[ ${#ARTIFACTS[@]} -eq 0 ]]; then
-  echo "[verify-codemagic] No artifacts found. Did the build run?" >&2
+if [[ ! -d "$ARCHIVE_PATH" ]]; then
+  echo "❌ Archive missing at $ARCHIVE_PATH" >&2
   exit 1
 fi
 
-echo "[verify-codemagic] Computing SHA256 checksums"
-for path in "${ARTIFACTS[@]}"; do
-  if [[ -d "$path" ]]; then
-    tarball="$path.tar.gz"
-    tar -czf "$tarball" -C "$(dirname "$path")" "$(basename "$path")"
-    shasum -a 256 "$tarball" | tee -a "$OUTPUT_FILE"
-  else
-    shasum -a 256 "$path" | tee -a "$OUTPUT_FILE"
-  fi
+if [[ ${#ipas[@]} -eq 0 ]]; then
+  echo "❌ No IPA found at $IPA_GLOB" >&2
+  exit 1
+fi
+
+: > "$OUTPUT_FILE"
+
+echo "[verify-codemagic] Computing SHA256 checksums" >&2
+archive_dir=$(dirname "$ARCHIVE_PATH")
+archive_name=$(basename "$ARCHIVE_PATH")
+
+archive_checksum=$( (cd "$archive_dir" && tar -cf - "$archive_name") | shasum -a 256 | awk '{print $1}' )
+printf "%s  %s\n" "$archive_checksum" "$ARCHIVE_PATH" | tee -a "$OUTPUT_FILE"
+
+for ipa in "${ipas[@]}"; do
+  shasum -a 256 "$ipa" | tee -a "$OUTPUT_FILE"
 done
 
-echo "[verify-codemagic] Checksums written to $OUTPUT_FILE"
-
+echo "[verify-codemagic] Checksums written to $OUTPUT_FILE" >&2
