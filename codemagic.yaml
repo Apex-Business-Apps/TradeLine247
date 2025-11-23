@@ -32,12 +32,15 @@ workflows:
           npx playwright install --with-deps chromium
           npm run test:e2e:smoke
       - name: Build archive & IPA
-        script: bash scripts/build-ios.sh
+        script: |
+          chmod +x scripts/build-ios.sh
+          scripts/build-ios.sh
       - name: Upload to TestFlight
         script: |
-          bundle install --path vendor/bundle
-          export IPA_PATH=ipa/App.ipa
-          bundle exec fastlane ios upload
+          bundle config set path 'vendor/bundle'
+          bundle install
+          cd ios
+          BUNDLE_GEMFILE=../Gemfile BUNDLE_PATH=../vendor/bundle bundle exec fastlane ios upload
       - name: Verify artifacts
         script: bash scripts/verify-codemagic.sh
     artifacts:
