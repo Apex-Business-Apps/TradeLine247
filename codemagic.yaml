@@ -1,5 +1,11 @@
 workflows:
   ios-capacitor-testflight:
+    # Previous pipeline used scripts/build-ios.sh which caused xcodebuild archive failures.
+    # Updated to match GOODBUILD.txt workflow: direct xcodebuild commands, Xcode 16.4,
+    # manual signing with existing cert/profile, Fastlane upload to TestFlight.
+    # Environment: XCODE_WORKSPACE=ios/App/App.xcworkspace, XCODE_SCHEME=App,
+    # BUNDLE_ID=com.apex.tradeline, TEAM_ID=NWGUYF42KW
+
     name: iOS • Capacitor -> TestFlight
     instance_type: mac_mini_m1
     max_build_duration: 75
@@ -19,7 +25,9 @@ workflows:
         TEAM_ID: NWGUYF42KW
       node: 20.11.1
       npm: 10
-      xcode: 26.2
+
+      xcode: 16.4
+
       cocoapods: default
     cache:
       cache_paths:
@@ -46,8 +54,72 @@ workflows:
           echo "[codesign] Initializing keychain and fetching signing assets"
           keychain initialize
 
-          echo "[codesign] Fetching provisioning profiles for ${BUNDLE_ID}"
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+      - name: Build archive & IPA
+
+        script: |
+          # Xcode project configuration (match GOODBUILD.txt)
+          echo "Set iOS versions"
+          cd ios/App
+          /usr/libexec/PlistBuddy -c "Set :UIDeviceFamily <array><integer>1</integer></array>" App/Info.plist
+          cd ../..
+
+          echo "Copy app icons"
+          npx capacitor-assets generate --ios
+
+          echo "🏗️  Building archive..."
+          xcodebuild archive \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -archivePath /Users/builder/clone/build/App.xcarchive \
+            -destination generic/platform=iOS \
+            -allowProvisioningUpdates \
+            CODE_SIGN_STYLE=Manual \
+            "CODE_SIGN_IDENTITY=Apple Distribution" \
+            DEVELOPMENT_TEAM=NWGUYF42KW \
+            PROVISIONING_PROFILE_SPECIFIER=TL247_mobpro_tradeline_01 \
+            PRODUCT_BUNDLE_IDENTIFIER=com.apex.tradeline \
+            clean archive
+
+          echo "** ARCHIVE SUCCEEDED **"
+
+          echo "📝 Creating ExportOptions.plist..."
+          cat > /Users/builder/clone/exportOptions.plist << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>method</key>
+    <string>app-store</string>
+    <key>teamID</key>
+    <string>NWGUYF42KW</string>
+    <key>uploadBitcode</key>
+    <false/>
+    <key>uploadSymbols</key>
+    <true/>
+    <key>compileBitcode</key>
+    <false/>
+    <key>signingStyle</key>
+    <string>manual</string>
+    <key>signingCertificate</key>
+    <string>Apple Distribution</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.apex.tradeline</key>
+        <string>TL247_mobpro_tradeline_01</string>
+    </dict>
+</dict>
+</plist>
+EOF
+
+          echo "📦 Exporting IPA..."
+          xcodebuild -exportArchive \
+            -archivePath /Users/builder/clone/build/App.xcarchive \
+            -exportPath /Users/builder/clone/export \
+            -exportOptionsPlist /Users/builder/clone/exportOptions.plist \
+            -allowProvisioningUpdates
+
+          echo "** EXPORT SUCCEEDED **"
 
           echo "[codesign] Importing certificates into the keychain"
           keychain add-certificates
@@ -111,6 +183,10 @@ workflows:
         script: |
 
           bundle install --path vendor/bundle
+
+          export IPA_PATH=/Users/builder/clone/export/App.ipa
+
+          bundle exec fastlane ios upload
 
           export IPA_PATH=ipa/App.ipa
 
