@@ -84,17 +84,15 @@ fi
 
 mkdir -p "$(dirname "$ARCHIVE_PATH")" "$EXPORT_PATH"
 
-cat <<INFO
-==============================================
-🏗️  TradeLine 24/7 iOS Build
-==============================================
-Workspace: ios/${XCODE_WORKSPACE}
-Scheme:    ${XCODE_SCHEME}
-Config:    ${CONFIGURATION}
-Archive:   ${ARCHIVE_PATH}
-Export:    ${EXPORT_PATH}
-==============================================
-INFO
+echo "=============================================="
+echo "🏗️  TradeLine 24/7 iOS Build"
+echo "=============================================="
+echo "Workspace: ios/${XCODE_WORKSPACE}"
+echo "Scheme:    ${XCODE_SCHEME}"
+echo "Config:    ${CONFIGURATION}"
+echo "Archive:   ${ARCHIVE_PATH}"
+echo "Export:    ${EXPORT_PATH}"
+echo "=============================================="
 
 echo "[build-ios] Installing CocoaPods dependencies..."
 pushd "$PROJECT_ROOT/ios/App" >/dev/null
@@ -169,3 +167,4 @@ echo "=============================================="
 echo "✅ BUILD SUCCESSFUL"
 echo "Archive: ${ARCHIVE_PATH}"
 echo "IPA:     ${IPA_PATH}"
+echo "=============================================="
