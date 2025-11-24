@@ -28,31 +28,16 @@ EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-$PROJECT_ROOT/ios/ExportOptions.pl
 ARCHIVE_PATH="${ARCHIVE_PATH:-$PROJECT_ROOT/ios/build/TradeLine247.xcarchive}"
 EXPORT_PATH="${EXPORT_PATH:-$PROJECT_ROOT/ios/build/export}"
 
-if [[ ! -f "$EXPORT_OPTIONS_PLIST" ]]; then
-  echo "❌ Export options plist missing at $EXPORT_OPTIONS_PLIST" >&2
-  exit 1
-fi
+log() {
+  echo "[build-ios] $*"
+}
 
-mkdir -p "$(dirname "$ARCHIVE_PATH")" "$EXPORT_PATH"
+log "Working directory: $(pwd)"
 
 cat <<INFO
-==============================================
-🏗️  TradeLine 24/7 iOS Build
-==============================================
-Workspace: ios/${XCODE_WORKSPACE}
-Scheme:    ${XCODE_SCHEME}
-Config:    ${CONFIGURATION}
-Archive:   ${ARCHIVE_PATH}
-Export:    ${EXPORT_PATH}
-Bundle ID: ${BUNDLE_ID}
-Team ID:   ${TEAM_ID}
-==============================================
-INFO
-
-echo "[build-ios] Building web assets..."
 npm run build
 
-echo "[build-ios] Syncing Capacitor iOS project..."
+log "Syncing Capacitor iOS project..."
 npx cap sync ios
 
 echo "[build-ios] Installing CocoaPods dependencies..."
@@ -94,26 +79,30 @@ xcodebuild archive \
   -scheme "${XCODE_SCHEME}" \
   -configuration "${CONFIGURATION}" \
   -destination "generic/platform=iOS" \
-  -archivePath "${ARCHIVE_PATH}" \
+  -archivePath "$ARCHIVE_PATH" \
   -allowProvisioningUpdates \
-  clean archive
+  clean archive; then
+  echo "❌ xcodebuild archive failed" >&2
+  exit 1
+fi
 
-echo "[build-ios] Exporting IPA..."
-xcodebuild -exportArchive \
-  -archivePath "${ARCHIVE_PATH}" \
-  -exportOptionsPlist "${EXPORT_OPTIONS_PLIST}" \
-  -exportPath "${EXPORT_PATH}" \
-  -allowProvisioningUpdates
+if [[ ! -d "$ARCHIVE_PATH" ]]; then
+  echo "❌ Archive not created at ${ARCHIVE_PATH}" >&2
+  exit 1
+fi
+log "Archive created"
 
 IPA_PATH="$(find "${EXPORT_PATH}" -maxdepth 1 -name "*.ipa" | head -1)"
 
-if [[ -z "${IPA_PATH}" || ! -f "${IPA_PATH}" ]]; then
-  echo "❌ IPA not found in ${EXPORT_PATH}" >&2
+IPA_SIZE=$(stat -f%z "$IPA_PATH" 2>/dev/null || stat -c%s "$IPA_PATH" 2>/dev/null || echo "0")
+if [[ "$IPA_SIZE" -lt 10000000 ]]; then
+  echo "❌ IPA file seems too small (${IPA_SIZE} bytes), likely corrupted" >&2
   exit 70
 fi
 
 export IPA_PATH
-printf "%s" "${IPA_PATH}" > "${EXPORT_PATH}/ipa_path.txt"
+printf "%s" "$IPA_PATH" > "$EXPORT_PATH/ipa_path.txt"
+log "IPA ready: ${IPA_PATH#"$PROJECT_ROOT/"} (${IPA_SIZE} bytes)"
 
 echo "=============================================="
 echo "✅ BUILD SUCCESSFUL"
