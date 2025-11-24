@@ -6,6 +6,8 @@ ARCHIVE_PATH="${ARCHIVE_PATH:-$ROOT/ios/build/TradeLine247.xcarchive}"
 EXPORT_PATH="${EXPORT_PATH:-$ROOT/ios/build/export}"
 OUTPUT_FILE="${OUTPUT_FILE:-$ROOT/build-artifacts-sha256.txt}"
 
+cd "$ROOT"
+
 if [[ ! -d "$ARCHIVE_PATH" ]]; then
   echo "❌ Archive missing at $ARCHIVE_PATH" >&2
   exit 1
