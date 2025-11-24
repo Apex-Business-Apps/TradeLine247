@@ -32,14 +32,79 @@ workflows:
       
       - name: Quality gates
         script: npm run lint && npm run typecheck && npm run test:unit
-      
+
       - name: Playwright smoke
         script: |
           npx playwright install --with-deps chromium
           npm run test:e2e:smoke
-      
+
+      - name: Set up code signing identities
+        script: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          echo "[codesign] Initializing keychain and fetching signing assets"
+          keychain initialize
+
+          echo "[codesign] Fetching provisioning profiles for ${BUNDLE_ID}"
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+
+          echo "[codesign] Importing certificates into the keychain"
+          keychain add-certificates
+
       - name: Build archive & IPA
-        script: bash scripts/build-ios.sh
+        script: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          echo "[build-ios] Workspace: ${XCODE_WORKSPACE:-ios/App/App.xcworkspace}"
+          echo "[build-ios] Scheme:   ${XCODE_SCHEME:-App}"
+          echo "[build-ios] Config:   ${CONFIGURATION:-Release}"
+
+          # Ensure codemagic-cli-tools are available (safe to re-run even if installed earlier)
+          pip3 install codemagic-cli-tools --upgrade
+
+          # Apply the fetched provisioning profiles to the Xcode project/workspace
+          echo "[build-ios] Applying provisioning profiles via xcode-project use-profiles..."
+          xcode-project use-profiles
+
+          # Build archive + IPA using Codemagic's Xcode wrapper
+          echo "[build-ios] Building IPA via xcode-project build-ipa..."
+          xcode-project build-ipa \
+            --workspace "${XCODE_WORKSPACE:-ios/App/App.xcworkspace}" \
+            --scheme "${XCODE_SCHEME:-App}" \
+            --log-path /tmp/xcodebuild_logs
+
+          echo "[build-ios] Locating generated IPA and .xcarchive..."
+          set +u
+          IPA_SOURCE="$(find build -type f -name '*.ipa' | head -1)"
+          ARCHIVE_SOURCE="$(find build -type d -name '*.xcarchive' | head -1)"
+          set -u
+
+          if [ -z "${IPA_SOURCE:-}" ] || [ ! -f "${IPA_SOURCE:-/dev/null}" ]; then
+            echo "❌ No IPA produced by xcode-project build-ipa" >&2
+            exit 70
+          fi
+
+          mkdir -p ios/build/export ios/build
+
+          # Copy IPA to legacy path expected by artifacts / any downstream scripts
+          cp "${IPA_SOURCE}" ios/build/export/TradeLine247.ipa
+          ABS_IPA_PATH="$(pwd)/ios/build/export/TradeLine247.ipa"
+          printf "%s" "${ABS_IPA_PATH}" > ipa_path.txt
+          printf "%s" "${ABS_IPA_PATH}" > ios/build/export/ipa_path.txt
+
+          # Copy archive to legacy path if present
+          if [ -n "${ARCHIVE_SOURCE:-}" ] && [ -d "${ARCHIVE_SOURCE:-}" ]; then
+            rm -rf ios/build/TradeLine247.xcarchive
+            cp -R "${ARCHIVE_SOURCE}" ios/build/TradeLine247.xcarchive
+          fi
+
+          echo "=============================================="
+          echo "✅ iOS archive & IPA successfully built"
+          echo "    IPA:     ios/build/export/TradeLine247.ipa"
+          echo "    Archive: ios/build/TradeLine247.xcarchive"
+          echo "=============================================="
       
       - name: 🚀 Upload to TestFlight
         script: |
@@ -93,6 +158,10 @@ workflows:
     artifacts:
       - ios/build/export/*.ipa
       - ios/build/TradeLine247.xcarchive
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
       - playwright-report/**/*
       - dist/**/*
       - build-artifacts-sha256.txt
