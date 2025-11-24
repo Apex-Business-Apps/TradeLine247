@@ -61,7 +61,7 @@ workflows:
           : "${APP_STORE_ID:?"ERROR: APP_STORE_CONNECT_APP_ID not set"}"
           : "${BUNDLE_ID:?"ERROR: BUNDLE_ID not set"}"
 
-          echo "✅ Environment variables validated"
+          echo "✅ PRE-FLIGHT VALIDATION COMPLETE"
 
           # Validate required tools
           if ! command -v xcrun >/dev/null 2>&1; then
@@ -137,7 +137,7 @@ workflows:
           # Set secure permissions
           chmod 600 "$API_KEY_PATH"
 
-          echo "✅ API key file created and validated"
+          echo "✅ API key file created"
 
           # ============================================================================
           # PHASE 3: TestFlight Upload with Retry Logic
@@ -172,7 +172,7 @@ workflows:
 
               # Parse and validate result
               if [[ -f "upload_result.json" ]] && jq -e '.success' upload_result.json >/dev/null 2>&1; then
-                echo "🎉 TestFlight upload completed successfully!"
+                echo "🎉 UPLOAD SUCCESSFUL"
                 echo "📊 Upload duration: ${UPLOAD_DURATION} seconds"
                 break
               else
