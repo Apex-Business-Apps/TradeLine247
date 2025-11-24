@@ -46,7 +46,7 @@ pod install --repo-update
 popd >/dev/null
 
 # Sanity check: workspace must exist after sync + pods
-if [[ ! -f "$WORKSPACE_ABS_PATH" ]]; then
+if [[ ! -d "$WORKSPACE_ABS_PATH" ]]; then
   echo "❌ CRITICAL: Xcode workspace not found after Capacitor sync + pod install."
   echo "   Looked for: $WORKSPACE_ABS_PATH"
   exit 1
