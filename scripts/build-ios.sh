@@ -4,17 +4,41 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-XCODE_WORKSPACE="${XCODE_WORKSPACE:-App/App.xcworkspace}"
-XCODE_SCHEME="${XCODE_SCHEME:-App}"
+# Workspace / scheme detection with env overrides
+: "${XCODE_WORKSPACE:=App/App.xcworkspace}"
+: "${XCODE_SCHEME:=App}"
 CONFIGURATION="${CONFIGURATION:-Release}"
+
+IOS_DIR="ios"
+
+# Normalize XCODE_WORKSPACE so it is always relative to ios/
+# If it already starts with "ios/", strip that prefix
+if [[ "$XCODE_WORKSPACE" == ios/* ]]; then
+  XCODE_WORKSPACE="${XCODE_WORKSPACE#ios/}"
+fi
+
+WORKSPACE_PATH="$IOS_DIR/$XCODE_WORKSPACE"
+
+# Try main workspace path
+if [ ! -f "$WORKSPACE_PATH" ]; then
+  echo "⚠️ Workspace $WORKSPACE_PATH not found, trying fallback ios/App.xcworkspace"
+  WORKSPACE_PATH="$IOS_DIR/App.xcworkspace"
+fi
+
+if [ ! -f "$WORKSPACE_PATH" ]; then
+  echo "❌ Could not find any Xcode workspace at:"
+  echo "    $IOS_DIR/$XCODE_WORKSPACE"
+  echo "    or $IOS_DIR/App.xcworkspace"
+  exit 1
+fi
+
+echo "ℹ️ Using workspace: $WORKSPACE_PATH"
+echo "ℹ️ Using scheme: $XCODE_SCHEME"
+echo "ℹ️ Configuration: $CONFIGURATION"
+
 EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-ios/ExportOptions.plist}"
 ARCHIVE_PATH="${ARCHIVE_PATH:-ios/build/TradeLine247.xcarchive}"
 EXPORT_PATH="${EXPORT_PATH:-ios/build/export}"
-
-if [[ ! -f "ios/${XCODE_WORKSPACE}" ]]; then
-  echo "❌ Xcode workspace ios/${XCODE_WORKSPACE} not found" >&2
-  exit 1
-fi
 
 if [[ ! -f "$EXPORT_OPTIONS_PLIST" ]]; then
   echo "❌ Export options plist missing at $EXPORT_OPTIONS_PLIST" >&2
@@ -27,7 +51,7 @@ cat <<INFO
 ==============================================
 🏗️  TradeLine 24/7 iOS Build
 ==============================================
-Workspace: ios/${XCODE_WORKSPACE}
+Workspace: ${WORKSPACE_PATH}
 Scheme:    ${XCODE_SCHEME}
 Config:    ${CONFIGURATION}
 Archive:   ${ARCHIVE_PATH}
@@ -48,7 +72,7 @@ popd >/dev/null
 
 echo "[build-ios] Archiving app..."
 xcodebuild archive \
-  -workspace "ios/${XCODE_WORKSPACE}" \
+  -workspace "${WORKSPACE_PATH}" \
   -scheme "${XCODE_SCHEME}" \
   -configuration "${CONFIGURATION}" \
   -destination "generic/platform=iOS" \
