@@ -6,9 +6,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
-# Workspace / scheme detection with env overrides
-: "${XCODE_WORKSPACE:=App/App.xcworkspace}"
-: "${XCODE_SCHEME:=App}"
+XCODE_WORKSPACE="${XCODE_WORKSPACE:-App/App.xcworkspace}"
+XCODE_SCHEME="${XCODE_SCHEME:-App}"
 CONFIGURATION="${CONFIGURATION:-Release}"
 
 IOS_DIR="ios"
@@ -89,7 +88,7 @@ cat <<INFO
 ==============================================
 🏗️  TradeLine 24/7 iOS Build
 ==============================================
-Workspace: ${WORKSPACE_PATH}
+Workspace: ios/${XCODE_WORKSPACE}
 Scheme:    ${XCODE_SCHEME}
 Config:    ${CONFIGURATION}
 Archive:   ${ARCHIVE_PATH}
@@ -170,4 +169,3 @@ echo "=============================================="
 echo "✅ BUILD SUCCESSFUL"
 echo "Archive: ${ARCHIVE_PATH}"
 echo "IPA:     ${IPA_PATH}"
-echo "=============================================="
