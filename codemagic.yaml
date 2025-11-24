@@ -12,7 +12,9 @@ workflows:
         bundle_identifier: com.apex.tradeline
       vars:
         XCODE_SCHEME: App
-        XCODE_WORKSPACE: App/App.xcworkspace
+
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
+
         BUNDLE_ID: com.apex.tradeline
         TEAM_ID: NWGUYF42KW
       node: 20.11.1
