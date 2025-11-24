@@ -45,11 +45,6 @@ EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-$PROJECT_ROOT/ios/ExportOptions.pl
 ARCHIVE_PATH="${ARCHIVE_PATH:-$PROJECT_ROOT/ios/build/TradeLine247.xcarchive}"
 EXPORT_PATH="${EXPORT_PATH:-$PROJECT_ROOT/ios/build/export}"
 
-if [[ ! -f "ios/${XCODE_WORKSPACE}" ]]; then
-  echo "❌ Xcode workspace ios/${XCODE_WORKSPACE} not found" >&2
-  exit 1
-fi
-
 if [[ ! -f "$EXPORT_OPTIONS_PLIST" ]]; then
   echo "❌ Export options plist missing at $EXPORT_OPTIONS_PLIST" >&2
   exit 1
@@ -111,4 +106,3 @@ echo "=============================================="
 echo "✅ BUILD SUCCESSFUL"
 echo "Archive: ${ARCHIVE_PATH}"
 echo "IPA:     ${IPA_PATH}"
-echo "=============================================="
