@@ -34,15 +34,17 @@ workflows:
       - name: Build archive & IPA
         script: |
           chmod +x scripts/build-ios.sh
-          scripts/build-ios.sh
+          ./scripts/build-ios.sh
       - name: Upload to TestFlight
         script: |
           bundle config set path 'vendor/bundle'
           bundle install
           cd ios
-          BUNDLE_GEMFILE=../Gemfile BUNDLE_PATH=../vendor/bundle bundle exec fastlane ios upload
+          BUNDLE_GEMFILE=../Gemfile BUNDLE_PATH=../vendor/bundle bundle exec fastlane ios upload || fastlane ios upload
       - name: Verify artifacts
-        script: bash scripts/verify-codemagic.sh
+        script: |
+          chmod +x scripts/verify-codemagic.sh
+          ./scripts/verify-codemagic.sh
     artifacts:
       - ios/build/export/*.ipa
       - ios/build/TradeLine247.xcarchive
