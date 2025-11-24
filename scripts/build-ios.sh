@@ -6,9 +6,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
-# Workspace / scheme detection with env overrides
-: "${XCODE_WORKSPACE:=App/App.xcworkspace}"
-: "${XCODE_SCHEME:=App}"
+XCODE_WORKSPACE="${XCODE_WORKSPACE:-App/App.xcworkspace}"
+XCODE_SCHEME="${XCODE_SCHEME:-App}"
 CONFIGURATION="${CONFIGURATION:-Release}"
 
 IOS_DIR="ios"
@@ -46,6 +45,11 @@ EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-$PROJECT_ROOT/ios/ExportOptions.pl
 ARCHIVE_PATH="${ARCHIVE_PATH:-$PROJECT_ROOT/ios/build/TradeLine247.xcarchive}"
 EXPORT_PATH="${EXPORT_PATH:-$PROJECT_ROOT/ios/build/export}"
 
+if [[ ! -f "ios/${XCODE_WORKSPACE}" ]]; then
+  echo "❌ Xcode workspace ios/${XCODE_WORKSPACE} not found" >&2
+  exit 1
+fi
+
 if [[ ! -f "$EXPORT_OPTIONS_PLIST" ]]; then
   echo "❌ Export options plist missing at $EXPORT_OPTIONS_PLIST" >&2
   exit 1
@@ -57,7 +61,7 @@ cat <<INFO
 ==============================================
 🏗️  TradeLine 24/7 iOS Build
 ==============================================
-Workspace: ${WORKSPACE_PATH}
+Workspace: ios/${XCODE_WORKSPACE}
 Scheme:    ${XCODE_SCHEME}
 Config:    ${CONFIGURATION}
 Archive:   ${ARCHIVE_PATH}
@@ -78,7 +82,7 @@ popd >/dev/null
 
 echo "[build-ios] Archiving app..."
 xcodebuild archive \
-  -workspace "${WORKSPACE_PATH}" \
+  -workspace "ios/${XCODE_WORKSPACE}" \
   -scheme "${XCODE_SCHEME}" \
   -configuration "${CONFIGURATION}" \
   -destination "generic/platform=iOS" \
