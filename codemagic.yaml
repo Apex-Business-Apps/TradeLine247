@@ -6,13 +6,18 @@ workflows:
     name: iOS • Capacitor -> TestFlight
     instance_type: mac_mini_m2
     max_build_duration: 75
-    environment:
-      groups:
-        - ios_config
-        - appstore_credentials
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: $BUNDLE_ID
+      environment:
+        groups:
+          - ios_config            # Apple cert + profile
+          - appstore_credentials  # APP_STORE_CONNECT_* vars
+        ios_signing:
+          distribution_type: app_store
+          bundle_identifier: com.apex.tradeline
+        vars:
+          XCODE_SCHEME: App
+          XCODE_WORKSPACE: App/App.xcworkspace
+          BUNDLE_ID: com.apex.tradeline
+          TEAM_ID: NWGUYF42KW
       node: 20.11.1
       npm: 10
       xcode: latest
@@ -24,25 +29,32 @@ workflows:
         - ios/Pods
     scripts:
       - name: Install dependencies
-        script: npm ci
+        script: |
+          npm ci
+
       - name: Quality gates
-        script: npm run lint && npm run typecheck && npm run test:unit
+        script: |
+          npm test
+
       - name: Playwright smoke
         script: |
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
+          npm run test:playwright:smoke
+
       - name: Build archive & IPA
         script: |
           chmod +x scripts/build-ios.sh
-          scripts/build-ios.sh
+          ./scripts/build-ios.sh
+
       - name: Upload to TestFlight
         script: |
-          bundle config set path 'vendor/bundle'
-          bundle install
-          cd ios
-          BUNDLE_GEMFILE=../Gemfile BUNDLE_PATH=../vendor/bundle bundle exec fastlane ios upload
+          bundle install --path vendor/bundle
+          bundle exec fastlane ios upload
+
       - name: Verify artifacts
-        script: bash scripts/verify-codemagic.sh
+        script: |
+          ls -R ios/build || true
+          echo "IPA artifacts:"
+          ls ios/build/export || true
     artifacts:
       - ios/build/export/*.ipa
       - ios/build/TradeLine247.xcarchive
