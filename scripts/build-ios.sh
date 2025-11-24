@@ -25,81 +25,9 @@ npm run build
 log "Syncing Capacitor iOS project..."
 npx cap sync ios
 
-if [[ -d "ios/App" && -f "ios/App/Podfile" ]]; then
-  log "Installing CocoaPods dependencies..."
-  pushd ios/App >/dev/null
-  pod install --repo-update
-  popd >/dev/null
-else
-  log "Skipping CocoaPods install (Podfile not found)"
-fi
-
-normalize_workspace_input() {
-  local workspace_input="$1"
-
-  [[ -z "$workspace_input" ]] && return
-
-  workspace_input="${workspace_input#./}"
-  workspace_input="${workspace_input#ios/}"
-
-  if [[ "$workspace_input" == /* ]]; then
-    echo "$workspace_input"
-  else
-    echo "$PROJECT_ROOT/ios/${workspace_input}"
-  fi
-}
-
-find_workspace() {
-  local normalized_input
-  normalized_input=$(normalize_workspace_input "$1")
-
-  declare -a candidates searched
-
-  if [[ -n "$normalized_input" ]]; then
-    candidates+=("$normalized_input")
-    searched+=("$normalized_input")
-  fi
-
-  if [[ -d "$PROJECT_ROOT/ios/App" ]]; then
-    while IFS= read -r path; do
-      candidates+=("$path")
-    done < <(find "$PROJECT_ROOT/ios/App" -maxdepth 2 -name "*.xcworkspace" -type d 2>/dev/null | sort)
-  fi
-
-  while IFS= read -r path; do
-    [[ " ${candidates[*]} " == *" $path "* ]] && continue
-    candidates+=("$path")
-  done < <(find "$PROJECT_ROOT/ios" -maxdepth 3 -name "*.xcworkspace" -type d 2>/dev/null | sort)
-
-  local workspace=""
-  for candidate in "${candidates[@]}"; do
-    searched+=("$candidate")
-    if [[ -e "$candidate" ]]; then
-      workspace="$candidate"
-      break
-    fi
-  done
-
-  if [[ -z "$workspace" ]]; then
-    echo "CRITICAL: Could not find Xcode workspace!" >&2
-    echo "Searched:" >&2
-    for path in "${searched[@]}"; do
-      display_path=${path#"$PROJECT_ROOT/"}
-      echo "  - ${display_path:-$path}" >&2
-    done
-    cat >&2 <<'HINT'
-Hint: Ensure the Capacitor iOS project exists (npx cap add ios), CocoaPods has generated a workspace (check ios/App/Podfile), and rerun pod install.
-HINT
-    exit 1
-  fi
-
-  echo "$workspace"
-}
-
-WORKSPACE_PATH=$(find_workspace "$XCODE_WORKSPACE")
-
-if [[ ! -e "$WORKSPACE_PATH" ]]; then
-  echo "❌ Workspace not found at $WORKSPACE_PATH" >&2
+# Check for workspace AFTER Capacitor sync creates it (using -d for directory)
+if [[ ! -d "ios/${XCODE_WORKSPACE}" ]]; then
+  echo "❌ Xcode workspace ios/${XCODE_WORKSPACE} not found" >&2
   exit 1
 fi
 
