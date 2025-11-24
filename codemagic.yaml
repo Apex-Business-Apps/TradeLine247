@@ -17,7 +17,7 @@ workflows:
         TEAM_ID: NWGUYF42KW
       node: 20.11.1
       npm: 10
-      xcode: latest
+      xcode: 26.2
       cocoapods: default
     cache:
       cache_paths:
