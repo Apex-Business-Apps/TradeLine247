@@ -26,7 +26,7 @@ workflows:
 
         XCODE_SCHEME: App
 
-        XCODE_WORKSPACE: App/App.xcworkspace
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
 
         BUNDLE_ID: com.apex.tradeline
 
