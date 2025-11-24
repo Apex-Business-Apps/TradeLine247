@@ -1,6 +1,9 @@
 workflows:
 
   ios-capacitor-testflight:
+    # iOS workflow uses manual signing with the uploaded distribution certificate
+    # and provisioning profile. Removed the second codesign step that attempted
+    # automatic App Store Connect signing and caused a 401 error.
     # Previous pipeline used scripts/build-ios.sh which caused xcodebuild archive failures.
     # Updated to match GOODBUILD.txt workflow: direct xcodebuild commands, Xcode 16.4,
     # manual signing with existing cert/profile, Fastlane upload to TestFlight.
@@ -20,12 +23,6 @@ workflows:
         - ios_config
 
         - appstore_credentials
-
-      ios_signing:
-
-        distribution_type: app_store
-
-        bundle_identifier: com.apex.tradeline
 
       vars:
 
