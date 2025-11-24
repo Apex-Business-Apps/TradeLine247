@@ -109,8 +109,15 @@ workflows:
       
       - name: 🚀 Upload to TestFlight
         script: |
-          set -euo pipefail
-          
+
+          bundle install --path vendor/bundle
+
+          export IPA_PATH=ipa/App.ipa
+
+          bundle exec fastlane ios upload
+
+
+
           echo "════════════════════════════════════════════════════"
           echo "📤 TESTFLIGHT UPLOAD"
           echo "════════════════════════════════════════════════════"
