@@ -1,78 +1,52 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Use environment variables from Codemagic
-WORKSPACE="${XCODE_WORKSPACE}"
-SCHEME="${XCODE_SCHEME}"
-CONFIGURATION="Release"
-ARCHIVE_PATH="/Users/builder/clone/ios/build/TradeLine247.xcarchive"
-EXPORT_PATH="/Users/builder/clone/ios/build/export"
+WORKSPACE="${XCODE_WORKSPACE:-ios/App/App.xcworkspace}"
+SCHEME="${XCODE_SCHEME:-App}"
+CONFIGURATION="${CONFIGURATION:-Release}"
 
-echo "[build-ios] Using workspace: ${WORKSPACE}"
-echo "[build-ios] Using scheme: ${SCHEME}"
-echo "[build-ios] Configuration: ${CONFIGURATION}"
-echo "[build-ios] Archive path: ${ARCHIVE_PATH}"
-echo "[build-ios] Export path: ${EXPORT_PATH}"
+echo "[build-ios] Workspace: ${WORKSPACE}"
+echo "[build-ios] Scheme:   ${SCHEME}"
+echo "[build-ios] Config:   ${CONFIGURATION}"
 
-# Archive
-echo "[build-ios] Archiving iOS app..."
-xcodebuild archive \
-  -workspace "${WORKSPACE}" \
-  -scheme "${SCHEME}" \
-  -configuration "${CONFIGURATION}" \
-  -archivePath "${ARCHIVE_PATH}" \
-  -allowProvisioningUpdates \
-  CODE_SIGN_STYLE=Manual \
-  CODE_SIGN_IDENTITY="Apple Distribution: 2755419 Alberta Ltd (NWGUYF42KW)" \
-  DEVELOPMENT_TEAM="${TEAM_ID}" \
-  PROVISIONING_PROFILE_SPECIFIER="TL247_mobpro_tradeline_01" \
-  | xcpretty
+echo "[build-ios] Ensuring codemagic-cli-tools are available..."
+pip3 install codemagic-cli-tools --upgrade
 
-# Export IPA
-echo "[build-ios] Exporting IPA..."
+echo "[build-ios] Applying provisioning profiles via xcode-project use-profiles..."
+xcode-project use-profiles
 
-# Create export options plist
-cat > /tmp/exportOptions.plist <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>method</key>
-    <string>app-store</string>
-    <key>teamID</key>
-    <string>${TEAM_ID}</string>
-    <key>uploadBitcode</key>
-    <false/>
-    <key>uploadSymbols</key>
-    <true/>
-    <key>compileBitcode</key>
-    <false/>
-    <key>signingStyle</key>
-    <string>manual</string>
-    <key>signingCertificate</key>
-    <string>Apple Distribution</string>
-    <key>provisioningProfiles</key>
-    <dict>
-        <key>${BUNDLE_ID}</key>
-        <string>TL247_mobpro_tradeline_01</string>
-    </dict>
-</dict>
-</plist>
-EOF
+echo "[build-ios] Building IPA via xcode-project build-ipa..."
+xcode-project build-ipa \
+  --workspace "${WORKSPACE}" \
+  --scheme "${SCHEME}" \
+  --config "${CONFIGURATION}" \
+  --log-path /tmp/xcodebuild_logs
 
-xcodebuild -exportArchive \
-  -archivePath "${ARCHIVE_PATH}" \
-  -exportPath "${EXPORT_PATH}" \
-  -exportOptionsPlist /tmp/exportOptions.plist \
-  -allowProvisioningUpdates \
-  | xcpretty
+echo "[build-ios] Locating generated IPA and .xcarchive..."
+set +u
+IPA_SOURCE="$(find build -type f -name '*.ipa' | head -1)"
+ARCHIVE_SOURCE="$(find build -type d -name '*.xcarchive' | head -1)"
+set -u
 
-# Find and save IPA path
-IPA_PATH=$(find "${EXPORT_PATH}" -name "*.ipa" | head -1)
-if [ -z "$IPA_PATH" ]; then
-  echo "[build-ios] ERROR: No IPA found in ${EXPORT_PATH}"
-  exit 1
+if [ -z "${IPA_SOURCE:-}" ] || [ ! -f "${IPA_SOURCE:-/dev/null}" ]; then
+  echo "❌ No IPA produced by xcode-project build-ipa" >&2
+  exit 70
 fi
 
-echo "[build-ios] ✅ IPA created: ${IPA_PATH}"
-echo "${IPA_PATH}" > /Users/builder/clone/ipa_path.txt
+mkdir -p ios/build/export ios/build
+
+cp "${IPA_SOURCE}" ios/build/export/TradeLine247.ipa
+ABS_IPA_PATH="$(pwd)/ios/build/export/TradeLine247.ipa"
+printf "%s" "${ABS_IPA_PATH}" > ipa_path.txt
+printf "%s" "${ABS_IPA_PATH}" > ios/build/export/ipa_path.txt
+
+if [ -n "${ARCHIVE_SOURCE:-}" ] && [ -d "${ARCHIVE_SOURCE:-}" ]; then
+  rm -rf ios/build/TradeLine247.xcarchive
+  cp -R "${ARCHIVE_SOURCE}" ios/build/TradeLine247.xcarchive
+fi
+
+echo "=============================================="
+echo "✅ iOS archive & IPA successfully built"
+echo "    IPA:     ios/build/export/TradeLine247.ipa"
+echo "    Archive: ios/build/TradeLine247.xcarchive"
+echo "=============================================="
