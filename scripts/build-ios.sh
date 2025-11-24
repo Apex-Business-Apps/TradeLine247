@@ -11,11 +11,6 @@ EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-ios/ExportOptions.plist}"
 ARCHIVE_PATH="${ARCHIVE_PATH:-ios/build/TradeLine247.xcarchive}"
 EXPORT_PATH="${EXPORT_PATH:-ios/build/export}"
 
-if [[ ! -f "ios/${XCODE_WORKSPACE}" ]]; then
-  echo "❌ Xcode workspace ios/${XCODE_WORKSPACE} not found" >&2
-  exit 1
-fi
-
 if [[ ! -f "$EXPORT_OPTIONS_PLIST" ]]; then
   echo "❌ Export options plist missing at $EXPORT_OPTIONS_PLIST" >&2
   exit 1
@@ -23,23 +18,27 @@ fi
 
 mkdir -p "$(dirname "$ARCHIVE_PATH")" "$EXPORT_PATH"
 
-cat <<INFO
-==============================================
-🏗️  TradeLine 24/7 iOS Build
-==============================================
-Workspace: ios/${XCODE_WORKSPACE}
-Scheme:    ${XCODE_SCHEME}
-Config:    ${CONFIGURATION}
-Archive:   ${ARCHIVE_PATH}
-Export:    ${EXPORT_PATH}
-==============================================
-INFO
+echo "=============================================="
+echo "🏗️  TradeLine 24/7 iOS Build"
+echo "=============================================="
+echo "Workspace: ios/${XCODE_WORKSPACE}"
+echo "Scheme:    ${XCODE_SCHEME}"
+echo "Config:    ${CONFIGURATION}"
+echo "Archive:   ${ARCHIVE_PATH}"
+echo "Export:    ${EXPORT_PATH}"
+echo "=============================================="
 
 echo "[build-ios] Building web assets..."
 npm run build
 
 echo "[build-ios] Syncing Capacitor iOS project..."
 npx cap sync ios
+
+# Check for workspace AFTER Capacitor sync creates it
+if [[ ! -f "ios/${XCODE_WORKSPACE}" ]]; then
+  echo "❌ Xcode workspace ios/${XCODE_WORKSPACE} not found" >&2
+  exit 1
+fi
 
 echo "[build-ios] Installing CocoaPods dependencies..."
 pushd ios/App >/dev/null
