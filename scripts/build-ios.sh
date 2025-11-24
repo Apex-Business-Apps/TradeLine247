@@ -34,8 +34,8 @@ npm run build
 echo "[build-ios] Syncing Capacitor iOS project..."
 npx cap sync ios
 
-# Check for workspace AFTER Capacitor sync creates it
-if [[ ! -f "ios/${XCODE_WORKSPACE}" ]]; then
+# Check for workspace AFTER Capacitor sync creates it (using -d for directory)
+if [[ ! -d "ios/${XCODE_WORKSPACE}" ]]; then
   echo "❌ Xcode workspace ios/${XCODE_WORKSPACE} not found" >&2
   exit 1
 fi
