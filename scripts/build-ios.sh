@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT"
+# Ensure we start from the project root regardless of where the script is called from
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
 
 XCODE_WORKSPACE="${XCODE_WORKSPACE:-App/App.xcworkspace}"
 XCODE_SCHEME="${XCODE_SCHEME:-App}"
 CONFIGURATION="${CONFIGURATION:-Release}"
-EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-ios/ExportOptions.plist}"
-ARCHIVE_PATH="${ARCHIVE_PATH:-ios/build/TradeLine247.xcarchive}"
-EXPORT_PATH="${EXPORT_PATH:-ios/build/export}"
 
 if [[ ! -f "$EXPORT_OPTIONS_PLIST" ]]; then
   echo "❌ Export options plist missing at $EXPORT_OPTIONS_PLIST" >&2
@@ -41,7 +40,7 @@ if [[ ! -f "ios/${XCODE_WORKSPACE}" ]]; then
 fi
 
 echo "[build-ios] Installing CocoaPods dependencies..."
-pushd ios/App >/dev/null
+pushd "$PROJECT_ROOT/ios/App" >/dev/null
 pod install --repo-update
 popd >/dev/null
 
