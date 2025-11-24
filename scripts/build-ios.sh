@@ -16,6 +16,13 @@ IOS_DIR="ios"
 # Ensure we're in the right directory
 echo "[build-ios] Running from: $(pwd)"
 
+echo "[build-ios] Building web assets..."
+npm run build
+
+echo "[build-ios] Syncing Capacitor iOS project..."
+npx cap sync ios
+
+# Now that Capacitor has synced, check for the workspace
 # Normalize XCODE_WORKSPACE so it is always relative to ios/
 # If it already starts with "ios/", strip that prefix
 if [[ "$XCODE_WORKSPACE" == ios/* ]]; then
@@ -64,12 +71,6 @@ Archive:   ${ARCHIVE_PATH}
 Export:    ${EXPORT_PATH}
 ==============================================
 INFO
-
-echo "[build-ios] Building web assets..."
-npm run build
-
-echo "[build-ios] Syncing Capacitor iOS project..."
-npx cap sync ios
 
 echo "[build-ios] Installing CocoaPods dependencies..."
 pushd "$PROJECT_ROOT/ios/App" >/dev/null
