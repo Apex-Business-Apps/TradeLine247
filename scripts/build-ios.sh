@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT"
+# Ensure we start from the project root regardless of where the script is called from
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
 
 # Workspace / scheme detection with env overrides
 : "${XCODE_WORKSPACE:=App/App.xcworkspace}"
@@ -11,24 +13,28 @@ CONFIGURATION="${CONFIGURATION:-Release}"
 
 IOS_DIR="ios"
 
+# Ensure we're in the right directory
+echo "[build-ios] Running from: $(pwd)"
+
 # Normalize XCODE_WORKSPACE so it is always relative to ios/
 # If it already starts with "ios/", strip that prefix
 if [[ "$XCODE_WORKSPACE" == ios/* ]]; then
   XCODE_WORKSPACE="${XCODE_WORKSPACE#ios/}"
 fi
 
-WORKSPACE_PATH="$IOS_DIR/$XCODE_WORKSPACE"
+# Use absolute path to ensure it works regardless of cwd
+WORKSPACE_PATH="$PROJECT_ROOT/$IOS_DIR/$XCODE_WORKSPACE"
 
 # Try main workspace path
 if [ ! -f "$WORKSPACE_PATH" ]; then
   echo "⚠️ Workspace $WORKSPACE_PATH not found, trying fallback ios/App.xcworkspace"
-  WORKSPACE_PATH="$IOS_DIR/App.xcworkspace"
+  WORKSPACE_PATH="$PROJECT_ROOT/$IOS_DIR/App.xcworkspace"
 fi
 
 if [ ! -f "$WORKSPACE_PATH" ]; then
   echo "❌ Could not find any Xcode workspace at:"
-  echo "    $IOS_DIR/$XCODE_WORKSPACE"
-  echo "    or $IOS_DIR/App.xcworkspace"
+  echo "    $PROJECT_ROOT/$IOS_DIR/$XCODE_WORKSPACE"
+  echo "    or $PROJECT_ROOT/$IOS_DIR/App.xcworkspace"
   exit 1
 fi
 
@@ -36,9 +42,9 @@ echo "ℹ️ Using workspace: $WORKSPACE_PATH"
 echo "ℹ️ Using scheme: $XCODE_SCHEME"
 echo "ℹ️ Configuration: $CONFIGURATION"
 
-EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-ios/ExportOptions.plist}"
-ARCHIVE_PATH="${ARCHIVE_PATH:-ios/build/TradeLine247.xcarchive}"
-EXPORT_PATH="${EXPORT_PATH:-ios/build/export}"
+EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-$PROJECT_ROOT/ios/ExportOptions.plist}"
+ARCHIVE_PATH="${ARCHIVE_PATH:-$PROJECT_ROOT/ios/build/TradeLine247.xcarchive}"
+EXPORT_PATH="${EXPORT_PATH:-$PROJECT_ROOT/ios/build/export}"
 
 if [[ ! -f "$EXPORT_OPTIONS_PLIST" ]]; then
   echo "❌ Export options plist missing at $EXPORT_OPTIONS_PLIST" >&2
@@ -66,7 +72,7 @@ echo "[build-ios] Syncing Capacitor iOS project..."
 npx cap sync ios
 
 echo "[build-ios] Installing CocoaPods dependencies..."
-pushd ios/App >/dev/null
+pushd "$PROJECT_ROOT/ios/App" >/dev/null
 pod install --repo-update
 popd >/dev/null
 
