@@ -73,6 +73,7 @@ workflows:
           xcode-project build-ipa \
             --workspace "${XCODE_WORKSPACE:-ios/App/App.xcworkspace}" \
             --scheme "${XCODE_SCHEME:-App}" \
+            --config "${CONFIGURATION:-Release}" \
             --log-path /tmp/xcodebuild_logs
 
           echo "[build-ios] Locating generated IPA and .xcarchive..."
