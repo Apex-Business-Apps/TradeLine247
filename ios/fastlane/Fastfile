@@ -1,59 +1,52 @@
-# frozen_string_literal: true
-
 platform :ios do
-  desc "Upload IPA to TestFlight using App Store Connect API key"
   lane :upload do
-    key_id = ENV.fetch("APP_STORE_CONNECT_KEY_IDENTIFIER")
-    issuer_id = ENV.fetch("APP_STORE_CONNECT_ISSUER_ID")
-    key_content_raw = ENV.fetch("APP_STORE_CONNECT_PRIVATE_KEY")
+    key_id = ENV['APP_STORE_CONNECT_KEY_IDENTIFIER']
+    issuer_id = ENV['APP_STORE_CONNECT_ISSUER_ID']
+    private_key = ENV['APP_STORE_CONNECT_PRIVATE_KEY']
 
-    key_content = if key_content_raw.include?("\\n") && !key_content_raw.include?("\n")
-      key_content_raw.gsub("\\n", "\n")
-    else
-      key_content_raw
+    if key_id.to_s.empty? || issuer_id.to_s.empty? || private_key.to_s.empty?
+      UI.user_error!("Missing App Store Connect API key env vars.")
     end
 
-    is_base64 = key_content.strip.start_with?("LS0t") && !key_content.include?("BEGIN PRIVATE KEY")
+    is_base64 = !private_key.include?("BEGIN") && !private_key.include?("END")
+
+    UI.message("🔐 Configuring App Store Connect API key...")
+    UI.message("   Key ID: #{key_id}")
+    UI.message("   Issuer: #{issuer_id}")
+    UI.message("   Private key appears base64? #{is_base64 ? 'yes' : 'no'}")
 
     api_key = app_store_connect_api_key(
       key_id: key_id,
       issuer_id: issuer_id,
-      key_content: key_content,
+      key_content: private_key,
       is_key_content_base64: is_base64,
       duration: 1200,
-      in_house: false
+      in_house: false,
+      set_spaceship_token: true
     )
 
-    ios_root = File.expand_path("..", __dir__)
-    ipa_env = ENV["IPA_PATH"]&.strip
-    ipa_candidates = [ipa_env, File.join(ios_root, "build", "export", "ipa_path.txt")].compact
+    # Resolve IPA path
+    ipa_path = ENV['IPA_PATH']
 
-    ipa_path = nil
-
-    ipa_candidates.each do |candidate|
-      next if candidate.nil? || candidate.empty?
-
-      if File.file?(candidate) && File.extname(candidate) == ".ipa"
-        ipa_path = candidate
-        break
-      elsif File.file?(candidate) && File.basename(candidate) == "ipa_path.txt"
-        ipa_path = File.read(candidate).strip
-        break if ipa_path && !ipa_path.empty?
+    if ipa_path.to_s.strip.empty?
+      ipa_path_file = File.join('ios', 'build', 'export', 'ipa_path.txt')
+      if File.exist?(ipa_path_file)
+        ipa_path = File.read(ipa_path_file).strip
       end
     end
 
-    if ipa_path.nil? || ipa_path.empty? || !File.exist?(ipa_path)
-      exported_ipas = Dir.glob(File.join(ios_root, "build", "export", "*.ipa"))
-      ipa_path = exported_ipas.max_by { |path| File.mtime(path) } if exported_ipas.any?
+    if ipa_path.to_s.strip.empty? || !File.exist?(ipa_path)
+      UI.user_error!("IPA not found. Expected IPA_PATH env var or ios/build/export/ipa_path.txt pointing to an existing .ipa")
     end
 
-    UI.user_error!("❌ IPA not found in ios/build/export") if ipa_path.nil? || ipa_path.empty? || !File.exist?(ipa_path)
+    UI.message("🚀 Uploading IPA to TestFlight: #{ipa_path}")
 
     upload_to_testflight(
-      api_key: api_key,
+      app_identifier: ENV['BUNDLE_ID'] || 'com.apex.tradeline',
       ipa: ipa_path,
+      skip_waiting_for_build_processing: true,
       skip_submission: true,
-      skip_waiting_for_build_processing: true
+      api_key: api_key
     )
   end
 end
