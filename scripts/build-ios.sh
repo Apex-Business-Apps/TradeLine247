@@ -19,6 +19,7 @@ echo "[build-ios] Building IPA via xcode-project build-ipa..."
 xcode-project build-ipa \
   --workspace "${WORKSPACE}" \
   --scheme "${SCHEME}" \
+  --config "${CONFIGURATION}" \
   --log-path /tmp/xcodebuild_logs
 
 echo "[build-ios] Locating generated IPA and .xcarchive..."
