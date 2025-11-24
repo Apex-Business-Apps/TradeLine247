@@ -2,14 +2,14 @@
 set -euo pipefail
 
 # Use environment variables from Codemagic
-WORKSPACE="${XCODE_WORKSPACE}"
-SCHEME="${XCODE_SCHEME}"
+PROJECT_PATH="ios/App/App.xcodeproj"
+TARGET="App"
 CONFIGURATION="Release"
 ARCHIVE_PATH="/Users/builder/clone/ios/build/TradeLine247.xcarchive"
 EXPORT_PATH="/Users/builder/clone/ios/build/export"
 
-echo "[build-ios] Using workspace: ${WORKSPACE}"
-echo "[build-ios] Using scheme: ${SCHEME}"
+echo "[build-ios] Using project: ${PROJECT_PATH}"
+echo "[build-ios] Using target: ${TARGET}"
 echo "[build-ios] Configuration: ${CONFIGURATION}"
 echo "[build-ios] Archive path: ${ARCHIVE_PATH}"
 echo "[build-ios] Export path: ${EXPORT_PATH}"
@@ -17,8 +17,8 @@ echo "[build-ios] Export path: ${EXPORT_PATH}"
 # Archive
 echo "[build-ios] Archiving iOS app..."
 xcodebuild archive \
-  -workspace "${WORKSPACE}" \
-  -scheme "${SCHEME}" \
+  -project "${PROJECT_PATH}" \
+  -target "${TARGET}" \
   -configuration "${CONFIGURATION}" \
   -archivePath "${ARCHIVE_PATH}" \
   -allowProvisioningUpdates \
