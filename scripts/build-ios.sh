@@ -1,37 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT"
+# Ensure we start from the project root regardless of where the script is called from
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
 
 XCODE_WORKSPACE="${XCODE_WORKSPACE:-App/App.xcworkspace}"
 XCODE_SCHEME="${XCODE_SCHEME:-App}"
 CONFIGURATION="${CONFIGURATION:-Release}"
-EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-ios/ExportOptions.plist}"
-ARCHIVE_PATH="${ARCHIVE_PATH:-ios/build/TradeLine247.xcarchive}"
-EXPORT_PATH="${EXPORT_PATH:-ios/build/export}"
+ARCHIVE_PATH="${ARCHIVE_PATH:-$PROJECT_ROOT/ios/build/TradeLine247.xcarchive}"
+EXPORT_PATH="${EXPORT_PATH:-$PROJECT_ROOT/ios/build/export}"
+EXPORT_OPTIONS_PLIST="${EXPORT_OPTIONS_PLIST:-$PROJECT_ROOT/ios/ExportOptions.plist}"
 
-if [[ ! -f "$EXPORT_OPTIONS_PLIST" ]]; then
-  echo "❌ Export options plist missing at $EXPORT_OPTIONS_PLIST" >&2
-  exit 1
-fi
+log() {
+  echo "[build-ios] $*"
+}
 
-mkdir -p "$(dirname "$ARCHIVE_PATH")" "$EXPORT_PATH"
+log "Working directory: $(pwd)"
 
-echo "=============================================="
-echo "🏗️  TradeLine 24/7 iOS Build"
-echo "=============================================="
-echo "Workspace: ios/${XCODE_WORKSPACE}"
-echo "Scheme:    ${XCODE_SCHEME}"
-echo "Config:    ${CONFIGURATION}"
-echo "Archive:   ${ARCHIVE_PATH}"
-echo "Export:    ${EXPORT_PATH}"
-echo "=============================================="
-
-echo "[build-ios] Building web assets..."
+log "Building web assets..."
 npm run build
 
-echo "[build-ios] Syncing Capacitor iOS project..."
+log "Syncing Capacitor iOS project..."
 npx cap sync ios
 
 # Check for workspace AFTER Capacitor sync creates it (using -d for directory)
@@ -40,40 +31,72 @@ if [[ ! -d "ios/${XCODE_WORKSPACE}" ]]; then
   exit 1
 fi
 
-echo "[build-ios] Installing CocoaPods dependencies..."
-pushd ios/App >/dev/null
-pod install --repo-update
-popd >/dev/null
+if [[ ! -f "$EXPORT_OPTIONS_PLIST" ]]; then
+  echo "❌ Export options plist missing at $EXPORT_OPTIONS_PLIST" >&2
+  exit 1
+fi
 
-echo "[build-ios] Archiving app..."
-xcodebuild archive \
-  -workspace "ios/${XCODE_WORKSPACE}" \
-  -scheme "${XCODE_SCHEME}" \
-  -configuration "${CONFIGURATION}" \
+mkdir -p "$(dirname "$ARCHIVE_PATH")" "$EXPORT_PATH"
+
+log "Using workspace: ${WORKSPACE_PATH#"$PROJECT_ROOT/"}"
+log "Using scheme: $XCODE_SCHEME"
+log "Configuration: $CONFIGURATION"
+log "Archive path: $ARCHIVE_PATH"
+log "Export path: $EXPORT_PATH"
+
+log "Archiving iOS app..."
+if ! xcodebuild \
+  -workspace "$WORKSPACE_PATH" \
+  -scheme "$XCODE_SCHEME" \
+  -configuration "$CONFIGURATION" \
   -destination "generic/platform=iOS" \
-  -archivePath "${ARCHIVE_PATH}" \
+  -archivePath "$ARCHIVE_PATH" \
   -allowProvisioningUpdates \
-  clean archive
+  clean archive; then
+  echo "❌ xcodebuild archive failed" >&2
+  exit 1
+fi
 
-echo "[build-ios] Exporting IPA..."
-xcodebuild -exportArchive \
-  -archivePath "${ARCHIVE_PATH}" \
-  -exportOptionsPlist "${EXPORT_OPTIONS_PLIST}" \
-  -exportPath "${EXPORT_PATH}" \
-  -allowProvisioningUpdates
+if [[ ! -d "$ARCHIVE_PATH" ]]; then
+  echo "❌ Archive not created at ${ARCHIVE_PATH}" >&2
+  exit 1
+fi
+log "Archive created"
 
-IPA_PATH=$(find "${EXPORT_PATH}" -maxdepth 1 -name "*.ipa" | head -1)
+log "Exporting IPA..."
+if ! xcodebuild -exportArchive \
+  -archivePath "$ARCHIVE_PATH" \
+  -exportOptionsPlist "$EXPORT_OPTIONS_PLIST" \
+  -exportPath "$EXPORT_PATH" \
+  -allowProvisioningUpdates; then
+  echo "❌ xcodebuild exportArchive failed" >&2
+  exit 1
+fi
 
-if [[ -z "${IPA_PATH}" || ! -f "${IPA_PATH}" ]]; then
-  echo "❌ IPA not found in ${EXPORT_PATH}" >&2
+log "Selecting IPA..."
+IPA_PATH=$(find "$EXPORT_PATH" -maxdepth 1 -name "*.ipa" -type f -print0 | xargs -0 ls -t 2>/dev/null | head -1 || true)
+
+if [[ -z "$IPA_PATH" || ! -f "$IPA_PATH" ]]; then
+  echo "❌ CRITICAL: IPA file not found in ${EXPORT_PATH}" >&2
+  echo "   Contents of export directory:" >&2
+  ls -la "$EXPORT_PATH" 2>/dev/null || echo "   Export directory not found" >&2
+  exit 70
+fi
+
+IPA_SIZE=$(stat -f%z "$IPA_PATH" 2>/dev/null || stat -c%s "$IPA_PATH" 2>/dev/null || echo "0")
+if [[ "$IPA_SIZE" -lt 10000000 ]]; then
+  echo "❌ IPA file seems too small (${IPA_SIZE} bytes), likely corrupted" >&2
   exit 70
 fi
 
 export IPA_PATH
-printf "%s" "${IPA_PATH}" > "${EXPORT_PATH}/ipa_path.txt"
+printf "%s" "$IPA_PATH" > "$EXPORT_PATH/ipa_path.txt"
+log "IPA ready: ${IPA_PATH#"$PROJECT_ROOT/"} (${IPA_SIZE} bytes)"
 
-echo "=============================================="
-echo "✅ BUILD SUCCESSFUL"
-echo "Archive: ${ARCHIVE_PATH}"
-echo "IPA:     ${IPA_PATH}"
-echo "=============================================="
+cat <<SUCCESS
+==============================================
+✅ BUILD SUCCESSFUL
+Archive: ${ARCHIVE_PATH}
+IPA:     ${IPA_PATH}
+==============================================
+SUCCESS
