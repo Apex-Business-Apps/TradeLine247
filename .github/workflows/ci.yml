@@ -38,6 +38,7 @@ jobs:
           npm run -s verify:env:public
           npm run -s verify:app
           npm run -s verify:icons
+          npm run -s verify:console
       - name: Verify web artifact
         run: |
           test -f dist/index.html || (echo "dist/index.html missing" && exit 2)

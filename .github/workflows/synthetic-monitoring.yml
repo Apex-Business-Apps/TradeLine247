@@ -1,0 +1,86 @@
+name: Synthetic Monitoring
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check health endpoint
+        run: |
+          # Replace with your actual deployment URL
+          HEALTH_URL="${{ vars.BASE_URL }}/health"
+
+          echo "Checking health endpoint: $HEALTH_URL"
+
+          # Make request with timeout
+          response=$(curl -s -w "%{http_code}" --max-time 10 "$HEALTH_URL" || echo "000")
+
+          # Extract status code
+          status_code=$(echo "$response" | tail -c 3)
+          response_body=$(echo "$response" | head -n -1)
+
+          echo "Status code: $status_code"
+          echo "Response: $response_body"
+
+          # Check if status is 2xx (success)
+          if [[ $status_code -ge 200 && $status_code -lt 300 ]]; then
+            echo "✅ Health check passed"
+
+            # Parse JSON response for detailed checks
+            if echo "$response_body" | jq -e '.status == "ok"' > /dev/null; then
+              echo "✅ All health checks passed"
+              exit 0
+            else
+              echo "⚠️ Some health checks failed"
+              echo "$response_body" | jq '.checks'
+              exit 1
+            fi
+          else
+            echo "❌ Health check failed with status $status_code"
+            exit 1
+          fi
+
+  synthetic-call-flow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Simulate call flow
+        run: |
+          echo "🔄 Starting synthetic call flow test"
+
+          # This would simulate:
+          # 1. Hit public website
+          # 2. Trigger test webhook (in staging env)
+          # 3. Verify webhook received and stored
+          # 4. Confirm end-to-end flow
+
+          echo "📊 Synthetic monitoring placeholder"
+          echo "✅ Call flow simulation would run here"
+
+          # For now, just pass - implement actual synthetic tests
+          # when staging environment is available
+
+  alert-on-failure:
+    runs-on: ubuntu-latest
+    needs: [health-check, synthetic-call-flow]
+    if: failure()
+
+    steps:
+      - name: Send alert
+        run: |
+          echo "🚨 ALERT: Synthetic monitoring failed"
+          echo "One or more health checks failed"
+          echo "Check logs above for details"
+
+          # In production, integrate with:
+          # - Slack/Discord webhooks
+          # - PagerDuty/OpsGenie
+          # - Email notifications
+          # - SMS alerts
