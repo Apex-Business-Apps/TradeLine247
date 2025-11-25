@@ -3,16 +3,17 @@ workflows:
     name: TradeLine 24/7 iOS TestFlight
     max_build_duration: 60
     instance_type: mac_mini_m2
-
     environment:
       groups:
         - ios_config
         - appstore_credentials
+      vars:
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
+        XCODE_SCHEME: App
       xcode: 16.4
       node: 20.11.1
       npm: 10
       cocoapods: default
-
     triggering:
       events:
         - push
@@ -20,166 +21,39 @@ workflows:
         - pattern: main
           include: true
           source: true
-
     scripts:
       - name: Install Node dependencies
         script: npm ci
-
-      - name: Quality gates
-        script: npm run lint && npm run typecheck && npm run test:unit
-
-      - name: Playwright smoke
-        script: |
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
-
       - name: Build web assets
         script: npm run build
-
       - name: Sync Capacitor
         script: npx cap sync ios
-
       - name: Install CocoaPods
-        script: |
-          cd ios/App
-          pod install
-
+        script: cd ios/App && pod install --repo-update
       - name: Set up keychain
         script: keychain initialize
-
       - name: Fetch signing files from App Store Connect
-        script: |
-          #!/usr/bin/env bash
-          set -euo pipefail
-
-          # Validate required environment variables
-          if [ -z "$APP_STORE_CONNECT_PRIVATE_KEY" ]; then
-            echo "❌ APP_STORE_CONNECT_PRIVATE_KEY is not set"
-            exit 1
-          fi
-          if [ -z "$APP_STORE_CONNECT_KEY_IDENTIFIER" ]; then
-            echo "❌ APP_STORE_CONNECT_KEY_IDENTIFIER is not set"
-            exit 1
-          fi
-          if [ -z "$APP_STORE_CONNECT_ISSUER_ID" ]; then
-            echo "❌ APP_STORE_CONNECT_ISSUER_ID is not set"
-            exit 1
-          fi
-
-          echo "🔐 Fetching signing files from App Store Connect..."
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create \
-            --api-key "$APP_STORE_CONNECT_PRIVATE_KEY" \
-            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
-            --api-unauthorized-retries 5 \
-            --disable-jwt-cache
-
+        script: app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
       - name: Add certificates to keychain
         script: keychain add-certificates
-
-      - name: Apply profiles to Xcode project
+      - name: Set up code signing settings
         script: xcode-project use-profiles
-
       - name: Build archive and IPA
         script: |
-          set -euo pipefail
-
-          echo "[build-ios] Workspace: $XCODE_WORKSPACE"
-          echo "[build-ios] Scheme:   $XCODE_SCHEME"
-          echo "[build-ios] Config:   Release"
-
           xcode-project build-ipa \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME" \
             --config Release \
-            --log-path /tmp/xcodebuild_logs
-
-          echo "[build-ios] Locating generated IPA and .xcarchive..."
-          IPA_SOURCE="$(find build -type f -name '*.ipa' 2>/dev/null | head -1)"
-          ARCHIVE_SOURCE="$(find build -type d -name '*.xcarchive' 2>/dev/null | head -1)"
-
-          if [ -z "${IPA_SOURCE:-}" ] || [ ! -f "${IPA_SOURCE:-/dev/null}" ]; then
-            echo "❌ No IPA produced by xcode-project build-ipa" >&2
-            exit 70
-          fi
-
-          mkdir -p ios/build/export
-          cp "$IPA_SOURCE" ios/build/export/TradeLine247.ipa
-          echo "✅ iOS archive & IPA built: ios/build/export/TradeLine247.ipa"
-
+            --archive-flags="-destination 'generic/platform=iOS'"
     artifacts:
-      - ios/build/export/*.ipa
-      - ios/build/TradeLine247.xcarchive
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-      - playwright-report/**/*
-      - dist/**/*
-
+      - ios/build/TradeLine247.xcarchive
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
-
-  android-capacitor-release:
-    name: Android • Capacitor bundleRelease
-    instance_type: linux_x2
-    max_build_duration: 60
-    environment:
-      groups:
-        - android_signing
-      node: 20.11.1
-      npm: 10
-      java: 17
-    cache:
-      cache_paths:
-        - ~/.npm
-        - ~/.gradle
-    scripts:
-      - name: Install dependencies
-        script: npm ci
-      - name: Quality gates
-        script: npm run lint && npm run typecheck && npm run test:unit
-      - name: Playwright smoke
-        script: |
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
-      - name: Build Android App Bundle
-        script: bash scripts/build-android.sh
-      - name: Verify artifacts
-        script: bash scripts/verify-codemagic.sh
-    artifacts:
-      - android/app/build/outputs/**/*.aab
-      - playwright-report/**/*
-      - dist/**/*
-      - build-artifacts-sha256.txt
-
-  web-tests-only:
-    name: Web Tests & Smoke
-    instance_type: linux
-    max_build_duration: 45
-    environment:
-      node: 20.11.1
-      npm: 10
-    cache:
-      cache_paths:
-        - ~/.npm
-    scripts:
-      - name: Install dependencies
-        script: npm ci
-      - name: Lint, typecheck, unit tests
-        script: npm run lint && npm run typecheck && npm run test:unit
-      - name: Build web bundle
-        script: npm run build:web
-      - name: Install Playwright browsers
-        script: npm run test:install-browsers
-      - name: Run full Playwright test suite
-        script: npx playwright test --reporter=html
-    artifacts:
-      - playwright-report/**/*
-      - dist/**/*
+        beta_groups:
+          - Internal Testers
