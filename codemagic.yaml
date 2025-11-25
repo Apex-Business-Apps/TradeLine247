@@ -75,30 +75,30 @@ workflows:
           mkdir -p ios/build/export
 
           cat >"${EXPORT_OPTIONS}" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>method</key>
-  <string>app-store</string>
-  <key>signingStyle</key>
-  <string>manual</string>
-  <key>teamID</key>
-  <string>${TEAM_ID}</string>
-  <key>provisioningProfiles</key>
-  <dict>
-    <key>${BUNDLE_ID}</key>
-    <string>${PROFILE_SPECIFIER}</string>
-  </dict>
-  <key>uploadSymbols</key>
-  <true/>
-  <key>stripSwiftSymbols</key>
-  <true/>
-  <key>compileBitcode</key>
-  <false/>
-</dict>
-</plist>
-EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>${TEAM_ID}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>${BUNDLE_ID}</key>
+              <string>${PROFILE_SPECIFIER}</string>
+            </dict>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>compileBitcode</key>
+            <false/>
+          </dict>
+          </plist>
+          EOF
 
           echo "[build-ios] Archiving with manual signing..."
           xcodebuild \
