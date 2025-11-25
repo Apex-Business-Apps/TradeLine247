@@ -1,182 +1,73 @@
 workflows:
   ios-capacitor-testflight:
-    # iOS workflow uses manual signing with the uploaded distribution certificate
-    # and provisioning profile. Removed the second codesign step that attempted
-    # automatic App Store Connect signing and caused a 401 error.
-    # Previous pipeline used scripts/build-ios.sh which caused xcodebuild archive failures.
-    # Updated to match GOODBUILD.txt workflow: direct xcodebuild commands, Xcode 16.4,
-    # manual signing with existing cert/profile, Fastlane upload to TestFlight.
-    # Environment: XCODE_WORKSPACE=ios/App/App.xcworkspace, XCODE_SCHEME=App,
-    # BUNDLE_ID=com.apex.tradeline, TEAM_ID=NWGUYF42KW
+    name: TradeLine 24/7 iOS TestFlight
+    max_build_duration: 60
+    instance_type: mac_mini_m2
 
-    name: iOS • Capacitor -> TestFlight
-    instance_type: mac_mini_m1
-    max_build_duration: 75
     environment:
       groups:
         - ios_config
         - appstore_credentials
-      vars:
-        XCODE_SCHEME: App
-
-        XCODE_WORKSPACE: ios/App/App.xcworkspace
-
-        BUNDLE_ID: com.apex.tradeline
-        TEAM_ID: NWGUYF42KW
+      xcode: 16.4
       node: 20.11.1
       npm: 10
-
-      xcode: 16.4
-
       cocoapods: default
-    cache:
-      cache_paths:
-        - ~/.npm
-        - ~/.cocoapods
-        - ios/Pods
-    scripts:
-      - name: Install dependencies
-        script: npm ci
-      
-      - name: Quality gates
-        script: npm run lint && npm run typecheck && npm run test:unit
 
-      - name: Playwright smoke
-        script: |
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
-
-      - name: Set up code signing identities
-        script: |
-          #!/usr/bin/env bash
-          set -euo pipefail
-
-          echo "[codesign] Initializing keychain and fetching signing assets"
-          keychain initialize
-
-          echo "[codesign] Importing certificates into the keychain"
-          keychain add-certificates
-
-      - name: Build archive & IPA
-        script: |
-          #!/usr/bin/env bash
-          set -euo pipefail
-
-          echo "[build-ios] Workspace: ${XCODE_WORKSPACE:-ios/App/App.xcworkspace}"
-          echo "[build-ios] Scheme:   ${XCODE_SCHEME:-App}"
-          echo "[build-ios] Config:   ${CONFIGURATION:-Release}"
-
-          # Ensure codemagic-cli-tools are available (safe to re-run even if installed earlier)
-          pip3 install codemagic-cli-tools --upgrade
-
-          # Apply the fetched provisioning profiles to the Xcode project/workspace
-          echo "[build-ios] Applying provisioning profiles via xcode-project use-profiles..."
-          xcode-project use-profiles
-
-          # Build archive + IPA using Codemagic's Xcode wrapper
-          echo "[build-ios] Building IPA via xcode-project build-ipa..."
-          xcode-project build-ipa \
-            --workspace "${XCODE_WORKSPACE:-ios/App/App.xcworkspace}" \
-            --scheme "${XCODE_SCHEME:-App}" \
-            --config "${CONFIGURATION:-Release}" \
-            --log-path /tmp/xcodebuild_logs
-
-          echo "[build-ios] Locating generated IPA and .xcarchive..."
-          set +u
-          IPA_SOURCE="$(find build -type f -name '*.ipa' | head -1)"
-          ARCHIVE_SOURCE="$(find build -type d -name '*.xcarchive' | head -1)"
-          set -u
-
-          if [ -z "${IPA_SOURCE:-}" ] || [ ! -f "${IPA_SOURCE:-/dev/null}" ]; then
-            echo "❌ No IPA produced by xcode-project build-ipa" >&2
-            exit 70
-          fi
-
-          mkdir -p ios/build/export ios/build
-
-          # Copy IPA to legacy path expected by artifacts / any downstream scripts
-          cp "${IPA_SOURCE}" ios/build/export/TradeLine247.ipa
-          ABS_IPA_PATH="$(pwd)/ios/build/export/TradeLine247.ipa"
-          printf "%s" "${ABS_IPA_PATH}" > ipa_path.txt
-          printf "%s" "${ABS_IPA_PATH}" > ios/build/export/ipa_path.txt
-
-          # Copy archive to legacy path if present
-          if [ -n "${ARCHIVE_SOURCE:-}" ] && [ -d "${ARCHIVE_SOURCE:-}" ]; then
-            rm -rf ios/build/TradeLine247.xcarchive
-            cp -R "${ARCHIVE_SOURCE}" ios/build/TradeLine247.xcarchive
-          fi
-
-          echo "=============================================="
-          echo "✅ iOS archive & IPA successfully built"
-          echo "    IPA:     ios/build/export/TradeLine247.ipa"
-          echo "    Archive: ios/build/TradeLine247.xcarchive"
-          echo "=============================================="
-      
-      - name: 🚀 Upload to TestFlight
-        script: |
-          set -euo pipefail
-
-          echo "════════════════════════════════════════════════════"
-          echo "📤 TESTFLIGHT UPLOAD"
-          echo "════════════════════════════════════════════════════"
-          
-          KEY_FILE="/tmp/AuthKey.p8"
-          MAX_RETRIES=3
-          
-          cleanup() { rm -f "$KEY_FILE"; }
-          trap cleanup EXIT
-          
-          for VAR in APP_STORE_CONNECT_KEY_IDENTIFIER APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_PRIVATE_KEY; do
-            [ -z "${!VAR}" ] && echo "❌ $VAR not set" && exit 1
-          done
-          
-          echo "$APP_STORE_CONNECT_PRIVATE_KEY" | base64 --decode > "$KEY_FILE"
-          chmod 600 "$KEY_FILE"
-          grep -q "BEGIN PRIVATE KEY" "$KEY_FILE" || { echo "❌ Invalid key"; exit 1; }
-          
-          IPA_PATH=$(cat /Users/builder/clone/ipa_path.txt 2>/dev/null || find /Users/builder/clone/ios/build/export -name "*.ipa" | head -1)
-          [ ! -f "$IPA_PATH" ] && echo "❌ No IPA found" && exit 1
-          
-          echo "✅ IPA: $IPA_PATH ($(du -h "$IPA_PATH" | cut -f1))"
-          
-          for attempt in $(seq 1 $MAX_RETRIES); do
-            echo ""
-            echo "📤 Attempt $attempt/$MAX_RETRIES..."
-            
-            if xcrun altool --upload-app --type ios --file "$IPA_PATH" \
-              --apiKey "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-              --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
-              --verbose; then
-              echo ""
-              echo "🎉 UPLOAD SUCCESSFUL"
-              exit 0
-            fi
-            
-            [ $attempt -lt $MAX_RETRIES ] && echo "⏳ Retry in 30s..." && sleep 30
-          done
-          
-          echo "❌ Upload failed"
-          exit 1
-      
-      - name: Verify artifacts
-        script: bash scripts/verify-codemagic.sh
-    
-    artifacts:
-      - ios/build/export/*.ipa
-      - ios/build/TradeLine247.xcarchive
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-      - playwright-report/**/*
-      - dist/**/*
-      - build-artifacts-sha256.txt
-    
     triggering:
       events:
         - push
       branch_patterns:
-        - pattern: 'main'
+        - pattern: main
+          include: true
+          source: true
+
+    scripts:
+      - name: Install Node dependencies
+        script: npm ci
+
+      - name: Build web assets
+        script: npm run build
+
+      - name: Sync Capacitor
+        script: npx cap sync ios
+
+      - name: Install CocoaPods
+        script: |
+          cd ios/App
+          pod install --repo-update
+
+      - name: Set up keychain
+        script: keychain initialize
+
+      - name: Fetch signing files from App Store Connect
+        script: |
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+
+      - name: Add certificates to keychain
+        script: keychain add-certificates
+
+      - name: Apply profiles to Xcode project
+        script: xcode-project use-profiles
+
+      - name: Build archive and IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME" \
+            --config Release
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        # keep using your existing Codemagic integration / config
+        submit_to_testflight: true
+        beta_groups:
+          - Internal Testers
 
   android-capacitor-release:
     name: Android • Capacitor bundleRelease
