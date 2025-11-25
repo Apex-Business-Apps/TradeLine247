@@ -49,9 +49,30 @@ workflows:
 
       - name: Fetch signing files from App Store Connect
         script: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          # Validate required environment variables
+          if [ -z "$APP_STORE_CONNECT_PRIVATE_KEY" ]; then
+            echo "❌ APP_STORE_CONNECT_PRIVATE_KEY is not set"
+            exit 1
+          fi
+          if [ -z "$APP_STORE_CONNECT_KEY_IDENTIFIER" ]; then
+            echo "❌ APP_STORE_CONNECT_KEY_IDENTIFIER is not set"
+            exit 1
+          fi
+          if [ -z "$APP_STORE_CONNECT_ISSUER_ID" ]; then
+            echo "❌ APP_STORE_CONNECT_ISSUER_ID is not set"
+            exit 1
+          fi
+
+          echo "🔐 Fetching signing files from App Store Connect..."
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create \
+            --api-key "$APP_STORE_CONNECT_PRIVATE_KEY" \
+            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
             --api-unauthorized-retries 5 \
             --disable-jwt-cache
 
