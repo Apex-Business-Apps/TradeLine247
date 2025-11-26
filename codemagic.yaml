@@ -7,6 +7,7 @@ workflows:
       groups:
         - ios_config
         - appstore_credentials
+
       vars:
         XCODE_WORKSPACE: ios/App/App.xcworkspace
         XCODE_SCHEME: App
