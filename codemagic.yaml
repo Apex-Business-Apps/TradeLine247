@@ -16,6 +16,13 @@ workflows:
       node: 20.11.1
       npm: 10
       cocoapods: default
+      # ═══════════════════════════════════════════════════════════════
+      # CRITICAL: This ios_signing block triggers automatic signing
+      # This is EXACTLY what GOODBUILD (Oct 27) used - verified from logs
+      # ═══════════════════════════════════════════════════════════════
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.apex.tradeline
 
     cache:
       cache_paths:
@@ -32,47 +39,62 @@ workflows:
           source: true
 
     scripts:
-      # ===== PHASE 1: WEB BUILD =====
+      # ════════════════════════════════════════════════════════════════
+      # PHASE 1: DEPENDENCIES & QUALITY GATES
+      # ════════════════════════════════════════════════════════════════
       - name: Install Node dependencies
-        script: npm ci
+        script: |
+          set -eo pipefail
+          npm ci
 
       - name: Quality gates
-        script: npm run lint && npm run typecheck && npm run test:unit
+        script: |
+          set -eo pipefail
+          npm run lint && npm run typecheck && npm run test:unit
 
       - name: Playwright smoke
         script: |
+          set -eo pipefail
           npx playwright install --with-deps chromium
           npm run test:e2e:smoke
 
+      # ════════════════════════════════════════════════════════════════
+      # PHASE 2: WEB BUILD
+      # ════════════════════════════════════════════════════════════════
       - name: Build web assets
-        script: npm run build
+        script: |
+          set -eo pipefail
+          npm run build
 
-      # ===== PHASE 2: iOS NATIVE PREP =====
+      # ════════════════════════════════════════════════════════════════
+      # PHASE 3: iOS NATIVE PREPARATION
+      # ════════════════════════════════════════════════════════════════
       - name: Sync Capacitor
-        script: npx cap sync ios
+        script: |
+          set -eo pipefail
+          npx cap sync ios
 
       - name: Install CocoaPods
-        script: cd ios/App && pod install --repo-update
-
-      # ===== PHASE 3: CODE SIGNING (THIS WAS MISSING!) =====
-      - name: Set up keychain
-        script: keychain initialize
-
-      - name: Fetch signing files from App Store Connect
         script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
+          set -eo pipefail
+          cd ios/App && pod install --repo-update
 
-      - name: Add certificates to keychain
-        script: keychain add-certificates
+      # ════════════════════════════════════════════════════════════════
+      # PHASE 4: CODE SIGNING (Handled by ios_signing block above)
+      # These steps execute AFTER ios_signing auto-provisions certificates
+      # ════════════════════════════════════════════════════════════════
+      - name: Configure code signing
+        script: |
+          set -eo pipefail
+          xcode-project use-profiles
 
-      - name: Set up code signing settings
-        script: xcode-project use-profiles
-
-      # ===== PHASE 4: BUILD IPA =====
+      # ════════════════════════════════════════════════════════════════
+      # PHASE 5: BUILD ARCHIVE & IPA
+      # Matches GOODBUILD exactly: xcodebuild archive then export
+      # ════════════════════════════════════════════════════════════════
       - name: Build archive and IPA
         script: |
+          set -eo pipefail
           xcode-project build-ipa \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME" \
@@ -82,7 +104,7 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-      - ios/build/TradeLine247.xcarchive
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
       - playwright-report/**/*
       - dist/**/*
 
