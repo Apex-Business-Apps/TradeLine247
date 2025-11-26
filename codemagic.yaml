@@ -1,8 +1,8 @@
 workflows:
   ios-capacitor-testflight:
     name: TradeLine 24/7 iOS TestFlight
-    instance_type: mac_mini_m2
     max_build_duration: 60
+    instance_type: mac_mini_m2
 
     environment:
       groups:
@@ -16,6 +16,9 @@ workflows:
       node: 20.11.1
       npm: 10
       cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.apex.tradeline
 
     cache:
       cache_paths:
@@ -32,9 +35,7 @@ workflows:
           source: true
 
     scripts:
-      # ─────────────────────────────────────────────────────────────
-      # PHASE 1: JS DEPENDENCIES & QUALITY GATES
-      # ─────────────────────────────────────────────────────────────
+      # PHASE 1 – JS deps & quality gates
       - name: Install Node dependencies
         script: |
           set -eo pipefail
@@ -51,111 +52,13 @@ workflows:
           npx playwright install --with-deps chromium
           npm run test:e2e:smoke
 
-      # ─────────────────────────────────────────────────────────────
-      # PHASE 2: WEB BUILD
-      # ─────────────────────────────────────────────────────────────
+      # PHASE 2 – Web build
       - name: Build web assets
         script: |
           set -eo pipefail
           npm run build
 
-      # ─────────────────────────────────────────────────────────────
-      # PHASE 3: CAPACITOR + COCOAPODS
-      # ─────────────────────────────────────────────────────────────
-      - name: Sync Capacitor
-        script: |
-          set -eo pipefail
-          npx cap sync ios
-
-      - name: Install CocoaPods
-        script: |
-          set -eo pipefail
-          cd ios/App
-          pod install --repo-update
-
-      # ─────────────────────────────────────────────────────────────
-      # PHASE 4: CODE SIGNING (SINGLE STRATEGY: CLI ONLY)
-      # ─────────────────────────────────────────────────────────────
-      - name: Initialize keychain
-        script: |
-          set -eo pipefail
-          keychain initialize
-
-      - name: Fetch signing files from App Store Connect
-        script: |
-          set -eo pipefail
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
-          keychain add-certificates
-
-      - name: Set up code signing in Xcode project
-        script: |
-          set -eo pipefail
-          xcode-project use-profiles
-
-      # ─────────────────────────────────────────────────────────────
-      # PHASE 5: BUILD ARCHIVE & IPA
-      # ─────────────────────────────────────────────────────────────
-      - name: Build archive and IPA
-        script: |
-          set -eo pipefail
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME" \
-            --config Release \
-            --archive-flags="-destination 'generic/platform=iOS'"
-
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - playwright-report/**/*
-      - dist/**/*
-
-    publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
-        beta_groups:
-          - Internal Testers
-        - pattern: main
-          include: true
-          source: true
-
-    scripts:
-      # ════════════════════════════════════════════════════════════════
-      # PHASE 1: DEPENDENCIES & QUALITY GATES
-      # ════════════════════════════════════════════════════════════════
-      - name: Install Node dependencies
-        script: |
-          set -eo pipefail
-          npm ci
-
-      - name: Quality gates
-        script: |
-          set -eo pipefail
-          npm run lint && npm run typecheck && npm run test:unit
-
-      - name: Playwright smoke
-        script: |
-          set -eo pipefail
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
-
-      # ════════════════════════════════════════════════════════════════
-      # PHASE 2: WEB BUILD
-      # ════════════════════════════════════════════════════════════════
-      - name: Build web assets
-        script: |
-          set -eo pipefail
-          npm run build
-
-      # ════════════════════════════════════════════════════════════════
-      # PHASE 3: iOS NATIVE PREPARATION
-      # ════════════════════════════════════════════════════════════════
+      # PHASE 3 – Capacitor & CocoaPods
       - name: Sync Capacitor
         script: |
           set -eo pipefail
@@ -166,19 +69,13 @@ workflows:
           set -eo pipefail
           cd ios/App && pod install --repo-update
 
-      # ════════════════════════════════════════════════════════════════
-      # PHASE 4: CODE SIGNING (Handled by ios_signing block above)
-      # These steps execute AFTER ios_signing auto-provisions certificates
-      # ════════════════════════════════════════════════════════════════
+      # PHASE 4 – Apply signing profiles (ios_signing does the fetching)
       - name: Configure code signing
         script: |
           set -eo pipefail
           xcode-project use-profiles
 
-      # ════════════════════════════════════════════════════════════════
-      # PHASE 5: BUILD ARCHIVE & IPA
-      # Matches GOODBUILD exactly: xcodebuild archive then export
-      # ════════════════════════════════════════════════════════════════
+      # PHASE 5 – Build archive & IPA
       - name: Build archive and IPA
         script: |
           set -eo pipefail
