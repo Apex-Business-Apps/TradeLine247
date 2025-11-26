@@ -1,10 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-// CI-specific timeout settings
-test.describe.configure({
-  timeout: process.env.CI ? 120000 : 60000, // 2 minutes in CI, 1 minute local
-});
+// Timeout settings are configured in playwright.config.ts
 
 test('a11y on home', async ({ page }) => {
   // Navigate with explicit wait - increased timeout for Windows CI
