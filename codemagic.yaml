@@ -3,190 +3,25 @@ workflows:
     name: TradeLine 24/7 iOS TestFlight
     max_build_duration: 60
     instance_type: mac_mini_m2
+
     environment:
       groups:
         - ios_config
         - appstore_credentials
-
       vars:
         XCODE_WORKSPACE: ios/App/App.xcworkspace
         XCODE_SCHEME: App
+        BUNDLE_ID: com.apex.tradeline
       xcode: 16.4
       node: 20.11.1
       npm: 10
       cocoapods: default
 
     cache:
-
       cache_paths:
-
         - ~/.npm
-
         - ~/.cocoapods
-
         - ios/Pods
-
-    scripts:
-
-      - name: Install dependencies
-
-        script: npm ci
-
-
-
-      - name: Quality gates
-
-        script: npm run lint && npm run typecheck && npm run test:unit
-
-
-
-      - name: Playwright smoke
-
-        script: |
-
-          npx playwright install --with-deps chromium
-
-          npm run test:e2e:smoke
-
-
-
-      - name: Build archive & IPA
-
-        script: bash scripts/build-ios.sh
-
-
-
-      - name: 🚀 Upload to TestFlight
-
-        script: |
-
-          set -euo pipefail
-
-
-
-          echo "════════════════════════════════════════════════════"
-
-          echo "📤 TESTFLIGHT UPLOAD"
-
-          echo "════════════════════════════════════════════════════"
-
-
-
-          # Setup
-
-          KEY_FILE="/tmp/AuthKey.p8"
-
-          MAX_RETRIES=3
-
-
-
-          cleanup() { rm -f "$KEY_FILE"; }
-
-          trap cleanup EXIT
-
-
-
-          # Validate
-
-          for VAR in APP_STORE_CONNECT_KEY_IDENTIFIER APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_PRIVATE_KEY; do
-
-            [ -z "${!VAR}" ] && echo "❌ $VAR not set" && exit 1
-
-          done
-
-
-
-          # Create key
-
-          echo "$APP_STORE_CONNECT_PRIVATE_KEY" | base64 --decode > "$KEY_FILE"
-
-          chmod 600 "$KEY_FILE"
-
-          grep -q "BEGIN PRIVATE KEY" "$KEY_FILE" || { echo "❌ Invalid key"; exit 1; }
-
-
-
-          # Find IPA
-
-          IPA_PATH=$(cat /Users/builder/clone/ipa_path.txt 2>/dev/null || find /Users/builder/clone/ios/build/export -name "*.ipa" | head -1)
-
-          [ ! -f "$IPA_PATH" ] && echo "❌ No IPA found" && exit 1
-
-
-
-          echo "✅ IPA: $IPA_PATH ($(du -h "$IPA_PATH" | cut -f1))"
-
-
-
-          # Upload with retry
-
-          for attempt in $(seq 1 $MAX_RETRIES); do
-
-            echo ""
-
-            echo "📤 Attempt $attempt/$MAX_RETRIES..."
-
-
-
-            if xcrun altool --upload-app --type ios --file "$IPA_PATH" \
-
-              --apiKey "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-
-              --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
-
-              --verbose; then
-
-              echo ""
-
-              echo "🎉 UPLOAD SUCCESSFUL"
-
-              exit 0
-
-            fi
-
-
-
-            [ $attempt -lt $MAX_RETRIES ] && echo "⏳ Retry in 30s..." && sleep 30
-
-          done
-
-
-
-          echo "❌ Upload failed"
-
-          exit 1
-
-
-
-      - name: Verify artifacts
-
-        script: bash scripts/verify-codemagic.sh
-
-
-
-    artifacts:
-
-      - ios/build/export/*.ipa
-
-      - ios/build/TradeLine247.xcarchive
-
-      - playwright-report/**/*
-
-      - dist/**/*
-
-      - build-artifacts-sha256.txt
-
-    publishing:
-
-      app_store_connect:
-
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-
-        submit_to_testflight: true
 
     triggering:
       events:
@@ -195,23 +30,47 @@ workflows:
         - pattern: main
           include: true
           source: true
+
     scripts:
+      # ===== PHASE 1: WEB BUILD =====
       - name: Install Node dependencies
         script: npm ci
+
+      - name: Quality gates
+        script: npm run lint && npm run typecheck && npm run test:unit
+
+      - name: Playwright smoke
+        script: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e:smoke
+
       - name: Build web assets
         script: npm run build
+
+      # ===== PHASE 2: iOS NATIVE PREP =====
       - name: Sync Capacitor
         script: npx cap sync ios
+
       - name: Install CocoaPods
         script: cd ios/App && pod install --repo-update
+
+      # ===== PHASE 3: CODE SIGNING (THIS WAS MISSING!) =====
       - name: Set up keychain
         script: keychain initialize
+
       - name: Fetch signing files from App Store Connect
-        script: app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+        script: |
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+
       - name: Add certificates to keychain
         script: keychain add-certificates
+
       - name: Set up code signing settings
         script: xcode-project use-profiles
+
+      # ===== PHASE 4: BUILD IPA =====
       - name: Build archive and IPA
         script: |
           xcode-project build-ipa \
@@ -219,10 +78,14 @@ workflows:
             --scheme "$XCODE_SCHEME" \
             --config Release \
             --archive-flags="-destination 'generic/platform=iOS'"
+
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - ios/build/TradeLine247.xcarchive
+      - playwright-report/**/*
+      - dist/**/*
+
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
