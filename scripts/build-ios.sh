@@ -14,6 +14,12 @@ echo "[build-ios] Configuration: ${CONFIGURATION}"
 echo "[build-ios] Archive path: ${ARCHIVE_PATH}"
 echo "[build-ios] Export path: ${EXPORT_PATH}"
 
+# Set build number to ensure it's higher than the previously uploaded version (2)
+# Use BUILD_NUMBER from Codemagic if available, otherwise default to 3
+# Temporarily disabled to ensure archive works first
+# BUILD_NUMBER="${BUILD_NUMBER:-3}"
+# echo "[build-ios] Using build number: ${BUILD_NUMBER}"
+
 # Archive
 echo "[build-ios] Archiving iOS app..."
 xcodebuild archive \
