@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Use environment variables from Codemagic
-WORKSPACE="${XCODE_WORKSPACE}"
-SCHEME="${XCODE_SCHEME}"
-CONFIGURATION="Release"
-ARCHIVE_PATH="/Users/builder/clone/ios/build/TradeLine247.xcarchive"
-EXPORT_PATH="/Users/builder/clone/ios/build/export"
+WORKSPACE="${XCODE_WORKSPACE:-ios/App/App.xcworkspace}"
+SCHEME="${XCODE_SCHEME:-App}"
+CONFIGURATION="${CONFIGURATION:-Release}"
+PROFILE_SPECIFIER="TL247_mobpro_tradeline_01"
+EXPORT_OPTIONS="/tmp/exportOptions.plist"
 
-echo "[build-ios] Using workspace: ${WORKSPACE}"
-echo "[build-ios] Using scheme: ${SCHEME}"
-echo "[build-ios] Configuration: ${CONFIGURATION}"
-echo "[build-ios] Archive path: ${ARCHIVE_PATH}"
-echo "[build-ios] Export path: ${EXPORT_PATH}"
+echo "[build-ios] Workspace: ${WORKSPACE}"
+echo "[build-ios] Scheme:   ${SCHEME}"
+echo "[build-ios] Config:   ${CONFIGURATION}"
 
 # Verify that CocoaPods has been installed (xcconfig files should exist)
 if [[ ! -f "ios/App/Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig" ]]; then
@@ -52,48 +49,64 @@ xcodebuild archive \
 # Export IPA
 echo "[build-ios] Exporting IPA..."
 
-# Create export options plist
-cat > /tmp/exportOptions.plist <<EOF
+cat >"${EXPORT_OPTIONS}" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>method</key>
-    <string>app-store</string>
-    <key>teamID</key>
-    <string>${TEAM_ID}</string>
-    <key>uploadBitcode</key>
-    <false/>
-    <key>uploadSymbols</key>
-    <true/>
-    <key>compileBitcode</key>
-    <false/>
-    <key>signingStyle</key>
-    <string>manual</string>
-    <key>signingCertificate</key>
-    <string>Apple Distribution</string>
-    <key>provisioningProfiles</key>
-    <dict>
-        <key>${BUNDLE_ID}</key>
-        <string>TL247_mobpro_tradeline_01</string>
-    </dict>
+  <key>method</key>
+  <string>app-store</string>
+  <key>signingStyle</key>
+  <string>manual</string>
+  <key>teamID</key>
+  <string>${TEAM_ID}</string>
+  <key>provisioningProfiles</key>
+  <dict>
+    <key>${BUNDLE_ID}</key>
+    <string>${PROFILE_SPECIFIER}</string>
+  </dict>
+  <key>uploadSymbols</key>
+  <true/>
+  <key>stripSwiftSymbols</key>
+  <true/>
+  <key>compileBitcode</key>
+  <false/>
 </dict>
 </plist>
 EOF
 
-xcodebuild -exportArchive \
-  -archivePath "${ARCHIVE_PATH}" \
-  -exportPath "${EXPORT_PATH}" \
-  -exportOptionsPlist /tmp/exportOptions.plist \
-  -allowProvisioningUpdates \
-  | xcpretty
+echo "[build-ios] Archiving with manual signing..."
+xcodebuild \
+  -workspace "${WORKSPACE}" \
+  -scheme "${SCHEME}" \
+  -configuration "${CONFIGURATION}" \
+  -archivePath ios/build/TradeLine247.xcarchive \
+  CODE_SIGN_STYLE=Manual \
+  DEVELOPMENT_TEAM="${TEAM_ID}" \
+  PROVISIONING_PROFILE_SPECIFIER="${PROFILE_SPECIFIER}" \
+  archive
 
-# Find and save IPA path
-IPA_PATH=$(find "${EXPORT_PATH}" -name "*.ipa" | head -1)
-if [ -z "$IPA_PATH" ]; then
-  echo "[build-ios] ERROR: No IPA found in ${EXPORT_PATH}"
-  exit 1
+echo "[build-ios] Exporting IPA via xcodebuild -exportArchive..."
+xcodebuild -exportArchive \
+  -archivePath ios/build/TradeLine247.xcarchive \
+  -exportOptionsPlist "${EXPORT_OPTIONS}" \
+  -exportPath ios/build/export
+
+echo "[build-ios] Locating generated IPA..."
+IPA_SOURCE="$(find ios/build/export -type f -name '*.ipa' | head -1)"
+
+if [ -z "${IPA_SOURCE:-}" ] || [ ! -f "${IPA_SOURCE:-/dev/null}" ]; then
+  echo "❌ No IPA produced by xcodebuild export" >&2
+  exit 70
 fi
 
-echo "[build-ios] ✅ IPA created: ${IPA_PATH}"
-echo "${IPA_PATH}" > /Users/builder/clone/ipa_path.txt
+cp "${IPA_SOURCE}" ios/build/export/TradeLine247.ipa
+ABS_IPA_PATH="$(pwd)/ios/build/export/TradeLine247.ipa"
+printf "%s" "${ABS_IPA_PATH}" > ipa_path.txt
+printf "%s" "${ABS_IPA_PATH}" > ios/build/export/ipa_path.txt
+
+echo "=============================================="
+echo "✅ iOS archive & IPA successfully built"
+echo "    IPA:     ios/build/export/TradeLine247.ipa"
+echo "    Archive: ios/build/TradeLine247.xcarchive"
+echo "=============================================="
