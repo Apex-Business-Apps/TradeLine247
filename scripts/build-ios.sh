@@ -14,11 +14,25 @@ echo "[build-ios] Configuration: ${CONFIGURATION}"
 echo "[build-ios] Archive path: ${ARCHIVE_PATH}"
 echo "[build-ios] Export path: ${EXPORT_PATH}"
 
+# Verify that CocoaPods has been installed (xcconfig files should exist)
+if [[ ! -f "ios/App/Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig" ]]; then
+  echo "[build-ios] ERROR: CocoaPods xcconfig file not found!"
+  echo "[build-ios] Make sure 'pod install --repo-update' was run in ios/App directory before this script."
+  exit 1
+fi
+echo "[build-ios] ✅ CocoaPods xcconfig files found"
+
 # Set build number to ensure it's higher than the previously uploaded version (2)
 # Use BUILD_NUMBER from Codemagic if available, otherwise default to 3
-# Temporarily disabled to ensure archive works first
-# BUILD_NUMBER="${BUILD_NUMBER:-3}"
-# echo "[build-ios] Using build number: ${BUILD_NUMBER}"
+# Can be disabled by setting DISABLE_BUILD_NUMBER=true for debugging
+if [[ "${DISABLE_BUILD_NUMBER:-false}" != "true" ]]; then
+  BUILD_NUMBER="${BUILD_NUMBER:-3}"
+  echo "[build-ios] Using build number: ${BUILD_NUMBER}"
+  XCODEBUILD_EXTRA_ARGS="CURRENT_PROJECT_VERSION=${BUILD_NUMBER}"
+else
+  echo "[build-ios] Build number setting disabled (DISABLE_BUILD_NUMBER=true)"
+  XCODEBUILD_EXTRA_ARGS=""
+fi
 
 # Archive
 echo "[build-ios] Archiving iOS app..."
@@ -28,6 +42,7 @@ xcodebuild archive \
   -configuration "${CONFIGURATION}" \
   -archivePath "${ARCHIVE_PATH}" \
   -allowProvisioningUpdates \
+  ${XCODEBUILD_EXTRA_ARGS} \
   CODE_SIGN_STYLE=Manual \
   CODE_SIGN_IDENTITY="Apple Distribution: 2755419 Alberta Ltd (NWGUYF42KW)" \
   DEVELOPMENT_TEAM="${TEAM_ID}" \
