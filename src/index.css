@@ -1721,3 +1721,36 @@ button[class*="orange"]:hover:not([class*="outline"]) {
     background-attachment: scroll, scroll, scroll;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE BACKGROUND FIX — HeroSection
+   Added: 2025-11-27
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .hero-bg,
+  [class*="hero-section"],
+  [class*="HeroSection"] {
+    background-attachment: scroll !important;
+    background-position: center 20% !important;
+    background-size: cover !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important; /* Dynamic viewport height for iOS Safari */
+  }
+}
+
+@media (max-width: 375px) {
+  .hero-bg,
+  [class*="hero-section"],
+  [class*="HeroSection"] {
+    background-position: center 15% !important;
+    background-size: 120% auto !important;
+  }
+}
+
+/* Hero text contrast for readability */
+.hero-text,
+.hero-headline,
+.hero-tagline {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
