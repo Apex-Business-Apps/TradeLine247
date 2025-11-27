@@ -9,9 +9,6 @@ workflows:
     instance_type: mac_mini_m2
     max_build_duration: 75
 
-    integrations:
-      app_store_connect: codemagic
-
     environment:
       groups:
         - ios_config
@@ -117,10 +114,3 @@ workflows:
       - build/ios/ipa/*.ipa
       - build/ios/archive/*.xcarchive
       - /tmp/xcodebuild_logs/*.log
-
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
-        beta_groups:
-          - "Internal Testers"
