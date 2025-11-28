@@ -136,11 +136,13 @@ workflows:
 
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
 
-        submit_to_testflight: true
+        # Internal-only distribution: upload without automatic TestFlight submission.
 
-        beta_groups:
+        # submit_to_testflight: true
 
-          - Internal Testers
+        # beta_groups:
+
+        #   - Internal Testers
 
 
     triggering:
