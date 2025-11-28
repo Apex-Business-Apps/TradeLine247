@@ -1,5 +1,4 @@
 workflows:
-
   ios-capacitor-testflight:
 
     name: TradeLine 24/7 iOS TestFlight
@@ -9,13 +8,9 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
-
       groups:
-
         - ios_config
-
         - appstore_credentials
-
       vars:
 
         XCODE_WORKSPACE: ios/App/App.xcworkspace
@@ -27,7 +22,6 @@ workflows:
       xcode: 16.4
 
       node: 20.11.1
-
       npm: 10
 
       cocoapods: default
@@ -39,15 +33,11 @@ workflows:
         bundle_identifier: com.apex.tradeline
 
     cache:
-
       cache_paths:
-
         - ~/.npm
-
         - ~/.cocoapods
-
         - ios/Pods
-
+    
     scripts:
 
       - name: Install Node dependencies
@@ -67,13 +57,11 @@ workflows:
           npm run lint && npm run typecheck && npm run test:unit
 
       - name: Playwright smoke
-
         script: |
 
           set -eo pipefail
 
           npx playwright install --with-deps chromium
-
           npm run test:e2e:smoke
 
       - name: Build web assets
@@ -93,7 +81,6 @@ workflows:
           npx cap sync ios
 
       - name: Install CocoaPods
-
         script: |
 
           set -eo pipefail
@@ -137,12 +124,10 @@ workflows:
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
 
       - playwright-report/**/*
-
       - dist/**/*
 
 
     publishing:
-
       app_store_connect:
 
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
@@ -159,11 +144,8 @@ workflows:
 
 
     triggering:
-
       events:
-
         - push
-
       branch_patterns:
 
         - pattern: main
@@ -172,118 +154,66 @@ workflows:
 
           source: true
 
-
-
+  # ────────────────────────────────────────────────────────────────────────────
+  # ANDROID BUILD
+  # ────────────────────────────────────────────────────────────────────────────
   android-capacitor-release:
-
     name: Android • Capacitor bundleRelease
-
     instance_type: linux_x2
-
     max_build_duration: 60
-
     environment:
-
       groups:
-
         - android_signing
-
       node: 20.11.1
-
       npm: 10
-
       java: 17
-
     cache:
-
       cache_paths:
-
         - ~/.npm
-
         - ~/.gradle
-
     scripts:
-
       - name: Install dependencies
-
         script: npm ci
-
       - name: Quality gates
-
         script: npm run lint && npm run typecheck && npm run test:unit
-
       - name: Playwright smoke
-
         script: |
-
           npx playwright install --with-deps chromium
-
           npm run test:e2e:smoke
-
       - name: Build Android App Bundle
-
         script: bash scripts/build-android.sh
-
       - name: Verify artifacts
-
         script: bash scripts/verify-codemagic.sh
-
     artifacts:
-
       - android/app/build/outputs/**/*.aab
-
       - playwright-report/**/*
-
       - dist/**/*
-
       - build-artifacts-sha256.txt
 
-
-
+  # ────────────────────────────────────────────────────────────────────────────
+  # WEB TESTS
+  # ────────────────────────────────────────────────────────────────────────────
   web-tests-only:
-
     name: Web Tests & Smoke
-
     instance_type: linux
-
     max_build_duration: 45
-
     environment:
-
       node: 20.11.1
-
       npm: 10
-
     cache:
-
       cache_paths:
-
         - ~/.npm
-
     scripts:
-
       - name: Install dependencies
-
         script: npm ci
-
       - name: Lint, typecheck, unit tests
-
         script: npm run lint && npm run typecheck && npm run test:unit
-
       - name: Build web bundle
-
         script: npm run build:web
-
       - name: Install Playwright browsers
-
         script: npm run test:install-browsers
-
       - name: Run full Playwright test suite
-
         script: npx playwright test --reporter=html
-
     artifacts:
-
       - playwright-report/**/*
-
       - dist/**/*
