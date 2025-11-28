@@ -19,17 +19,9 @@ if [[ ! -f "ios/App/Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig
 fi
 echo "[build-ios] ✅ CocoaPods xcconfig files found"
 
-# Set build number to ensure it's higher than the previously uploaded version (2)
-# Use BUILD_NUMBER from Codemagic if available, otherwise default to 3
-# Can be disabled by setting DISABLE_BUILD_NUMBER=true for debugging
-if [[ "${DISABLE_BUILD_NUMBER:-false}" != "true" ]]; then
-  BUILD_NUMBER="${BUILD_NUMBER:-3}"
-  echo "[build-ios] Using build number: ${BUILD_NUMBER}"
-  XCODEBUILD_EXTRA_ARGS="CURRENT_PROJECT_VERSION=${BUILD_NUMBER}"
-else
-  echo "[build-ios] Build number setting disabled (DISABLE_BUILD_NUMBER=true)"
-  XCODEBUILD_EXTRA_ARGS=""
-fi
+# Build number is now set in Info.plist by scripts/set-ios-version-from-codemagic.sh
+# This script no longer handles versioning to avoid conflicts
+XCODEBUILD_EXTRA_ARGS=""
 
 # Archive
 echo "[build-ios] Archiving iOS app..."
@@ -39,7 +31,6 @@ xcodebuild archive \
   -configuration "${CONFIGURATION}" \
   -archivePath "${ARCHIVE_PATH}" \
   -allowProvisioningUpdates \
-  ${XCODEBUILD_EXTRA_ARGS} \
   CODE_SIGN_STYLE=Manual \
   CODE_SIGN_IDENTITY="Apple Distribution: 2755419 Alberta Ltd (NWGUYF42KW)" \
   DEVELOPMENT_TEAM="${TEAM_ID}" \
