@@ -19,11 +19,6 @@ workflows:
       xcode: 16.4
       cocoapods: default
     
-    # ✅ CRITICAL: This enables automatic code signing (like GOODBUILD #77)
-    ios_signing:
-      distribution_type: app_store
-      bundle_identifier: com.apex.tradeline
-    
     cache:
       cache_paths:
         - ~/.npm
@@ -73,7 +68,6 @@ workflows:
           
           echo "✅ CFBundleVersion set to $BUILD_NUMBER"
       
-      # ✅ FIX: Use Codemagic CLI build-ipa (handles signing, platforms, export automatically)
       - name: Build archive & IPA
         script: |
           #!/bin/bash
@@ -88,10 +82,10 @@ workflows:
           echo "Team ID:   ${TEAM_ID}"
           echo "════════════════════════════════════════════════════════════"
           
-          # Apply provisioning profiles (no custom options - keep it simple like GOODBUILD)
-          xcode-project use-profiles
+          # Apply provisioning profiles for internal TestFlight
+          xcode-project use-profiles --custom-export-options='{"testFlightInternalTestingOnly":true}'
           
-          # Build using Codemagic's wrapper (handles platforms, destinations, export)
+          # Build using Codemagic's wrapper
           xcode-project build-ipa \
             --workspace "${CM_BUILD_DIR}/${XCODE_WORKSPACE}" \
             --scheme "${XCODE_SCHEME}" \
@@ -115,10 +109,10 @@ workflows:
           echo "📦 IPA created: $IPA_SIZE"
           ls -lh "${CM_BUILD_DIR}/ios/build/ipa/"
           
-          # Copy to legacy paths for compatibility with existing workflows
+          # Copy to legacy paths for compatibility
           mkdir -p "${CM_BUILD_DIR}/ios/build/export"
           cp "$IPA_PATH" "${CM_BUILD_DIR}/ios/build/export/TradeLine247.ipa"
-          echo "✅ IPA copied to legacy path: ios/build/export/TradeLine247.ipa"
+          echo "✅ IPA copied to: ios/build/export/TradeLine247.ipa"
           
           # Copy archive if exists
           ARCHIVE_PATH=$(find "${CM_BUILD_DIR}/ios/build/archive" -name "*.xcarchive" | head -1)
@@ -137,9 +131,12 @@ workflows:
       - playwright-report/**/*
       - dist/**/*
     
-    # ✅ INTERNAL TESTING: Let ios_signing + Codemagic handle TestFlight upload
     publishing:
       app_store_connect:
+        # Use credentials from appstore_credentials environment group
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
     
     triggering:
