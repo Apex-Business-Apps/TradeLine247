@@ -88,9 +88,11 @@ workflows:
           ls -la ~/Library/MobileDevice/Provisioning\ Profiles/ 2>/dev/null || echo "⚠️  No profiles directory yet"
 
           # Configure Xcode project to use the profiles
+          # Use testFlightInternalTestingOnly for internal testing (no beta review required)
           echo ""
-          echo "Configuring Xcode project..."
-          xcode-project use-profiles
+          echo "Configuring Xcode project for internal testing only..."
+          xcode-project use-profiles \
+            --custom-export-options='{"testFlightInternalTestingOnly": true}'
 
           echo ""
           echo "════════════════════════════════════════════════════════════"
@@ -135,16 +137,16 @@ workflows:
             exit 1
           fi
 
-          echo "[publish] Uploading ${IPA_PATH} to App Store Connect for internal testing..."
+          echo "[publish] Uploading ${IPA_PATH} to App Store Connect..."
+          echo "Build marked as 'Internal Testing Only' - no beta review required"
 
-          # Upload to App Store Connect - skip beta review submission (internal testing only)
+          # Upload to App Store Connect (without --testflight flag = no beta review submission)
           app-store-connect publish \
-            --path "${IPA_PATH}" \
-            --skip-submit-to-testflight
+            --path "${IPA_PATH}"
 
           echo ""
           echo "✅ Successfully uploaded to App Store Connect"
-          echo "✅ Build is ready for internal testing"
+          echo "✅ Build is ready for INTERNAL TESTING ONLY"
 
     artifacts:
       - build/ios/ipa/*.ipa
