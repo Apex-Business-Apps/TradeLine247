@@ -108,105 +108,19 @@ workflows:
 
 
 
-      - name: 🚀 Upload to TestFlight
+    publishing:
 
-        script: |
+      app_store_connect:
 
-          set -euo pipefail
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
 
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
 
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
 
-          echo "════════════════════════════════════════════════════"
+        # Upload only - do not submit for TestFlight beta review
 
-          echo "📤 TESTFLIGHT UPLOAD"
-
-          echo "════════════════════════════════════════════════════"
-
-
-
-          # Setup
-
-          KEY_FILE="/tmp/AuthKey.p8"
-
-          MAX_RETRIES=3
-
-
-
-          cleanup() { rm -f "$KEY_FILE"; }
-
-          trap cleanup EXIT
-
-
-
-          # Validate
-
-          for VAR in APP_STORE_CONNECT_KEY_IDENTIFIER APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_PRIVATE_KEY; do
-
-            [ -z "${!VAR}" ] && echo "❌ $VAR not set" && exit 1
-
-          done
-
-
-
-          # Create key
-
-          echo "$APP_STORE_CONNECT_PRIVATE_KEY" | base64 --decode > "$KEY_FILE"
-
-          chmod 600 "$KEY_FILE"
-
-          grep -q "BEGIN PRIVATE KEY" "$KEY_FILE" || { echo "❌ Invalid key"; exit 1; }
-
-
-
-          # Find IPA
-
-          IPA_PATH=$(cat /Users/builder/clone/ipa_path.txt 2>/dev/null || find /Users/builder/clone/ios/build/export -name "*.ipa" | head -1)
-
-          [ ! -f "$IPA_PATH" ] && echo "❌ No IPA found" && exit 1
-
-
-
-          echo "✅ IPA: $IPA_PATH ($(du -h "$IPA_PATH" | cut -f1))"
-
-
-
-          # Upload with retry
-
-          for attempt in $(seq 1 $MAX_RETRIES); do
-
-            echo ""
-
-            echo "📤 Attempt $attempt/$MAX_RETRIES..."
-
-
-
-            if xcrun altool --upload-app --type ios --file "$IPA_PATH" \
-
-              --apiKey "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-
-              --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
-
-              --verbose; then
-
-              echo ""
-
-              echo "🎉 UPLOAD SUCCESSFUL"
-
-              exit 0
-
-            fi
-
-
-
-            [ $attempt -lt $MAX_RETRIES ] && echo "⏳ Retry in 30s..." && sleep 30
-
-          done
-
-
-
-          echo "❌ Upload failed"
-
-          exit 1
+        submit_to_testflight: false
 
 
 
