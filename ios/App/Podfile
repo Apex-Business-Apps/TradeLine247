@@ -1,4 +1,4 @@
-require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
+require_relative '../../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
 app_dir = File.expand_path(__dir__)
 unless Dir.pwd == app_dir
@@ -23,8 +23,9 @@ use_frameworks! linkage: :static
 project project_relative
 
 def capacitor_pods
-  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
-  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  pod 'Capacitor', :path => '../../../node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../../node_modules/@capacitor/ios'
+
 end
 
 target 'App' do
