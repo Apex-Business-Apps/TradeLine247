@@ -78,13 +78,19 @@ workflows:
 
       - name: Sync Capacitor for iOS
 
-        script: npx cap sync ios
+        script: |
+
+          set -eo pipefail
+
+          npx cap sync ios
 
 
 
       - name: Install CocoaPods
 
         script: |
+
+          set -eo pipefail
 
           cd ios/App
 
