@@ -58,6 +58,11 @@ workflows:
           cd ios/App
           pod install --repo-update
 
+      - name: Set iOS version & build number
+        script: |
+          set -eo pipefail
+          bash ./scripts/set-ios-version-from-codemagic.sh
+
       - name: Set up code signing
         script: |
           set -euo pipefail
