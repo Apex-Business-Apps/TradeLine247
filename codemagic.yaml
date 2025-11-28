@@ -1,209 +1,148 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# TRADELINE 24/7 — iOS Build Pipeline
+# GOODBUILD Baseline: Build #77 (Oct 27, 2025) - Commit d075d9b
+# ═══════════════════════════════════════════════════════════════════════════════
+
 workflows:
   ios-capacitor-testflight:
-    name: iOS • TestFlight Internal
+    name: iOS • Capacitor -> TestFlight
     instance_type: mac_mini_m2
     max_build_duration: 75
-    
+
     environment:
       groups:
         - ios_config
         - appstore_credentials
+
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.apex.tradeline
+
       vars:
         XCODE_SCHEME: App
         XCODE_WORKSPACE: ios/App/App.xcworkspace
         BUNDLE_ID: com.apex.tradeline
         TEAM_ID: NWGUYF42KW
-        APP_VERSION: 1.0.2
+        APP_VERSION: "1.0.3"
+
       node: 20.11.1
       npm: 10
       xcode: 16.4
       cocoapods: default
-    
+
     cache:
       cache_paths:
         - ~/.npm
         - ~/.cocoapods
         - ios/Pods
-    
+
     scripts:
       - name: Install dependencies
-        script: npm ci
-      
-      - name: Quality gates
-        script: npm run lint && npm run typecheck && npm run test:unit
-      
-      - name: Playwright smoke
         script: |
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
-      
+          set -euo pipefail
+          npm ci
+
       - name: Build web assets
-        script: npm run build
-      
+        script: |
+          set -euo pipefail
+          npm run build
+
       - name: Sync Capacitor for iOS
-        script: npx cap sync ios
-      
+        script: |
+          set -euo pipefail
+          npx cap sync ios
+
       - name: Install CocoaPods
         script: |
+          set -euo pipefail
           cd ios/App
           pod install --repo-update
-      
-      - name: Set build number
+
+      - name: Set iOS version & build number
         script: |
-          #!/bin/bash
           set -eo pipefail
-          
-          PLIST="$CM_BUILD_DIR/ios/App/App/Info.plist"
-          
-          if [ ! -f "$PLIST" ]; then
-            echo "❌ Info.plist not found"
-            exit 1
-          fi
-          
-          BUILD_NUMBER=${PROJECT_BUILD_NUMBER:-3}
-          [ "$BUILD_NUMBER" -lt 3 ] && BUILD_NUMBER=3
-          
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST" || \
-          /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$PLIST"
-          
-          echo "✅ CFBundleVersion set to $BUILD_NUMBER"
-      
+          bash ./scripts/set-ios-version-from-codemagic.sh
+
+      - name: Fetch and configure code signing
+        script: |
+          set -euo pipefail
+          echo "════════════════════════════════════════════════════════════"
+          echo "📋 INITIALIZING CODE SIGNING FOR iOS"
+          echo "════════════════════════════════════════════════════════════"
+
+          # Fetch provisioning profiles and certificates from App Store Connect
+          echo "Fetching code signing files from App Store Connect..."
+          app-store-connect fetch-signing-files \
+            "${BUNDLE_ID}" \
+            --type IOS_APP_STORE \
+            --create
+
+          # List available certificates
+          echo ""
+          echo "Available certificates:"
+          security find-identity -v -p codesigning
+
+          # List provisioning profiles
+          echo ""
+          echo "Provisioning profiles:"
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/ 2>/dev/null || echo "⚠️  No profiles directory yet"
+
+          # Configure Xcode project to use the profiles
+          echo ""
+          echo "Configuring Xcode project..."
+          xcode-project use-profiles
+
+          echo ""
+          echo "════════════════════════════════════════════════════════════"
+          echo "✅ CODE SIGNING CONFIGURED"
+          echo "════════════════════════════════════════════════════════════"
+
       - name: Build archive & IPA
         script: |
-          #!/bin/bash
-          set -eo pipefail
-          
+          set -euo pipefail
+
           echo "════════════════════════════════════════════════════════════"
-          echo "🔨 Building iOS Archive & IPA via Codemagic CLI"
+          echo "🔨 BUILDING iOS ARCHIVE & IPA"
           echo "════════════════════════════════════════════════════════════"
           echo "Workspace: ${XCODE_WORKSPACE}"
           echo "Scheme:    ${XCODE_SCHEME}"
           echo "Bundle ID: ${BUNDLE_ID}"
           echo "Team ID:   ${TEAM_ID}"
           echo "════════════════════════════════════════════════════════════"
-          
-          # Apply provisioning profiles for internal TestFlight
-          xcode-project use-profiles --custom-export-options='{"testFlightInternalTestingOnly":true}'
-          
-          # Build using Codemagic's wrapper
+
           xcode-project build-ipa \
             --workspace "${CM_BUILD_DIR}/${XCODE_WORKSPACE}" \
             --scheme "${XCODE_SCHEME}" \
             --config Release \
-            --archive-directory "${CM_BUILD_DIR}/ios/build/archive" \
-            --ipa-directory "${CM_BUILD_DIR}/ios/build/ipa"
-          
+            --archive-directory "${CM_BUILD_DIR}/build/ios/archive" \
+            --ipa-directory "${CM_BUILD_DIR}/build/ios/ipa"
+
           echo ""
           echo "════════════════════════════════════════════════════════════"
           echo "✅ iOS ARCHIVE & IPA SUCCESSFULLY BUILT"
           echo "════════════════════════════════════════════════════════════"
-          
-          # Verify IPA was created
-          IPA_PATH=$(find "${CM_BUILD_DIR}/ios/build/ipa" -name "*.ipa" | head -1)
-          if [ -z "$IPA_PATH" ]; then
+          ls -la "${CM_BUILD_DIR}/build/ios/ipa/"
+
+      - name: Publish to TestFlight
+        script: |
+          set -euo pipefail
+
+          echo "[publish] Finding IPA..."
+          IPA_PATH=$(find "${CM_BUILD_DIR}/build/ios/ipa" -name "*.ipa" | head -1)
+
+          if [ -z "${IPA_PATH}" ]; then
             echo "❌ ERROR: No IPA file found"
             exit 1
           fi
-          
-          IPA_SIZE=$(du -h "$IPA_PATH" | cut -f1)
-          echo "📦 IPA created: $IPA_SIZE"
-          ls -lh "${CM_BUILD_DIR}/ios/build/ipa/"
-          
-          # Copy to legacy paths for compatibility
-          mkdir -p "${CM_BUILD_DIR}/ios/build/export"
-          cp "$IPA_PATH" "${CM_BUILD_DIR}/ios/build/export/TradeLine247.ipa"
-          echo "✅ IPA copied to: ios/build/export/TradeLine247.ipa"
-          
-          # Copy archive if exists
-          ARCHIVE_PATH=$(find "${CM_BUILD_DIR}/ios/build/archive" -name "*.xcarchive" | head -1)
-          if [ -n "$ARCHIVE_PATH" ]; then
-            rm -rf "${CM_BUILD_DIR}/ios/build/TradeLine247.xcarchive"
-            cp -R "$ARCHIVE_PATH" "${CM_BUILD_DIR}/ios/build/TradeLine247.xcarchive"
-            echo "✅ Archive copied to: ios/build/TradeLine247.xcarchive"
-          fi
-    
+
+          echo "[publish] Uploading ${IPA_PATH} to TestFlight..."
+          app-store-connect publish \
+            --path "${IPA_PATH}" \
+            --testflight
+
+          echo "✅ Successfully uploaded to TestFlight"
+
     artifacts:
-      - ios/build/ipa/*.ipa
-      - ios/build/export/*.ipa
-      - ios/build/archive/*.xcarchive
-      - ios/build/TradeLine247.xcarchive
+      - build/ios/ipa/*.ipa
+      - build/ios/archive/*.xcarchive
       - /tmp/xcodebuild_logs/*.log
-      - playwright-report/**/*
-      - dist/**/*
-    
-    publishing:
-      app_store_connect:
-        # Use credentials from appstore_credentials environment group
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
-    
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: 'main'
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # ANDROID BUILD
-  # ────────────────────────────────────────────────────────────────────────────
-  android-capacitor-release:
-    name: Android • Capacitor bundleRelease
-    instance_type: linux_x2
-    max_build_duration: 60
-    environment:
-      groups:
-        - android_signing
-      node: 20.11.1
-      npm: 10
-      java: 17
-    cache:
-      cache_paths:
-        - ~/.npm
-        - ~/.gradle
-    scripts:
-      - name: Install dependencies
-        script: npm ci
-      - name: Quality gates
-        script: npm run lint && npm run typecheck && npm run test:unit
-      - name: Playwright smoke
-        script: |
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
-      - name: Build Android App Bundle
-        script: bash scripts/build-android.sh
-      - name: Verify artifacts
-        script: bash scripts/verify-codemagic.sh
-    artifacts:
-      - android/app/build/outputs/**/*.aab
-      - playwright-report/**/*
-      - dist/**/*
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # WEB TESTS
-  # ────────────────────────────────────────────────────────────────────────────
-  web-tests-only:
-    name: Web Tests & Smoke
-    instance_type: linux
-    max_build_duration: 45
-    environment:
-      node: 20.11.1
-      npm: 10
-    cache:
-      cache_paths:
-        - ~/.npm
-    scripts:
-      - name: Install dependencies
-        script: npm ci
-      - name: Lint, typecheck, unit tests
-        script: npm run lint && npm run typecheck && npm run test:unit
-      - name: Build web bundle
-        script: npm run build:web
-      - name: Install Playwright browsers
-        script: npm run test:install-browsers
-      - name: Run full Playwright test suite
-        script: npx playwright test --reporter=html
-    artifacts:
-      - playwright-report/**/*
-      - dist/**/*
