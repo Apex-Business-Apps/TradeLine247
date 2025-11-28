@@ -108,22 +108,6 @@ workflows:
 
 
 
-    publishing:
-
-      app_store_connect:
-
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-
-        # Upload only - do not submit for TestFlight beta review
-
-        submit_to_testflight: false
-
-
-
       - name: Verify artifacts
 
         script: bash scripts/verify-codemagic.sh
@@ -142,6 +126,20 @@ workflows:
 
       - build-artifacts-sha256.txt
 
+
+    publishing:
+
+      app_store_connect:
+
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+
+        # Upload only - do not submit for TestFlight beta review
+
+        submit_to_testflight: false
 
 
     triggering:
