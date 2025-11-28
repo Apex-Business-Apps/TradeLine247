@@ -1,37 +1,29 @@
 workflows:
   ios-capacitor-testflight:
-
-    name: TradeLine 24/7 iOS TestFlight
-
-    max_build_duration: 60
-
+    name: iOS • TestFlight Internal
     instance_type: mac_mini_m2
-
+    max_build_duration: 75
+    
     environment:
       groups:
         - ios_config
         - appstore_credentials
       vars:
-
-        XCODE_WORKSPACE: ios/App/App.xcworkspace
-
         XCODE_SCHEME: App
-
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
         BUNDLE_ID: com.apex.tradeline
-
-      xcode: 16.4
-
+        TEAM_ID: NWGUYF42KW
+        APP_VERSION: 1.0.2
       node: 20.11.1
       npm: 10
-
+      xcode: 16.4
       cocoapods: default
-
-      ios_signing:
-
-        distribution_type: app_store
-
-        bundle_identifier: com.apex.tradeline
-
+    
+    # ✅ CRITICAL: This enables automatic code signing (like GOODBUILD #77)
+    ios_signing:
+      distribution_type: app_store
+      bundle_identifier: com.apex.tradeline
+    
     cache:
       cache_paths:
         - ~/.npm
@@ -39,122 +31,122 @@ workflows:
         - ios/Pods
     
     scripts:
-
-      - name: Install Node dependencies
-
-        script: |
-
-          set -eo pipefail
-
-          npm ci
-
+      - name: Install dependencies
+        script: npm ci
+      
       - name: Quality gates
-
-        script: |
-
-          set -eo pipefail
-
-          npm run lint && npm run typecheck && npm run test:unit
-
+        script: npm run lint && npm run typecheck && npm run test:unit
+      
       - name: Playwright smoke
         script: |
-
-          set -eo pipefail
-
           npx playwright install --with-deps chromium
           npm run test:e2e:smoke
-
+      
       - name: Build web assets
-
-        script: |
-
-          set -eo pipefail
-
-          npm run build
-
-      - name: Sync Capacitor
-
-        script: |
-
-          set -eo pipefail
-
-          npx cap sync ios
-
+        script: npm run build
+      
+      - name: Sync Capacitor for iOS
+        script: npx cap sync ios
+      
       - name: Install CocoaPods
         script: |
-
-          set -eo pipefail
-
-          cd ios/App && pod install --repo-update
-
-      - name: Configure code signing
-
+          cd ios/App
+          pod install --repo-update
+      
+      - name: Set build number
         script: |
-
+          #!/bin/bash
           set -eo pipefail
-
-          xcode-project use-profiles \
-
-            --custom-export-options='{"testFlightInternalTestingOnly": true}'
-
-      - name: Build archive and IPA
-
+          
+          PLIST="$CM_BUILD_DIR/ios/App/App/Info.plist"
+          
+          if [ ! -f "$PLIST" ]; then
+            echo "❌ Info.plist not found"
+            exit 1
+          fi
+          
+          BUILD_NUMBER=${PROJECT_BUILD_NUMBER:-3}
+          [ "$BUILD_NUMBER" -lt 3 ] && BUILD_NUMBER=3
+          
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST" || \
+          /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$PLIST"
+          
+          echo "✅ CFBundleVersion set to $BUILD_NUMBER"
+      
+      # ✅ FIX: Use Codemagic CLI build-ipa (handles signing, platforms, export automatically)
+      - name: Build archive & IPA
         script: |
-
+          #!/bin/bash
           set -eo pipefail
-
+          
+          echo "════════════════════════════════════════════════════════════"
+          echo "🔨 Building iOS Archive & IPA via Codemagic CLI"
+          echo "════════════════════════════════════════════════════════════"
+          echo "Workspace: ${XCODE_WORKSPACE}"
+          echo "Scheme:    ${XCODE_SCHEME}"
+          echo "Bundle ID: ${BUNDLE_ID}"
+          echo "Team ID:   ${TEAM_ID}"
+          echo "════════════════════════════════════════════════════════════"
+          
+          # Apply provisioning profiles (no custom options - keep it simple like GOODBUILD)
+          xcode-project use-profiles
+          
+          # Build using Codemagic's wrapper (handles platforms, destinations, export)
           xcode-project build-ipa \
-
-            --workspace "$XCODE_WORKSPACE" \
-
-            --scheme "$XCODE_SCHEME" \
-
+            --workspace "${CM_BUILD_DIR}/${XCODE_WORKSPACE}" \
+            --scheme "${XCODE_SCHEME}" \
             --config Release \
-
-            --archive-flags="-destination 'generic/platform=iOS'"
-
-
-
+            --archive-directory "${CM_BUILD_DIR}/ios/build/archive" \
+            --ipa-directory "${CM_BUILD_DIR}/ios/build/ipa"
+          
+          echo ""
+          echo "════════════════════════════════════════════════════════════"
+          echo "✅ iOS ARCHIVE & IPA SUCCESSFULLY BUILT"
+          echo "════════════════════════════════════════════════════════════"
+          
+          # Verify IPA was created
+          IPA_PATH=$(find "${CM_BUILD_DIR}/ios/build/ipa" -name "*.ipa" | head -1)
+          if [ -z "$IPA_PATH" ]; then
+            echo "❌ ERROR: No IPA file found"
+            exit 1
+          fi
+          
+          IPA_SIZE=$(du -h "$IPA_PATH" | cut -f1)
+          echo "📦 IPA created: $IPA_SIZE"
+          ls -lh "${CM_BUILD_DIR}/ios/build/ipa/"
+          
+          # Copy to legacy paths for compatibility with existing workflows
+          mkdir -p "${CM_BUILD_DIR}/ios/build/export"
+          cp "$IPA_PATH" "${CM_BUILD_DIR}/ios/build/export/TradeLine247.ipa"
+          echo "✅ IPA copied to legacy path: ios/build/export/TradeLine247.ipa"
+          
+          # Copy archive if exists
+          ARCHIVE_PATH=$(find "${CM_BUILD_DIR}/ios/build/archive" -name "*.xcarchive" | head -1)
+          if [ -n "$ARCHIVE_PATH" ]; then
+            rm -rf "${CM_BUILD_DIR}/ios/build/TradeLine247.xcarchive"
+            cp -R "$ARCHIVE_PATH" "${CM_BUILD_DIR}/ios/build/TradeLine247.xcarchive"
+            echo "✅ Archive copied to: ios/build/TradeLine247.xcarchive"
+          fi
+    
     artifacts:
-
-      - build/ios/ipa/*.ipa
-
+      - ios/build/ipa/*.ipa
+      - ios/build/export/*.ipa
+      - ios/build/archive/*.xcarchive
+      - ios/build/TradeLine247.xcarchive
       - /tmp/xcodebuild_logs/*.log
-
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-
       - playwright-report/**/*
       - dist/**/*
-
-
+    
+    # ✅ INTERNAL TESTING: Let ios_signing + Codemagic handle TestFlight upload
     publishing:
       app_store_connect:
-
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-
-        # Internal-only distribution: upload without automatic TestFlight submission.
-
-        # submit_to_testflight: true
-
-        # beta_groups:
-
-        #   - Internal Testers
-
-
+        submit_to_testflight: true
+    
     triggering:
       events:
         - push
       branch_patterns:
-
-        - pattern: main
-
-          include: true
-
-          source: true
+        - pattern: 'main'
 
   # ────────────────────────────────────────────────────────────────────────────
   # ANDROID BUILD
@@ -190,7 +182,6 @@ workflows:
       - android/app/build/outputs/**/*.aab
       - playwright-report/**/*
       - dist/**/*
-      - build-artifacts-sha256.txt
 
   # ────────────────────────────────────────────────────────────────────────────
   # WEB TESTS
