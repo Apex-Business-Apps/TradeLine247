@@ -48,13 +48,20 @@ workflows:
           npm run build
 
       - name: Sync Capacitor for iOS
+
         script: |
-          set -euo pipefail
+
+          set -eo pipefail
+
           npx cap sync ios
+
+
 
       - name: Install CocoaPods
         script: |
-          set -euo pipefail
+
+          set -eo pipefail
+
           cd ios/App
           pod install --repo-update
 
