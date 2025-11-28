@@ -106,9 +106,7 @@ workflows:
 
           set -eo pipefail
 
-          xcode-project use-profiles \
-
-            --custom-export-options='{"testFlightInternalTestingOnly": true}'
+          xcode-project use-profiles --custom-export-options '{"testFlightInternalTestingOnly": true}'
 
       - name: Build archive and IPA
 
