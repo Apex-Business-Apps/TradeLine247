@@ -65,6 +65,16 @@ workflows:
           xcode-project use-profiles
           echo "✅ Code signing configured"
 
+      - name: Set iOS version & build number
+
+        script: |
+
+          set -eo pipefail
+
+          bash ./scripts/set-ios-version-from-codemagic.sh
+
+
+
       - name: Build archive & IPA
         script: |
           set -euo pipefail
