@@ -58,14 +58,111 @@ workflows:
           cd ios/App
           pod install --repo-update
 
-      - name: Set up code signing
-        script: |
-          set -euo pipefail
-          echo "[signing] Applying provisioning profiles..."
-          xcode-project use-profiles
-          echo "✅ Code signing configured"
+
 
       - name: Set iOS version & build number
+
+        script: |
+
+          set -eo pipefail
+
+          bash ./scripts/set-ios-version-from-codemagic.sh
+
+
+
+      - name: Build archive & IPA
+
+        script: bash scripts/build-ios.sh
+
+
+
+    publishing:
+
+      app_store_connect:
+
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+
+        # Upload only - do not submit for TestFlight beta review
+
+        submit_to_testflight: false
+
+
+
+      - name: Verify artifacts
+
+        script: bash scripts/verify-codemagic.sh
+
+
+
+    artifacts:
+
+      - ios/build/export/*.ipa
+
+      - ios/build/TradeLine247.xcarchive
+
+      - playwright-report/**/*
+
+      - dist/**/*
+
+      - build-artifacts-sha256.txt
+
+
+
+    triggering:
+
+      events:
+
+        - push
+
+      branch_patterns:
+
+        - pattern: 'main'
+
+
+
+  android-capacitor-release:
+
+    name: Android • Capacitor bundleRelease
+
+    instance_type: linux_x2
+
+    max_build_duration: 60
+
+    environment:
+
+      groups:
+
+        - android_signing
+
+      node: 20.11.1
+
+      npm: 10
+
+      java: 17
+
+    cache:
+
+      cache_paths:
+
+        - ~/.npm
+
+        - ~/.gradle
+
+    scripts:
+
+      - name: Install dependencies
+
+        script: npm ci
+
+      - name: Quality gates
+
+        script: npm run lint && npm run typecheck && npm run test:unit
+
+      - name: Playwright smoke
 
         script: |
 
