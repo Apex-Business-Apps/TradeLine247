@@ -123,7 +123,7 @@ workflows:
           echo "════════════════════════════════════════════════════════════"
           ls -la "${CM_BUILD_DIR}/build/ios/ipa/"
 
-      - name: Publish to App Store Connect
+      - name: Upload to App Store Connect (Internal Testing Only)
         script: |
           set -euo pipefail
 
@@ -135,19 +135,16 @@ workflows:
             exit 1
           fi
 
-          echo "[publish] Uploading ${IPA_PATH} to App Store Connect..."
-          echo "Note: Build will be available for internal testing immediately."
-          echo "External testing requires one-time TestFlight metadata setup at:"
-          echo "https://appstoreconnect.apple.com/apps/6754187965/testflight/test-info"
+          echo "[publish] Uploading ${IPA_PATH} to App Store Connect for internal testing..."
 
-          # Upload to App Store Connect without auto-submitting for external beta review
+          # Upload to App Store Connect - skip beta review submission (internal testing only)
           app-store-connect publish \
-            --path "${IPA_PATH}"
+            --path "${IPA_PATH}" \
+            --skip-submit-to-testflight
 
           echo ""
           echo "✅ Successfully uploaded to App Store Connect"
           echo "✅ Build is ready for internal testing"
-          echo "⚠️  For external testing, fill in TestFlight metadata manually"
 
     artifacts:
       - build/ios/ipa/*.ipa
