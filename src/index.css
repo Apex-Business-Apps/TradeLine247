@@ -17,6 +17,63 @@
   background-repeat: no-repeat;
 }
 
+.landing-shell {
+  background-position: center top;
+  background-size: cover, cover, contain;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+.hero-background {
+  position: relative;
+  isolation: isolate;
+  background-color: hsl(0, 0%, 97%);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.hero-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
+    linear-gradient(
+      to bottom,
+      rgba(255, 107, 53, 0.62) 0%,
+      rgba(104, 182, 233, 0.72) 100%
+    ),
+    var(--landing-wallpaper, none);
+  background-position: center top;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-size: cover, cover, cover;
+  background-attachment: scroll;
+}
+
+@media (max-width: 1024px) {
+  .hero-background::before {
+    background-position: center 10%;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-background::before {
+    background-position: center 14%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .landing-shell {
+    background-position: center 12%;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-shell {
+    background-position: center 16%;
+  }
+}
+
 /* Always paint content above wallpaper */
 .landing-shell > *,
 .dashboard-shell > * {

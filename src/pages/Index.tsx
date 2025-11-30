@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { CSSProperties, useEffect } from "react";
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
 import { TrustBadgesSlim } from "@/components/sections/TrustBadgesSlim";
@@ -37,26 +37,17 @@ const Index = () => {
     };
   }, []);
 
+  const wallpaperStyle = {
+    // Keeps the wallpaper constrained to the hero wrapper only
+    "--landing-wallpaper": `url(${backgroundImage})`,
+  } as CSSProperties;
+
   return (
     <main
       id="app-home"
       className="landing-shell min-h-screen flex flex-col relative"
       style={{
-        backgroundImage: `
-          linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
-          linear-gradient(
-            to bottom,
-            rgba(255, 107, 53, 0.62) 0%,
-            rgba(104, 182, 233, 0.72) 100%
-          ),
-          url(${backgroundImage})
-        `,
-        backgroundRepeat: "no-repeat, no-repeat, no-repeat",
-        backgroundSize: "cover, cover, cover",
-        backgroundPosition: "center, center, center",
-        backgroundAttachment: "scroll, scroll, scroll",
         backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-        minHeight: "100vh",
       }}
     >
         {/* Content with translucency - Optimized for performance */}
@@ -103,7 +94,9 @@ const Index = () => {
           />
 
           <div className="flex-1" style={{ minHeight: "60vh" }}>
-            <HeroRoiDuo />
+            <div className="hero-background" style={wallpaperStyle}>
+              <HeroRoiDuo />
+            </div>
             <BenefitsGrid />
             <ImpactStrip />
             <HowItWorks />
