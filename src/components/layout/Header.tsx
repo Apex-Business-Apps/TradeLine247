@@ -278,6 +278,16 @@ export const Header: React.FC = () => {
           data-slot="right"
           className="flex items-center gap-2 ml-auto"
         >
+          {user && (
+            <Button
+              variant="default"
+              size={isScrolled ? 'sm' : 'default'}
+              onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
+              className="hover-scale transition-all duration-300"
+            >
+              Dashboard
+            </Button>
+          )}
           <LanguageSwitcher />
 
           {/* Burger Menu Button - Always visible */}
@@ -344,21 +354,21 @@ export const Header: React.FC = () => {
                       </span>
                     )}
                   </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
+                    className="cursor-pointer"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </DropdownMenuItem>
                   {isUserAdmin && (
                     <>
-                      <DropdownMenuSeparator />
                       <div className="px-2 py-1.5">
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           Application
                         </p>
                       </div>
-                      <DropdownMenuItem
-                        onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
-                        className="cursor-pointer"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleNavigation(paths.calls, 'Calls')}
                         className="cursor-pointer"
@@ -408,7 +418,7 @@ export const Header: React.FC = () => {
             <Button
               variant="success"
               size={isScrolled ? 'sm' : 'default'}
-              onClick={() => handleNavigation(paths.auth, 'Login')}
+              onClick={() => handleNavigation(paths.login, 'Login')}
               className="hover-scale transition-all duration-300 shadow-lg hover:shadow-xl min-h-[44px]"
             >
               Login
@@ -469,6 +479,22 @@ export const Header: React.FC = () => {
                 </div>
               </>
             )}
+            {user && (
+              <div className="border-t border-border my-2" />
+            )}
+            {user && (
+              <div className="px-2 py-2">
+                <Link
+                  to={paths.dashboard}
+                  onClick={() => handleNavigation(paths.dashboard, 'Dashboard', true)}
+                  className="block px-4 py-2.5 text-sm font-semibold rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-300"
+                  aria-label="Navigate to dashboard"
+                  aria-current={isActivePath(paths.dashboard) ? 'page' : undefined}
+                >
+                  Dashboard
+                </Link>
+              </div>
+            )}
             <div className="border-t border-border" />
             <div className="space-y-3">
               <LanguageSwitcher className="w-full" />
@@ -487,7 +513,7 @@ export const Header: React.FC = () => {
               ) : (
                 <Button
                   variant="success"
-                  onClick={() => handleNavigation(paths.auth, 'Login', true)}
+                  onClick={() => handleNavigation(paths.login, 'Login', true)}
                   className="w-full justify-center px-4 py-2.5 text-sm font-semibold"
                 >
                   Login

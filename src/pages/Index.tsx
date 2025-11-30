@@ -38,28 +38,27 @@ const Index = () => {
   }, []);
 
   return (
-    <>
-      <div
-        id="app-home"
-        className="min-h-screen flex flex-col relative"
-        style={{
-          backgroundImage: `
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
-            linear-gradient(
-              to bottom,
-              rgba(255, 107, 53, 0.62) 0%,
-              rgba(104, 182, 233, 0.72) 100%
-            ),
-            url(${backgroundImage})
-          `,
-          backgroundRepeat: "no-repeat, no-repeat, no-repeat",
-          backgroundSize: "cover, cover, cover",
-          backgroundPosition: "center, center, center",
-          backgroundAttachment: "scroll, scroll, fixed",
-          backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-          minHeight: "100vh",
-        }}
-      >
+    <main
+      id="app-home"
+      className="landing-shell min-h-screen flex flex-col relative"
+      style={{
+        backgroundImage: `
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
+          linear-gradient(
+            to bottom,
+            rgba(255, 107, 53, 0.62) 0%,
+            rgba(104, 182, 233, 0.72) 100%
+          ),
+          url(${backgroundImage})
+        `,
+        backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+        backgroundSize: "cover, cover, cover",
+        backgroundPosition: "center, center, center",
+        backgroundAttachment: "scroll, scroll, scroll",
+        backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
+        minHeight: "100vh",
+      }}
+    >
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
           <AISEOHead
@@ -127,8 +126,7 @@ const Index = () => {
 
           <NoAIHypeFooter />
         </div>
-      </div>
-    </>
+    </main>
   );
 };
 

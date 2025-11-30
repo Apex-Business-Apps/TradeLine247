@@ -213,7 +213,11 @@ export const NewDashboard = () => {
               transcriptsCount={transcripts?.length || 0}
             />
 
-            {showQuickActions && <QuickActionsCard />}
+            {showQuickActions && (
+              <section className="quick-actions md:sticky md:top-4 ios-no-sticky">
+                <QuickActionsCard />
+              </section>
+            )}
             {showServiceHealth && <ServiceHealth />}
           </div>
         </div>
