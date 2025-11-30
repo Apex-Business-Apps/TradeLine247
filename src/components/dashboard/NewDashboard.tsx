@@ -23,7 +23,6 @@ import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import { useDashboardStore } from '@/stores/dashboardStore';
 import { PersonalizedWelcomeDialog } from './PersonalizedWelcomeDialog';
 import { PersonalizedTips } from './PersonalizedTips';
-import { WelcomeHeader } from './new/WelcomeHeader';
 
 export const NewDashboard = () => {
   const { kpis, nextItems, transcripts, isLoading, hasData } = useDashboardData();
@@ -88,9 +87,6 @@ export const NewDashboard = () => {
   return (
     <>
       <div className={spacingClass}>
-        {/* Welcome Header */}
-        <WelcomeHeader />
-
         {/* KPI Cards */}
         <div className={`grid grid-cols-2 md:grid-cols-4 ${gridGapClass}`}>
         {isLoading ? (
