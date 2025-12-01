@@ -75,9 +75,7 @@ workflows:
       - name: Sync Capacitor
 
         script: |
-
-          set -eo pipefail
-
+          set -euo pipefail
           npx cap sync ios
 
       - name: Install CocoaPods
@@ -90,7 +88,6 @@ workflows:
       - name: Configure code signing
 
         script: |
-
           set -eo pipefail
 
           xcode-project use-profiles --custom-export-options '{"testFlightInternalTestingOnly": true}'
