@@ -12,6 +12,8 @@ import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
+import SwipeNavigator from "@/components/layout/SwipeNavigator";
+import SwipeLayout from "@/components/layout/SwipeLayout";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
