@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { CSSProperties, useEffect } from "react";
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
 import { TrustBadgesSlim } from "@/components/sections/TrustBadgesSlim";
@@ -37,29 +37,26 @@ const Index = () => {
     };
   }, []);
 
+  const wallpaperStyle = {
+    // Keeps the wallpaper constrained to the hero wrapper only
+    "--landing-wallpaper": `url(${backgroundImage})`,
+  } as CSSProperties;
+
+  const landingBackgroundStyle = {
+    backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center top",
+    backgroundSize: "cover",
+    backgroundAttachment: "fixed",
+  } as CSSProperties;
+
   return (
-    <>
-      <div
-        id="app-home"
-        className="min-h-screen flex flex-col relative"
-        style={{
-          backgroundImage: `
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
-            linear-gradient(
-              to bottom,
-              rgba(255, 107, 53, 0.62) 0%,
-              rgba(104, 182, 233, 0.72) 100%
-            ),
-            url(${backgroundImage})
-          `,
-          backgroundRepeat: "no-repeat, no-repeat, no-repeat",
-          backgroundSize: "cover, cover, cover",
-          backgroundPosition: "center, center, center",
-          backgroundAttachment: "scroll, scroll, fixed",
-          backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-          minHeight: "100vh",
-        }}
-      >
+    <main
+      id="app-home"
+      className="landing-shell min-h-screen flex flex-col relative"
+      style={landingBackgroundStyle}
+    >
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
           <AISEOHead
@@ -104,31 +101,33 @@ const Index = () => {
           />
 
           <div className="flex-1" style={{ minHeight: "60vh" }}>
-            <HeroRoiDuo />
-            <BenefitsGrid />
-            <ImpactStrip />
-            <HowItWorks />
-            <div className="container mx-auto px-4 py-12">
-              <div className="mx-auto max-w-4xl space-y-6 text-center">
-                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                  Quick actions for operators
-                </h2>
-                <p className="text-muted-foreground">
-                  Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-                </p>
-                <QuickActionsCard />
+            <div className="hero-background" style={wallpaperStyle}>
+              <HeroRoiDuo />
+            </div>
+
+            <div className="landing-mask-65">
+              <BenefitsGrid />
+              <ImpactStrip />
+              <HowItWorks />
+              <div className="container mx-auto px-4 py-12">
+                <div className="mx-auto max-w-4xl space-y-6 text-center">
+                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                    Quick actions for operators
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+                  </p>
+                  <QuickActionsCard />
+                </div>
               </div>
+              <TrustBadgesSlim />
+              <LeadCaptureForm />
+              <Footer />
+              <NoAIHypeFooter />
             </div>
           </div>
-
-          <TrustBadgesSlim />
-          <LeadCaptureForm />
-          <Footer />
-
-          <NoAIHypeFooter />
         </div>
-      </div>
-    </>
+    </main>
   );
 };
 
