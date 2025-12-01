@@ -42,13 +42,19 @@ const Index = () => {
     "--landing-wallpaper": `url(${backgroundImage})`,
   } as CSSProperties;
 
+  const landingBackgroundStyle = {
+    backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center top",
+    backgroundSize: "cover",
+  } as CSSProperties;
+
   return (
     <main
       id="app-home"
       className="landing-shell min-h-screen flex flex-col relative"
-      style={{
-        backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-      }}
+      style={landingBackgroundStyle}
     >
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
