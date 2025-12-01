@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { CSSProperties, useEffect } from "react";
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
 import { TrustBadgesSlim } from "@/components/sections/TrustBadgesSlim";
@@ -36,6 +36,11 @@ const Index = () => {
       });
     };
   }, []);
+
+  const wallpaperStyle = {
+    // Keeps the wallpaper constrained to the hero wrapper only
+    "--landing-wallpaper": `url(${backgroundImage})`,
+  } as CSSProperties;
 
   return (
     <>
@@ -91,7 +96,9 @@ const Index = () => {
           />
 
           <div className="flex-1" style={{ minHeight: "60vh" }}>
-            <HeroRoiDuo />
+            <div className="hero-background" style={wallpaperStyle}>
+              <HeroRoiDuo />
+            </div>
             <BenefitsGrid />
             <ImpactStrip />
             <HowItWorks />
@@ -114,8 +121,7 @@ const Index = () => {
 
           <NoAIHypeFooter />
         </div>
-      </div>
-    </>
+    </main>
   );
 };
 

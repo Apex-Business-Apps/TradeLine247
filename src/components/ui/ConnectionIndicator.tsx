@@ -15,6 +15,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { Wifi, WifiOff, Signal, SignalLow, SignalMedium, SignalHigh } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from '@/lib/performanceOptimizations';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ConnectionIndicatorProps {
   /**
@@ -107,8 +108,13 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.mem
   className,
 }) => {
   const { status, queuedRequestCount } = useNetworkStatus();
+  const { user, isAdmin, userRole } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [announced, setAnnounced] = useState(false);
+
+  const isUserAdmin = user
+    ? (typeof isAdmin === 'function' ? isAdmin() : userRole === 'admin' || userRole === 'owner')
+    : false;
 
   // Show/hide logic
   useEffect(() => {
@@ -164,7 +170,9 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.mem
     'top-left': 'top-4 left-4',
   };
 
-  if (!isVisible) return null;
+  const shouldHideSlowPill = status.quality === 'slow' && !isUserAdmin;
+
+  if (!isVisible || shouldHideSlowPill) return null;
 
   const shouldAnimate = !prefersReducedMotion();
   const statusMessage = getStatusMessage(status.type, status.quality, status.online);
