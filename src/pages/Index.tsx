@@ -43,13 +43,17 @@ const Index = () => {
     backgroundImage: `url(${backgroundImage})`,
   } as CSSProperties;
 
+  const wallpaperVariables = {
+    ["--hero-wallpaper-image" as const]: `url(${backgroundImage})`,
+  } as CSSProperties;
+
   const landingBackgroundStyle = {
     backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
   } as CSSProperties;
 
   return (
     <SwipeNavigator>
-      <div className="relative min-h-screen">
+      <div className="relative min-h-screen" style={wallpaperVariables}>
         <div
           id="app-home"
           className="fixed inset-0 -z-10 pointer-events-none bg-no-repeat bg-cover bg-center"
