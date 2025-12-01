@@ -8,6 +8,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { SEOHead } from "@/components/seo/SEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { createBrandGradientStyle } from "@/styles/brandGradients";
+import SwipeNavigator from "@/components/layout/SwipeNavigator";
 
 const features = [
   {
@@ -62,11 +63,12 @@ const Features = () => {
   const gradientBackgroundStyle = createBrandGradientStyle(backgroundImage);
 
   return (
-    <div 
-      className="min-h-screen flex flex-col relative"
-      style={gradientBackgroundStyle}
-    >
-      <SEOHead 
+    <SwipeNavigator>
+      <div
+        className="min-h-screen flex flex-col relative"
+        style={gradientBackgroundStyle}
+      >
+      <SEOHead
         title="Features - TradeLine 24/7 AI Receptionist"
         description="Discover powerful AI features: 24/7 call handling, smart routing, omnichannel messaging, CRM integration, and enterprise security. Upgrade your customer service today."
         keywords="AI receptionist features, call management, omnichannel messaging, CRM integration, business automation, 24/7 customer service"
@@ -144,10 +146,11 @@ const Features = () => {
             </div>
           </section>
         </div>
-        
-        <Footer />
+
+          <Footer />
+        </div>
       </div>
-    </div>
+    </SwipeNavigator>
   );
 };
 

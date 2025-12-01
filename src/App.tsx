@@ -17,6 +17,7 @@ const Compare = lazy(() => import("./pages/Compare"));
 const Security = lazy(() => import("./pages/Security"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Contact = lazy(() => import("./pages/Contact"));
+const DocsHub = lazy(() => import("./pages/DocsHub"));
 const Auth = lazy(() => import("./pages/Auth"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const AuthLanding = lazy(() => import("./pages/AuthLanding"));
