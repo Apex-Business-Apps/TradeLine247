@@ -83,27 +83,17 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": "off",
-      
+
       // 🚫 Core guard: never render more hooks than previous render
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "off",
-      
+
       // Helpful strictness to catch sneaky conditionals
       "no-cond-assign": "error",
       "no-unreachable": "error",
       "no-constant-condition": ["error", { checkLoops: true }],
       "no-return-assign": "error",
-      
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-empty-object-type": "off",
-      "@typescript-eslint/no-require-imports": "off",
-      "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
-      "no-useless-escape": "off",
-      "no-control-regex": "off",
-      "prefer-const": "off",
-      "no-empty": "off",
-      "react/no-unknown-property": ["error", { ignore: ["fetchpriority"] }],
+
     },
   },
 );
