@@ -7,6 +7,7 @@ export const paths = {
   security: "/security",
   contact: "/contact",
   privacy: "/privacy",
+  docs: "/docs",
   previewHealth: "/preview-health",
   login: "/login",
   auth: "/auth",

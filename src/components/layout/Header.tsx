@@ -30,6 +30,7 @@ const MARKETING_NAV = [
   { name: 'Security', href: paths.security },
   { name: 'FAQ', href: paths.faq },
   { name: 'Contact', href: paths.contact },
+  { name: 'Docs', href: paths.docs },
 ] as const;
 
 const ADMIN_NAV = [
@@ -395,7 +396,7 @@ export const Header: React.FC = () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleSignOut}
-                    className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:text-red-400 dark:focus:bg-red-950/20"
+                    className="cursor-pointer rounded-md bg-gradient-to-r from-[#FF6B35] to-[#ff8a4c] px-3 py-2 font-semibold text-white shadow-md transition-all duration-300 focus:bg-gradient-to-r focus:from-[#ff7a44] focus:to-[#ff9a66] focus:text-white hover:shadow-lg"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
@@ -405,10 +406,10 @@ export const Header: React.FC = () => {
 
               {/* Mobile: Sign Out Icon */}
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 onClick={handleSignOut}
-                className="lg:hidden hover:bg-accent transition-all duration-300"
+                className="lg:hidden border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white transition-all duration-300 shadow-sm"
                 aria-label="Sign out"
               >
                 <LogOut className="h-5 w-5" />
@@ -500,12 +501,12 @@ export const Header: React.FC = () => {
               <LanguageSwitcher className="w-full" />
               {user ? (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     handleSignOut();
                   }}
-                  className="w-full justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-semibold text-red-600 transition-all duration-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  className="w-full justify-center gap-2 rounded-md border-transparent bg-gradient-to-r from-[#FF6B35] to-[#ff8a4c] px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FF6B35]"
                 >
                   <LogOut className="h-4 w-4" />
                   Sign Out
