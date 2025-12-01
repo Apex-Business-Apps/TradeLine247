@@ -13,6 +13,7 @@ import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
 import SwipeNavigator from "@/components/layout/SwipeNavigator";
+import SwipeLayout from "@/components/layout/SwipeLayout";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
@@ -39,16 +40,11 @@ const Index = () => {
   }, []);
 
   const wallpaperStyle = {
-    // Keeps the wallpaper constrained to the hero wrapper only
-    "--landing-wallpaper": `url(${backgroundImage})`,
+    backgroundImage: `url(${backgroundImage})`,
   } as CSSProperties;
 
   const landingBackgroundStyle = {
     backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-    backgroundImage: `url(${backgroundImage})`,
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "center top",
-    backgroundSize: "cover",
   } as CSSProperties;
 
   return (
@@ -58,75 +54,80 @@ const Index = () => {
         className="landing-shell min-h-screen flex flex-col relative"
         style={landingBackgroundStyle}
       >
-          {/* Content with translucency - Optimized for performance */}
-          <div className="relative z-10" style={{ minHeight: "100vh" }}>
-            <AISEOHead
-              title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
-              description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
-              canonical="/"
-              contentType="service"
-              directAnswer="TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads, and sends clean transcripts via email to Canadian businesses. Never miss a call. Work while you sleep."
-              primaryEntity={{
-                name: "TradeLine 24/7 AI Receptionist Service",
-                type: "Service",
-                description: "24/7 AI-powered phone answering service for Canadian businesses",
-              }}
-              keyFacts={[
-                { label: "Availability", value: "24/7" },
-                { label: "Response Time", value: "<2 seconds" },
-                { label: "Uptime", value: "99.9%" },
-                { label: "Service Area", value: "Canada" },
-              ]}
-              faqs={[
-                {
-                  question: "What is TradeLine 24/7?",
-                  answer:
-                    "TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads based on your criteria, and sends clean email transcripts. It never misses a call and works while you sleep.",
-                },
-                {
-                  question: "How does TradeLine 24/7 work?",
-                  answer:
-                    "When a call comes in, our AI answers immediately, has a natural conversation with the caller, qualifies them based on your criteria, and sends you a clean email transcript with all the details.",
-                },
-                {
-                  question: "What areas does TradeLine 24/7 serve?",
-                  answer:
-                    "TradeLine 24/7 serves businesses across Canada, with primary operations in Edmonton, Alberta.",
-                },
-                {
-                  question: "How much does TradeLine 24/7 cost?",
-                  answer:
-                    "TradeLine 24/7 offers flexible pricing: $149 CAD per qualified appointment (pay-per-use) or $249 CAD per month for the Predictable Plan.",
-                },
-              ]}
-            />
+        {/* Content with translucency - Optimized for performance */}
+        <div className="relative z-10" style={{ minHeight: "100vh" }}>
+          <AISEOHead
+            title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
+            description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
+            canonical="/"
+            contentType="service"
+            directAnswer="TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads based on your criteria, and sends clean email transcripts to Canadian businesses. Never miss a call. Work while you sleep."
+            primaryEntity={{
+              name: "TradeLine 24/7 AI Receptionist Service",
+              type: "Service",
+              description: "24/7 AI-powered phone answering service for Canadian businesses",
+            }}
+            keyFacts={[
+              { label: "Availability", value: "24/7" },
+              { label: "Response Time", value: "<2 seconds" },
+              { label: "Uptime", value: "99.9%" },
+              { label: "Service Area", value: "Canada" },
+            ]}
+            faqs={[
+              {
+                question: "What is TradeLine 24/7?",
+                answer:
+                  "TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads based on your criteria, and sends clean email transcripts. It never misses a call and works while you sleep.",
+              },
+              {
+                question: "How does TradeLine 24/7 work?",
+                answer:
+                  "When a call comes in, our AI answers immediately, has a natural conversation with the caller, qualifies them based on your criteria, and sends you a clean email transcript with all the details.",
+              },
+              {
+                question: "What areas does TradeLine 24/7 serve?",
+                answer:
+                  "TradeLine 24/7 serves businesses across Canada, with primary operations in Edmonton, Alberta.",
+              },
+              {
+                question: "How much does TradeLine 24/7 cost?",
+                answer:
+                  "TradeLine 24/7 offers flexible pricing: $149 CAD per qualified appointment (pay-per-use) or $249 CAD per month for the Predictable Plan.",
+              },
+            ]}
+          />
 
-            <div className="flex-1" style={{ minHeight: "60vh" }}>
-              <div className="hero-background" style={wallpaperStyle}>
-                <HeroRoiDuo />
-              </div>
-              <BenefitsGrid />
-              <ImpactStrip />
-              <HowItWorks />
-              <div className="container mx-auto px-4 py-12">
-                <div className="mx-auto max-w-4xl space-y-6 text-center">
-                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                    Quick actions for operators
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-                  </p>
-                  <QuickActionsCard />
-                </div>
+          <SwipeLayout sectionClassName="justify-start">
+            <div className="hero-background relative">
+              <div
+                id="hero-background-wrapper"
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
+                style={wallpaperStyle}
+                aria-hidden="true"
+              />
+              <div className="hero-gradient-tint" aria-hidden="true" />
+              <HeroRoiDuo />
+            </div>
+            <BenefitsGrid />
+            <ImpactStrip />
+            <HowItWorks />
+            <div className="container mx-auto px-4 py-12">
+              <div className="mx-auto max-w-4xl space-y-6 text-center">
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                  Quick actions for operators
+                </h2>
+                <p className="text-muted-foreground">
+                  Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+                </p>
+                <QuickActionsCard />
               </div>
             </div>
-
             <TrustBadgesSlim />
             <LeadCaptureForm />
             <Footer />
-
             <NoAIHypeFooter />
-          </div>
+          </SwipeLayout>
+        </div>
       </main>
     </SwipeNavigator>
   );
