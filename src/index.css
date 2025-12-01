@@ -32,44 +32,32 @@
   overflow: hidden;
 }
 
-.hero-background::before {
-  content: "";
+.hero-gradient-tint {
   position: absolute;
   inset: 0;
-  z-index: -1;
   background-image:
     linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
     linear-gradient(
       to bottom,
       rgba(255, 107, 53, 0.62) 0%,
       rgba(104, 182, 233, 0.72) 100%
-    ),
-    var(--landing-wallpaper, none);
-  background-position: center top, center top, center top;
-  background-repeat: no-repeat, no-repeat, no-repeat;
-  /* Keep gradients covering the hero band while letting the wallpaper stay fully in-frame */
-  background-size: cover, cover, cover;
-  /* Keep the wallpaper pinned in place across platforms */
-  background-attachment: fixed, fixed, fixed;
-  will-change: transform;
+    );
+  background-position: center top, center top;
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  pointer-events: none;
+  z-index: 0;
 }
 
 @media (max-width: 1024px) {
-  .hero-background::before {
-    background-position: center 10%, center 10%, center 10%;
+  .hero-gradient-tint {
+    background-position: center 10%, center 10%;
   }
 }
 
 @media (max-width: 640px) {
-  .hero-background::before {
-    background-position: center 14%, center 14%, center 14%;
-  }
-}
-
-/* iOS fallback: maintain stationary effect without fixed attachment glitches */
-@supports (-webkit-touch-callout: none) {
-  .hero-background::before {
-    background-attachment: fixed !important;
+  .hero-gradient-tint {
+    background-position: center 14%, center 14%;
   }
 }
 
