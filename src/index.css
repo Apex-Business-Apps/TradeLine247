@@ -32,6 +32,20 @@
   overflow: hidden;
 }
 
+.hero-background::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: var(--hero-wallpaper-image);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  pointer-events: none;
+  z-index: -1;
+  transform: translateZ(0);
+}
+
 .hero-gradient-tint {
   position: absolute;
   inset: 0;
@@ -85,6 +99,13 @@
   .landing-shell,
   .dashboard-shell {
     background-attachment: scroll !important;
+  }
+
+  /* iOS: avoid fixed attachment jitter by using fixed positioning + scroll attachment */
+  .hero-background::before {
+    position: fixed;
+    background-attachment: scroll !important;
+    transform: translateZ(0);
   }
 }
 
