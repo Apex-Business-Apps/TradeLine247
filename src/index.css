@@ -1235,6 +1235,59 @@ textarea:focus-visible {
   display: none !important;
 }
 
+/* ============================================================================
+   LANDING PAGE OVERLAY SYSTEM - REGRESSION SAFEGUARDS
+   ============================================================================
+   DO NOT MODIFY: These rules ensure 65% orange overlay covers full landing page
+   Critical z-index stack: Background (-10) < Overlays (99-100) < Header (9999)
+   ============================================================================ */
+
+/* Ensure landing page content doesn't interfere with overlays */
+[data-page="landing"] .landing-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+[data-page="landing"] .landing-shell > * {
+  position: relative;
+  z-index: 1 !important; /* Below overlays (99-100) but above background */
+}
+
+/* Prevent any z-index escalation that could hide overlays */
+[data-page="landing"] main,
+[data-page="landing"] section:not(header),
+[data-page="landing"] div:not([style*="zIndex: 99"]):not([style*="zIndex: 100"]) {
+  z-index: auto;
+}
+
+/* iOS-specific fixes for fixed overlays */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari fix for fixed positioning */
+  [data-page="landing"] body {
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Prevent iOS scroll jank with overlays */
+  [data-page="landing"] .fixed {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Idempotency guard: Ensure overlays always work even if applied multiple times */
+[data-page="landing"] [style*="rgba(255, 107, 53, 0.65)"] {
+  z-index: 99 !important;
+  position: fixed !important;
+}
+
+[data-page="landing"] [style*="radial-gradient"] {
+  z-index: 100 !important;
+  position: fixed !important;
+}
+
 .hero-vignette {
   position: absolute;
   inset: 0;

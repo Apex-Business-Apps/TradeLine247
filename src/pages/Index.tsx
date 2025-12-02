@@ -65,8 +65,13 @@ const Index = () => {
           className="fixed inset-0 pointer-events-none"
           style={{
             background: 'rgba(255, 107, 53, 0.65)',
-            zIndex: 5,
-            minHeight: '100vh'
+            zIndex: 99,
+            height: '100%',
+            width: '100%',
+            top: 0,
+            left: 0,
+            WebkitTransform: 'translateZ(0)',
+            transform: 'translateZ(0)'
           }}
           aria-hidden="true"
         />
@@ -75,8 +80,13 @@ const Index = () => {
           className="fixed inset-0 pointer-events-none"
           style={{
             background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.25) 100%)',
-            zIndex: 6,
-            minHeight: '100vh'
+            zIndex: 100,
+            height: '100%',
+            width: '100%',
+            top: 0,
+            left: 0,
+            WebkitTransform: 'translateZ(0)',
+            transform: 'translateZ(0)'
           }}
           aria-hidden="true"
         />
