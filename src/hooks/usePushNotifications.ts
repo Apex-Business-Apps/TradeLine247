@@ -16,6 +16,7 @@ import {
   getPlatform,
   type PushPlatform,
 } from '@/lib/push/client';
+import type { PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -173,12 +174,12 @@ export function usePushNotifications() {
         toast.error(`Push notification error: ${error.message}`);
       },
       // On notification received
-      (notification: any) => {
+      (notification: PushNotificationSchema) => {
         console.info('[Push] Notification received:', notification);
         // Handle notification display if needed
       },
       // On notification action
-      (action: any) => {
+      (action: ActionPerformed) => {
         console.info('[Push] Notification action:', action);
         // Handle notification actions if needed
       }

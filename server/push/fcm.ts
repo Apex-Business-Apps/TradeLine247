@@ -110,12 +110,13 @@ export async function sendPushToDevice(
     const response = await admin.messaging().send(message);
     console.info('[FCM] Message sent successfully:', response);
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[FCM] Failed to send message:', error);
     
     // Handle specific FCM errors
-    if (error.code === 'messaging/invalid-registration-token' || 
-        error.code === 'messaging/registration-token-not-registered') {
+    const fcmError = error as { code?: string; message?: string };
+    if (fcmError.code === 'messaging/invalid-registration-token' || 
+        fcmError.code === 'messaging/registration-token-not-registered') {
       // Token is invalid, should be removed from database
       throw new Error('INVALID_TOKEN');
     }

@@ -5,7 +5,7 @@
  * Provides functions for requesting permissions, registering tokens, and handling notifications.
  */
 
-import { PushNotifications } from '@capacitor/push-notifications';
+import { PushNotifications, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 
 export type PushPlatform = 'ios' | 'android';
@@ -79,8 +79,8 @@ export async function checkPushPermissions(): Promise<PushPermissionStatus> {
 export function registerPushListeners(
   onRegistration: (token: string) => void,
   onRegistrationError: (error: Error) => void,
-  onNotificationReceived: (notification: any) => void,
-  onNotificationActionPerformed: (action: any) => void
+  onNotificationReceived: (notification: PushNotificationSchema) => void,
+  onNotificationActionPerformed: (action: ActionPerformed) => void
 ): () => void {
   if (!isPushAvailable()) {
     return () => {}; // No-op cleanup
