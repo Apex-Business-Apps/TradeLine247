@@ -16,7 +16,7 @@ workflows:
 
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.apex.tradeline
+        bundle_identifier: $BUNDLE_ID
 
       vars:
         XCODE_SCHEME: App
@@ -38,117 +38,28 @@ workflows:
 
     scripts:
       - name: Install dependencies
+        script: npm ci
+
+      - name: Quality gates
+        script: npm run lint && npm run typecheck && npm run test:unit
+
+      - name: Playwright smoke
         script: |
-          set -euo pipefail
-          npm ci
-
-      - name: Build web assets
-        script: |
-          set -euo pipefail
-          npm run build
-
-      - name: Sync Capacitor for iOS
-        script: |
-          set -euo pipefail
-          npx cap sync ios
-
-      - name: Install CocoaPods
-        script: |
-          set -euo pipefail
-          cd ios/App
-          pod install --repo-update
-
-      - name: Set iOS version & build number
-        script: |
-          set -eo pipefail
-          bash ./scripts/set-ios-version-from-codemagic.sh
-
-      - name: Fetch and configure code signing
-        script: |
-          set -euo pipefail
-          echo "════════════════════════════════════════════════════════════"
-          echo "📋 INITIALIZING CODE SIGNING FOR iOS"
-          echo "════════════════════════════════════════════════════════════"
-
-          # Fetch provisioning profiles and certificates from App Store Connect
-          echo "Fetching code signing files from App Store Connect..."
-          app-store-connect fetch-signing-files \
-            "${BUNDLE_ID}" \
-            --type IOS_APP_STORE \
-            --create
-
-          # List available certificates
-          echo ""
-          echo "Available certificates:"
-          security find-identity -v -p codesigning
-
-          # List provisioning profiles
-          echo ""
-          echo "Provisioning profiles:"
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/ 2>/dev/null || echo "⚠️  No profiles directory yet"
-
-          # Configure Xcode project to use the profiles
-          # Use testFlightInternalTestingOnly for internal testing (no beta review required)
-          echo ""
-          echo "Configuring Xcode project for internal testing only..."
-          xcode-project use-profiles \
-            --custom-export-options='{"testFlightInternalTestingOnly": true}'
-
-          echo ""
-          echo "════════════════════════════════════════════════════════════"
-          echo "✅ CODE SIGNING CONFIGURED"
-          echo "════════════════════════════════════════════════════════════"
+          npx playwright install --with-deps chromium
+          npm run test:e2e:smoke
 
       - name: Build archive & IPA
-        script: |
-          set -euo pipefail
+        script: bash scripts/build-ios.sh
 
-          echo "════════════════════════════════════════════════════════════"
-          echo "🔨 BUILDING iOS ARCHIVE & IPA"
-          echo "════════════════════════════════════════════════════════════"
-          echo "Workspace: ${XCODE_WORKSPACE}"
-          echo "Scheme:    ${XCODE_SCHEME}"
-          echo "Bundle ID: ${BUNDLE_ID}"
-          echo "Team ID:   ${TEAM_ID}"
-          echo "════════════════════════════════════════════════════════════"
+      - name: Upload to TestFlight
+        script: fastlane ios upload
 
-          xcode-project build-ipa \
-            --workspace "${CM_BUILD_DIR}/${XCODE_WORKSPACE}" \
-            --scheme "${XCODE_SCHEME}" \
-            --config Release \
-            --archive-directory "${CM_BUILD_DIR}/build/ios/archive" \
-            --ipa-directory "${CM_BUILD_DIR}/build/ios/ipa"
-
-          echo ""
-          echo "════════════════════════════════════════════════════════════"
-          echo "✅ iOS ARCHIVE & IPA SUCCESSFULLY BUILT"
-          echo "════════════════════════════════════════════════════════════"
-          ls -la "${CM_BUILD_DIR}/build/ios/ipa/"
-
-      - name: Upload to App Store Connect (Internal Testing Only)
-        script: |
-          set -euo pipefail
-
-          echo "[publish] Finding IPA..."
-          IPA_PATH=$(find "${CM_BUILD_DIR}/build/ios/ipa" -name "*.ipa" | head -1)
-
-          if [ -z "${IPA_PATH}" ]; then
-            echo "❌ ERROR: No IPA file found"
-            exit 1
-          fi
-
-          echo "[publish] Uploading ${IPA_PATH} to App Store Connect..."
-          echo "Build marked as 'Internal Testing Only' - no beta review required"
-
-          # Upload to App Store Connect (without --testflight flag = no beta review submission)
-          app-store-connect publish \
-            --path "${IPA_PATH}"
-
-          echo ""
-          echo "✅ Successfully uploaded to App Store Connect"
-          echo "✅ Build is ready for INTERNAL TESTING ONLY"
+      - name: Verify artifacts
+        script: bash scripts/verify-codemagic.sh
 
     artifacts:
-      - build/ios/ipa/*.ipa
-      - build/ios/archive/*.xcarchive
-      - /tmp/xcodebuild_logs/*.log
+      - ios/build/export/*.ipa
+      - ios/build/TradeLine247.xcarchive
+      - playwright-report/**/*
+      - dist/**/*
+      - build-artifacts-sha256.txt

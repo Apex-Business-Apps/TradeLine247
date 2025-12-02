@@ -54,21 +54,20 @@ const Index = () => {
   } as CSSProperties;
 
   return (
-    <SwipeNavigator>
-      <div className="relative min-h-screen" style={wallpaperVariables}>
-        <div
-          id="app-home"
-          className="fixed inset-0 -z-10 pointer-events-none bg-no-repeat bg-cover bg-center"
-          style={wallpaperStyle}
-          aria-hidden="true"
-        />
-        <main
-          className="landing-shell min-h-screen flex flex-col relative"
-          style={landingBackgroundStyle}
-        >
-          {/* Content with translucency - Optimized for performance */}
-          <div className="relative z-10" style={{ minHeight: "100vh" }}>
-            <AISEOHead
+    <div className="relative min-h-screen" style={wallpaperVariables}>
+      <div
+        id="app-home"
+        className="fixed inset-0 -z-10 pointer-events-none bg-no-repeat bg-cover bg-center"
+        style={wallpaperStyle}
+        aria-hidden="true"
+      />
+      <main
+        className="landing-shell min-h-screen flex flex-col relative"
+        style={landingBackgroundStyle}
+      >
+        {/* Content with translucency - Optimized for performance */}
+        <div className="relative z-10" style={{ minHeight: "100vh" }}>
+          <AISEOHead
               title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
               description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
               canonical="/"
@@ -134,11 +133,11 @@ const Index = () => {
               <LeadCaptureForm />
               <Footer />
               <NoAIHypeFooter />
-            </SwipeLayout>
+            </div>
           </div>
-        </main>
-      </div>
-    </SwipeNavigator>
+        </div>
+      </main>
+    </div>
   );
 };
 

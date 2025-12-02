@@ -149,8 +149,6 @@
 html {
   min-height: 100vh;
   height: 100%;
-  scroll-behavior: smooth;
-  scroll-padding-top: 4rem; /* Account for sticky header (h-16 = 4rem) */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -1242,6 +1240,66 @@ textarea:focus-visible {
   background: rgba(255, 107, 53, 0.16); /* Brand orange #FF6B35 with 16% opacity - landing page lighter baseline */
 }
 
+/* Hide ALL hero-section overlays on landing page since full-page overlays are applied at root level */
+[data-page="landing"] .hero-gradient-overlay,
+[data-page="landing"] .hero-vignette,
+[data-page="landing"] .hero-gradient {
+  display: none !important;
+}
+
+/* ============================================================================
+   LANDING PAGE OVERLAY SYSTEM - REGRESSION SAFEGUARDS
+   ============================================================================
+   DO NOT MODIFY: These rules ensure 65% orange overlay covers full landing page
+   Critical z-index stack: Background (-10) < Overlays (99-100) < Header (9999)
+   ============================================================================ */
+
+/* Ensure landing page content doesn't interfere with overlays */
+[data-page="landing"] .landing-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+[data-page="landing"] .landing-shell > * {
+  position: relative;
+  z-index: 1 !important; /* Below overlays (99-100) but above background */
+}
+
+/* Prevent any z-index escalation that could hide overlays */
+[data-page="landing"] main,
+[data-page="landing"] section:not(header),
+[data-page="landing"] div:not([style*="zIndex: 99"]):not([style*="zIndex: 100"]) {
+  z-index: auto;
+}
+
+/* iOS-specific fixes for fixed overlays */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari fix for fixed positioning */
+  [data-page="landing"] body {
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Prevent iOS scroll jank with overlays */
+  [data-page="landing"] .fixed {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Idempotency guard: Ensure overlays always work even if applied multiple times */
+[data-page="landing"] [style*="rgba(255, 107, 53, 0.65)"] {
+  z-index: 99 !important;
+  position: fixed !important;
+}
+
+[data-page="landing"] [style*="radial-gradient"] {
+  z-index: 100 !important;
+  position: fixed !important;
+}
+
 .hero-vignette {
   position: absolute;
   inset: 0;
@@ -1711,23 +1769,23 @@ section h1,
   color: hsl(var(--foreground)) !important;
 }
 
-/* Add brand blue shadow to hero text for depth and readability */
+/* Add brand orange shadow to hero text for depth and readability */
 .hero-gradient h1,
 .hero-gradient h2,
 [data-testid="hero-bg"] h1,
 [data-testid="hero-bg"] h2,
 .page-hero h1,
 .page-hero h2 {
-  text-shadow: 0 3px 8px rgba(104, 182, 233, 0.45), 
-               0 1px 4px rgba(104, 182, 233, 0.35) !important;
+  text-shadow: 0 3px 8px rgba(255, 107, 53, 0.45),
+               0 1px 4px rgba(255, 107, 53, 0.35) !important;
 }
 
-/* Add brand blue shadow to hero subtext */
+/* Add brand orange shadow to hero subtext */
 .hero-gradient p,
 [data-testid="hero-bg"] p,
 .page-hero p {
-  text-shadow: 0 2px 6px rgba(104, 182, 233, 0.35), 
-               0 1px 3px rgba(104, 182, 233, 0.25) !important;
+  text-shadow: 0 2px 6px rgba(255, 107, 53, 0.35),
+               0 1px 3px rgba(255, 107, 53, 0.25) !important;
 }
 
 /* LOGO COLOR GRADIENT - Removed these duplicate layers that were obscuring the blue gradient */
@@ -1862,11 +1920,12 @@ button[class*="orange"]:hover:not([class*="outline"]) {
   }
 }
 
-/* Hero text contrast for readability */
+/* Hero text contrast for readability - unified orange shadow */
 .hero-text,
 .hero-headline,
 .hero-tagline {
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 8px rgba(255, 107, 53, 0.45),
+               0 1px 4px rgba(255, 107, 53, 0.35);
 }
 
 .hero-heading {
