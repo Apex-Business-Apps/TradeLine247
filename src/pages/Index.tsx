@@ -60,9 +60,26 @@ const Index = () => {
           style={wallpaperStyle}
           aria-hidden="true"
         />
-        {/* Full-page mask overlay - extends to cover entire landing page */}
-        <div className="hero-gradient-overlay fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} aria-hidden="true" />
-        <div className="hero-vignette fixed inset-0 pointer-events-none" style={{ zIndex: 1 }} aria-hidden="true" />
+        {/* Full-page mask overlay - 65% opacity orange covering entire landing page */}
+        <div
+          className="fixed inset-0 pointer-events-none"
+          style={{
+            background: 'rgba(255, 107, 53, 0.65)',
+            zIndex: 5,
+            minHeight: '100vh'
+          }}
+          aria-hidden="true"
+        />
+        {/* Full-page vignette overlay */}
+        <div
+          className="fixed inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.25) 100%)',
+            zIndex: 6,
+            minHeight: '100vh'
+          }}
+          aria-hidden="true"
+        />
         <main
           className="landing-shell min-h-screen flex flex-col relative"
           style={landingBackgroundStyle}

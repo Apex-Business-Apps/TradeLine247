@@ -136,8 +136,7 @@
 html {
   min-height: 100vh;
   height: 100%;
-  scroll-behavior: smooth;
-  scroll-padding-top: 6rem; /* Account for sticky header - max height with py-4 + h-14 (5.5rem) + buffer */
+  scroll-padding-top: 4rem; /* Account for sticky header */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -1229,10 +1228,11 @@ textarea:focus-visible {
   background: rgba(255, 107, 53, 0.16); /* Brand orange #FF6B35 with 16% opacity - landing page lighter baseline */
 }
 
-/* Hide hero-section overlays on landing page since full-page overlays are applied at root level */
-[data-page="landing"] .hero-section .hero-gradient-overlay,
-[data-page="landing"] .hero-section .hero-vignette {
-  display: none;
+/* Hide ALL hero-section overlays on landing page since full-page overlays are applied at root level */
+[data-page="landing"] .hero-gradient-overlay,
+[data-page="landing"] .hero-vignette,
+[data-page="landing"] .hero-gradient {
+  display: none !important;
 }
 
 .hero-vignette {
