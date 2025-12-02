@@ -223,7 +223,11 @@ router.post('/test', pushLimiter, async (req: Request, res: Response) => {
     }
 
     // Send push to all devices
-    const tokens = devices.map((d: any) => d.fcm_token || d.device_token).filter(Boolean);
+    interface DeviceRow {
+      device_token: string;
+      fcm_token: string | null;
+    }
+    const tokens = (devices as DeviceRow[]).map((d) => d.fcm_token || d.device_token).filter(Boolean) as string[];
     
     if (tokens.length === 0) {
       return res.status(404).json({ 
