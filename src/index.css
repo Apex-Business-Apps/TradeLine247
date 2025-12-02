@@ -137,7 +137,7 @@ html {
   min-height: 100vh;
   height: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: 4rem; /* Account for sticky header (h-16 = 4rem) */
+  scroll-padding-top: 6rem; /* Account for sticky header - max height with py-4 + h-14 (5.5rem) + buffer */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -1229,6 +1229,12 @@ textarea:focus-visible {
   background: rgba(255, 107, 53, 0.16); /* Brand orange #FF6B35 with 16% opacity - landing page lighter baseline */
 }
 
+/* Hide hero-section overlays on landing page since full-page overlays are applied at root level */
+[data-page="landing"] .hero-section .hero-gradient-overlay,
+[data-page="landing"] .hero-section .hero-vignette {
+  display: none;
+}
+
 .hero-vignette {
   position: absolute;
   inset: 0;
@@ -1698,23 +1704,23 @@ section h1,
   color: hsl(var(--foreground)) !important;
 }
 
-/* Add brand blue shadow to hero text for depth and readability */
+/* Add brand orange shadow to hero text for depth and readability */
 .hero-gradient h1,
 .hero-gradient h2,
 [data-testid="hero-bg"] h1,
 [data-testid="hero-bg"] h2,
 .page-hero h1,
 .page-hero h2 {
-  text-shadow: 0 3px 8px rgba(104, 182, 233, 0.45), 
-               0 1px 4px rgba(104, 182, 233, 0.35) !important;
+  text-shadow: 0 3px 8px rgba(255, 107, 53, 0.45),
+               0 1px 4px rgba(255, 107, 53, 0.35) !important;
 }
 
-/* Add brand blue shadow to hero subtext */
+/* Add brand orange shadow to hero subtext */
 .hero-gradient p,
 [data-testid="hero-bg"] p,
 .page-hero p {
-  text-shadow: 0 2px 6px rgba(104, 182, 233, 0.35), 
-               0 1px 3px rgba(104, 182, 233, 0.25) !important;
+  text-shadow: 0 2px 6px rgba(255, 107, 53, 0.35),
+               0 1px 3px rgba(255, 107, 53, 0.25) !important;
 }
 
 /* LOGO COLOR GRADIENT - Removed these duplicate layers that were obscuring the blue gradient */
@@ -1849,11 +1855,12 @@ button[class*="orange"]:hover:not([class*="outline"]) {
   }
 }
 
-/* Hero text contrast for readability */
+/* Hero text contrast for readability - unified orange shadow */
 .hero-text,
 .hero-headline,
 .hero-tagline {
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 8px rgba(255, 107, 53, 0.45),
+               0 1px 4px rgba(255, 107, 53, 0.35);
 }
 
 .hero-heading {
