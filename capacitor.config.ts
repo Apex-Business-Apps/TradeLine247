@@ -4,7 +4,12 @@ const config: CapacitorConfig = {
   appId: 'com.apex.tradeline',   // must match your ASC bundle id
   appName: 'TradeLine 24/7',
   webDir: 'dist',
-  bundledWebRuntime: false
+  bundledWebRuntime: false,
+  plugins: {
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
+  },
 };
 
 export default config;
