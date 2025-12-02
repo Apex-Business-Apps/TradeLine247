@@ -136,8 +136,6 @@
 html {
   min-height: 100vh;
   height: 100%;
-  scroll-behavior: smooth;
-  scroll-padding-top: 4rem; /* Account for sticky header (h-16 = 4rem) */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
