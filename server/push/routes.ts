@@ -8,6 +8,7 @@ import { Router, Request, Response } from 'express';
 import { supabase } from '../supabase/client';
 import { sendPushToDevice } from './fcm';
 import { createRateLimiter } from '../middleware/rateLimit';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const router = Router();
 
@@ -21,7 +22,7 @@ const pushLimiter = createRateLimiter({
 /**
  * Middleware to extract and validate auth token
  */
-async function authenticateRequest(req: Request): Promise<{ userId: string; supabaseClient: any } | null> {
+async function authenticateRequest(req: Request): Promise<{ userId: string; supabaseClient: SupabaseClient } | null> {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;
@@ -231,20 +232,28 @@ router.post('/test', pushLimiter, async (req: Request, res: Response) => {
       });
     }
 
-    const results = [];
+    interface PushResult {
+      token: string;
+      success: boolean;
+      messageId?: string;
+      error?: string;
+    }
+    
+    const results: PushResult[] = [];
     for (const token of tokens) {
       try {
         const messageId = await sendPushToDevice(token, { title, body, data });
         results.push({ token, success: true, messageId });
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         results.push({ 
           token, 
           success: false, 
-          error: error.message || 'Unknown error' 
+          error: errorMessage,
         });
         
         // If token is invalid, mark as inactive
-        if (error.message === 'INVALID_TOKEN') {
+        if (errorMessage === 'INVALID_TOKEN') {
           await auth.supabaseClient
             .from('device_push_tokens')
             .update({ is_active: false })
@@ -253,7 +262,7 @@ router.post('/test', pushLimiter, async (req: Request, res: Response) => {
       }
     }
 
-    const successCount = results.filter((r: any) => r.success).length;
+    const successCount = results.filter((r) => r.success).length;
 
     return res.json({
       success: successCount > 0,
