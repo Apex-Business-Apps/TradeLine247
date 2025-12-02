@@ -60,9 +60,6 @@ const Index = () => {
           style={wallpaperStyle}
           aria-hidden="true"
         />
-        {/* Full-page mask overlay - extends to cover entire landing page */}
-        <div className="hero-gradient-overlay fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} aria-hidden="true" />
-        <div className="hero-vignette fixed inset-0 pointer-events-none" style={{ zIndex: 1 }} aria-hidden="true" />
         <main
           className="landing-shell min-h-screen flex flex-col relative"
           style={landingBackgroundStyle}
@@ -115,24 +112,31 @@ const Index = () => {
                 <div className="hero-gradient-tint" aria-hidden="true" />
                 <HeroRoiDuo />
               </div>
-              <BenefitsGrid />
-              <ImpactStrip />
-              <HowItWorks />
-              <div className="container mx-auto px-4 py-12">
-                <div className="mx-auto max-w-4xl space-y-6 text-center">
-                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                    Quick actions for operators
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-                  </p>
-                  <QuickActionsCard />
+              {/* Sections below hero with extended mask overlay */}
+              <div className="relative">
+                <div className="hero-gradient-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />
+                <div className="hero-vignette absolute inset-0 pointer-events-none" aria-hidden="true" />
+                <div className="relative">
+                  <BenefitsGrid />
+                  <ImpactStrip />
+                  <HowItWorks />
+                  <div className="container mx-auto px-4 py-12">
+                    <div className="mx-auto max-w-4xl space-y-6 text-center">
+                      <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                        Quick actions for operators
+                      </h2>
+                      <p className="text-muted-foreground">
+                        Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+                      </p>
+                      <QuickActionsCard />
+                    </div>
+                  </div>
+                  <TrustBadgesSlim />
+                  <LeadCaptureForm />
+                  <Footer />
+                  <NoAIHypeFooter />
                 </div>
               </div>
-              <TrustBadgesSlim />
-              <LeadCaptureForm />
-              <Footer />
-              <NoAIHypeFooter />
             </SwipeLayout>
           </div>
         </main>
