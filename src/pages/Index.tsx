@@ -12,8 +12,6 @@ import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
-import SwipeNavigator from "@/components/layout/SwipeNavigator";
-import SwipeLayout from "@/components/layout/SwipeLayout";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
@@ -52,51 +50,20 @@ const Index = () => {
   } as CSSProperties;
 
   return (
-    <SwipeNavigator>
-      <div className="relative min-h-screen" style={wallpaperVariables}>
-        <div
-          id="app-home"
-          className="fixed inset-0 -z-10 pointer-events-none bg-no-repeat bg-cover bg-center"
-          style={wallpaperStyle}
-          aria-hidden="true"
-        />
-        {/* Full-page mask overlay - 65% opacity orange covering entire landing page */}
-        <div
-          className="fixed inset-0 pointer-events-none"
-          style={{
-            background: 'rgba(255, 107, 53, 0.65)',
-            zIndex: 99,
-            height: '100%',
-            width: '100%',
-            top: 0,
-            left: 0,
-            WebkitTransform: 'translateZ(0)',
-            transform: 'translateZ(0)'
-          }}
-          aria-hidden="true"
-        />
-        {/* Full-page vignette overlay */}
-        <div
-          className="fixed inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.25) 100%)',
-            zIndex: 100,
-            height: '100%',
-            width: '100%',
-            top: 0,
-            left: 0,
-            WebkitTransform: 'translateZ(0)',
-            transform: 'translateZ(0)'
-          }}
-          aria-hidden="true"
-        />
-        <main
-          className="landing-shell min-h-screen flex flex-col relative"
-          style={landingBackgroundStyle}
-        >
-          {/* Content with translucency - Optimized for performance */}
-          <div className="relative z-10" style={{ minHeight: "100vh" }}>
-            <AISEOHead
+    <div className="relative min-h-screen" style={wallpaperVariables}>
+      <div
+        id="app-home"
+        className="fixed inset-0 -z-10 pointer-events-none bg-no-repeat bg-cover bg-center"
+        style={wallpaperStyle}
+        aria-hidden="true"
+      />
+      <main
+        className="landing-shell min-h-screen flex flex-col relative"
+        style={landingBackgroundStyle}
+      >
+        {/* Content with translucency - Optimized for performance */}
+        <div className="relative z-10" style={{ minHeight: "100vh" }}>
+          <AISEOHead
               title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
               description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
               canonical="/"
@@ -137,11 +104,15 @@ const Index = () => {
               ]}
             />
 
-            <SwipeLayout sectionClassName="justify-start">
-              <div className="hero-background relative">
-                <div className="hero-gradient-tint" aria-hidden="true" />
-                <HeroRoiDuo />
-              </div>
+          <div className="hero-background relative">
+            <div className="hero-gradient-tint" aria-hidden="true" />
+            <HeroRoiDuo />
+          </div>
+          {/* Sections below hero with extended mask overlay */}
+          <div className="relative">
+            <div className="hero-gradient-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />
+            <div className="hero-vignette absolute inset-0 pointer-events-none" aria-hidden="true" />
+            <div className="relative">
               <BenefitsGrid />
               <ImpactStrip />
               <HowItWorks />
@@ -160,11 +131,11 @@ const Index = () => {
               <LeadCaptureForm />
               <Footer />
               <NoAIHypeFooter />
-            </SwipeLayout>
+            </div>
           </div>
-        </main>
-      </div>
-    </SwipeNavigator>
+        </div>
+      </main>
+    </div>
   );
 };
 
