@@ -43,7 +43,7 @@ vi.mock('@/components/sections/HowItWorks', () => ({ HowItWorks: () => <div data
 vi.mock('@/components/sections/LeadCaptureForm', () => ({ LeadCaptureForm: () => <form data-testid="lead-capture" /> }));
 vi.mock('@/components/sections/NoAIHypeFooter', () => ({ NoAIHypeFooter: () => <div data-testid="no-ai-hype" /> }));
 vi.mock('@/components/layout/Footer', () => ({ Footer: () => <footer data-testid="footer" /> }));
-vi.mock('@/components/LanguageSwitcher', () => ({ LanguageSwitcher: () => <div data-testid="language-switcher" /> }));
+vi.mock('@/components/common/LanguageToggle', () => ({ LanguageToggle: () => <div data-testid="language-switcher" /> }));
 vi.mock('@/components/ui/logo', () => ({ Logo: () => <div data-testid="logo" /> }));
 
 // Mock integrations

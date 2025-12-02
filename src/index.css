@@ -32,6 +32,14 @@
   overflow: hidden;
 }
 
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 43, 74, 0.7);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .hero-background::before {
   content: "";
   position: fixed;
@@ -60,7 +68,7 @@
   background-repeat: no-repeat, no-repeat;
   background-size: cover, cover;
   pointer-events: none;
-  z-index: 0;
+  z-index: 2;
 }
 
 @media (max-width: 1024px) {
@@ -92,6 +100,11 @@
 .dashboard-shell > * {
   position: relative;
   z-index: 1;
+}
+
+.quick-actions-card {
+  position: relative;
+  z-index: 2;
 }
 
 /* iOS-specific: avoid fixed background issues */

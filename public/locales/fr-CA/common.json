@@ -31,6 +31,29 @@
     "en": "English",
     "fr-CA": "Français (CA)"
   },
+  "quickActions": {
+    "title": "Actions rapides",
+    "heading": "Actions rapides pour les opérateurs",
+    "subheading": "Accédez directement aux flux que vous utilisez chaque jour. Ces raccourcis survivent aux rafraîchissements et aux liens profonds.",
+    "actions": {
+      "viewCalls": {
+        "label": "Voir les appels",
+        "description": "Consulter l'historique et l'activité des appels"
+      },
+      "addNumber": {
+        "label": "Ajouter un numéro",
+        "description": "Acheter ou provisionner un nouveau numéro de téléphone"
+      },
+      "inviteStaff": {
+        "label": "Inviter le personnel",
+        "description": "Donner accès aux membres de l'équipe"
+      },
+      "integrations": {
+        "label": "Intégrations",
+        "description": "Connecter des services externes"
+      }
+    }
+  },
   "common": {
     "loading": "Chargement...",
     "error": "Une erreur s'est produite",

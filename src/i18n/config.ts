@@ -23,11 +23,11 @@ i18n
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
-    
+
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
-      lookupLocalStorage: 'i18nextLng',
+      lookupLocalStorage: 'tl24-lang',
     },
     
     react: {

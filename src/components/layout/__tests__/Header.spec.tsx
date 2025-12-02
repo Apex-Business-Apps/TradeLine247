@@ -14,8 +14,8 @@ vi.mock('@/hooks/useAuth', () => ({
   }),
 }));
 
-vi.mock('@/components/LanguageSwitcher', () => ({
-  LanguageSwitcher: () => <div data-testid="language-switcher" />,
+vi.mock('@/components/common/LanguageToggle', () => ({
+  LanguageToggle: () => <div data-testid="language-switcher" />,
 }));
 
 vi.mock('@/components/ui/navigation-menu', () => ({

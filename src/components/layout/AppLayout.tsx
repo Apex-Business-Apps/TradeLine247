@@ -6,6 +6,7 @@ import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { useUserPreferencesStore } from "@/stores/userPreferencesStore";
 import { Toaster } from "@/components/ui/sonner";
 import { useKlaviyoAnalytics } from "@/hooks/useKlaviyoAnalytics";
+import { PWAInstallPrompt } from "@/components/common/PWAInstallPrompt";
 
 // Lazy load non-critical UI components to reduce initial bundle size
 const MiniChat = lazy(() => import("@/components/ui/MiniChat").then(module => ({ default: module.MiniChat })));
@@ -92,6 +93,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         <Suspense fallback={null}>
           <ConnectionIndicator />
         </Suspense>
+        <PWAInstallPrompt />
         {/* Enhanced Toast Notifications */}
         <Toaster position="bottom-right" richColors closeButton />
       </ThemeProvider>

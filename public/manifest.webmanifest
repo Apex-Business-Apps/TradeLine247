@@ -1,10 +1,11 @@
 {
   "name": "TradeLine 24/7",
-  "short_name": "TL247",
+  "short_name": "TradeLine",
+  "description": "Never miss a call. Work while you sleep.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#141414",
+  "background_color": "#1a2b4a",
+  "theme_color": "#e55a2b",
   "icons": [
     {
       "src": "/assets/brand/App_Icons/icon-192.png",

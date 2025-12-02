@@ -31,6 +31,29 @@
     "en": "English",
     "fr-CA": "Français (CA)"
   },
+  "quickActions": {
+    "title": "Quick Actions",
+    "heading": "Quick actions for operators",
+    "subheading": "Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.",
+    "actions": {
+      "viewCalls": {
+        "label": "View Calls",
+        "description": "Review call history and activity"
+      },
+      "addNumber": {
+        "label": "Add Number",
+        "description": "Purchase or provision a new phone number"
+      },
+      "inviteStaff": {
+        "label": "Invite Staff",
+        "description": "Grant access to team members"
+      },
+      "integrations": {
+        "label": "Integrations",
+        "description": "Connect external services"
+      }
+    }
+  },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",

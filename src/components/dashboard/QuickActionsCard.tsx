@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Phone, UserPlus, PhoneCall, Link as LinkIcon, Loader2 } from 'lucide-react';
@@ -6,41 +6,38 @@ import { paths } from '@/routes/paths';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { toast } from 'sonner';
 import { errorReporter } from '@/lib/errorReporter';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 
-const actions = [
-  {
-    label: 'View Calls',
-    icon: Phone,
-    to: paths.calls,
-    variant: 'default' as const,
-    description: 'Review call history and activity'
-  },
-  {
-    label: 'Add Number',
-    icon: PhoneCall,
-    to: paths.addNumber,
-    variant: 'outline' as const,
-    description: 'Purchase or provision a new phone number'
-  },
-  {
-    label: 'Invite Staff',
-    icon: UserPlus,
-    to: paths.teamInvite,
-    variant: 'outline' as const,
-    description: 'Grant access to team members'
-  },
-  {
-    label: 'Integrations',
-    icon: LinkIcon,
-    to: paths.integrations,
-    variant: 'outline' as const,
-    description: 'Connect external services'
-  },
-];
+type QuickActionKey = 'viewCalls' | 'addNumber' | 'inviteStaff' | 'integrations';
 
-export const QuickActionsCard: React.FC = () => {
+const actionConfig: Record<QuickActionKey, { icon: typeof Phone; to: string; variant: 'default' | 'outline' }> = {
+  viewCalls: { icon: Phone, to: paths.calls, variant: 'default' },
+  addNumber: { icon: PhoneCall, to: paths.addNumber, variant: 'outline' },
+  inviteStaff: { icon: UserPlus, to: paths.teamInvite, variant: 'outline' },
+  integrations: { icon: LinkIcon, to: paths.integrations, variant: 'outline' },
+};
+
+interface QuickActionsCardProps {
+  className?: string;
+}
+
+export const QuickActionsCard: React.FC<QuickActionsCardProps> = ({ className }) => {
   const { goToWithFeedback, isNavigating } = useSafeNavigation();
   const [clickedAction, setClickedAction] = useState<string | null>(null);
+  const { t } = useTranslation('common');
+
+  const actions = useMemo(() => {
+    return (Object.keys(actionConfig) as QuickActionKey[]).map((key) => {
+      const config = actionConfig[key];
+      return {
+        key,
+        label: t(`quickActions.actions.${key}.label`),
+        description: t(`quickActions.actions.${key}.description`),
+        ...config,
+      };
+    });
+  }, [t]);
 
   const handleActionClick = async (action: typeof actions[0]) => {
     try {
@@ -81,15 +78,15 @@ export const QuickActionsCard: React.FC = () => {
   };
 
   return (
-    <Card>
+    <Card className={cn('quick-actions-card relative z-[2]', className)} style={{ zIndex: 2 }}>
       <CardHeader>
-        <CardTitle className="text-lg">Quick Actions</CardTitle>
+        <CardTitle className="text-lg">{t('quickActions.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         {actions.map((action) => {
           const Icon = action.icon;
           const isActionLoading = isNavigating && clickedAction === action.label;
-          const descriptionId = `quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}-description`;
+          const descriptionId = `quick-action-${action.key}-description`;
 
           return (
             <Button
@@ -101,16 +98,16 @@ export const QuickActionsCard: React.FC = () => {
               aria-label={action.label}
               aria-describedby={descriptionId}
               title={action.description}
-              data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
+              data-testid={`quick-action-${action.key}`}
               data-qa-action={action.label}
             >
               {isActionLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-              <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4" />
               )}
               <span className={isActionLoading ? 'opacity-70' : ''}>
-              {action.label}
+                {action.label}
               </span>
               <span id={descriptionId} className="sr-only">
                 {action.description}

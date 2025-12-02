@@ -14,9 +14,11 @@ import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
 import SwipeNavigator from "@/components/layout/SwipeNavigator";
 import SwipeLayout from "@/components/layout/SwipeLayout";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     trackPageView("home");
@@ -109,6 +111,8 @@ const Index = () => {
 
             <SwipeLayout sectionClassName="justify-start">
               <div className="hero-background relative">
+                {/* Z-index order: wallpaper (-1) < scrim (1) < gradient tint (2) < content (10+) */}
+                <div className="hero-scrim" aria-hidden="true" style={{ zIndex: 1 }} />
                 <div className="hero-gradient-tint" aria-hidden="true" />
                 <HeroRoiDuo />
               </div>
@@ -118,10 +122,10 @@ const Index = () => {
               <div className="container mx-auto px-4 py-12">
                 <div className="mx-auto max-w-4xl space-y-6 text-center">
                   <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                    Quick actions for operators
+                    {t('quickActions.heading')}
                   </h2>
                   <p className="text-muted-foreground">
-                    Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+                    {t('quickActions.subheading')}
                   </p>
                   <QuickActionsCard />
                 </div>

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, useLocation } from 'react-router-dom';
 import { paths } from '@/routes/paths';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { LanguageToggle } from '@/components/common/LanguageToggle';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { errorReporter } from '@/lib/errorReporter';
 import builtCanadianBadge from '@/assets/badges/built-canadian.svg';
@@ -289,7 +289,7 @@ export const Header: React.FC = () => {
               Dashboard
             </Button>
           )}
-          <LanguageSwitcher />
+          <LanguageToggle />
 
           {/* Burger Menu Button - Always visible */}
           <button
@@ -498,7 +498,7 @@ export const Header: React.FC = () => {
             )}
             <div className="border-t border-border" />
             <div className="space-y-3">
-              <LanguageSwitcher className="w-full" />
+              <LanguageToggle className="w-full" />
               {user ? (
                 <Button
                   variant="outline"

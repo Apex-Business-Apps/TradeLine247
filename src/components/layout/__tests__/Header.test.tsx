@@ -21,8 +21,8 @@ vi.mock('@/hooks/useSafeNavigation', () => ({
   useSafeNavigation: () => ({ goToWithFeedback: vi.fn() }),
 }));
 
-vi.mock('@/components/LanguageSwitcher', () => ({
-  LanguageSwitcher: () => <button aria-label="language switcher" />,
+vi.mock('@/components/common/LanguageToggle', () => ({
+  LanguageToggle: () => <button aria-label="language switcher" />,
 }));
 
 vi.mock('@/assets/badges/built-canadian.svg', () => ({ default: 'badge.svg' }));
