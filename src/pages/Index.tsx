@@ -97,28 +97,28 @@ const Index = () => {
               ]}
             />
 
-          {/* Hero section with 70% opacity gradient background - WCAG AA compliant */}
+          {/* Hero section with 55% opacity gradient - Background image visible */}
           <div
             className="relative"
             style={{
               backgroundImage: `linear-gradient(
                 to bottom,
-                rgba(255, 107, 53, 0.70) 0%,
-                rgba(104, 182, 233, 0.70) 100%
+                rgba(255, 107, 53, 0.55) 0%,
+                rgba(104, 182, 233, 0.55) 100%
               )`,
             }}
           >
             <HeroRoiDuo />
           </div>
 
-          {/* Rest of page with 85% opacity gradient background - WCAG AA compliant */}
+          {/* Rest of page with 72% opacity gradient - Text readable, image visible */}
           <div
             className="relative"
             style={{
               backgroundImage: `linear-gradient(
                 to bottom,
-                rgba(255, 107, 53, 0.85) 0%,
-                rgba(104, 182, 233, 0.85) 100%
+                rgba(255, 107, 53, 0.72) 0%,
+                rgba(104, 182, 233, 0.72) 100%
               )`,
             }}
           >
