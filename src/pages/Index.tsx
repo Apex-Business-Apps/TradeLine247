@@ -45,10 +45,6 @@ const Index = () => {
     ["--hero-wallpaper-image" as const]: `url(${backgroundImage})`,
   } as CSSProperties;
 
-  const landingBackgroundStyle = {
-    backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-  } as CSSProperties;
-
   return (
     <div className="relative min-h-screen" style={wallpaperVariables}>
       <div
@@ -57,10 +53,7 @@ const Index = () => {
         style={wallpaperStyle}
         aria-hidden="true"
       />
-      <main
-        className="landing-shell min-h-screen flex flex-col relative"
-        style={landingBackgroundStyle}
-      >
+      <main className="landing-shell min-h-screen flex flex-col relative">
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
           <AISEOHead
