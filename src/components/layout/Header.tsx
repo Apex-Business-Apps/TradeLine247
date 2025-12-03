@@ -34,7 +34,6 @@ const MARKETING_NAV = [
 ] as const;
 
 const ADMIN_NAV = [
-  { name: 'Dashboard', href: paths.dashboard, icon: User },
   { name: 'Calls', href: paths.calls, icon: Phone },
   { name: 'Phone Apps', href: paths.phoneApps, icon: Smartphone },
   { name: 'Settings', href: paths.voiceSettings, icon: Settings },
@@ -142,6 +141,18 @@ export const Header: React.FC = () => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location?.pathname]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   // Active path check
   const isActivePath = useCallback((href: string) => {
