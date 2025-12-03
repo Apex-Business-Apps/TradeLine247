@@ -117,20 +117,68 @@ const Index = () => {
               ]}
             />
 
-          {/* Hero and Quick Actions sections */}
-          <HeroRoiDuo />
-          <BenefitsGrid />
-          <ImpactStrip />
-          <HowItWorks />
-          <div className="container mx-auto px-4 py-12">
-            <div className="mx-auto max-w-4xl space-y-6 text-center">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                Quick actions for operators
-              </h2>
-              <p className="text-muted-foreground">
-                Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-              </p>
-              <QuickActionsCard />
+          {/* Hero section with 45% opacity gradient overlay */}
+          <div className="relative">
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: `
+                  linear-gradient(to bottom, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07)),
+                  linear-gradient(
+                    to bottom,
+                    rgba(255, 107, 53, 0.45) 0%,
+                    rgba(104, 182, 233, 0.45) 100%
+                  )
+                `,
+                backgroundRepeat: "no-repeat, no-repeat",
+                backgroundSize: "cover, cover",
+                backgroundPosition: "center, center",
+              }}
+              aria-hidden="true"
+            />
+            <div className="relative">
+              <HeroRoiDuo />
+            </div>
+          </div>
+
+          {/* Rest of page with 65% opacity gradient overlay */}
+          <div className="relative">
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: `
+                  linear-gradient(to bottom, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.10)),
+                  linear-gradient(
+                    to bottom,
+                    rgba(255, 107, 53, 0.65) 0%,
+                    rgba(104, 182, 233, 0.65) 100%
+                  )
+                `,
+                backgroundRepeat: "no-repeat, no-repeat",
+                backgroundSize: "cover, cover",
+                backgroundPosition: "center, center",
+              }}
+              aria-hidden="true"
+            />
+            <div className="relative">
+              <BenefitsGrid />
+              <ImpactStrip />
+              <HowItWorks />
+              <div className="container mx-auto px-4 py-12">
+                <div className="mx-auto max-w-4xl space-y-6 text-center">
+                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                    Quick actions for operators
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+                  </p>
+                  <QuickActionsCard />
+                </div>
+              </div>
+              <TrustBadgesSlim />
+              <LeadCaptureForm />
+              <Footer />
+              <NoAIHypeFooter />
             </div>
           </div>
           <TrustBadgesSlim />
