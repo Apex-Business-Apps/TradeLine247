@@ -106,12 +106,11 @@ const Index = () => {
 
           {/* Hero and Quick Actions bands with unified mask overlay */}
           <div className="relative">
-            <div className="hero-gradient-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />
+            {/* Orange-to-blue gradient tint covering hero + Quick Actions band */}
+            <div className="hero-gradient-tint" aria-hidden="true" />
             <div className="hero-vignette absolute inset-0 pointer-events-none" aria-hidden="true" />
             <div className="relative">
-              <div className="hero-background">
-                <HeroRoiDuo />
-              </div>
+              <HeroRoiDuo />
               <BenefitsGrid />
               <ImpactStrip />
               <HowItWorks />

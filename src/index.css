@@ -1217,22 +1217,16 @@ textarea:focus-visible {
   50% { background-position: 100% 50%; }
 }
 
+/* Hero section internal overlays - only used inside HeroRoiDuo component */
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  /* Orange mask overlay - proper brand orange with reduced opacity for better background visibility */
-  /* Using brand orange #FF6B35 (hsl(21, 100%, 60%)) for consistent brand identity */
-  background: rgba(255, 107, 53, 0.20); /* Brand orange #FF6B35 with 20% opacity - baseline for non-landing pages */
+  background: rgba(255, 107, 53, 0.20);
   pointer-events: none;
   z-index: 1;
 }
 
-/* Landing page overlay - consistent opacity for WCAG compliance */
-[data-page="landing"] .hero-gradient-overlay {
-  background: rgba(255, 107, 53, 0.24); /* Brand orange #FF6B35 with 24% opacity - sufficient for text contrast */
-}
-
-/* Hide hero-section internal overlays on landing page since unified overlays are applied at root level */
+/* Hide hero-section internal overlays on landing page since unified gradient-tint is applied at root level */
 [data-page="landing"] .hero-section .hero-gradient-overlay,
 [data-page="landing"] .hero-section .hero-vignette,
 [data-page="landing"] .hero-section .hero-gradient {
