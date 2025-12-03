@@ -15,6 +15,7 @@ import { runSwCleanup } from "./lib/swCleanup";
 import { featureFlags } from "./config/featureFlags";
 import "./i18n/config";
 import { detectSafeModeFromSearch } from "./lib/safeMode";
+import { initBackgroundSystem } from "./utils/backgroundSystem";
 
 console.info('✅ Core modules loaded');
 
@@ -141,14 +142,17 @@ function boot() {
 
     console.info('✅ React mounted successfully');
 
+    // Initialize background system (viewport height fix, platform detection)
+    initBackgroundSystem();
+
     // Signal to E2E tests that React hydration is complete
     setTimeout(() => {
       (window as any).__REACT_READY__ = true;
     }, 0);
-    
+
     // Run SW cleanup hotfix (one-time, auto-expires after 7 days)
     runSwCleanup().catch(err => console.warn('[SW Cleanup] Failed:', err));
-    
+
     // Initialize boot sentinel (production monitoring only)
     initBootSentinel();
     

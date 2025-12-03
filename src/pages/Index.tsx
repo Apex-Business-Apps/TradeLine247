@@ -97,28 +97,28 @@ const Index = () => {
               ]}
             />
 
-          {/* Hero section with 45% opacity gradient background */}
+          {/* Hero section with 55% opacity gradient - Background image visible */}
           <div
             className="relative"
             style={{
               backgroundImage: `linear-gradient(
                 to bottom,
-                rgba(255, 107, 53, 0.45) 0%,
-                rgba(104, 182, 233, 0.45) 100%
+                rgba(255, 107, 53, 0.55) 0%,
+                rgba(104, 182, 233, 0.55) 100%
               )`,
             }}
           >
             <HeroRoiDuo />
           </div>
 
-          {/* Rest of page with 65% opacity gradient background */}
+          {/* Rest of page with 72% opacity gradient - Text readable, image visible */}
           <div
             className="relative"
             style={{
               backgroundImage: `linear-gradient(
                 to bottom,
-                rgba(255, 107, 53, 0.65) 0%,
-                rgba(104, 182, 233, 0.65) 100%
+                rgba(255, 107, 53, 0.72) 0%,
+                rgba(104, 182, 233, 0.72) 100%
               )`,
             }}
           >
