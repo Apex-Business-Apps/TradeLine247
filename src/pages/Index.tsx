@@ -122,17 +122,11 @@ const Index = () => {
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                backgroundImage: `
-                  linear-gradient(to bottom, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.07)),
-                  linear-gradient(
-                    to bottom,
-                    rgba(255, 107, 53, 0.45) 0%,
-                    rgba(104, 182, 233, 0.45) 100%
-                  )
-                `,
-                backgroundRepeat: "no-repeat, no-repeat",
-                backgroundSize: "cover, cover",
-                backgroundPosition: "center, center",
+                backgroundImage: `linear-gradient(
+                  to bottom,
+                  rgba(255, 107, 53, 0.45) 0%,
+                  rgba(104, 182, 233, 0.45) 100%
+                )`,
               }}
               aria-hidden="true"
             />
@@ -146,17 +140,11 @@ const Index = () => {
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
-                backgroundImage: `
-                  linear-gradient(to bottom, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.10)),
-                  linear-gradient(
-                    to bottom,
-                    rgba(255, 107, 53, 0.65) 0%,
-                    rgba(104, 182, 233, 0.65) 100%
-                  )
-                `,
-                backgroundRepeat: "no-repeat, no-repeat",
-                backgroundSize: "cover, cover",
-                backgroundPosition: "center, center",
+                backgroundImage: `linear-gradient(
+                  to bottom,
+                  rgba(255, 107, 53, 0.65) 0%,
+                  rgba(104, 182, 233, 0.65) 100%
+                )`,
               }}
               aria-hidden="true"
             />
