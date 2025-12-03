@@ -8,6 +8,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Scroll behavior: Account for sticky header when jumping to anchors */
+html {
+  scroll-padding-top: 70px; /* Sticky header height + safe margin */
+}
+
 /* Shell containers for landing and dashboard pages */
 .landing-shell,
 .dashboard-shell {
@@ -1222,15 +1227,15 @@ textarea:focus-visible {
   z-index: 1;
 }
 
-/* Landing page overlay - 20% more transparent (20% * 0.8 = 16%) */
+/* Landing page overlay - consistent opacity for WCAG compliance */
 [data-page="landing"] .hero-gradient-overlay {
-  background: rgba(255, 107, 53, 0.16); /* Brand orange #FF6B35 with 16% opacity - landing page lighter baseline */
+  background: rgba(255, 107, 53, 0.24); /* Brand orange #FF6B35 with 24% opacity - sufficient for text contrast */
 }
 
-/* Hide ALL hero-section overlays on landing page since full-page overlays are applied at root level */
-[data-page="landing"] .hero-gradient-overlay,
-[data-page="landing"] .hero-vignette,
-[data-page="landing"] .hero-gradient {
+/* Hide hero-section internal overlays on landing page since unified overlays are applied at root level */
+[data-page="landing"] .hero-section .hero-gradient-overlay,
+[data-page="landing"] .hero-section .hero-vignette,
+[data-page="landing"] .hero-section .hero-gradient {
   display: none !important;
 }
 
@@ -1302,16 +1307,14 @@ textarea:focus-visible {
 }
 
 .hero-headline {
-  color: hsl(var(--brand-orange-primary)) !important; /* WCAG AA: 4.50:1 contrast - compliant for all text sizes */
-  /* text-shadow removed for a11y - causes color-contrast violations */
+  color: hsl(var(--brand-orange-primary)) !important; /* WCAG AA compliance via proper overlay coverage */
   line-height: 1.1;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
 .hero-tagline {
-  color: #1e556b !important;
-  /* text-shadow removed for a11y - causes color-contrast violations */
+  color: #1e556b !important; /* WCAG AA compliance via proper overlay coverage */
   line-height: 1.3;
   font-weight: 600;
 }

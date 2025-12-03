@@ -104,15 +104,14 @@ const Index = () => {
               ]}
             />
 
-          <div className="hero-background relative">
-            <div className="hero-gradient-tint" aria-hidden="true" />
-            <HeroRoiDuo />
-          </div>
-          {/* Sections below hero with extended mask overlay */}
+          {/* Hero and Quick Actions bands with unified mask overlay */}
           <div className="relative">
             <div className="hero-gradient-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />
             <div className="hero-vignette absolute inset-0 pointer-events-none" aria-hidden="true" />
             <div className="relative">
+              <div className="hero-background">
+                <HeroRoiDuo />
+              </div>
               <BenefitsGrid />
               <ImpactStrip />
               <HowItWorks />
