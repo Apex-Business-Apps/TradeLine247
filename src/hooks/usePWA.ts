@@ -17,6 +17,11 @@ export const usePWA = (): UsePWAReturn => {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
+    // Guard: Only run in browser environment with matchMedia support
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return;
+    }
+
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
