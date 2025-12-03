@@ -62,11 +62,11 @@ const Index = () => {
         style={{
           ...landingBackgroundStyle,
           backgroundImage: `
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)),
             linear-gradient(
               to bottom,
-              rgba(255, 107, 53, 0.62) 0%,
-              rgba(104, 182, 233, 0.72) 100%
+              rgba(255, 107, 53, 0.18) 0%,
+              rgba(104, 182, 233, 0.22) 100%
             )
           `,
           backgroundRepeat: "no-repeat, no-repeat",
