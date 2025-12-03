@@ -73,17 +73,11 @@ if (import.meta.env.DEV || /lovable/.test(location.hostname)) {
     });
 }
 
-// Unregister any existing service workers to prevent stale cache issues
-// Will re-enable PWA with proper update strategy after stabilization
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    for (const registration of registrations) {
-      registration.unregister().then(() => {
-        console.info('[SW] Service worker unregistered - preventing stale cache during stabilization');
-      });
-    }
-  });
-}
+// PWA Service Worker Management:
+// - Registration handled in index.html (production only)
+// - Safe mode available via ?safe=1 query parameter
+// - Version-based cache invalidation in sw.js prevents stale assets
+// - One-time cleanup hotfix runs via swCleanup.ts (auto-expires after 7 days)
 
 const root = document.getElementById('root');
 if (!root) {
