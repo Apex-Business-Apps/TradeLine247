@@ -59,7 +59,20 @@ const Index = () => {
       />
       <main
         className="landing-shell min-h-screen flex flex-col relative"
-        style={landingBackgroundStyle}
+        style={{
+          ...landingBackgroundStyle,
+          backgroundImage: `
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
+            linear-gradient(
+              to bottom,
+              rgba(255, 107, 53, 0.62) 0%,
+              rgba(104, 182, 233, 0.72) 100%
+            )
+          `,
+          backgroundRepeat: "no-repeat, no-repeat",
+          backgroundSize: "cover, cover",
+          backgroundPosition: "center, center",
+        }}
       >
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
@@ -104,33 +117,26 @@ const Index = () => {
               ]}
             />
 
-          {/* Hero and Quick Actions bands with unified mask overlay */}
-          <div className="relative">
-            {/* Orange-to-blue gradient tint covering hero + Quick Actions band */}
-            <div className="hero-gradient-tint" aria-hidden="true" />
-            <div className="hero-vignette absolute inset-0 pointer-events-none" aria-hidden="true" />
-            <div className="relative">
-              <HeroRoiDuo />
-              <BenefitsGrid />
-              <ImpactStrip />
-              <HowItWorks />
-              <div className="container mx-auto px-4 py-12">
-                <div className="mx-auto max-w-4xl space-y-6 text-center">
-                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                    Quick actions for operators
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-                  </p>
-                  <QuickActionsCard />
-                </div>
-              </div>
-              <TrustBadgesSlim />
-              <LeadCaptureForm />
-              <Footer />
-              <NoAIHypeFooter />
+          {/* Hero and Quick Actions sections */}
+          <HeroRoiDuo />
+          <BenefitsGrid />
+          <ImpactStrip />
+          <HowItWorks />
+          <div className="container mx-auto px-4 py-12">
+            <div className="mx-auto max-w-4xl space-y-6 text-center">
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                Quick actions for operators
+              </h2>
+              <p className="text-muted-foreground">
+                Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+              </p>
+              <QuickActionsCard />
             </div>
           </div>
+          <TrustBadgesSlim />
+          <LeadCaptureForm />
+          <Footer />
+          <NoAIHypeFooter />
         </div>
       </main>
     </div>
