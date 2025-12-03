@@ -51,34 +51,10 @@ html {
   transform: translateZ(0);
 }
 
-.hero-gradient-tint {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
-    linear-gradient(
-      to bottom,
-      rgba(255, 107, 53, 0.62) 0%,
-      rgba(104, 182, 233, 0.72) 100%
-    );
-  background-position: center top, center top;
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@media (max-width: 1024px) {
-  .hero-gradient-tint {
-    background-position: center 10%, center 10%;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-gradient-tint {
-    background-position: center 14%, center 14%;
-  }
-}
+/* REMOVED: .hero-gradient-tint class - no longer used
+ * Gradient overlays now applied as inline background-image styles
+ * on section containers in Index.tsx (45% hero, 65% rest)
+ */
 
 @media (max-width: 1024px) {
   .landing-shell {
@@ -1234,57 +1210,14 @@ textarea:focus-visible {
 }
 
 /* ============================================================================
-   LANDING PAGE OVERLAY SYSTEM - REGRESSION SAFEGUARDS
+   LANDING PAGE OVERLAY SYSTEM - REMOVED
    ============================================================================
-   DO NOT MODIFY: These rules ensure 65% orange overlay covers full landing page
-   Critical z-index stack: Background (-10) < Overlays (99-100) < Header (9999)
+   Previous "regression safeguards" were forcing gradients to position: fixed,
+   causing them to overlay content instead of serving as backgrounds.
+
+   Current approach: Clean inline background-image gradients applied directly
+   to section containers. No global CSS overrides needed.
    ============================================================================ */
-
-/* Ensure landing page content doesn't interfere with overlays */
-[data-page="landing"] .landing-shell {
-  position: relative;
-  isolation: isolate;
-}
-
-[data-page="landing"] .landing-shell > * {
-  position: relative;
-  z-index: 1 !important; /* Below overlays (99-100) but above background */
-}
-
-/* Prevent any z-index escalation that could hide overlays */
-[data-page="landing"] main,
-[data-page="landing"] section:not(header),
-[data-page="landing"] div:not([style*="zIndex: 99"]):not([style*="zIndex: 100"]) {
-  z-index: auto;
-}
-
-/* iOS-specific fixes for fixed overlays */
-@supports (-webkit-touch-callout: none) {
-  /* iOS Safari fix for fixed positioning */
-  [data-page="landing"] body {
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* Prevent iOS scroll jank with overlays */
-  [data-page="landing"] .fixed {
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-/* Idempotency guard: Ensure overlays always work even if applied multiple times */
-[data-page="landing"] [style*="rgba(255, 107, 53, 0.65)"] {
-  z-index: 99 !important;
-  position: fixed !important;
-}
-
-[data-page="landing"] [style*="radial-gradient"] {
-  z-index: 100 !important;
-  position: fixed !important;
-}
 
 .hero-vignette {
   position: absolute;
