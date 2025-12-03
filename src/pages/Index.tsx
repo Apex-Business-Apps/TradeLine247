@@ -59,20 +59,7 @@ const Index = () => {
       />
       <main
         className="landing-shell min-h-screen flex flex-col relative"
-        style={{
-          ...landingBackgroundStyle,
-          backgroundImage: `
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
-            linear-gradient(
-              to bottom,
-              rgba(255, 107, 53, 0.62) 0%,
-              rgba(104, 182, 233, 0.72) 100%
-            )
-          `,
-          backgroundRepeat: "no-repeat, no-repeat",
-          backgroundSize: "cover, cover",
-          backgroundPosition: "center, center",
-        }}
+        style={landingBackgroundStyle}
       >
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
@@ -169,10 +156,6 @@ const Index = () => {
               <NoAIHypeFooter />
             </div>
           </div>
-          <TrustBadgesSlim />
-          <LeadCaptureForm />
-          <Footer />
-          <NoAIHypeFooter />
         </div>
       </main>
     </div>
