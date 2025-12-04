@@ -49,7 +49,7 @@ const Index = () => {
     <div className="relative min-h-screen" style={wallpaperVariables}>
       <div
         id="app-home"
-        className="fixed inset-0 -z-10 pointer-events-none bg-no-repeat bg-cover bg-center"
+        className="fixed inset-0 z-0 pointer-events-none bg-no-repeat bg-cover bg-center"
         style={wallpaperStyle}
         aria-hidden="true"
       />
