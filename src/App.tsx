@@ -7,6 +7,7 @@ import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 // CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
 import { paths } from "./routes/paths";
+import RequireAuth from "./components/RequireAuth";
 
 // PERFORMANCE: Route-based code splitting - lazy load all routes except Index (critical)
 const Pricing = lazy(() => import("./pages/Pricing"));
@@ -14,8 +15,11 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const Features = lazy(() => import("./pages/Features"));
 const Compare = lazy(() => import("./pages/Compare"));
 const Security = lazy(() => import("./pages/Security"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 const Contact = lazy(() => import("./pages/Contact"));
+const DocsHub = lazy(() => import("./pages/DocsHub"));
 const Auth = lazy(() => import("./pages/Auth"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
 const AuthLanding = lazy(() => import("./pages/AuthLanding"));
 const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
 const CallCenter = lazy(() => import("./pages/CallCenter"));
@@ -26,6 +30,7 @@ const VoiceSettings = lazy(() => import("./pages/ops/VoiceSettings"));
 const TeamInvite = lazy(() => import("./pages/TeamInvite"));
 const PhoneApps = lazy(() => import("./pages/PhoneApps"));
 const ForwardingWizard = lazy(() => import("./routes/ForwardingWizard"));
+const PreviewHealth = lazy(() => import("./pages/PreviewHealth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
@@ -35,10 +40,17 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.features, element: <Features /> },
   { path: paths.compare, element: <Compare /> },
   { path: paths.security, element: <Security /> },
+  { path: paths.privacy, element: <Privacy /> },
   { path: paths.contact, element: <Contact /> },
+  { path: paths.docs, element: <DocsHub /> },
+  { path: paths.login, element: <LoginPage /> },
   { path: paths.auth, element: <Auth /> },
   { path: '/auth-landing', element: <AuthLanding /> },
-  { path: paths.dashboard, element: <ClientDashboard /> },
+  { path: paths.dashboard, element: (
+    <RequireAuth>
+      <ClientDashboard />
+    </RequireAuth>
+  ) },
   { path: paths.calls, element: <CallCenter /> },
   { path: paths.callCenterLegacy, element: <CallCenter /> },
   { path: paths.callLogs, element: <CallLogs /> },
@@ -49,6 +61,7 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.integrations, element: <Integrations /> },
   { path: paths.phoneApps, element: <PhoneApps /> },
   { path: paths.forwardingWizard, element: <ForwardingWizard /> },
+  { path: paths.previewHealth, element: <PreviewHealth /> },
   { path: paths.notFound, element: <NotFound /> },
 ];
 

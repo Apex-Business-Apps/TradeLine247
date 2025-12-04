@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -60,7 +60,7 @@ jobs:
     needs: [ build ]
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -97,7 +97,7 @@ jobs:
     needs: [ build ]
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -123,7 +123,7 @@ jobs:
     needs: [ build ]
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -131,7 +131,14 @@ jobs:
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps
       - run: npm run -s build
-      - run: npx playwright test tests/cta-smoke.spec.ts --reporter=line
+      - name: Ensure port 4173 is free
+        run: |
+          lsof -ti:4173 | xargs kill -9 || true
+          sleep 2
+      - name: Run smoke tests
+        run: npx playwright test tests/cta-smoke.spec.ts --reporter=line
+        env:
+          CI: true
 
   e2e-full:
     name: e2e/full
@@ -140,7 +147,7 @@ jobs:
     if: github.event_name == 'schedule' || github.ref == 'refs/heads/main'
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -148,7 +155,14 @@ jobs:
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps
       - run: npm run -s build
-      - run: npx playwright test --reporter=line
+      - name: Ensure port 4173 is free
+        run: |
+          lsof -ti:4173 | xargs kill -9 || true
+          sleep 2
+      - name: Run full E2E tests
+        run: npx playwright test --reporter=line
+        env:
+          CI: true
   
   a11y:
     name: a11y/accessibility
@@ -156,7 +170,7 @@ jobs:
     needs: [ build ]
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -164,6 +178,10 @@ jobs:
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps
       - run: npm run -s build
+      - name: Ensure port 4173 is free
+        run: |
+          lsof -ti:4173 | xargs kill -9 || true
+          sleep 2
       - name: Run comprehensive accessibility tests
         run: npx playwright test tests/e2e/a11y-comprehensive.spec.ts --reporter=list --reporter=html
       - name: Upload accessibility report
@@ -181,7 +199,7 @@ jobs:
     needs: [ build ]
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 20

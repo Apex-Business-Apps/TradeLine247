@@ -64,6 +64,10 @@
   <key>UIViewControllerBasedStatusBarAppearance</key>
   <true/>
 
+  <!-- EXPORT COMPLIANCE: App uses only standard encryption (HTTPS/TLS) -->
+  <key>ITSAppUsesNonExemptEncryption</key>
+  <false/>
+
   <!-- Add privacy descriptions ONLY for capabilities you use -->
   <!-- <key>NSCameraUsageDescription</key>
   <string>This app uses the camera to scan IDs and receipts.</string> -->

@@ -27,6 +27,17 @@ const Privacy = () => {
                 <CardTitle>Your Privacy Matters</CardTitle>
               </CardHeader>
               <CardContent className="prose prose-gray max-w-none dark:prose-invert space-y-6">
+                <div className="text-sm text-muted-foreground border border-dashed border-muted rounded-lg p-4">
+                  <p className="font-semibold mb-2">Quick links</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>
+                      <a href="#call-recording" className="text-primary hover:underline">
+                        Call recording policy
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
                 <section>
                   <h2 className="text-2xl font-semibold mb-4">Information We Collect</h2>
                   <p className="text-muted-foreground">
@@ -63,6 +74,8 @@ const Privacy = () => {
                   </p>
                 </section>
 
+                {/* CONTRACT: E2E and compliance checks expect this section with id="call-recording"
+                    to describe call recording, consent, and retention in line with PIPEDA guidance. */}
                 <section id="call-recording">
                   <h2 className="text-2xl font-semibold mb-4">Call Recording Policy</h2>
                   <p className="text-muted-foreground mb-4">

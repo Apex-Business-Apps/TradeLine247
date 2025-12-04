@@ -1,7 +1,8 @@
 name: ci/lighthouse
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  # TEMPORARILY DISABLED - GitHub infrastructure issues causing false failures
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
   workflow_dispatch:
 jobs:
   lhci:
@@ -10,7 +11,7 @@ jobs:
     continue-on-error: true   # LHCI advisory: non-blocking
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Node
         uses: actions/setup-node@v4
         with:

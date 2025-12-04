@@ -6,6 +6,7 @@ console.info('🚀 TradeLine 24/7 - Starting main.tsx...');
 
 import React from "react";
 import { createRoot } from "react-dom/client";
+import "./safe-mode";
 import App from "./App.tsx";
 import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 import "./index.css";
@@ -13,6 +14,8 @@ import { initBootSentinel } from "./lib/bootSentinel";
 import { runSwCleanup } from "./lib/swCleanup";
 import { featureFlags } from "./config/featureFlags";
 import "./i18n/config";
+import { detectSafeModeFromSearch } from "./lib/safeMode";
+import { initBackgroundSystem } from "./utils/backgroundSystem";
 
 console.info('✅ Core modules loaded');
 
@@ -71,17 +74,11 @@ if (import.meta.env.DEV || /lovable/.test(location.hostname)) {
     });
 }
 
-// Unregister any existing service workers to prevent stale cache issues
-// Will re-enable PWA with proper update strategy after stabilization
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    for (const registration of registrations) {
-      registration.unregister().then(() => {
-        console.info('[SW] Service worker unregistered - preventing stale cache during stabilization');
-      });
-    }
-  });
-}
+// PWA Service Worker Management:
+// - Registration handled in index.html (production only)
+// - Safe mode available via ?safe=1 query parameter
+// - Version-based cache invalidation in sw.js prevents stale assets
+// - One-time cleanup hotfix runs via swCleanup.ts (auto-expires after 7 days)
 
 const root = document.getElementById('root');
 if (!root) {
@@ -91,6 +88,8 @@ if (!root) {
   document.body.appendChild(errorPre);
   throw new Error('Missing #root');
 }
+
+const safeModeActive = detectSafeModeFromSearch(window.location.search);
 
 // CRITICAL: Hide loading fallback immediately when this script executes (non-blocking, safe)
 const loadingEl = document.getElementById('root-loading');
@@ -143,14 +142,17 @@ function boot() {
 
     console.info('✅ React mounted successfully');
 
+    // Initialize background system (viewport height fix, platform detection)
+    initBackgroundSystem();
+
     // Signal to E2E tests that React hydration is complete
     setTimeout(() => {
       (window as any).__REACT_READY__ = true;
     }, 0);
-    
+
     // Run SW cleanup hotfix (one-time, auto-expires after 7 days)
     runSwCleanup().catch(err => console.warn('[SW Cleanup] Failed:', err));
-    
+
     // Initialize boot sentinel (production monitoring only)
     initBootSentinel();
     
@@ -161,10 +163,7 @@ function boot() {
       // Moved to index.css import for synchronous loading
       
       // Check for safe mode
-      const urlParams = new URLSearchParams(window.location.search);
-      const isSafeMode = urlParams.get('safe') === '1';
-      
-      if (!isSafeMode) {
+      if (!safeModeActive) {
         import("./lib/roiTableFix")
           .then(m => m.watchRoiTableCanon())
           .catch(e => console.warn('⚠️ ROI watcher failed:', e));
