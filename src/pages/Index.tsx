@@ -148,7 +148,7 @@ const Index = () => {
             <NoAIHypeFooter />
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
