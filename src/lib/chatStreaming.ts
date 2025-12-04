@@ -3,6 +3,8 @@
  * Reduces perceived latency by displaying tokens as they arrive
  */
 
+import { SUPABASE_FUNCTIONS, getSupabaseHeaders } from '@/config/api';
+
 export interface StreamMessage {
   role: 'user' | 'assistant';
   content: string;
@@ -23,13 +25,10 @@ export async function streamChatResponse(
   
   try {
     const response = await fetch(
-      'https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1/chat',
+      SUPABASE_FUNCTIONS.chat,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3ZxZHdtaHhuYmx4ZnFuc3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3MTQxMjcsImV4cCI6MjA3MjI5MDEyN30.cPgBYmuZh7o-stRDGGG0grKINWe9-RolObGmiqsdJfo`
-        },
+        headers: getSupabaseHeaders(),
         body: JSON.stringify({ messages }),
         signal
       }

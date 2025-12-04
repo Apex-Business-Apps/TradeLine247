@@ -39,6 +39,8 @@ if (import.meta.env.DEV && featureFlags.H310_HARDENING) {
 if (import.meta.env.PROD) {
   import('./utils/errorObservability').then(({ initErrorObservability }) => {
     initErrorObservability();
+  }).catch((error) => {
+    console.error('⚠️ Error observability initialization failed:', error);
   });
 }
 
