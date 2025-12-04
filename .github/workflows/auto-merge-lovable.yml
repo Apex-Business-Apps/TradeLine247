@@ -22,11 +22,10 @@ jobs:
   preflight:
     name: validate lovable connection
     if: >
-      github.event.pull_request.user.login == 'lovable[bot]' ||
-      github.event.pull_request.user.login == 'lovable-bot' ||
-      contains(github.event.pull_request.title, 'Lovable') ||
-      contains(github.event.pull_request.title, 'lovable') ||
-      contains(join(github.event.pull_request.labels.*.name, ','), 'lovable')
+      (github.event.pull_request.user.login == 'lovable[bot]' ||
+       github.event.pull_request.user.login == 'lovable-bot' ||
+       contains(join(github.event.pull_request.labels.*.name, ','), 'lovable')) &&
+      !startsWith(github.head_ref, 'claude/')
     runs-on: ubuntu-latest
     outputs:
       should_merge: ${{ steps.validate.outputs.should_merge }}
@@ -117,10 +116,22 @@ jobs:
 
           # Enable auto-merge with squash strategy
           echo "🔄 Enabling auto-merge (squash strategy)..."
-          if retry_with_backoff gh pr merge "$PR" --auto --squash --repo "$REPO"; then
+          if retry_with_backoff gh pr merge "$PR" --auto --squash --repo "$REPO" 2>&1; then
             echo "✅ Auto-merge armed for PR #$PR"
             echo "   Will merge automatically when all required checks pass"
           else
+            EXIT_CODE=$?
+
+            # Check if the error is because auto-merge is not enabled
+            if gh pr merge "$PR" --auto --squash --repo "$REPO" 2>&1 | grep -q "Auto merge is not allowed"; then
+              echo "⚠️  Auto-merge is not enabled for this repository"
+              echo "   Skipping auto-merge - PR can be merged manually"
+              echo ""
+              echo "ℹ️  To enable auto-merge:"
+              echo "   Settings → Pull Requests → Allow auto-merge"
+              exit 0
+            fi
+
             echo "❌ Failed to enable auto-merge"
             echo "   This may be due to:"
             echo "   - Branch protection rules requiring manual approval"
