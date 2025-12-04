@@ -55,7 +55,7 @@ const Index = () => {
       />
       <main className="landing-shell min-h-screen flex flex-col relative">
         {/* Content with translucency - Optimized for performance */}
-        <div className="relative z-10" style={{ minHeight: "100vh" }}>
+        <div className="relative z-10" style={{ minHeight: "100vh" }} role="main">
           <AISEOHead
               title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
               description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
