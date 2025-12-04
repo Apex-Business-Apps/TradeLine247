@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
+import AxeBuilder from './vendor/axe-core-playwright/src/index.js';
 
 async function analyzeAccessibility(page: any, routeName: string) {
   // Use basic accessibility scan without specific tags for compatibility
