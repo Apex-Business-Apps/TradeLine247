@@ -1973,3 +1973,24 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 }
 
 /* END GLOBAL BACKGROUND SYSTEM */
+
+/* MOBILE BACKGROUND FIX - 2025-12-03 */
+@media screen and (max-width: 768px) {
+  .hero-bg {
+    background-attachment: scroll !important;
+    background-position: center top !important;
+    background-size: cover !important;
+    min-height: 100vh !important;
+    min-height: -webkit-fill-available !important;
+  }
+}
+@media screen and (max-width: 375px) {
+  .hero-bg {
+    background-position: center 15% !important;
+    background-size: auto 105% !important;
+  }
+}
+@supports (-webkit-touch-callout: none) {
+  .hero-bg { min-height: -webkit-fill-available !important; }
+}
+/* END MOBILE FIX */
