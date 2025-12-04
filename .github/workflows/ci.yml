@@ -165,7 +165,7 @@ jobs:
       - run: npx playwright install --with-deps
       - run: npm run -s build
       - name: Run comprehensive accessibility tests
-        run: npx playwright test tests/e2e/a11y-comprehensive.spec.ts --reporter=line
+        run: npx playwright test tests/e2e/a11y-comprehensive.spec.ts --reporter=list --reporter=html
       - name: Upload accessibility report
         if: always()
         uses: actions/upload-artifact@v4
@@ -173,6 +173,7 @@ jobs:
           name: accessibility-report
           path: playwright-report/
           retention-days: 30
+          if-no-files-found: ignore
 
   lhci:
     name: ci/lighthouse

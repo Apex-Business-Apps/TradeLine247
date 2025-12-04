@@ -110,7 +110,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "file:tests/e2e/vendor/axe-core-playwright",
+    "@axe-core/playwright": "4.8.0",
     "@eslint/js": "^9.37.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",

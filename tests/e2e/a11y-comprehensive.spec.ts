@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { waitForReactHydration } from './helpers';
 
 /**
  * Comprehensive Accessibility Test Suite
@@ -18,6 +19,12 @@ import AxeBuilder from '@axe-core/playwright';
 // HELPER FUNCTIONS
 // ==========================================
 
+async function gotoAndWaitForHydration(page: any, url: string) {
+  await page.goto(url);
+  await waitForReactHydration(page);
+  await page.waitForLoadState('networkidle');
+}
+
 async function analyzeAccessibility(page: any, routeName: string) {
   // Use basic accessibility scan without specific tags for compatibility
   const results = await new AxeBuilder({ page })
@@ -31,10 +38,11 @@ async function analyzeAccessibility(page: any, routeName: string) {
       console.log(`  Impact: ${violation.impact}`);
       console.log(`  Description: ${violation.description}`);
       console.log(`  Help: ${violation.helpUrl}`);
-      console.log(`  Affected elements: ${violation.nodes.length}`);
+      const nodes = violation.nodes as Array<{ target?: string[] }>;
+      console.log(`  Affected elements: ${nodes.length}`);
       
       // Log first 3 affected elements
-      violation.nodes.slice(0, 3).forEach((node, idx) => {
+      nodes.slice(0, 3).forEach((node, idx) => {
         const selector = node.target?.[0] ?? 'unknown';
         console.log(`    ${idx + 1}. ${selector}`);
       });
@@ -65,8 +73,7 @@ function expectNoViolations(results: any, severity: 'critical' | 'serious' | 'mo
 
 test.describe('Public Pages Accessibility', () => {
   test('Home page - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/');
     
     const results = await analyzeAccessibility(page, 'Home');
     
@@ -80,24 +87,21 @@ test.describe('Public Pages Accessibility', () => {
   });
 
   test('Features page - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/features');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/features');
     
     const results = await analyzeAccessibility(page, 'Features');
     expectNoViolations(results, 'serious');
   });
 
   test('Pricing page - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/pricing');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/pricing');
     
     const results = await analyzeAccessibility(page, 'Pricing');
     expectNoViolations(results, 'serious');
   });
 
   test('Contact page - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/contact');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/contact');
     
     const results = await analyzeAccessibility(page, 'Contact');
     expectNoViolations(results, 'serious');
@@ -110,8 +114,7 @@ test.describe('Public Pages Accessibility', () => {
 
 test.describe('Authentication Accessibility', () => {
   test('Auth landing page - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/auth-landing');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/auth-landing');
     
     const results = await analyzeAccessibility(page, 'Auth Landing');
     expectNoViolations(results, 'serious');
@@ -122,8 +125,7 @@ test.describe('Authentication Accessibility', () => {
   });
 
   test('Main auth page - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/auth');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/auth');
     
     const results = await analyzeAccessibility(page, 'Auth Page');
     expectNoViolations(results, 'serious');
@@ -139,8 +141,7 @@ test.describe('Authentication Accessibility', () => {
 
 test.describe('Dashboard Accessibility', () => {
   test('Client dashboard - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/dashboard');
     
     const results = await analyzeAccessibility(page, 'Client Dashboard');
     expectNoViolations(results, 'serious');
@@ -150,16 +151,14 @@ test.describe('Dashboard Accessibility', () => {
   });
 
   test('Call center - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/call-center');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/call-center');
     
     const results = await analyzeAccessibility(page, 'Call Center');
     expectNoViolations(results, 'serious');
   });
 
   test('Campaign manager - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/campaign-manager');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/campaign-manager');
     
     const results = await analyzeAccessibility(page, 'Campaign Manager');
     expectNoViolations(results, 'serious');
@@ -172,56 +171,49 @@ test.describe('Dashboard Accessibility', () => {
 
 test.describe('Integration Pages Accessibility', () => {
   test('Integrations hub - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/integrations');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/integrations');
     
     const results = await analyzeAccessibility(page, 'Integrations Hub');
     expectNoViolations(results, 'serious');
   });
 
   test('CRM integration - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/dashboard/integrations/crm');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/dashboard/integrations/crm');
     
     const results = await analyzeAccessibility(page, 'CRM Integration');
     expectNoViolations(results, 'serious');
   });
 
   test('Messaging integration - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/dashboard/integrations/messaging');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/dashboard/integrations/messaging');
     
     const results = await analyzeAccessibility(page, 'Messaging Integration');
     expectNoViolations(results, 'serious');
   });
 
   test('Phone integration - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/dashboard/integrations/phone');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/dashboard/integrations/phone');
     
     const results = await analyzeAccessibility(page, 'Phone Integration');
     expectNoViolations(results, 'serious');
   });
 
   test('Email integration - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/dashboard/integrations/email');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/dashboard/integrations/email');
     
     const results = await analyzeAccessibility(page, 'Email Integration');
     expectNoViolations(results, 'serious');
   });
 
   test('Automation integration - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/dashboard/integrations/automation');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/dashboard/integrations/automation');
     
     const results = await analyzeAccessibility(page, 'Automation Integration');
     expectNoViolations(results, 'serious');
   });
 
   test('Mobile integration - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/dashboard/integrations/mobile');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/dashboard/integrations/mobile');
     
     const results = await analyzeAccessibility(page, 'Mobile Integration');
     expectNoViolations(results, 'serious');
@@ -234,8 +226,7 @@ test.describe('Integration Pages Accessibility', () => {
 
 test.describe('Operations Pages Accessibility', () => {
   test('Messaging health - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/ops/messaging-health');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/ops/messaging-health');
     
     const results = await analyzeAccessibility(page, 'Messaging Health');
     expectNoViolations(results, 'serious');
@@ -245,16 +236,14 @@ test.describe('Operations Pages Accessibility', () => {
   });
 
   test('Voice health - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/ops/voice-health');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/ops/voice-health');
     
     const results = await analyzeAccessibility(page, 'Voice Health');
     expectNoViolations(results, 'serious');
   });
 
   test('Twilio evidence - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/ops/twilio-evidence');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/ops/twilio-evidence');
     
     const results = await analyzeAccessibility(page, 'Twilio Evidence');
     expectNoViolations(results, 'serious');
@@ -269,8 +258,7 @@ test.describe('Dark Mode Accessibility', () => {
   test.use({ colorScheme: 'dark' });
 
   test('Home page dark mode - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/');
     
     // Force dark mode
     await page.evaluate(() => {
@@ -285,8 +273,7 @@ test.describe('Dark Mode Accessibility', () => {
   });
 
   test('Dashboard dark mode - WCAG AA compliant', async ({ page }) => {
-    await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/dashboard');
     
     await page.evaluate(() => {
       document.documentElement.classList.add('dark');
@@ -304,8 +291,7 @@ test.describe('Dark Mode Accessibility', () => {
 
 test.describe('Keyboard Navigation', () => {
   test('Tab navigation works on home page', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/');
     
     // Press Tab multiple times and verify focus is visible
     for (let i = 0; i < 5; i++) {
@@ -353,8 +339,7 @@ test.describe('Keyboard Navigation', () => {
 
 test.describe('Form Accessibility', () => {
   test('Contact form - all inputs labeled', async ({ page }) => {
-    await page.goto('/contact');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/contact');
     
     const results = await analyzeAccessibility(page, 'Contact Form');
     
@@ -364,8 +349,7 @@ test.describe('Form Accessibility', () => {
   });
 
   test('Auth form - accessible error messages', async ({ page }) => {
-    await page.goto('/auth');
-    await page.waitForLoadState('networkidle');
+    await gotoAndWaitForHydration(page, '/auth');
     
     const results = await analyzeAccessibility(page, 'Auth Form');
     
