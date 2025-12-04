@@ -21,8 +21,10 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PushNotificationToggle } from '@/components/settings/PushNotificationToggle';
 
 interface DashboardSettingsDialogProps {
   open: boolean;
@@ -158,6 +160,11 @@ export const DashboardSettingsDialog: React.FC<DashboardSettingsDialogProps> = (
               <CardDescription className="text-slate-600 dark:text-slate-400">Manage notification preferences</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Push Notifications (Mobile) */}
+              <PushNotificationToggle />
+
+              <Separator />
+
               <div className="flex items-center justify-between">
                 <Label htmlFor="enable-notifications" className="cursor-pointer">
                   Enable Notifications

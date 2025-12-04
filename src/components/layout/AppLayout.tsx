@@ -81,7 +81,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         <ThemeSync />
         <MotionPreferenceSync />
         <Header />
-        <main className="flex min-h-screen flex-col flex-1" id="main">
+        <main className="flex min-h-screen flex-col flex-1" id="main" role="main">
           {children ?? <Outlet />}
         </main>
         {/* Lazy-loaded Global Chat Widget - uses startup splash robot icon */}

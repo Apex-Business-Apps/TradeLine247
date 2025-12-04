@@ -27,17 +27,16 @@ jobs:
   preflight:
     name: validate lovable connection
     if: >
-      github.event.pull_request.user.login == 'lovable[bot]' ||
-      github.event.pull_request.user.login == 'lovable-bot' ||
-      contains(github.event.pull_request.title, 'Lovable') ||
-      contains(github.event.pull_request.title, 'lovable') ||
-      contains(join(github.event.pull_request.labels.*.name, ','), 'lovable')
+      (github.event.pull_request.user.login == 'lovable[bot]' ||
+       github.event.pull_request.user.login == 'lovable-bot' ||
+       contains(join(github.event.pull_request.labels.*.name, ','), 'lovable')) &&
+      !startsWith(github.head_ref, 'claude/')
     runs-on: ubuntu-latest
     outputs:
       should_merge: ${{ steps.validate.outputs.should_merge }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -77,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -131,7 +130,7 @@ jobs:
 
           # Enable auto-merge with squash strategy
           echo "🔄 Enabling auto-merge (squash strategy)..."
-          if retry_with_backoff gh pr merge "$PR" --auto --squash --repo "$REPO"; then
+          if retry_with_backoff gh pr merge "$PR" --auto --squash --repo "$REPO" 2>&1; then
             echo "✅ Auto-merge armed for PR #$PR"
             echo "   Will merge automatically when all required checks pass"
           else

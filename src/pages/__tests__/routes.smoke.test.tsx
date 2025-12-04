@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HelmetProvider } from 'react-helmet-async';
+import { MemoryRouter } from 'react-router-dom';
 import Pricing from '../Pricing';
 import Auth from '../Auth';
 import Index from '../Index';
@@ -92,9 +93,11 @@ describe('Router Smoke Tests', () => {
 
   it('should render Index page with hero section', () => {
     render(
-      <HelmetProvider>
-        <Index />
-      </HelmetProvider>
+      <MemoryRouter initialEntries={["/"]}>
+        <HelmetProvider>
+          <Index />
+        </HelmetProvider>
+      </MemoryRouter>
     );
 
     // Check that hero section renders
