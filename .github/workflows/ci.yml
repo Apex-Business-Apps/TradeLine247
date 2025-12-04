@@ -183,9 +183,7 @@ jobs:
           lsof -ti:4173 | xargs kill -9 || true
           sleep 2
       - name: Run comprehensive accessibility tests
-        run: npx playwright test tests/e2e/a11y-comprehensive.spec.ts --reporter=line
-        env:
-          CI: true
+        run: npx playwright test tests/e2e/a11y-comprehensive.spec.ts --reporter=list --reporter=html
       - name: Upload accessibility report
         if: always()
         uses: actions/upload-artifact@v4
@@ -193,6 +191,7 @@ jobs:
           name: accessibility-report
           path: playwright-report/
           retention-days: 30
+          if-no-files-found: ignore
 
   lhci:
     name: ci/lighthouse

@@ -114,7 +114,6 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.8.0",
-    "@capacitor/assets": "^3.0.5",
     "@eslint/js": "^9.37.0",
     "@playwright/test": "^1.55.1",
     "@testing-library/dom": "^10.4.0",
