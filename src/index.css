@@ -1327,3 +1327,25 @@ button[class*="btn-aa"] {
   .hero-gradient { animation: none; }
   .hero-cta-button:hover, .feature-badge:hover { transform: none; }
 }
+
+:root { --vh-safe: 100vh; }
+
+@supports (-webkit-touch-callout: none) { :root { --vh-safe: -webkit-fill-available; } }
+
+#app-home, .hero-bg, [class*="hero-section"] {
+  background-attachment: scroll;
+  background-position: center top;
+  background-size: cover;
+  min-height: var(--vh-safe);
+}
+
+@media (max-width: 768px) {
+  #app-home, .hero-bg, [class*="hero-section"] {
+    background-attachment: scroll !important;
+    background-position: center 20%;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  #app-home, .hero-bg, [class*="hero-section"] { min-height: -webkit-fill-available; }
+}

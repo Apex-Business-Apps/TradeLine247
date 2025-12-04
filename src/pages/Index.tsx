@@ -51,6 +51,7 @@ const Index = () => {
           backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
         }}
       >
+        <div className="fixed inset-0 z-0 pointer-events-none"></div>
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
           <AISEOHead
