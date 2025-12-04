@@ -32,6 +32,21 @@
   overflow: hidden;
 }
 
+.hero-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    var(--hero-gradient-layer-1, linear-gradient(transparent, transparent)),
+    var(--hero-gradient-layer-2, linear-gradient(transparent, transparent)),
+    var(--hero-wallpaper-image);
+  background-size: cover, cover, contain;
+  background-position: center top, center top, center;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .hero-gradient-tint {
   position: absolute;
   inset: 0;

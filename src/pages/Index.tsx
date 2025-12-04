@@ -47,6 +47,10 @@ const Index = () => {
     backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
   } as CSSProperties;
 
+  const heroWallpaperStyle = {
+    "--hero-wallpaper-image": `url(${backgroundImage})`,
+  } as CSSProperties;
+
   return (
     <SwipeNavigator>
       <div className="relative min-h-screen">
@@ -104,7 +108,7 @@ const Index = () => {
             />
 
             <SwipeLayout sectionClassName="justify-start">
-              <div className="hero-background relative">
+              <div className="hero-background relative" style={heroWallpaperStyle}>
                 <div className="hero-gradient-tint" aria-hidden="true" />
                 <HeroRoiDuo />
               </div>
