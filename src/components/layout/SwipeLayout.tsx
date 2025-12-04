@@ -20,7 +20,7 @@ export const SwipeLayout: React.FC<SwipeLayoutProps> = ({
     const target = sectionRefs.current[index];
 
     if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 

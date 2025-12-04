@@ -12,8 +12,6 @@ import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
-import SwipeNavigator from "@/components/layout/SwipeNavigator";
-import SwipeLayout from "@/components/layout/SwipeLayout";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
@@ -43,8 +41,8 @@ const Index = () => {
     backgroundImage: `url(${backgroundImage})`,
   } as CSSProperties;
 
-  const landingBackgroundStyle = {
-    backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
+  const wallpaperVariables = {
+    ["--hero-wallpaper-image" as const]: `url(${backgroundImage})`,
   } as CSSProperties;
 
   const heroWallpaperStyle = {
@@ -52,21 +50,17 @@ const Index = () => {
   } as CSSProperties;
 
   return (
-    <SwipeNavigator>
-      <div className="relative min-h-screen">
-        <div
-          id="app-home"
-          className="fixed inset-0 -z-10 pointer-events-none bg-no-repeat bg-cover bg-center"
-          style={wallpaperStyle}
-          aria-hidden="true"
-        />
-        <main
-          className="landing-shell min-h-screen flex flex-col relative"
-          style={landingBackgroundStyle}
-        >
-          {/* Content with translucency - Optimized for performance */}
-          <div className="relative z-10" style={{ minHeight: "100vh" }}>
-            <AISEOHead
+    <div className="relative min-h-screen" style={wallpaperVariables}>
+      <div
+        id="app-home"
+        className="fixed inset-0 z-0 pointer-events-none bg-no-repeat bg-cover bg-center"
+        style={wallpaperStyle}
+        aria-hidden="true"
+      />
+      <main className="landing-shell min-h-screen flex flex-col relative">
+        {/* Content with translucency - Optimized for performance */}
+        <div className="relative z-10" style={{ minHeight: "100vh" }} role="main">
+          <AISEOHead
               title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
               description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
               canonical="/"
@@ -126,15 +120,15 @@ const Index = () => {
                   <QuickActionsCard />
                 </div>
               </div>
-              <TrustBadgesSlim />
-              <LeadCaptureForm />
-              <Footer />
-              <NoAIHypeFooter />
-            </SwipeLayout>
+            </div>
+            <TrustBadgesSlim />
+            <LeadCaptureForm />
+            <Footer />
+            <NoAIHypeFooter />
           </div>
-        </main>
+        </div>
       </div>
-    </SwipeNavigator>
+    </div>
   );
 };
 

@@ -1,7 +1,12 @@
 import React from 'react';
 import { Logo } from '@/components/ui/logo';
+import { usePWA } from '@/hooks/usePWA';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 export const Footer: React.FC = () => {
+  const { isInstallable, isInstalled, showInstallPrompt } = usePWA();
+
   return (
     <footer className="border-t bg-background mt-auto" role="contentinfo">
       <div className="container py-4">
@@ -20,6 +25,18 @@ export const Footer: React.FC = () => {
           </div>
           
           <nav className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+            {isInstallable && !isInstalled && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={showInstallPrompt}
+                className="text-sm"
+                aria-label="Install TradeLine 24/7 app"
+              >
+                <Download className="w-4 h-4 mr-1" />
+                Install App
+              </Button>
+            )}
             <a 
               href="/security" 
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
