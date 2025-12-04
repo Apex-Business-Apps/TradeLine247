@@ -67,7 +67,7 @@ const reactPlugin = {
 };
 
 export default tseslint.config(
-  { ignores: ["dist", "coverage"] },
+  { ignores: ["dist", "coverage", "flowbills/**", "tradeline247aicom/**", "TradeLine247/**"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

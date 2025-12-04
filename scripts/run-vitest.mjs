@@ -48,9 +48,11 @@ if (!Number.isFinite(configuredColumns) || configuredColumns <= 0) {
   env.COLUMNS = '80';
 }
 
+// Cross-platform compatibility: use shell on Windows
+const isWindows = process.platform === 'win32';
 const child = spawn('npx', ['--no-install', 'vitest', ...finalArgs], {
   stdio: 'inherit',
-  shell: false,
+  shell: isWindows,
   env,
 });
 

@@ -11,6 +11,11 @@ on:
         required: true
         type: number
 
+# CRITICAL: Prevent infinite loops - only one workflow run per PR at a time
+concurrency:
+  group: auto-merge-lovable-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  cancel-in-progress: false
+
 permissions:
   pull-requests: write
   contents: write
@@ -109,6 +114,15 @@ jobs:
             return 1
           }
 
+          # CRITICAL: Check if auto-merge is already enabled to prevent loops
+          echo "🔍 Checking if auto-merge is already enabled..."
+          MERGE_STATE=$(gh pr view "$PR" --repo "$REPO" --json autoMergeRequest --jq '.autoMergeRequest.enabledAt // empty')
+          if [ -n "$MERGE_STATE" ]; then
+            echo "✅ Auto-merge is already enabled for PR #$PR (enabled at: $MERGE_STATE)"
+            echo "   Skipping to prevent infinite loops"
+            exit 0
+          fi
+
           # Mark PR as ready (no-op if already ready)
           echo "📝 Marking PR as ready for review..."
           retry_with_backoff gh pr ready "$PR" --repo "$REPO" || {
@@ -121,6 +135,14 @@ jobs:
             echo "✅ Auto-merge armed for PR #$PR"
             echo "   Will merge automatically when all required checks pass"
           else
+            # Check if it failed because auto-merge was already enabled (race condition)
+            MERGE_STATE_AFTER=$(gh pr view "$PR" --repo "$REPO" --json autoMergeRequest --jq '.autoMergeRequest.enabledAt // empty')
+            if [ -n "$MERGE_STATE_AFTER" ]; then
+              echo "✅ Auto-merge was enabled by another process (enabled at: $MERGE_STATE_AFTER)"
+              echo "   This is safe - exiting successfully"
+              exit 0
+            fi
+            
             echo "❌ Failed to enable auto-merge"
             echo "   This may be due to:"
             echo "   - Branch protection rules requiring manual approval"
