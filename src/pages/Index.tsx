@@ -49,17 +49,11 @@ const Index = () => {
     <div className="relative min-h-screen" style={wallpaperVariables}>
       <div
         id="app-home"
-        className="min-h-screen flex flex-col relative"
-        style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
-          backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-        }}
-      >
-        <div className="fixed inset-0 z-0 pointer-events-none"></div>
+        className="fixed inset-0 z-0 pointer-events-none bg-no-repeat bg-cover bg-center"
+        style={wallpaperStyle}
+        aria-hidden="true"
+      />
+      <main className="landing-shell min-h-screen flex flex-col relative">
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
           <AISEOHead
@@ -148,7 +142,7 @@ const Index = () => {
             <NoAIHypeFooter />
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
