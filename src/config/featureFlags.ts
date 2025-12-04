@@ -17,7 +17,7 @@ export const featureFlags = {
   // Add other feature flags here as needed
   ANALYTICS_ENABLED: true,
   ERROR_BOUNDARY_ENABLED: true,
-  SMOKE_CHECKS_ENABLED: process.env.NODE_ENV === 'development',
+  SMOKE_CHECKS_ENABLED: (typeof import.meta !== 'undefined' && import.meta.env?.MODE) === 'development',
   RCS_ENABLED:
     (typeof import.meta !== 'undefined' && import.meta.env?.VITE_FEATURE_RCS) !== undefined
       ? import.meta.env.VITE_FEATURE_RCS === '1'
