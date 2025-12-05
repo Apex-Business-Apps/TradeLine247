@@ -178,36 +178,38 @@ export const Header: React.FC = () => {
           />
         </div>
 
-        {/* Center: Desktop Marketing Navigation */}
-        <nav 
-          data-slot="center" 
-          aria-label="Primary" 
-          className="hidden lg:flex items-center gap-1"
-        >
-          <NavigationMenu>
-            <NavigationMenuList className="gap-1">
-              {MARKETING_NAV.map((item) => (
-                <NavigationMenuItem key={item.name}>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      to={item.href}
-                      className={cn(
-                        'inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2',
-                        'text-sm font-medium text-muted-foreground transition-all duration-300',
-                        'hover:bg-accent hover:text-foreground focus:bg-accent focus:text-foreground',
-                        'focus:outline-none disabled:pointer-events-none disabled:opacity-50',
-                        'data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 hover-scale'
-                      )}
-                      aria-current={isActivePath(item.href) ? 'page' : undefined}
-                    >
-                      {item.name}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
-            </NavigationMenuList>
-          </NavigationMenu>
-        </nav>
+        {/* Center: Desktop Marketing Navigation (Logged-out users only) */}
+        {!user && (
+          <nav
+            data-slot="center"
+            aria-label="Primary"
+            className="hidden lg:flex items-center gap-1"
+          >
+            <NavigationMenu>
+              <NavigationMenuList className="gap-1">
+                {MARKETING_NAV.map((item) => (
+                  <NavigationMenuItem key={item.name}>
+                    <NavigationMenuLink asChild>
+                      <Link
+                        to={item.href}
+                        className={cn(
+                          'inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2',
+                          'text-sm font-medium text-muted-foreground transition-all duration-300',
+                          'hover:bg-accent hover:text-foreground focus:bg-accent focus:text-foreground',
+                          'focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+                          'data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 hover-scale'
+                        )}
+                        aria-current={isActivePath(item.href) ? 'page' : undefined}
+                      >
+                        {item.name}
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </nav>
+        )}
 
         {/* Center: Desktop Admin Navigation (Admin Only, NOT on marketing home) */}
         {isUserAdmin && !isMarketingHome && (

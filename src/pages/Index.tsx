@@ -95,45 +95,49 @@ const Index = () => {
             ]}
           />
 
-          <div className="flex-1" style={{ minHeight: "60vh" }}>
-            {/* All sections now use 85% opacity to match secondary pages */}
-            <div className="bg-background/85 backdrop-blur-[2px]" style={{ willChange: "transform" }}>
-              <HeroRoiDuo />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <BenefitsGrid />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <ImpactStrip />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <HowItWorks />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <div className="container mx-auto px-4 py-12">
-                <div className="mx-auto max-w-4xl space-y-6 text-center">
-                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                    Quick actions for operators
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-                  </p>
-                  <QuickActionsCard />
+          {/* Extended mask overlay covering full landing page */}
+          <div className="relative">
+            <div className="hero-gradient-overlay" aria-hidden="true"></div>
+            <div className="flex-1" style={{ minHeight: "60vh" }}>
+              {/* All sections now use transparent backgrounds over the extended overlay */}
+              <div style={{ willChange: "transform" }}>
+                <HeroRoiDuo />
+              </div>
+              <div>
+                <BenefitsGrid />
+              </div>
+              <div>
+                <ImpactStrip />
+              </div>
+              <div>
+                <HowItWorks />
+              </div>
+              <div>
+                <div className="container mx-auto px-4 py-12">
+                  <div className="mx-auto max-w-4xl space-y-6 text-center">
+                    <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                      Quick actions for operators
+                    </h2>
+                    <p className="text-muted-foreground">
+                      Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+                    </p>
+                    <QuickActionsCard />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <TrustBadgesSlim />
-          </div>
+            <div>
+              <TrustBadgesSlim />
+            </div>
 
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <LeadCaptureForm />
-          </div>
+            <div>
+              <LeadCaptureForm />
+            </div>
 
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <Footer />
+            <div>
+              <Footer />
+            </div>
           </div>
 
           <NoAIHypeFooter />
