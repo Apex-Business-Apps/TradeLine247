@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/seo/SEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
+import { createBrandGradientStyle } from "@/styles/brandGradients";
 
 const faqs = [
   {
@@ -50,17 +51,12 @@ const faqs = [
 ];
 
 const FAQ = () => {
+  const gradientBackgroundStyle = createBrandGradientStyle(backgroundImage);
+
   return (
     <div 
       className="min-h-screen flex flex-col relative"
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed",
-        backgroundColor: "hsl(0, 0%, 97%)",
-      }}
+      style={gradientBackgroundStyle}
     >
       <SEOHead 
         title="FAQ - TradeLine 24/7 AI Receptionist Questions"
@@ -72,99 +68,89 @@ const FAQ = () => {
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
         <div className="flex-1">
           {/* Hero Section */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <section style={{
-              paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
-              paddingLeft: 'env(safe-area-inset-left, 0)',
-              paddingRight: 'env(safe-area-inset-right, 0)'
-            }}>
-              <div className="container text-center">
-                <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
-                  Frequently Asked Questions
-                </h1>
-                <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-                  Everything you need to know about TradeLine 24/7 AI receptionist service
-                </p>
-              </div>
-            </section>
-          </div>
+          <section style={{
+            paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3.5rem)',
+            paddingLeft: 'env(safe-area-inset-left, 0)',
+            paddingRight: 'env(safe-area-inset-right, 0)'
+          }}>
+            <div className="container text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
+                Frequently Asked Questions
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-3xl mx-auto">
+                Everything you need to know about TradeLine 24/7 AI receptionist service
+              </p>
+            </div>
+          </section>
 
           {/* FAQ Accordion */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <section className="py-20">
-              <div className="container">
-                <Card className="max-w-4xl mx-auto">
-                  <CardHeader>
-                    <CardTitle className="text-2xl text-center">Common Questions</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Accordion type="single" collapsible className="w-full">
-                      {faqs.map((faq, index) => (
-                        <AccordionItem key={index} value={`item-${index}`}>
-                          <AccordionTrigger className="text-left">
-                            {faq.question}
-                          </AccordionTrigger>
-                          <AccordionContent className="text-muted-foreground">
-                            {faq.answer}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </CardContent>
-                </Card>
-              </div>
-            </section>
-          </div>
+          <section className="py-20">
+            <div className="container">
+              <Card className="max-w-4xl mx-auto">
+                <CardHeader>
+                  <CardTitle className="text-2xl text-center">Common Questions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`item-${index}`}>
+                        <AccordionTrigger className="text-left">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
 
           {/* Still Have Questions */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <section className="py-20">
-              <div className="container text-center">
-                <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                  Still Have Questions?
-                </h2>
-                <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  Our team is here to help. Get in touch and we'll answer any questions about TradeLine 24/7.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button size="lg" className="shadow-lg" asChild>
-                    <Link to="/contact">Contact Sales</Link>
-                  </Button>
-                  <Button size="lg" variant="outline" asChild>
-                    <Link to="/contact">Schedule Demo</Link>
-                  </Button>
-                </div>
+          <section className="py-20">
+            <div className="container text-center">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                Still Have Questions?
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Our team is here to help. Get in touch and we'll answer any questions about TradeLine 24/7.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" className="shadow-lg" asChild>
+                  <Link to="/contact">Contact Sales</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link to="/contact">Schedule Demo</Link>
+                </Button>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
 
           {/* Quick Stats */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <section className="py-16">
-              <div className="container">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">99.9%</div>
-                    <div className="text-muted-foreground">Uptime Guarantee</div>
-                  </div>
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">10 min</div>
-                    <div className="text-muted-foreground">Setup Time</div>
-                  </div>
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">50+</div>
-                    <div className="text-muted-foreground">Languages Supported</div>
-                  </div>
+          <section className="py-16">
+            <div className="container">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div>
+                  <div className="text-4xl font-bold text-primary mb-2">99.9%</div>
+                  <div className="text-muted-foreground">Uptime Guarantee</div>
+                </div>
+                <div>
+                  <div className="text-4xl font-bold text-primary mb-2">10 min</div>
+                  <div className="text-muted-foreground">Setup Time</div>
+                </div>
+                <div>
+                  <div className="text-4xl font-bold text-primary mb-2">50+</div>
+                  <div className="text-muted-foreground">Languages Supported</div>
                 </div>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
         </div>
         
-        <div className="bg-background/85 backdrop-blur-[2px]">
-          <Footer />
-        </div>
+        <Footer />
       </div>
     </div>
   );

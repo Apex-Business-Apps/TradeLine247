@@ -1,3 +1,8 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# TRADELINE 24/7 — iOS Build Pipeline
+# GOODBUILD Baseline: Build #77 (Oct 27, 2025) - Commit d075d9b
+# ═══════════════════════════════════════════════════════════════════════════════
+
 workflows:
   ios-capacitor-testflight:
     name: TradeLine 24/7 iOS TestFlight

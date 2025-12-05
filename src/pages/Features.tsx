@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { SEOHead } from "@/components/seo/SEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
+import { createBrandGradientStyle } from "@/styles/brandGradients";
+import SwipeNavigator from "@/components/layout/SwipeNavigator";
 
 const features = [
   {
@@ -57,19 +59,16 @@ const Features = () => {
   const handleCTAClick = () => {
     trackButtonClick('features_cta', 'features_page');
   };
+
+  const gradientBackgroundStyle = createBrandGradientStyle(backgroundImage);
+
   return (
-    <div 
-      className="min-h-screen flex flex-col relative"
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed",
-        backgroundColor: "hsl(0, 0%, 97%)",
-      }}
-    >
-      <SEOHead 
+    <SwipeNavigator>
+      <div
+        className="min-h-screen flex flex-col relative"
+        style={gradientBackgroundStyle}
+      >
+      <SEOHead
         title="Features - TradeLine 24/7 AI Receptionist"
         description="Discover powerful AI features: 24/7 call handling, smart routing, omnichannel messaging, CRM integration, and enterprise security. Upgrade your customer service today."
         keywords="AI receptionist features, call management, omnichannel messaging, CRM integration, business automation, 24/7 customer service"
@@ -79,86 +78,79 @@ const Features = () => {
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
         <div className="flex-1">
           {/* Hero Section */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <section style={{
-              paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0), 5rem)',
-              paddingLeft: 'env(safe-area-inset-left, 0)',
-              paddingRight: 'env(safe-area-inset-right, 0)'
-            }}>
-              <div className="container">
-                <div className="text-center max-w-3xl mx-auto">
-                  <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
-                    Powerful Features
-                  </h1>
-                  <p className="text-lg md:text-xl text-muted-foreground mb-8">
-                    Everything you need for fast and reliable customer interaction automation
-                  </p>
-                  <Button size="lg" className="shadow-lg" onClick={handleCTAClick} asChild>
-                    <Link to="/auth">Start Free Trial</Link>
-                  </Button>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* Features Grid */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <section className="py-20">
-              <div className="container">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {features.map((feature, index) => (
-                    <Card key={index} className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <CardHeader className="relative">
-                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                          <feature.icon className="w-6 h-6 text-primary" />
-                        </div>
-                        <CardTitle className="text-xl">{feature.title}</CardTitle>
-                        <CardDescription className="text-base">
-                          {feature.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="relative">
-                        <ul className="space-y-2">
-                          {feature.benefits.map((benefit, idx) => (
-                            <li key={idx} className="flex items-center gap-2 text-sm">
-                              <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)] flex-shrink-0" aria-hidden="true" />
-                              <span>{benefit}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* CTA Section */}
-          <div className="bg-background/85 backdrop-blur-[2px]">
-            <section className="py-20">
-              <div className="container text-center">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  Ready to Grow Your Business?
-                </h2>
-                <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  Join thousands of businesses already using TradeLine 24/7 to grow their customer relationships
+          <section style={{
+            paddingTop: 'max(env(safe-area-inset-top, 0), 5rem)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3.5rem)',
+            paddingLeft: 'env(safe-area-inset-left, 0)',
+            paddingRight: 'env(safe-area-inset-right, 0)'
+          }}>
+            <div className="container">
+              <div className="text-center max-w-3xl mx-auto">
+                <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
+                  Powerful Features
+                </h1>
+                <p className="text-lg md:text-xl text-muted-foreground mb-6">
+                  Everything you need for fast and reliable customer interaction automation
                 </p>
                 <Button size="lg" className="shadow-lg" onClick={handleCTAClick} asChild>
-                  <Link to="/auth">Grow Now</Link>
+                  <Link to="/auth">Start Free Trial</Link>
                 </Button>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
+
+          {/* Features Grid */}
+          <section className="py-20">
+            <div className="container">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {features.map((feature, index) => (
+                  <Card key={index} className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="relative">
+                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                        <feature.icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <CardTitle className="text-xl">{feature.title}</CardTitle>
+                      <CardDescription className="text-base">
+                        {feature.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="relative">
+                      <ul className="space-y-2">
+                        {feature.benefits.map((benefit, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-sm">
+                            <CheckCircle className="w-4 h-4 text-[hsl(142,85%,25%)] flex-shrink-0" aria-hidden="true" />
+                            <span>{benefit}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="py-20">
+            <div className="container text-center">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Ready to Grow Your Business?
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Join thousands of businesses already using TradeLine 24/7 to grow their customer relationships
+              </p>
+              <Button size="lg" className="shadow-lg" onClick={handleCTAClick} asChild>
+                <Link to="/auth">Grow Now</Link>
+              </Button>
+            </div>
+          </section>
         </div>
-        
-        <div className="bg-background/85 backdrop-blur-[2px]">
+
           <Footer />
         </div>
       </div>
-    </div>
+    </SwipeNavigator>
   );
 };
 

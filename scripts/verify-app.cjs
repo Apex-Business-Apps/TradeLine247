@@ -4,7 +4,7 @@ const { spawn } = require('node:child_process');
 const { setTimeout: delay } = require('node:timers/promises');
 
 const HOST = '127.0.0.1';
-const PORT = Number(process.env.VERIFY_PORT || 4173);
+const PORT = Number(process.env.VERIFY_PORT || 4176);
 const ORIGIN = `http://${HOST}:${PORT}`;
 const PATH = process.env.VERIFY_PATH || '/';
 const TIMEOUT_MS = Number(process.env.VERIFY_TIMEOUT_MS || 15000);

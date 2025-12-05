@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client.ts';
 import { useSecureAnalytics } from './useSecureAnalytics';
 import { featureFlags } from '@/config/featureFlags';
 import { errorReporter } from '@/lib/errorReporter';
+import { SUPABASE_FUNCTIONS } from '@/config/api';
 
 interface ABTestVariant {
   [key: string]: any;
@@ -16,14 +17,14 @@ const getOrCreateSessionId = (): string => {
   if (!sessionId) {
     sessionId = crypto.randomUUID();
     sessionStorage.setItem(sessionKey, sessionId);
-    
+
     // Register session server-side for validation (async, non-blocking)
-    fetch('https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1/register-ab-session', {
+    fetch(SUPABASE_FUNCTIONS.registerAbSession, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         sessionId,
-        userAgent: navigator.userAgent 
+        userAgent: navigator.userAgent
       })
     }).catch(() => {
       // Fail silently - session registration is best-effort
@@ -54,8 +55,8 @@ export const useSecureABTest = (testName: string) => {
       const sessionId = getOrCreateSessionId();
 
       // Call secure assignment endpoint
-      const { data, error } = await supabase.functions.invoke('secure-ab-assign', {
-        body: { 
+      const { data, error } = await supabase.functions.invoke(SUPABASE_FUNCTIONS.secureAbAssign, {
+        body: {
           testName,
           anonId: sessionId
         }
@@ -135,7 +136,7 @@ export const useSecureABTest = (testName: string) => {
     }
 
     try {
-      const { error } = await supabase.functions.invoke('ab-convert', {
+      const { error } = await supabase.functions.invoke(SUPABASE_FUNCTIONS.abConvert, {
         body: {
           testName,
           conversionValue
