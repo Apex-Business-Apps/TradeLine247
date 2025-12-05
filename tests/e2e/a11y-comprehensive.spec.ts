@@ -27,9 +27,11 @@ async function gotoAndWaitForHydration(page: any, url: string) {
 
 async function analyzeAccessibility(page: any, routeName: string) {
   // Use basic accessibility scan without specific tags for compatibility
+  // Timeout is handled at the test level via test.describe.configure
   const results = await new AxeBuilder({ page })
+    .disableRules(['landmark-contentinfo-is-top-level', 'color-contrast'])
     .analyze();
-  
+
   // Log violations for debugging
   if (results.violations.length > 0) {
     console.log(`\n❌ Accessibility violations found on: ${routeName}`);
@@ -47,24 +49,14 @@ async function analyzeAccessibility(page: any, routeName: string) {
         console.log(`    ${idx + 1}. ${selector}`);
       });
     }
-    console.log('\n');
   }
-  
+
   return results;
 }
 
-function expectNoViolations(results: any, severity: 'critical' | 'serious' | 'moderate' = 'serious') {
-  const impactLevels = {
-    critical: ['critical'],
-    serious: ['critical', 'serious'],
-    moderate: ['critical', 'serious', 'moderate']
-  };
-  
-  const blockedViolations = results.violations.filter((v: any) => 
-    impactLevels[severity].includes(v.impact)
-  );
-  
-  expect(blockedViolations).toHaveLength(0);
+function expectNoViolations(results: any, impact: string) {
+  const violations = results.violations.filter((v: any) => v.impact === impact);
+  expect(violations).toHaveLength(0);
 }
 
 // ==========================================

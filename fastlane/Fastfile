@@ -4,6 +4,37 @@
 
 default_platform(:ios)
 
+def normalize_private_key(key_content)
+  # If the env value contains literal \n sequences (single-line encoded key),
+  # convert them back to real newlines. If the key already includes real newlines
+  # and the -----BEGIN PRIVATE KEY----- header, leave it unchanged.
+  if key_content.include?("\\n") && !key_content.include?("\n")
+    key_content.gsub("\\n", "\n")
+  else
+    key_content
+  end
+end
+
+def tradeline_app_store_api_key
+  # Use APP_STORE_ID for key_id as it contains the actual Key ID (5XDRL75994)
+  # APP_STORE_CONNECT_KEY_IDENTIFIER currently contains the private key content
+  key_id = ENV.fetch("APP_STORE_ID")
+  issuer_id = ENV.fetch("APP_STORE_CONNECT_ISSUER_ID")
+  key_content_raw = ENV.fetch("APP_STORE_CONNECT_PRIVATE_KEY")
+  key_content = normalize_private_key(key_content_raw)
+
+  UI.message("🔐 Using App Store Connect API key (ID: #{key_id}, Issuer: #{issuer_id.to_s[0, 8]}…)")
+  UI.message("🔑 Private key includes header? #{key_content&.include?('BEGIN PRIVATE KEY') ? 'yes' : 'no'}")
+
+  app_store_connect_api_key(
+    key_id: key_id,
+    issuer_id: issuer_id,
+    key_content: key_content,  # Fastlane expects 'key_content', not 'key'
+    duration: 1200,
+    in_house: false
+  )
+end
+
 platform :ios do
   # Helper method to create App Store Connect API key from Codemagic environment variables
   # 
