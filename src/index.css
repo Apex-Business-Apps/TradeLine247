@@ -1248,8 +1248,8 @@ textarea:focus-visible {
 
 /* Global Orange Color Unification - All orange elements use hero text orange (#FF6B35) */
 :root {
-  --unified-orange: #FF6B35;
-  --unified-orange-dark: #CC4A1F; /* Darker orange for text on white (WCAG AA: 4.5:1 contrast) */
+  --unified-orange: hsl(var(--brand-orange-primary));
+  --unified-orange-dark: hsl(var(--brand-orange-dark)); /* Darker orange for text on white (WCAG AA: 4.5:1 contrast) */
 }
 
 /* Force all black text to navy blue globally */
@@ -1310,8 +1310,8 @@ html.dark a[class*="hover:text-primary"]:hover,
 html.dark [style*="color"][style*="primary"],
 html.dark button[class*="hover:text-primary"]:hover,
 html.dark a[class*="hover:text-primary"]:hover {
-  /* Use lighter orange (#FF6B35) for better contrast on dark backgrounds (#020817) - 4.6:1 contrast */
-  color: #FF6B35 !important;
+  /* Use the unified brand orange for consistent contrast */
+  color: var(--unified-orange) !important;
 }
 
 /* For backgrounds and borders, use the original bright orange */
@@ -1319,12 +1319,12 @@ html.dark a[class*="hover:text-primary"]:hover {
 [class*="bg-primary"],
 button.bg-primary,
 a.bg-primary {
-  background-color: #FF6B35 !important;
+  background-color: var(--unified-orange) !important;
 }
 
 .border-primary,
 [class*="border-primary"] {
-  border-color: #FF6B35 !important;
+  border-color: var(--unified-orange) !important;
 }
 
 /* Special case: outline buttons with primary text on white background need darker orange for WCAG AA */
@@ -1360,7 +1360,7 @@ button[class*="default"],
 a[class*="default"],
 button.btn-aa,
 button[class*="btn-aa"] {
-  background-color: #FF6B35 !important;
+  background-color: var(--unified-orange) !important;
   color: white !important;
 }
 
