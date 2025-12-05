@@ -52,6 +52,49 @@ export const Footer: React.FC = () => {
             </a>
           </nav>
         </div>
+
+        {/* Ecosystem partners / trust strip */}
+        <div className="mt-10 border-t border-slate-200 pt-6 pb-8">
+          <div className="flex flex-col items-center gap-4 text-xs text-slate-500 sm:flex-row sm:justify-center sm:gap-10">
+            {/* TDA backed by Alberta Innovates */}
+            <div className="flex flex-col items-center gap-1 text-center">
+              <span className="uppercase tracking-wide text-[0.7rem]">
+                TDA Backed by
+              </span>
+              <a
+                href="https://albertainnovates.ca/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center"
+              >
+                <img
+                  src="/alberta-innovates.svg"
+                  alt="Alberta Innovates"
+                  className="h-6 w-auto"
+                />
+              </a>
+            </div>
+
+            {/* ERIN membership */}
+            <div className="flex flex-col items-center gap-1 text-center">
+              <span className="uppercase tracking-wide text-[0.7rem]">
+                Member of
+              </span>
+              <a
+                href="https://www.edmontonrin.ca/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center"
+              >
+                <img
+                  src="/erin-logo.svg"
+                  alt="Edmonton Regional Innovation Network (ERIN)"
+                  className="h-10 w-auto"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </footer>
   );
