@@ -25,8 +25,18 @@ const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
 const CallCenter = lazy(() => import("./pages/CallCenter"));
 const CallLogs = lazy(() => import("./pages/CallLogs"));
 const Integrations = lazy(() => import("./pages/Integrations"));
+const CampaignManager = lazy(() => import("./pages/CampaignManager"));
+const CRMIntegration = lazy(() => import("./pages/integrations/CRMIntegration"));
+const MessagingIntegration = lazy(() => import("./pages/integrations/MessagingIntegration"));
+const PhoneIntegration = lazy(() => import("./pages/integrations/PhoneIntegration"));
+const EmailIntegration = lazy(() => import("./pages/integrations/EmailIntegration"));
+const AutomationIntegration = lazy(() => import("./pages/integrations/AutomationIntegration"));
+const MobileIntegration = lazy(() => import("./pages/integrations/MobileIntegration"));
 const ClientNumberOnboarding = lazy(() => import("./pages/ops/ClientNumberOnboarding"));
 const VoiceSettings = lazy(() => import("./pages/ops/VoiceSettings"));
+const MessagingHealth = lazy(() => import("./pages/ops/MessagingHealth"));
+const VoiceHealth = lazy(() => import("./pages/ops/VoiceHealth"));
+const TwilioEvidence = lazy(() => import("./pages/ops/TwilioEvidence"));
 const TeamInvite = lazy(() => import("./pages/TeamInvite"));
 const PhoneApps = lazy(() => import("./pages/PhoneApps"));
 const ForwardingWizard = lazy(() => import("./routes/ForwardingWizard"));
@@ -57,10 +67,20 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.addNumber, element: <ClientNumberOnboarding /> },
   { path: paths.numbersLegacy, element: <ClientNumberOnboarding /> },
   { path: paths.voiceSettings, element: <VoiceSettings /> },
+  { path: paths.campaignManager, element: <CampaignManager /> },
   { path: paths.teamInvite, element: <TeamInvite /> },
   { path: paths.integrations, element: <Integrations /> },
+  { path: paths.integrationsCRM, element: <CRMIntegration /> },
+  { path: paths.integrationsMessaging, element: <MessagingIntegration /> },
+  { path: paths.integrationsPhone, element: <PhoneIntegration /> },
+  { path: paths.integrationsEmail, element: <EmailIntegration /> },
+  { path: paths.integrationsAutomation, element: <AutomationIntegration /> },
+  { path: paths.integrationsMobile, element: <MobileIntegration /> },
   { path: paths.phoneApps, element: <PhoneApps /> },
   { path: paths.forwardingWizard, element: <ForwardingWizard /> },
+  { path: paths.messagingHealth, element: <MessagingHealth /> },
+  { path: paths.voiceHealth, element: <VoiceHealth /> },
+  { path: paths.twilioEvidence, element: <TwilioEvidence /> },
   { path: paths.previewHealth, element: <PreviewHealth /> },
   { path: paths.notFound, element: <NotFound /> },
 ];
