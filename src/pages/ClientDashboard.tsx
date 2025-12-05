@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -12,6 +13,7 @@ import SwipeNavigator from '@/components/layout/SwipeNavigator';
 const NewDashboard = lazy(() => import('@/components/dashboard/NewDashboard').then(module => ({ default: module.NewDashboard })));
 
 const ClientDashboard = () => {
+  const { t } = useTranslation('dashboard');
   const { error, lastUpdated, refresh } = useDashboardData();
   const { dashboardLayout } = useUserPreferencesStore();
 
@@ -21,9 +23,9 @@ const ClientDashboard = () => {
 
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
             <p className="text-sm text-muted-foreground">
-              Your AI receptionist is working hard for you today
+              {t('welcome.subtitle')}
             </p>
           </div>
 
@@ -40,7 +42,7 @@ const ClientDashboard = () => {
                   className="ml-4 h-auto px-3 py-1 text-xs"
                 >
                   <RefreshCw className="h-3 w-3 mr-1" />
-                  Try again
+                  {t('actions.try_again')}
                 </Button>
               </AlertDescription>
             </Alert>
