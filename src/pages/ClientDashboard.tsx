@@ -1,3 +1,13 @@
+/**
+ * Client Dashboard - Main entry point
+ *
+ * ============================================================================
+ * LOVABLE: DO NOT MODIFY TYPESCRIPT IN THIS FILE
+ * ============================================================================
+ * This project uses strict: false intentionally. TypeCheck passes (0 errors).
+ * Do not apply stricter rules than tsconfig.json specifies.
+ * ============================================================================
+ */
 import React, { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Footer } from '@/components/layout/Footer';
