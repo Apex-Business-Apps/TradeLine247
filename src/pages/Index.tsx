@@ -53,7 +53,7 @@ const Index = () => {
         style={wallpaperStyle}
         aria-hidden="true"
       />
-      <main className="landing-shell min-h-screen flex flex-col relative">
+      <div className="landing-shell min-h-screen flex flex-col relative">
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
           <AISEOHead
@@ -142,7 +142,7 @@ const Index = () => {
             <NoAIHypeFooter />
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

@@ -33,7 +33,10 @@ export const HowItWorks = () => {
             const IconComponent = step.icon;
             return (
             <Card key={index} className="relative text-center group hover:shadow-lg transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: 'hsl(21 100% 30%)' }}>
+              <div
+                className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                style={{ backgroundColor: 'hsl(var(--brand-orange-dark))', color: '#ffffff' }}
+              >
                 {step.step}
               </div>
               <CardHeader className="pt-8">
