@@ -1,0 +1,197 @@
+name: Auto-merge Lovable PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  # ENHANCED: Also trigger on workflow_dispatch for manual intervention
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to auto-merge'
+        required: true
+        type: number
+
+# CRITICAL: Prevent infinite loops - only one workflow run per PR at a time
+concurrency:
+  group: auto-merge-lovable-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  cancel-in-progress: false
+
+permissions:
+  pull-requests: write
+  contents: write
+  checks: read
+  statuses: read
+
+jobs:
+  # ENHANCED: Pre-flight validation job
+  preflight:
+    name: validate lovable connection
+    if: >
+      github.event.pull_request.user.login == 'lovable[bot]' ||
+      github.event.pull_request.user.login == 'lovable-bot' ||
+      contains(github.event.pull_request.title, 'Lovable') ||
+      contains(github.event.pull_request.title, 'lovable') ||
+      contains(join(github.event.pull_request.labels.*.name, ','), 'lovable')
+    runs-on: ubuntu-latest
+    outputs:
+      should_merge: ${{ steps.validate.outputs.should_merge }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Validate PR metadata
+        id: validate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+        run: |
+          set -euo pipefail
+          echo "🔍 Validating PR #$PR..."
+
+          # Check if PR is from Lovable bot
+          PR_AUTHOR=$(gh pr view "$PR" --repo "$REPO" --json author --jq '.author.login')
+          echo "PR Author: $PR_AUTHOR"
+
+          # Check PR state
+          PR_STATE=$(gh pr view "$PR" --repo "$REPO" --json state --jq '.state')
+          echo "PR State: $PR_STATE"
+
+          if [ "$PR_STATE" != "OPEN" ]; then
+            echo "⚠️  PR is not open, skipping auto-merge"
+            echo "should_merge=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Validation passed
+          echo "✅ Pre-flight validation passed"
+          echo "should_merge=true" >> $GITHUB_OUTPUT
+
+  # ENHANCED: Main auto-merge job with better error handling
+  auto:
+    name: enable auto-merge when checks pass
+    needs: preflight
+    if: needs.preflight.outputs.should_merge == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Enable auto-merge with retry logic
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+        run: |
+          set -euo pipefail
+          echo "🤖 Processing PR #$PR on $REPO"
+
+          # Function to retry with exponential backoff
+          retry_with_backoff() {
+            local max_attempts=3
+            local timeout=2
+            local attempt=1
+
+            while [ $attempt -le $max_attempts ]; do
+              if "$@"; then
+                return 0
+              fi
+
+              if [ $attempt -lt $max_attempts ]; then
+                echo "⚠️  Attempt $attempt failed. Retrying in ${timeout}s..."
+                sleep $timeout
+                timeout=$((timeout * 2))
+              fi
+
+              attempt=$((attempt + 1))
+            done
+
+            echo "❌ All $max_attempts attempts failed"
+            return 1
+          }
+
+          # CRITICAL: Check if auto-merge is already enabled to prevent loops
+          echo "🔍 Checking if auto-merge is already enabled..."
+          MERGE_STATE=$(gh pr view "$PR" --repo "$REPO" --json autoMergeRequest --jq '.autoMergeRequest.enabledAt // empty')
+          if [ -n "$MERGE_STATE" ]; then
+            echo "✅ Auto-merge is already enabled for PR #$PR (enabled at: $MERGE_STATE)"
+            echo "   Skipping to prevent infinite loops"
+            exit 0
+          fi
+
+          # Mark PR as ready (no-op if already ready)
+          echo "📝 Marking PR as ready for review..."
+          retry_with_backoff gh pr ready "$PR" --repo "$REPO" || {
+            echo "⚠️  Could not mark PR as ready (may already be ready)"
+          }
+
+          # Enable auto-merge with squash strategy
+          echo "🔄 Enabling auto-merge (squash strategy)..."
+          if retry_with_backoff gh pr merge "$PR" --auto --squash --repo "$REPO"; then
+            echo "✅ Auto-merge armed for PR #$PR"
+            echo "   Will merge automatically when all required checks pass"
+          else
+            # Check if it failed because auto-merge was already enabled (race condition)
+            MERGE_STATE_AFTER=$(gh pr view "$PR" --repo "$REPO" --json autoMergeRequest --jq '.autoMergeRequest.enabledAt // empty')
+            if [ -n "$MERGE_STATE_AFTER" ]; then
+              echo "✅ Auto-merge was enabled by another process (enabled at: $MERGE_STATE_AFTER)"
+              echo "   This is safe - exiting successfully"
+              exit 0
+            fi
+            
+            echo "❌ Failed to enable auto-merge"
+            echo "   This may be due to:"
+            echo "   - Branch protection rules requiring manual approval"
+            echo "   - PR conflicts with base branch"
+            echo "   - Insufficient permissions"
+            echo ""
+            echo "🔧 Troubleshooting steps:"
+            echo "1. Check branch protection settings"
+            echo "2. Ensure Lovable GitHub App has write permissions"
+            echo "3. Verify no merge conflicts exist"
+            echo "4. Check required status checks configuration"
+            exit 1
+          fi
+
+      - name: Comment on PR with status
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+        run: |
+          gh pr comment "$PR" --repo "$REPO" --body "✅ Auto-merge enabled. This PR will merge automatically when all required checks pass.
+
+          **Required for merge:**
+          - All status checks must pass
+          - No merge conflicts
+          - Branch protection rules satisfied
+
+          _This is an automated Lovable PR._"
+
+      - name: Report failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+        run: |
+          gh pr comment "$PR" --repo "$REPO" --body "⚠️  Auto-merge could not be enabled for this PR.
+
+          **Possible reasons:**
+          - Branch protection requires manual approval
+          - Merge conflicts detected
+          - Insufficient GitHub App permissions
+          - Required status checks not configured
+
+          **To resolve:**
+          1. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details
+          2. Verify Lovable GitHub App permissions in repository settings
+          3. Review branch protection rules
+          4. Manually approve and merge if needed
+
+          _This is an automated Lovable PR._"

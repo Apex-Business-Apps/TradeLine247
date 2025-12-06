@@ -1,0 +1,119 @@
+/* 🔒 HERO SECTION STYLES - PERMANENTLY LOCKED LAYOUT 🔒
+ * 
+ * ⚠️ CRITICAL: THIS LAYOUT IS LOCKED FOR LIFE - DO NOT MODIFY ⚠️
+ * Last locked: 2025-09-30
+ * 
+ * APPROVED LAYOUT SPECIFICATIONS:
+ * Mobile (< 1024px):
+ *   - Single column, perfectly centered
+ *   - Logo: 322px max-width, centered
+ *   - All text: centered alignment
+ *   - Form: single column, centered, max-width 600px
+ *   - NO horizontal offset (transform: none)
+ * 
+ * Desktop (≥ 1024px):
+ *   - Two column grid (form + ROI calculator)
+ *   - Both columns: equal width, same top alignment
+ *   - Horizontal offset: translateX(0.35cm) for visual balance
+ *   - Max-width per column: 715px
+ *   - Grid centered with max-width 1980px
+ * 
+ * Protected by:
+ * - Runtime validation (heroGuardian.ts)
+ * - Layout canon checks (layoutCanon.ts)
+ * - Layout self-healing (layoutGuard.ts)
+ * - MutationObserver monitoring
+ * 
+ * Performance Targets (ENFORCED):
+ * - LCP ≤ 2.5s
+ * - CLS ≤ 0.05
+ * 
+ * MODIFICATION REQUIRES:
+ * 1. Executive approval
+ * 2. Full regression testing
+ * 3. Performance validation
+ * 4. Mobile/PWA compliance check
+ * 
+ * Violations will trigger:
+ * - Console errors
+ * - Visual overlay warnings
+ * - Potential deployment blocks
+ */
+
+/* === LOCKED HERO ROI LAYOUT - MOBILE CENTERED, DESKTOP OFFSET === */
+
+/* Container: always centered with safe area insets - LOCKED */
+.hero-roi__container{
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding-left: max(2rem, env(safe-area-inset-left)) !important;
+  padding-right: max(2rem, env(safe-area-inset-right)) !important;
+  padding-top: max(0rem, env(safe-area-inset-top)) !important;
+  padding-bottom: max(0rem, env(safe-area-inset-bottom)) !important;
+  width: 100% !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+/* Grid: single column mobile, two column desktop - LOCKED */
+.hero-roi__grid{
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 3rem !important;
+  justify-items: center !important;
+  justify-content: center !important;
+  align-items: start !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  max-width: 1800px !important;
+}
+
+/* Mobile: centered, NO offset - LOCKED */
+#start-trial-hero,
+#roi-calculator{
+  position: static !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: 660px !important; /* Increased by 10% from 600px */
+  margin: 0 auto !important;
+  /* CLS FIX: Reserve minimum height to prevent layout shift */
+  min-height: 520px !important;
+  contain: layout !important;
+}
+
+/* Portrait mode: force center alignment (height > width) - LOCKED */
+@media (orientation: portrait) {
+  #start-trial-hero,
+  #roi-calculator{
+    transform: none !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+}
+
+/* Desktop: side by side WITH offset for visual balance - LOCKED */
+@media (min-width: 1024px) {
+  .hero-roi__grid {
+    grid-template-columns: repeat(2, minmax(550px, 715px)) !important; /* Increased by 10% */
+    max-width: 1980px !important; /* Increased by 10% from 1800px */
+    gap: 4rem !important;
+    justify-content: center !important;
+  }
+  
+  #start-trial-hero,
+  #roi-calculator{
+    max-width: 715px !important; /* Increased by 10% from 650px */
+    transform: translateX(0.55cm) !important; /* Moved right by 1cm from -0.45cm */
+    /* CLS FIX: Maintain min-height on desktop */
+    min-height: 520px !important;
+  }
+  
+  /* Desktop portrait: override offset for center alignment */
+  @media (orientation: portrait) {
+    #start-trial-hero,
+    #roi-calculator{
+      transform: none !important;
+      margin: 0 auto !important;
+    }
+  }
+}

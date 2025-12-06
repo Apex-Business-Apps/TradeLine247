@@ -1,0 +1,79 @@
+name: ios/build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-14
+    timeout-minutes: 45
+    env:
+      NODE_VERSION: '20'
+      IOS_APP_DIR: ios/App
+      WORKSPACE_PATH: App.xcworkspace
+      PROJECT_PATH: App.xcodeproj
+      SCHEME: App
+      CONFIGURATION: Debug
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build web assets
+        run: npm run build
+
+      - name: Sync Capacitor iOS project
+        run: npx cap sync ios
+
+      - name: Verify synced iOS project layout
+        run: |
+          set -euo pipefail
+          if [ ! -d "$IOS_APP_DIR" ]; then
+            echo "::error::Expected iOS app directory at $IOS_APP_DIR"; exit 1;
+          fi
+          if [ ! -f "$IOS_APP_DIR/Podfile" ]; then
+            echo "::error::Podfile missing from $IOS_APP_DIR"; exit 1;
+          fi
+          if [ ! -d "$IOS_APP_DIR/$PROJECT_PATH" ]; then
+            echo "::error::Missing $PROJECT_PATH inside $IOS_APP_DIR (run npx cap sync ios)"; exit 1;
+          fi
+          if [ ! -f "$IOS_APP_DIR/$PROJECT_PATH/project.pbxproj" ]; then
+            echo "::error::Missing project.pbxproj inside $IOS_APP_DIR/$PROJECT_PATH"; exit 1;
+          fi
+
+      - name: Install CocoaPods
+        shell: bash
+        working-directory: ${{ env.IOS_APP_DIR }}
+        run: |
+          set -euo pipefail
+
+          echo "Installing pods from $(pwd)"
+
+          pod install --repo-update
+
+          if [ ! -d "$WORKSPACE_PATH" ]; then
+            echo "Expected CocoaPods to generate $WORKSPACE_PATH" >&2
+            exit 1
+          fi
+
+      - name: Build iOS workspace
+        shell: bash
+        working-directory: ${{ env.IOS_APP_DIR }}
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace "$WORKSPACE_PATH" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            build
