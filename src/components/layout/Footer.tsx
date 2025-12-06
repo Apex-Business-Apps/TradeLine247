@@ -16,7 +16,7 @@ const trustBadges = [
   {
     title: 'Backed by Alberta Innovates',
     alt: 'Alberta Innovates logo',
-    logo: '/alberta-innovates.svg',
+    logo: '/alberta-innovates.png',
     abbreviation: 'AI',
   },
   {
