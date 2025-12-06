@@ -16,25 +16,25 @@ const trustBadges = [
   {
     title: 'Backed by Alberta Innovates',
     alt: 'Alberta Innovates logo',
-    logo: '/alberta-innovates.svg',
+    logo: '/alberta-innovates.png',
     abbreviation: 'AI',
   },
   {
     title: 'Powered by OpenAI',
-    alt: 'OpenAI logo placeholder',
-    logo: null,
+    alt: 'OpenAI logo',
+    logo: '/assets/brand/badges/openai-logo.png',
     abbreviation: 'OA',
   },
   {
     title: 'Payments by Stripe',
-    alt: 'Stripe logo placeholder',
-    logo: null,
+    alt: 'Stripe logo',
+    logo: '/assets/brand/badges/stripe-logo.png',
     abbreviation: 'S',
   },
   {
     title: 'Infrastructure on Vercel',
-    alt: 'Vercel logo placeholder',
-    logo: null,
+    alt: 'Vercel logo',
+    logo: '/assets/brand/badges/vercel-logo.png',
     abbreviation: 'V',
   },
 ];
@@ -62,6 +62,16 @@ export const Footer: React.FC = () => {
             <p className="text-sm text-muted-foreground">
               © 2025 <span className="text-primary font-semibold">TradeLine 24/7</span>. Never miss a call. We got it.
             </p>
+          </div>
+
+          {/* Apex Business Systems Logo - Center */}
+          <div className="hidden md:flex items-center justify-center">
+            <img
+              src="/assets/brand/apex-logo.png"
+              alt="Apex Business Systems"
+              className="h-12 w-auto object-contain"
+              loading="lazy"
+            />
           </div>
 
           <nav className="flex flex-wrap items-center justify-center gap-3 md:gap-5 text-sm text-muted-foreground">
@@ -94,26 +104,26 @@ export const Footer: React.FC = () => {
             {trustBadges.map((badge) => (
               <div
                 key={badge.title}
-                className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 shadow-sm"
+                className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 shadow-sm max-w-[220px] overflow-hidden"
                 data-testid="trust-badge"
               >
                 {badge.logo ? (
                   <img
                     src={badge.logo}
                     alt={badge.alt}
-                    className="h-8 w-auto object-contain"
+                    className="h-8 w-auto object-contain flex-shrink-0"
                     loading="lazy"
                   />
                 ) : (
                   <div
-                    className="flex h-8 w-8 items-center justify-center rounded-md bg-muted text-xs font-semibold uppercase text-muted-foreground"
+                    className="flex h-8 w-8 items-center justify-center rounded-md bg-muted text-xs font-semibold uppercase text-muted-foreground flex-shrink-0"
                     aria-label={badge.alt}
                   >
                     {badge.abbreviation}
                   </div>
                 )}
-                <div className="text-left">
-                  <div className="text-sm font-semibold leading-tight text-foreground">{badge.title}</div>
+                <div className="text-left min-w-0 flex-1">
+                  <div className="text-sm font-semibold leading-tight text-foreground truncate">{badge.title}</div>
                   <div className="text-xs text-muted-foreground">Ecosystem partner</div>
                 </div>
               </div>
