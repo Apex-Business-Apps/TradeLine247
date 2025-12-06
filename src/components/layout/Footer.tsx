@@ -64,6 +64,16 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
+          {/* Apex Business Systems Logo - Center */}
+          <div className="hidden md:flex items-center justify-center">
+            <img
+              src="/assets/brand/apex-logo.svg"
+              alt="Apex Business Systems"
+              className="h-12 w-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+
           <nav className="flex flex-wrap items-center justify-center gap-3 md:gap-5 text-sm text-muted-foreground">
             {isInstallable && !isInstalled && (
               <Button
