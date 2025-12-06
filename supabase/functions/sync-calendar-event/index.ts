@@ -247,13 +247,14 @@ Booked via TradeLine 24/7 AI Receptionist
   // Perform action based on provider
   if (integration.provider === 'google') {
     switch (data.action) {
-      case 'create':
+      case 'create': {
         const created = await createGoogleEvent(accessToken, integration.calendar_id, calendarEvent);
         if (created) {
           eventId = created.id;
           success = true;
         }
         break;
+      }
       case 'update':
         if (eventId) {
           success = await updateGoogleEvent(accessToken, integration.calendar_id, eventId, calendarEvent);

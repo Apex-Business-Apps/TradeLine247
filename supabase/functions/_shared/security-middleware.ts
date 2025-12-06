@@ -262,51 +262,57 @@ export function validateRequest<T extends Record<string, unknown>>(
       case 'string':
         sanitizedData[field] = sanitize.string(value, rules.maxLength);
         break;
-      case 'email':
+      case 'email': {
         const email = sanitize.email(value);
         if (rules.required && !email) {
           errors.push(`${field} must be a valid email`);
         }
         sanitizedData[field] = email;
         break;
-      case 'phone':
+      }
+      case 'phone': {
         const phone = sanitize.phone(value);
         if (rules.required && !phone) {
           errors.push(`${field} must be a valid phone number`);
         }
         sanitizedData[field] = phone;
         break;
+      }
       case 'integer':
         sanitizedData[field] = sanitize.integer(value, rules.min, rules.max);
         break;
-      case 'uuid':
+      case 'uuid': {
         const uuid = sanitize.uuid(value);
         if (rules.required && !uuid) {
           errors.push(`${field} must be a valid UUID`);
         }
         sanitizedData[field] = uuid;
         break;
-      case 'date':
+      }
+      case 'date': {
         const date = sanitize.date(value);
         if (rules.required && !date) {
           errors.push(`${field} must be a valid date`);
         }
         sanitizedData[field] = date;
         break;
-      case 'time':
+      }
+      case 'time': {
         const time = sanitize.time(value);
         if (rules.required && !time) {
           errors.push(`${field} must be a valid time (HH:MM)`);
         }
         sanitizedData[field] = time;
         break;
-      case 'enum':
+      }
+      case 'enum': {
         const enumValue = sanitize.enum(value, rules.allowedValues || []);
         if (rules.required && !enumValue) {
           errors.push(`${field} must be one of: ${rules.allowedValues?.join(', ')}`);
         }
         sanitizedData[field] = enumValue;
         break;
+      }
       case 'boolean':
         sanitizedData[field] = Boolean(value);
         break;
