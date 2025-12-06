@@ -52,52 +52,76 @@ Follow these exact clicks. No thinking required. Just do what it says.
 
 ---
 
-## PART 2: Add Key to Supabase
+## PART 2: Get OpenAI API Key (For TTS - Optional but Recommended)
 
-### Click 9: Open Supabase Dashboard
+### Click 9: Open OpenAI Website
+- Go to: `platform.openai.com`
+- Click **"Sign up"** or **"Log in"** (top right)
+
+### Click 10: Get API Key
+- Once logged in, click your profile (top right)
+- Click **"API keys"** or go to: `platform.openai.com/api-keys`
+- Click **"Create new secret key"** button
+- **Name it**: Type `Hermes3-TTS` (or anything)
+- Click **"Create secret key"**
+
+### Click 11: Copy OpenAI Key
+- **IMPORTANT**: Copy the key (starts with `sk-`)
+- **Paste it into your text file** (save it!)
+- ⚠️ **You can only see this once!** Copy it now!
+- Click **"Done"**
+
+### Click 12: Open Supabase Dashboard
 - Go to: `supabase.com/dashboard`
 - Click on your project name
 
-### Click 10: Open Settings
+### Click 13: Open Settings
 - Look at left sidebar
 - Find **"Settings"** (gear icon ⚙️)
 - Click it
 
-### Click 11: Open Edge Functions
+### Click 14: Open Edge Functions
 - In Settings menu, find **"Edge Functions"**
 - Click it
 
-### Click 12: Open Environment Variables
+### Click 15: Open Environment Variables
 - Find **"Environment Variables"** or **"Secrets"**
 - Click it
 
-### Click 13: Add First Variable
+### Click 16: Add First Variable (Hermes 3)
 - Click **"Add new secret"** or **"New variable"** button
 - **Name field**: Click, type exactly: `HERMES3_HOSTING_PROVIDER`
 - **Value field**: Click, type exactly: `huggingface`
 - Click **"Save"** or **"Add"**
 
-### Click 14: Add Second Variable
+### Click 17: Add Second Variable (Hugging Face Key)
 - Click **"Add new secret"** or **"New variable"** again
 - **Name field**: Click, type exactly: `HUGGINGFACE_API_KEY`
-- **Value field**: Click, paste your token (from the text file you saved)
+- **Value field**: Click, paste your Hugging Face token (from Part 1)
 - Click **"Save"** or **"Add"**
 
-### Click 15: Verify
-- You should see both variables listed:
+### Click 18: Add Third Variable (OpenAI Key for TTS)
+- Click **"Add new secret"** or **"New variable"** again
+- **Name field**: Click, type exactly: `OPENAI_API_KEY`
+- **Value field**: Click, paste your OpenAI key (from Click 11, starts with `sk-`)
+- Click **"Save"** or **"Add"**
+
+### Click 19: Verify
+- You should see three variables listed:
   - `HERMES3_HOSTING_PROVIDER` = `huggingface`
-  - `HUGGINGFACE_API_KEY` = `hf_...` (your token)
+  - `HUGGINGFACE_API_KEY` = `hf_...` (your Hugging Face token)
+  - `OPENAI_API_KEY` = `sk-...` (your OpenAI key)
 - ✅ **Part 2 done!**
 
 ---
 
-## PART 3: Deploy the Function
+## PART 3: Deploy the Functions
 
-### Click 16: Go to Edge Functions
+### Click 20: Go to Edge Functions
 - In Supabase dashboard, left sidebar
 - Click **"Edge Functions"**
 
-### Click 17: Deploy Function
+### Click 21: Deploy Hermes 3 Function
 - **Option A** (if you see "Deploy" button):
   - Click **"Deploy"**
   - Select function: `hermes3`
@@ -113,62 +137,73 @@ Follow these exact clicks. No thinking required. Just do what it says.
   - Press Enter
   - Wait for "Deployed successfully"
 
-### Click 18: Wait for Success
-- You'll see "Deployed successfully" or green checkmark
+### Click 22: Deploy TTS Function
+- **Option A** (if you see "Deploy" button):
+  - Click **"Deploy"** again
+  - Select function: `tts`
+  - Click **"Deploy"**
+
+- **Option B** (if using terminal):
+  - Type: `supabase functions deploy tts`
+  - Press Enter
+  - Wait for "Deployed successfully"
+
+### Click 23: Wait for Success
+- You'll see "Deployed successfully" or green checkmarks for both functions
 - ✅ **Part 3 done!**
 
 ---
 
 ## PART 4: Add Chat to Your App
 
-### Click 19: Open Your Code Editor
+### Click 24: Open Your Code Editor
 - Open VS Code (or your code editor)
 - Open your project folder
 
-### Click 20: Find a Page File
+### Click 25: Find a Page File
 - Look in `src/pages/` folder
 - Click on any `.tsx` file (like `Index.tsx` or create new one)
 
-### Click 21: Add Import Line
+### Click 26: Add Import Line
 - Scroll to top of file
 - Find other `import` lines
 - Click at the end of the last import line
 - Press Enter (new line)
 - Type exactly: `import { Hermes3Chat } from '@/components/ui/Hermes3Chat';`
 
-### Click 22: Find Where to Add Chat
+### Click 27: Find Where to Add Chat
 - Scroll down in the file
 - Find the `return (` section
 - Look for where you want the chat to appear
 - Click there (after some content, before closing `</div>`)
 
-### Click 23: Add the Component
+### Click 28: Add the Component
 - Press Enter (new line)
 - Type exactly: `<Hermes3Chat />`
 - Press Enter
 
-### Click 24: Save File
+### Click 29: Save File
 - Press **Ctrl+S** (Windows) or **Cmd+S** (Mac)
 - Or click File → Save
 
-### Click 25: Check Files Exist
+### Click 30: Check Files Exist
 - Make sure these files exist in your project:
   - ✅ `src/components/ui/Hermes3Chat.tsx` exists
   - ✅ `src/lib/hermes3Streaming.ts` exists
   - ✅ `supabase/functions/hermes3/index.ts` exists
 - If any are missing, they should have been created automatically
 
-### Click 26: Start Dev Server
+### Click 31: Start Dev Server
 - Open terminal in your project
 - Type: `npm run dev` (or `yarn dev`)
 - Press Enter
 - Wait for "Local: http://localhost:5173" (or similar)
 
-### Click 27: Open Browser
+### Click 32: Open Browser
 - Click the link that appeared (or go to `localhost:5173`)
 - Navigate to the page where you added `<Hermes3Chat />`
 
-### Click 28: See the Chat!
+### Click 33: See the Chat!
 - You should see a chat interface
 - ✅ **Part 4 done!**
 
@@ -176,32 +211,61 @@ Follow these exact clicks. No thinking required. Just do what it says.
 
 ## PART 5: Test It
 
-### Click 29: Type a Message
+### Click 34: Type a Message
 - Click in the chat input box
 - Type: `Hello!`
 - Press Enter (or click Send button)
 
-### Click 30: Wait (Important!)
+### Click 35: Wait (Important!)
 - **First message takes 30-60 seconds** - this is normal!
 - The AI model is "waking up"
 - You'll see "Thinking..." or a loading spinner
 - **Just wait** - don't refresh!
 
-### Click 31: See Response
+### Click 36: See Response
 - After 30-60 seconds, you should see a response!
 - 🎉 **It works!**
 
 ---
+
+## PART 6: Test TTS (Text-to-Speech)
+
+### Click 37: Enable TTS
+- In the chat interface, look at the top right
+- Find the **volume icon** (🔊 or 🔇)
+- Click it
+- It should turn blue/active (means TTS is enabled)
+
+### Click 38: Send Another Message
+- Type a message like: "Tell me a short story"
+- Press Enter
+- Wait for response
+
+### Click 39: Listen
+- When the AI responds, you should **hear it speak automatically**
+- The response will be read out loud using natural-sounding voice
+- ✅ **TTS is working!**
+
+### Click 40: Test Voice Input (Optional)
+- Find the **microphone icon** (🎤) next to the input box
+- Click it
+- **Speak your message** (browser will ask permission first)
+- Your speech will be converted to text
+- Click Send
+- Get response + hear it spoken!
 
 ## ✅ Success Checklist
 
 Before celebrating, verify:
 
 - [ ] Got token from Hugging Face
-- [ ] Saved token in text file
+- [ ] Got API key from OpenAI (for TTS)
+- [ ] Saved both keys in text file
 - [ ] Added `HERMES3_HOSTING_PROVIDER` = `huggingface` in Supabase
 - [ ] Added `HUGGINGFACE_API_KEY` = (your token) in Supabase
+- [ ] Added `OPENAI_API_KEY` = (your key) in Supabase
 - [ ] Deployed `hermes3` function
+- [ ] Deployed `tts` function
 - [ ] Added `import { Hermes3Chat } from '@/components/ui/Hermes3Chat';` to your page
 - [ ] Added `<Hermes3Chat />` in your page
 - [ ] Saved the file
@@ -209,6 +273,8 @@ Before celebrating, verify:
 - [ ] Opened the page in browser
 - [ ] Sent a test message
 - [ ] Got a response (after waiting 30-60 seconds)
+- [ ] Enabled TTS (volume icon)
+- [ ] Heard the response spoken out loud
 
 **If all checked ✅ → You're done!**
 
@@ -222,13 +288,24 @@ Before celebrating, verify:
 
 ### "API key error"
 - **Click**: Supabase dashboard → Settings → Edge Functions → Environment Variables
-- **Click**: Verify both variables are there
+- **Click**: Verify all three variables are there:
+  - `HERMES3_HOSTING_PROVIDER` = `huggingface`
+  - `HUGGINGFACE_API_KEY` = `hf_...`
+  - `OPENAI_API_KEY` = `sk-...`
 - **Click**: Check spelling is exact (copy-paste the names)
 
 ### "Function not found"
 - **Click**: Supabase dashboard → Edge Functions
-- **Click**: See if `hermes3` is listed
-- **Click**: If not, deploy it again (Part 3)
+- **Click**: See if `hermes3` and `tts` are both listed
+- **Click**: If not, deploy them again (Part 3)
+
+### "TTS not working / No sound"
+- **Click**: Check that `OPENAI_API_KEY` is set correctly
+- **Click**: Verify `tts` function is deployed
+- **Click**: Check browser console (F12) for errors
+- **Click**: Make sure volume icon is blue/active (TTS enabled)
+- **Click**: Check your computer volume is up
+- **Click**: Try clicking volume icon off and on again
 
 ### "Nothing happens when I type"
 - **Click**: Open browser console (F12 key)

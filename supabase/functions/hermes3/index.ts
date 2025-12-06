@@ -1,12 +1,10 @@
 /**
- * Hermes 3 3B Inference Function
+ * OpenAI Chat Completion Function
  * 
- * This function provides an API endpoint for Hermes 3 model inference.
- * It supports ChatML format, function calling, and structured outputs.
+ * This function provides an API endpoint for OpenAI model inference.
+ * Supports streaming, function calling, and structured outputs.
  * 
- * Note: This implementation assumes you have a Python service running
- * that handles the actual model inference. For local development,
- * you can use the Python implementation in docs/hermes3_service.py
+ * Models supported: gpt-4, gpt-4-turbo, gpt-3.5-turbo, o1, o1-mini, etc.
  */
 
 const corsHeaders = {
@@ -37,7 +35,7 @@ interface ToolDefinition {
   };
 }
 
-interface Hermes3Request {
+interface OpenAIRequest {
   messages: ChatMessage[];
   systemPrompt?: string;
   tools?: ToolDefinition[];
@@ -45,48 +43,53 @@ interface Hermes3Request {
   temperature?: number;
   maxTokens?: number;
   stream?: boolean;
+  model?: string;
 }
 
 /**
- * Format messages in ChatML format for Hermes 3
+ * Format messages for OpenAI API
  */
-function formatChatML(messages: ChatMessage[], systemPrompt?: string): string {
-  let formatted = '';
+function formatOpenAIMessages(messages: ChatMessage[], systemPrompt?: string): Array<{role: string, content: string}> {
+  const formatted: Array<{role: string, content: string}> = [];
   
   // Add system prompt if provided
   if (systemPrompt) {
-    formatted += `<|im_start|>system\n${systemPrompt}<|im_end|>\n`;
+    formatted.push({ role: 'system', content: systemPrompt });
   }
   
-  // Format messages
+  // Format messages (OpenAI uses standard role/content format)
   for (const msg of messages) {
-    formatted += `<|im_start|>${msg.role}\n${msg.content}<|im_end|>\n`;
+    // Skip tool messages in the main array (they go in tool_calls)
+    if (msg.role !== 'tool') {
+      formatted.push({
+        role: msg.role === 'assistant' ? 'assistant' : msg.role === 'user' ? 'user' : 'system',
+        content: msg.content,
+      });
+    }
   }
-  
-  // Add assistant prompt for generation
-  formatted += `<|im_start|>assistant\n`;
   
   return formatted;
 }
 
 /**
- * Format function calling system prompt
+ * Format tools for OpenAI function calling
+ * OpenAI uses a different format - tools are passed directly in the API call
  */
-function formatFunctionCallingPrompt(tools: ToolDefinition[]): string {
-  const toolsJson = JSON.stringify(tools);
-  return `You are a function calling AI model. You are provided with function signatures within <tools></tools> XML tags. You may call one or more functions to assist with the user query. Don't make assumptions about what values to plug into functions. Here are the available tools: <tools> ${toolsJson} </tools> Use the following pydantic model json schema for each tool call you will make: {"properties": {"arguments": {"title": "Arguments", "type": "object"}, "name": {"title": "Name", "type": "string"}}, "required": ["arguments", "name"], "title": "FunctionCall", "type": "object"} For each function call return a json object with function name and arguments within <tool_call></tool_call> XML tags as follows:
-<tool_call>
-{"arguments": <args-dict>, "name": <function-name>}
-</tool_call>`;
+function formatOpenAITools(tools: ToolDefinition[]): Array<{type: string, function: any}> {
+  return tools.map(tool => ({
+    type: 'function',
+    function: {
+      name: tool.function.name,
+      description: tool.function.description,
+      parameters: tool.function.parameters,
+    },
+  }));
 }
 
 /**
- * Format JSON mode system prompt
+ * OpenAI supports JSON mode via response_format parameter
+ * No need for special system prompt
  */
-function formatJSONModePrompt(schema: Record<string, unknown>): string {
-  const schemaStr = JSON.stringify(schema, null, 2);
-  return `You are a helpful assistant that answers in JSON. Here's the json schema you must adhere to:\n<schema>\n${schemaStr}\n</schema>`;
-}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -95,8 +98,17 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const requestData: Hermes3Request = await req.json();
-    const { messages, systemPrompt, tools, jsonSchema, temperature = 0.8, maxTokens = 750, stream = true } = requestData;
+    const requestData: OpenAIRequest = await req.json();
+    const { 
+      messages, 
+      systemPrompt, 
+      tools, 
+      jsonSchema, 
+      temperature = 0.7, 
+      maxTokens = 1000, 
+      stream = true,
+      model = 'gpt-4o-mini' // Default to cost-effective model
+    } = requestData;
 
     // Validation
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -126,107 +138,83 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Determine system prompt based on mode
-    let finalSystemPrompt = systemPrompt;
-    if (tools && tools.length > 0) {
-      finalSystemPrompt = formatFunctionCallingPrompt(tools);
-    } else if (jsonSchema) {
-      finalSystemPrompt = formatJSONModePrompt(jsonSchema);
-    } else if (!finalSystemPrompt) {
-      finalSystemPrompt = 'You are Hermes 3, a helpful AI assistant.';
+    // Get OpenAI API key
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    if (!OPENAI_API_KEY) {
+      return new Response(JSON.stringify({ 
+        error: 'OPENAI_API_KEY not configured. Please add it to your environment variables.' 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    // Format prompt in ChatML
-    const formattedPrompt = formatChatML(messages, finalSystemPrompt);
+    // Format messages for OpenAI
+    const formattedMessages = formatOpenAIMessages(messages, systemPrompt || 'You are a helpful AI assistant.');
 
-    // Support multiple hosting providers
-    const hostingProvider = Deno.env.get('HERMES3_HOSTING_PROVIDER') || 'huggingface';
-    
-    console.log('Sending request to Hermes 3 service:', {
-      provider: hostingProvider,
-      messageCount: messages.length,
+    // Build request body
+    const requestBody: any = {
+      model,
+      messages: formattedMessages,
+      temperature,
+      max_tokens: maxTokens,
+      stream,
+    };
+
+    // Add tools if provided
+    if (tools && tools.length > 0) {
+      requestBody.tools = formatOpenAITools(tools);
+      requestBody.tool_choice = 'auto';
+    }
+
+    // Add JSON mode if schema provided
+    if (jsonSchema) {
+      requestBody.response_format = { type: 'json_object' };
+      // Add schema instruction to system message
+      const systemMsg = formattedMessages.find(m => m.role === 'system');
+      if (systemMsg) {
+        systemMsg.content += `\n\nYou must respond with valid JSON matching this schema: ${JSON.stringify(jsonSchema)}`;
+      } else {
+        formattedMessages.unshift({
+          role: 'system',
+          content: `You must respond with valid JSON matching this schema: ${JSON.stringify(jsonSchema)}`,
+        });
+      }
+    }
+
+    console.log('Sending request to OpenAI:', {
+      model,
+      messageCount: formattedMessages.length,
       hasTools: !!tools,
       hasJsonSchema: !!jsonSchema,
       stream,
     });
 
-    let response: Response;
-    
-    if (hostingProvider === 'huggingface') {
-      // Hugging Face Inference API (Free tier: 30k requests/month)
-      const HF_API_KEY = Deno.env.get('HUGGINGFACE_API_KEY');
-      if (!HF_API_KEY) {
-        throw new Error('HUGGINGFACE_API_KEY not configured');
-      }
-      
-      response = await fetch(
-        'https://api-inference.huggingface.co/models/NousResearch/Hermes-3-Llama-3.2-3B',
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${HF_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            inputs: formattedPrompt,
-            parameters: {
-              temperature,
-              max_new_tokens: maxTokens,
-              return_full_text: false,
-            },
-            options: {
-              wait_for_model: true,
-            },
-          }),
-        }
-      );
-    } else if (hostingProvider === 'together') {
-      // Together AI (Free tier: $25 credits)
-      const TOGETHER_API_KEY = Deno.env.get('TOGETHER_API_KEY');
-      if (!TOGETHER_API_KEY) {
-        throw new Error('TOGETHER_API_KEY not configured');
-      }
-      
-      response = await fetch('https://api.together.xyz/inference', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${TOGETHER_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'NousResearch/Hermes-3-Llama-3.2-3B',
-          prompt: formattedPrompt,
-          temperature,
-          max_tokens: maxTokens,
-          stream,
-        }),
-      });
-    } else if (hostingProvider === 'custom') {
-      // Custom service URL (for self-hosted, RunPod, Modal, etc.)
-      const HERMES3_SERVICE_URL = Deno.env.get('HERMES3_SERVICE_URL') || 'http://localhost:8000/infer';
-      
-      response = await fetch(HERMES3_SERVICE_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: formattedPrompt,
-          temperature,
-          max_tokens: maxTokens,
-          stream,
-        }),
-      });
-    } else {
-      throw new Error(`Unknown hosting provider: ${hostingProvider}. Use 'huggingface', 'together', or 'custom'`);
-    }
+    // Call OpenAI API
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Hermes 3 service error:', response.status, errorText);
+      console.error('OpenAI API error:', response.status, errorText);
+      
+      let errorMessage = `OpenAI API error: ${response.status}`;
+      if (response.status === 401) {
+        errorMessage = 'Invalid API key. Please check your OPENAI_API_KEY.';
+      } else if (response.status === 429) {
+        errorMessage = 'Rate limit exceeded. Please try again later.';
+      } else if (response.status === 402) {
+        errorMessage = 'Payment required. Please check your OpenAI account billing.';
+      }
       
       return new Response(JSON.stringify({ 
-        error: `Hermes 3 service error: ${response.status}`,
+        error: errorMessage,
         details: errorText
       }), {
         status: response.status || 500,
@@ -253,7 +241,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Hermes 3 function error:', error);
+    console.error('OpenAI function error:', error);
     return new Response(JSON.stringify({ 
       error: error instanceof Error ? error.message : 'Unknown error occurred' 
     }), {

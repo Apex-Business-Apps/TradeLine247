@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Send, Bot, User, Loader2, X, Settings, Sparkles } from 'lucide-react';
+import { Send, Bot, User, Loader2, X, Settings, Sparkles, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { streamHermes3Response, type Hermes3Message } from '@/lib/hermes3Streaming';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -8,6 +8,8 @@ import { Input } from './input';
 import { Textarea } from './textarea';
 import { Card } from './card';
 import { Badge } from './badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+import { Label } from './label';
 
 interface ChatMessage {
   id: string;
@@ -36,11 +38,16 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState(defaultSystemPrompt);
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
-  const [temperature, setTemperature] = useState(0.8);
-  const [maxTokens, setMaxTokens] = useState(750);
+  const [temperature, setTemperature] = useState(0.7);
+  const [maxTokens, setMaxTokens] = useState(1000);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
   const { toast } = useToast();
 
   // Auto-scroll to bottom
@@ -55,6 +62,161 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
   // Focus input when component mounts
   useEffect(() => {
     inputRef.current?.focus();
+  }, []);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+        recognitionRef.current.lang = 'en-US';
+
+        recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+          const transcript = event.results[0][0].transcript;
+          setInput(prev => prev + (prev ? ' ' : '') + transcript);
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+          toast({
+            title: 'Voice recognition error',
+            description: 'Please try again or type your message.',
+            variant: 'destructive',
+          });
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      // Stop any ongoing speech
+      if (speechSynthesisRef.current) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [toast]);
+
+  // Text-to-speech function using OpenAI TTS API for natural, low-latency speech
+  const speakText = useCallback(async (text: string) => {
+    // Cancel any ongoing speech
+    stopSpeaking();
+
+    // Use OpenAI TTS for natural, low-latency speech
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Call Supabase function that uses OpenAI TTS
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tts`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            text,
+            model: 'tts-1', // Fast model, or 'tts-1-hd' for higher quality
+            voice: 'alloy', // Options: alloy, echo, fable, onyx, nova, shimmer
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`TTS API error: ${response.status}`);
+      }
+
+      // Get audio blob
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+
+      setIsSpeaking(true);
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        URL.revokeObjectURL(audioUrl);
+        // Fallback to browser TTS
+        fallbackToBrowserTTS(text);
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('OpenAI TTS error:', error);
+      // Fallback to browser TTS
+      fallbackToBrowserTTS(text);
+    }
+  }, [toast]);
+
+  // Fallback to browser TTS if OpenAI TTS fails
+  const fallbackToBrowserTTS = useCallback((text: string) => {
+    if (!('speechSynthesis' in window)) {
+      toast({
+        title: 'TTS not available',
+        description: 'Text-to-speech is not supported in your browser.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    utterance.lang = 'en-US';
+
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+    };
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      speechSynthesisRef.current = null;
+    };
+
+    utterance.onerror = (event) => {
+      console.error('Speech synthesis error:', event);
+      setIsSpeaking(false);
+      speechSynthesisRef.current = null;
+    };
+
+    speechSynthesisRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+  }, [toast]);
+
+  const stopSpeaking = useCallback(() => {
+    // Stop browser TTS
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    // Stop any playing audio
+    const audios = document.querySelectorAll('audio');
+    audios.forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+    setIsSpeaking(false);
+    speechSynthesisRef.current = null;
   }, []);
 
   const sendMessage = async () => {
@@ -111,6 +273,11 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
         onComplete: (fullResponse) => {
           setIsLoading(false);
           console.log('Hermes 3 response completed:', fullResponse.length, 'chars');
+          
+          // Auto-speak if TTS is enabled
+          if (ttsEnabled && fullResponse) {
+            speakText(fullResponse);
+          }
         },
         onError: (err) => {
           console.error('Hermes 3 error:', err);
@@ -166,6 +333,39 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
     });
   };
 
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      toast({
+        title: 'Voice not supported',
+        description: 'Your browser does not support speech recognition.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+        toast({
+          title: 'Listening...',
+          description: 'Speak now. Click the mic again to stop.',
+        });
+      } catch (error) {
+        console.error('Error starting recognition:', error);
+        setIsListening(false);
+        toast({
+          title: 'Voice input error',
+          description: 'Could not start voice recognition.',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
   return (
     <Card className={cn('flex flex-col h-[600px] max-h-[90vh] w-full max-w-4xl mx-auto', className)}>
       {/* Header */}
@@ -174,21 +374,41 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-primary" />
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Hermes 3 Chat</h2>
-            <p className="text-xs text-muted-foreground">NousResearch • 3B Parameters</p>
-          </div>
+              <div>
+              <h2 className="text-lg font-semibold text-foreground">Hermes 3 Chat</h2>
+              <p className="text-xs text-muted-foreground">NousResearch • 3B Parameters</p>
+            </div>
         </div>
-        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
           {showSettings && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowSystemPrompt(!showSystemPrompt)}
-              className="h-8"
-            >
-              <Settings className="w-4 h-4" />
-            </Button>
+            <>
+              <Button
+                variant={ttsEnabled ? "default" : "ghost"}
+                size="sm"
+                onClick={() => {
+                  setTtsEnabled(!ttsEnabled);
+                  if (ttsEnabled) {
+                    stopSpeaking();
+                  }
+                }}
+                className="h-8"
+                title={ttsEnabled ? "Disable text-to-speech" : "Enable text-to-speech"}
+              >
+                {ttsEnabled ? (
+                  <Volume2 className="w-4 h-4" />
+                ) : (
+                  <VolumeX className="w-4 h-4" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSystemPrompt(!showSystemPrompt)}
+                className="h-8"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </>
           )}
           {messages.length > 0 && (
             <Button
@@ -207,7 +427,7 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
       {showSystemPrompt && showSettings && (
         <div className="p-4 border-b bg-muted/30 space-y-3">
           <div>
-            <label className="text-sm font-medium mb-1 block">System Prompt</label>
+            <Label className="text-sm font-medium mb-1 block">System Prompt</Label>
             <Textarea
               value={systemPrompt}
               onChange={(e) => setSystemPrompt(e.target.value)}
@@ -217,9 +437,9 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
           </div>
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="text-sm font-medium mb-1 block">
+              <Label className="text-sm font-medium mb-1 block">
                 Temperature: {temperature.toFixed(1)}
-              </label>
+              </Label>
               <input
                 type="range"
                 min="0"
@@ -231,14 +451,14 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
               />
             </div>
             <div className="flex-1">
-              <label className="text-sm font-medium mb-1 block">
+              <Label className="text-sm font-medium mb-1 block">
                 Max Tokens: {maxTokens}
-              </label>
+              </Label>
               <input
                 type="range"
                 min="100"
-                max="2000"
-                step="50"
+                max="4000"
+                step="100"
                 value={maxTokens}
                 onChange={(e) => setMaxTokens(parseInt(e.target.value))}
                 className="w-full"
@@ -265,7 +485,8 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
             <div className="flex flex-wrap gap-2 justify-center mt-4">
               <Badge variant="outline">Function Calling</Badge>
               <Badge variant="outline">Structured Outputs</Badge>
-              <Badge variant="outline">ChatML Format</Badge>
+              <Badge variant="outline">Voice Input</Badge>
+              <Badge variant="outline">Text-to-Speech</Badge>
             </div>
           </div>
         ) : (
@@ -325,21 +546,37 @@ export const Hermes3Chat: React.FC<Hermes3ChatProps> = ({
             className="min-h-[60px] max-h-[120px] resize-none"
             disabled={isLoading}
           />
-          <Button
-            onClick={sendMessage}
-            disabled={!input.trim() || isLoading}
-            size="lg"
-            className="self-end"
-          >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={toggleVoiceInput}
+              variant={isListening ? "destructive" : "outline"}
+              size="lg"
+              className="self-end"
+              disabled={isLoading}
+              title={isListening ? "Stop listening" : "Start voice input"}
+            >
+              {isListening ? (
+                <MicOff className="w-5 h-5" />
+              ) : (
+                <Mic className="w-5 h-5" />
+              )}
+            </Button>
+            <Button
+              onClick={sendMessage}
+              disabled={!input.trim() || isLoading}
+              size="lg"
+              className="self-end"
+            >
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+            </Button>
+          </div>
         </div>
         <p className="text-xs text-muted-foreground mt-2 text-center">
-          Powered by Hermes 3 3B • ChatML Format • Research Use
+          Powered by Hermes 3 3B • ChatML Format • Voice Enabled
         </p>
       </div>
     </Card>

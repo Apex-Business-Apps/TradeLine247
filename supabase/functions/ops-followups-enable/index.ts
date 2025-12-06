@@ -1,0 +1,180 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkAdminAuth } from "../_shared/adminAuth.ts";
+import { corsHeaders, preflight } from "../_shared/cors.ts";
+import { addDays, setHours, setMinutes, setSeconds } from "npm:date-fns@3.6.0";
+import { toZonedTime, fromZonedTime } from "https://esm.sh/date-fns-tz@3.2.0";
+
+interface FollowupRequest {
+  campaign_id: string;
+  day3_enabled?: boolean;
+  day7_enabled?: boolean;
+}
+
+Deno.serve(async (req) => {
+  const pf = preflight(req);
+  if (pf) return pf;
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Security: Verify admin access
+    await checkAdminAuth(req, supabaseClient);
+
+    const { 
+      campaign_id, 
+      day3_enabled = true,
+      day7_enabled = true
+    }: FollowupRequest = await req.json();
+
+    console.log(`Enabling follow-ups for campaign ${campaign_id}`);
+
+    // Get all sent campaign members
+    const { data: sentMembers, error: membersError } = await supabaseClient
+      .from('campaign_members')
+      .select('*')
+      .eq('campaign_id', campaign_id)
+      .eq('status', 'sent')
+      .not('sent_at', 'is', null);
+
+    if (membersError) {
+      throw membersError;
+    }
+
+    if (!sentMembers || sentMembers.length === 0) {
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'No sent emails to schedule follow-ups for' 
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    console.log(`Found ${sentMembers.length} sent members`);
+
+    // Schedule follow-ups at 09:15 America/Vancouver (business hours)
+    const followups = [];
+    const timezone = 'America/Vancouver';
+    const targetHour = 9;
+    const targetMinute = 15;
+
+    for (const member of sentMembers) {
+      const sentDate = new Date(member.sent_at);
+
+      // Day 3 nudge at 09:15 Vancouver time
+      if (day3_enabled) {
+        // Add 3 days to sent date
+        let day3Date = addDays(sentDate, 3);
+        
+        // Convert to Vancouver timezone and set to 09:15
+        const day3Vancouver = toZonedTime(day3Date, timezone);
+        const scheduledVancouver = setSeconds(
+          setMinutes(
+            setHours(day3Vancouver, targetHour),
+            targetMinute
+          ),
+          0
+        );
+        
+        // Convert back to UTC for storage
+        const day3UTC = fromZonedTime(scheduledVancouver, timezone);
+        
+        followups.push({
+          campaign_id,
+          member_id: member.id,
+          followup_number: 1,
+          scheduled_at: day3UTC.toISOString(),
+          status: 'pending'
+        });
+      }
+
+      // Day 7 final at 09:15 Vancouver time
+      if (day7_enabled) {
+        // Add 7 days to sent date
+        let day7Date = addDays(sentDate, 7);
+        
+        // Convert to Vancouver timezone and set to 09:15
+        const day7Vancouver = toZonedTime(day7Date, timezone);
+        const scheduledVancouver = setSeconds(
+          setMinutes(
+            setHours(day7Vancouver, targetHour),
+            targetMinute
+          ),
+          0
+        );
+        
+        // Convert back to UTC for storage
+        const day7UTC = fromZonedTime(scheduledVancouver, timezone);
+        
+        followups.push({
+          campaign_id,
+          member_id: member.id,
+          followup_number: 2,
+          scheduled_at: day7UTC.toISOString(),
+          status: 'pending'
+        });
+      }
+    }
+
+    // Upsert follow-ups (idempotent)
+    const { data: insertedFollowups, error: followupsError } = await supabaseClient
+      .from('campaign_followups')
+      .upsert(followups, { 
+        onConflict: 'member_id,followup_number',
+        ignoreDuplicates: false 
+      })
+      .select();
+
+    if (followupsError) {
+      throw followupsError;
+    }
+
+    console.log(`Scheduled ${insertedFollowups?.length || 0} follow-ups`);
+
+    // Log analytics event
+    await supabaseClient
+      .from('analytics_events')
+      .insert({
+        event_type: 'followups_enabled',
+        event_data: {
+          campaign_id,
+          day3_enabled,
+          day7_enabled,
+          scheduled_count: insertedFollowups?.length || 0,
+          timestamp: new Date().toISOString()
+        },
+        severity: 'info'
+      });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        campaign_id,
+        scheduled_count: insertedFollowups?.length || 0,
+        day3_enabled,
+        day7_enabled
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+
+  } catch (error) {
+    console.error('Error in ops-followups-enable:', error);
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  }
+});
+

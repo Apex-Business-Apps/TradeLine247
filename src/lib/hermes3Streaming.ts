@@ -16,6 +16,7 @@ export interface Hermes3StreamOptions {
   systemPrompt?: string;
   temperature?: number;
   maxTokens?: number;
+  model?: string;
 }
 
 /**
@@ -25,7 +26,7 @@ export async function streamHermes3Response(
   messages: Hermes3Message[],
   options: Hermes3StreamOptions = {}
 ): Promise<string> {
-  const { onChunk, onComplete, onError, signal, systemPrompt, temperature = 0.8, maxTokens = 750 } = options;
+  const { onChunk, onComplete, onError, signal, systemPrompt, temperature = 0.7, maxTokens = 1000, model = 'gpt-4o-mini' } = options;
   
   try {
     const { supabase } = await import('@/integrations/supabase/client');
@@ -44,6 +45,7 @@ export async function streamHermes3Response(
           systemPrompt,
           temperature,
           maxTokens,
+          model,
           stream: true,
         }),
         signal
@@ -64,10 +66,8 @@ export async function streamHermes3Response(
     let fullResponse = '';
     let buffer = '';
 
-    // Handle different response formats
-    // Hugging Face returns: {"generated_text": "..."}
-    // Together AI returns: SSE format
-    // Custom services may return different formats
+    // Handle OpenAI SSE format (Server-Sent Events)
+    // OpenAI returns: data: {"choices":[{"delta":{"content":"..."}}]}
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
@@ -94,87 +94,55 @@ export async function streamHermes3Response(
           try {
             const parsed = JSON.parse(data);
             
-            // Hugging Face format
-            if (parsed.generated_text) {
-              const newText = parsed.generated_text.slice(fullResponse.length);
-              if (newText) {
-                fullResponse += newText;
-                onChunk?.(newText);
-              }
-            }
-            // Together AI / OpenAI-like format
-            else if (parsed.choices?.[0]?.delta?.content) {
+            // OpenAI format: data: {"choices":[{"delta":{"content":"..."}}]}
+            if (parsed.choices?.[0]?.delta?.content) {
               const content = parsed.choices[0].delta.content;
-              fullResponse += content;
-              onChunk?.(content);
-            }
-            // Direct text response
-            else if (parsed.text) {
-              const newText = parsed.text.slice(fullResponse.length);
-              if (newText) {
-                fullResponse += newText;
-                onChunk?.(newText);
+              if (content) {
+                fullResponse += content;
+                onChunk?.(content);
               }
             }
-            // Custom format: {response: "..."}
-            else if (parsed.response) {
-              const newText = parsed.response.slice(fullResponse.length);
-              if (newText) {
-                fullResponse += newText;
-                onChunk?.(newText);
-              }
+            // Handle finish_reason (end of stream)
+            else if (parsed.choices?.[0]?.finish_reason) {
+              // Stream is complete
+              onComplete?.(fullResponse);
+              return fullResponse;
             }
           } catch (e) {
-            // Try parsing as plain text if JSON fails
-            if (line.trim() && !line.startsWith('data: ')) {
-              fullResponse += line;
-              onChunk?.(line);
-            }
+            // Skip invalid JSON chunks
+            console.warn('Invalid JSON chunk:', data);
           }
         }
-        // Handle non-SSE JSON responses (Hugging Face sometimes returns this)
+        // Handle non-SSE JSON responses (non-streaming OpenAI response)
         else if (line.trim().startsWith('{')) {
           try {
             const parsed = JSON.parse(line);
-            if (parsed.generated_text) {
-              fullResponse = parsed.generated_text;
-              onChunk?.(parsed.generated_text);
-            } else if (parsed.response) {
-              fullResponse = parsed.response;
-              onChunk?.(parsed.response);
+            // OpenAI non-streaming format
+            if (parsed.choices?.[0]?.message?.content) {
+              fullResponse = parsed.choices[0].message.content;
+              onChunk?.(fullResponse);
             }
           } catch (e) {
-            // Not JSON, treat as plain text
-            if (line.trim()) {
-              fullResponse += line;
-              onChunk?.(line);
-            }
+            // Skip invalid JSON
+            console.warn('Invalid JSON line:', line);
           }
-        }
-        // Plain text fallback
-        else if (line.trim()) {
-          fullResponse += line;
-          onChunk?.(line);
         }
       }
     }
 
-    // Process remaining buffer
+    // Process remaining buffer (if any)
     if (buffer.trim()) {
       try {
         const parsed = JSON.parse(buffer);
-        if (parsed.generated_text) {
-          const newText = parsed.generated_text.slice(fullResponse.length);
-          if (newText) {
-            fullResponse += newText;
-            onChunk?.(newText);
+        if (parsed.choices?.[0]?.delta?.content) {
+          const content = parsed.choices[0].delta.content;
+          if (content) {
+            fullResponse += content;
+            onChunk?.(content);
           }
         }
       } catch (e) {
-        if (buffer.trim()) {
-          fullResponse += buffer;
-          onChunk?.(buffer);
-        }
+        // Buffer might be incomplete, that's okay
       }
     }
 

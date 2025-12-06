@@ -1,0 +1,45 @@
+# CodeQL Configuration for TradeLine 24/7
+# Enterprise-grade security analysis configuration
+
+name: "TradeLine 24/7 CodeQL Config"
+
+# Disable default queries to use our custom selection
+disable-default-queries: false
+
+# Query suites to run
+queries:
+  - uses: security-extended
+  - uses: security-and-quality
+
+# Paths to analyze
+paths:
+  - src
+  - supabase/functions
+
+# Paths to ignore (reduces noise and scan time)
+paths-ignore:
+  - node_modules
+  - dist
+  - build
+  - coverage
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - '**/__tests__/**'
+  - '**/__mocks__/**'
+  - scripts/verify*.js
+  - scripts/verify*.mjs
+  - scripts/verify*.cjs
+
+# Query filters to reduce false positives
+query-filters:
+  - exclude:
+      # Suppress specific query IDs that are known false positives
+      id: js/unused-local-variable
+  - exclude:
+      # Suppress test-related queries
+      tags: test
+
+# External data sources
+external-repository-token: ${{ secrets.GITHUB_TOKEN }}

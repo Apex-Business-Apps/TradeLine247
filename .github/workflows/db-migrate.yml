@@ -1,0 +1,28 @@
+name: db/migrate
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - supabase/migrations/**
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Validate env (secret must already exist)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: test -n "$SUPABASE_DB_URL" || (echo "Missing SUPABASE_DB_URL"; exit 1)
+      - name: Dry run (no changes)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: supabase db push --db-url "$SUPABASE_DB_URL" --dry-run --debug
+      - name: Apply migrations (idempotent)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: supabase db push --db-url "$SUPABASE_DB_URL" --debug

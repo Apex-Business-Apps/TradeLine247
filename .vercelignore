@@ -1,0 +1,80 @@
+# Vercel ignore file
+# Files and directories to exclude from Vercel deployments
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+test-results/
+playwright-report/
+.nyc_output
+
+# Build outputs (Vercel builds these)
+dist/
+build/
+.next/
+out/
+
+# Environment files (use Vercel dashboard instead)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in deployment)
+*.md
+docs/
+audit/
+
+# Scripts (some needed for build process)
+# Include check-required-files.mjs needed for build
+!scripts/check-required-files.mjs
+*.ps1
+*.sh
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Mobile
+ios/
+android/
+capacitor.config.ts
+
+# Supabase (deployed separately)
+# Exclude root-level supabase/ directory (migrations, functions, etc.)
+supabase/
+# BUT explicitly include src/integrations/supabase/ (needed for build)
+!src/integrations/supabase/
+
+# K6 tests
+k6/
+
+# Fastlane
+fastlane/
+
+# Config (some may be needed, adjust as needed)
+# config/ - REMOVED: featureFlags.ts needed for deployment
+
+# Temporary files
+*.log
+*.tmp
+*.temp
+

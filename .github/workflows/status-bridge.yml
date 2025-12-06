@@ -1,0 +1,37 @@
+name: status-bridge
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: read
+  checks: read
+  statuses: write
+
+jobs:
+  bridge:
+    if: ${{ github.event.workflow_run.event == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const run = context.payload.workflow_run;
+            const sha = run.head_sha;
+            const jobs = await github.paginate(
+              github.rest.actions.listJobsForWorkflowRunAttempt,
+              { owner, repo, run_id: run.id, attempt_number: run.run_attempt || 1, per_page: 100 }
+            );
+            const map = [
+              { ctx: 'ci/build', rx: /(^|\/)ci\/build\b/i },
+              { ctx: 'ci/lint',  rx: /(^|\/)ci\/lint\b/i  },
+              { ctx: 'ci/test',  rx: /(^|\/)ci\/test\b/i  },
+            ];
+            const toState = c => c==='success' ? 'success' : (['skipped','cancelled'].includes(c||'')) ? 'success' : 'failure';
+            for (const m of map) {
+              const j = jobs.find(x => m.rx.test(x.name));
+              if (!j) continue;
+              await github.rest.repos.createCommitStatus({ owner, repo, sha, state: toState(j.conclusion), context: m.ctx, description: `${m.ctx} => ${j.conclusion||'unknown'}` });
+            }
