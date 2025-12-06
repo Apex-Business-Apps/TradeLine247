@@ -1315,11 +1315,30 @@ html.dark a[class*="hover:text-primary"]:hover {
 }
 
 /* For backgrounds and borders, use the original bright orange */
-.bg-primary,
-[class*="bg-primary"],
-button.bg-primary,
-a.bg-primary {
+/* IMPORTANT: Only match exact bg-primary, NOT opacity variants like bg-primary/10 */
+/* The [class*="bg-primary"] selector was matching bg-primary/10 and breaking icons */
+.bg-primary:not([class*="/"]),
+button.bg-primary:not([class*="/"]),
+a.bg-primary:not([class*="/"]) {
   background-color: var(--unified-orange) !important;
+}
+
+/* Preserve opacity variants for icon backgrounds - these need to stay semi-transparent */
+/* Without these overrides, icons show as solid orange squares instead of actual icons */
+.bg-primary\/5 {
+  background-color: hsl(var(--brand-orange-primary) / 0.05) !important;
+}
+
+.bg-primary\/10 {
+  background-color: hsl(var(--brand-orange-primary) / 0.10) !important;
+}
+
+.bg-primary\/20 {
+  background-color: hsl(var(--brand-orange-primary) / 0.20) !important;
+}
+
+.bg-primary\/30 {
+  background-color: hsl(var(--brand-orange-primary) / 0.30) !important;
 }
 
 .border-primary,
