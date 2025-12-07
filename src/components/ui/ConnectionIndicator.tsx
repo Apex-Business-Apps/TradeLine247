@@ -108,12 +108,17 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.mem
   className,
 }) => {
   const { status, queuedRequestCount } = useNetworkStatus();
+  const { user, isAdmin, userRole } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [announced, setAnnounced] = useState(false);
   const { user, userRole, isAdmin: authIsAdmin } = useAuth();
 
   const isAdminUser = Boolean(user) && (typeof authIsAdmin === 'function' ? authIsAdmin() : userRole === 'admin');
   const isSlowConnection = status.quality === 'slow';
+
+  const isUserAdmin = user
+    ? (typeof isAdmin === 'function' ? isAdmin() : userRole === 'admin' || userRole === 'owner')
+    : false;
 
   // Show/hide logic
   useEffect(() => {

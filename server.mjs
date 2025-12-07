@@ -6,6 +6,8 @@ import cors from 'cors';
 import { fileURLToPath } from 'node:url';
 import { getSecurityHeaders, additionalSecurityHeaders, getCorsOptions } from './server/securityHeaders.ts';
 import { createRateLimiter, cleanupRateLimits } from './server/middleware/rateLimit.ts';
+import pushRoutes from './server/push/routes.ts';
+import { initializeFCM } from './server/push/fcm.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(__dirname, 'dist');
@@ -76,6 +78,16 @@ setInterval(async () => {
     console.log(`[Server] Cleaned up ${cleaned} expired rate limit records`);
   }
 }, 60 * 60 * 1000);
+
+// Initialize FCM (non-blocking, will fail gracefully if not configured)
+try {
+  initializeFCM();
+} catch (error) {
+  console.warn('[Server] FCM not initialized (push notifications disabled):', error.message);
+}
+
+// API routes
+app.use('/api/push', pushRoutes);
 
 // Health checks
 app.get('/healthz', (_req, res) => {

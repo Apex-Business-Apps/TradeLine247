@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { CSSProperties, useEffect } from "react";
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
 import { TrustBadgesSlim } from "@/components/sections/TrustBadgesSlim";
@@ -36,6 +36,14 @@ const Index = () => {
       });
     };
   }, []);
+
+  const wallpaperStyle = {
+    backgroundImage: `url(${backgroundImage})`,
+  } as CSSProperties;
+
+  const wallpaperVariables = {
+    ["--hero-wallpaper-image" as const]: `url(${backgroundImage})`,
+  } as CSSProperties;
 
   return (
     <main
@@ -117,6 +125,10 @@ const Index = () => {
               </p>
               <QuickActionsCard />
             </div>
+            <TrustBadgesSlim />
+            <LeadCaptureForm />
+            <Footer />
+            <NoAIHypeFooter />
           </div>
         </div>
 

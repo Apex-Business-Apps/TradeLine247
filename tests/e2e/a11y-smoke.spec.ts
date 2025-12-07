@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
+import AxeBuilder from './vendor/axe-core-playwright/src/index.js';
 
 // Timeout settings are configured in playwright.config.ts
 
