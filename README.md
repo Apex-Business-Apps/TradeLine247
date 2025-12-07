@@ -87,6 +87,30 @@ VITE_SUPABASE_URL=... VITE_SUPABASE_ANON_KEY=... npm run verify:env:public
 
 The CI workflow runs this script automatically; ensure the variables are available in your environment to avoid failures.
 
+## Verification before committing changes
+
+Run the quality checks from the repository root to confirm your changes are safe to commit:
+
+```sh
+# Lint the codebase (no warnings allowed)
+npm run lint
+
+# Type-check the project
+npm run typecheck
+
+# Run unit tests
+npm run test:unit
+
+# Build the web app (also triggers postbuild verifiers)
+npm run build
+```
+
+If you need to validate environment setup without exposing values, run:
+
+```sh
+npm run verify:env:public
+```
+
 
 ## Forwarding Wizard (no new vendors)
 

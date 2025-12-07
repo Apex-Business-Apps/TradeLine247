@@ -7,6 +7,7 @@ import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 // CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
 import { paths } from "./routes/paths";
+import { RequireAuth } from "./components/auth/RequireAuth";
 
 // PERFORMANCE: Route-based code splitting - lazy load all routes except Index (critical)
 const Pricing = lazy(() => import("./pages/Pricing"));
@@ -40,8 +41,16 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.privacy, element: <Privacy /> },
   { path: paths.contact, element: <Contact /> },
   { path: paths.auth, element: <Auth /> },
+  { path: paths.login, element: <Auth /> },
   { path: '/auth-landing', element: <AuthLanding /> },
-  { path: paths.dashboard, element: <ClientDashboard /> },
+  {
+    path: paths.dashboard,
+    element: (
+      <RequireAuth>
+        <ClientDashboard />
+      </RequireAuth>
+    ),
+  },
   { path: paths.calls, element: <CallCenter /> },
   { path: paths.callCenterLegacy, element: <CallCenter /> },
   { path: paths.callLogs, element: <CallLogs /> },

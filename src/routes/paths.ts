@@ -9,6 +9,7 @@ export const paths = {
   privacy: "/privacy",
   previewHealth: "/preview-health",
   auth: "/auth",
+  login: "/login",
   dashboard: "/dashboard",
   calls: "/calls",
   callCenterLegacy: "/call-center",

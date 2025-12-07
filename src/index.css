@@ -57,6 +57,30 @@ body {
   position: relative;
 }
 
+/* Shell containers for landing and dashboard pages */
+.landing-shell,
+.dashboard-shell {
+  min-height: 100dvh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Always paint content above wallpaper */
+.landing-shell > *,
+.dashboard-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* iOS-specific: avoid fixed background issues */
+@supports (-webkit-touch-callout: none) {
+  .landing-shell,
+  .dashboard-shell {
+    background-attachment: scroll !important;
+  }
+}
+
 /* REMOVED: Global body overlay for non-landing pages
  * This was causing visual inconsistency across pages.
  * Now using consistent hero-specific overlays instead.
@@ -1703,7 +1727,7 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 #app-home {
   background-size: auto, auto, cover;
   background-position: center, center, center;
-  background-attachment: scroll, scroll, fixed;
+  background-attachment: scroll, scroll, scroll;
 }
 
 @media (max-width: 600px) {
@@ -1753,4 +1777,21 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 .hero-headline,
 .hero-tagline {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.hero-heading {
+  text-shadow:
+    0 0 8px rgba(249, 115, 22, 0.85),
+    0 0 20px rgba(249, 115, 22, 0.75);
+}
+
+.quick-actions {
+  z-index: 2;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .ios-no-sticky {
+    position: static !important;
+    top: auto !important;
+  }
 }

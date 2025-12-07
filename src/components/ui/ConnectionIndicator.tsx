@@ -15,6 +15,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { Wifi, WifiOff, Signal, SignalLow, SignalMedium, SignalHigh } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from '@/lib/performanceOptimizations';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ConnectionIndicatorProps {
   /**
@@ -109,17 +110,26 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.mem
   const { status, queuedRequestCount } = useNetworkStatus();
   const [isVisible, setIsVisible] = useState(false);
   const [announced, setAnnounced] = useState(false);
+  const { user, userRole, isAdmin: authIsAdmin } = useAuth();
+
+  const isAdminUser = Boolean(user) && (typeof authIsAdmin === 'function' ? authIsAdmin() : userRole === 'admin');
+  const isSlowConnection = status.quality === 'slow';
 
   // Show/hide logic
   useEffect(() => {
+    if (!isAdminUser) {
+      setIsVisible(false);
+      return;
+    }
+
     if (showOnlyWhenIssues) {
       // Show only when offline or slow
-      setIsVisible(!status.online || status.quality === 'slow' || status.quality === 'offline');
+      setIsVisible(isSlowConnection);
     } else {
       // Always show (for debugging/demo)
       setIsVisible(true);
     }
-  }, [status.online, status.quality, showOnlyWhenIssues]);
+  }, [isAdminUser, isSlowConnection, showOnlyWhenIssues]);
 
   // Screen reader announcement (only announce changes)
   useEffect(() => {
@@ -164,7 +174,7 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.mem
     'top-left': 'top-4 left-4',
   };
 
-  if (!isVisible) return null;
+  if (!isAdminUser || !isSlowConnection || !isVisible) return null;
 
   const shouldAnimate = !prefersReducedMotion();
   const statusMessage = getStatusMessage(status.type, status.quality, status.online);
