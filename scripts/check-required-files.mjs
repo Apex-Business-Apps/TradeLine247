@@ -1,4 +1,10 @@
 import { access, constants } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const repoRoot = join(__dirname, '..');
 
 const requiredFiles = [
   'src/integrations/supabase/client.ts',
@@ -12,7 +18,7 @@ let missingFiles = [];
 
 for (const file of requiredFiles) {
   try {
-    await access(file, constants.F_OK);
+    await access(join(repoRoot, file), constants.F_OK);
   } catch {
     missingFiles.push(file);
   }

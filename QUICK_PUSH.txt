@@ -1,0 +1,16 @@
+# Quick Push Commands
+# Run these commands in PowerShell from the repository root
+
+# Navigate to repo root first:
+cd "c:\Users\sinyo\TradeLine24-7\TradeLine247"
+
+# Then run:
+.\set-remote-and-push.ps1
+
+# OR run commands directly:
+git remote set-url origin https://github.com/Apex-Business-Apps/TradeLine247.git
+$branch = git rev-parse --abbrev-ref HEAD
+git add -A
+git commit -m "Fix build blockers: path resolution and GitHub Actions updates"
+git push -u origin $branch
+Write-Host "PR: https://github.com/Apex-Business-Apps/TradeLine247/compare/main...$branch"

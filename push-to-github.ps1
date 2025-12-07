@@ -36,9 +36,15 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "`nPR Creation Link:" -ForegroundColor Cyan
     Write-Host "https://github.com/Apex-Business-Apps/TradeLine247/compare/main...$branchName" -ForegroundColor Yellow
 } else {
-    Write-Host "`n❌ Push failed. Check your authentication." -ForegroundColor Red
-    Write-Host "You may need to authenticate with:" -ForegroundColor Yellow
-    Write-Host "  gh auth login" -ForegroundColor Yellow
-    Write-Host "  OR" -ForegroundColor Yellow
-    Write-Host "  git config credential.helper store" -ForegroundColor Yellow
+    Write-Host "`n❌ Push failed. Authentication required." -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Run the authentication setup script:" -ForegroundColor Yellow
+    Write-Host "  .\setup-github-auth.ps1" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Quick options:" -ForegroundColor Yellow
+    Write-Host "  1. GitHub CLI: gh auth login" -ForegroundColor White
+    Write-Host "  2. Personal Access Token: https://github.com/settings/tokens" -ForegroundColor White
+    Write-Host "     (Use token as password when prompted)" -ForegroundColor Gray
 }
+
+
