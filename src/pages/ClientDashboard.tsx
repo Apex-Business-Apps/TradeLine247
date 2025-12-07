@@ -44,9 +44,9 @@ const ClientDashboard = () => {
             <AlertTriangle className="h-4 w-4 text-amber-800 dark:text-yellow-400" />
             <AlertDescription className="flex items-center justify-between">
               <span className="text-yellow-800 dark:text-yellow-300">{error}</span>
-              <Button 
+              <Button
                 onClick={refresh}
-                variant="outline" 
+                variant="outline"
                 size="sm"
                 className="ml-4 h-auto px-3 py-1 text-xs"
               >
@@ -56,6 +56,8 @@ const ClientDashboard = () => {
             </AlertDescription>
           </Alert>
         )}
+
+      </div>
 
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">

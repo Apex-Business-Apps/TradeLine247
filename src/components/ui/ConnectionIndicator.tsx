@@ -102,18 +102,18 @@ function getStatusColor(quality: string): string {
  * Connection Indicator Component
  * Memoized to prevent unnecessary re-renders when network status hasn't changed
  */
-export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.memo(({
-  showOnlyWhenIssues = true,
-  position = 'bottom-right',
-  className,
-}) => {
-  const { status, queuedRequestCount } = useNetworkStatus();
-  const { user, isAdmin, userRole } = useAuth();
-  const [isVisible, setIsVisible] = useState(false);
-  const [announced, setAnnounced] = useState(false);
-  const { user, userRole, isAdmin: authIsAdmin } = useAuth();
+  export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.memo(({
+    showOnlyWhenIssues = true,
+    position = 'bottom-right',
+    className,
+  }) => {
+    const { status, queuedRequestCount } = useNetworkStatus();
+    const { user, isAdmin, userRole } = useAuth();
+    const authIsAdmin = isAdmin;
+    const [isVisible, setIsVisible] = useState(false);
+    const [announced, setAnnounced] = useState(false);
 
-  const isAdminUser = Boolean(user) && (typeof authIsAdmin === 'function' ? authIsAdmin() : userRole === 'admin');
+    const isAdminUser = Boolean(user) && (typeof authIsAdmin === 'function' ? authIsAdmin() : userRole === 'admin');
   const isSlowConnection = status.quality === 'slow';
 
   const isUserAdmin = user

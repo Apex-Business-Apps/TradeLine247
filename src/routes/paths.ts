@@ -11,7 +11,6 @@ export const paths = {
   previewHealth: "/preview-health",
   login: "/login",
   auth: "/auth",
-  login: "/login",
   dashboard: "/dashboard",
   calls: "/calls",
   callCenterLegacy: "/call-center",
