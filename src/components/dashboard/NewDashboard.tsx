@@ -225,9 +225,9 @@ export const NewDashboard = () => {
             />
 
             {showQuickActions && (
-              <section className="quick-actions md:sticky md:top-4 ios-no-sticky">
+              <div className="quick-actions lg:sticky lg:top-4 ios-no-sticky">
                 <QuickActionsCard />
-              </section>
+              </div>
             )}
             {showServiceHealth && <ServiceHealth />}
           </div>

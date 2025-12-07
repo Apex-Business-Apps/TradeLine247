@@ -111,6 +111,10 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.mem
   const { user, isAdmin, userRole } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [announced, setAnnounced] = useState(false);
+  const { user, userRole, isAdmin: authIsAdmin } = useAuth();
+
+  const isAdminUser = Boolean(user) && (typeof authIsAdmin === 'function' ? authIsAdmin() : userRole === 'admin');
+  const isSlowConnection = status.quality === 'slow';
 
   const isUserAdmin = user
     ? (typeof isAdmin === 'function' ? isAdmin() : userRole === 'admin' || userRole === 'owner')
@@ -118,14 +122,19 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.mem
 
   // Show/hide logic
   useEffect(() => {
+    if (!isAdminUser) {
+      setIsVisible(false);
+      return;
+    }
+
     if (showOnlyWhenIssues) {
       // Show only when offline or slow
-      setIsVisible(!status.online || status.quality === 'slow' || status.quality === 'offline');
+      setIsVisible(isSlowConnection);
     } else {
       // Always show (for debugging/demo)
       setIsVisible(true);
     }
-  }, [status.online, status.quality, showOnlyWhenIssues]);
+  }, [isAdminUser, isSlowConnection, showOnlyWhenIssues]);
 
   // Screen reader announcement (only announce changes)
   useEffect(() => {
@@ -170,9 +179,7 @@ export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.mem
     'top-left': 'top-4 left-4',
   };
 
-  const shouldHideSlowPill = status.quality === 'slow' && !isUserAdmin;
-
-  if (!isVisible || shouldHideSlowPill) return null;
+  if (!isAdminUser || !isSlowConnection || !isVisible) return null;
 
   const shouldAnimate = !prefersReducedMotion();
   const statusMessage = getStatusMessage(status.type, status.quality, status.online);

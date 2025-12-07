@@ -28,8 +28,34 @@ const ClientDashboard = () => {
   const { dashboardLayout } = useUserPreferencesStore();
 
   return (
-    <SwipeNavigator>
-      <main className="dashboard-shell min-h-screen bg-background">
+    <main className="dashboard-shell min-h-screen bg-background">
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Your AI receptionist is working hard for you today
+          </p>
+        </div>
+
+        {/* Error Banner */}
+        {error && (
+          <Alert className="mb-6 border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20">
+            <AlertTriangle className="h-4 w-4 text-amber-800 dark:text-yellow-400" />
+            <AlertDescription className="flex items-center justify-between">
+              <span className="text-yellow-800 dark:text-yellow-300">{error}</span>
+              <Button 
+                onClick={refresh}
+                variant="outline" 
+                size="sm"
+                className="ml-4 h-auto px-3 py-1 text-xs"
+              >
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Try again
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
@@ -71,9 +97,8 @@ const ClientDashboard = () => {
           </Suspense>
         </div>
 
-        <Footer />
-      </main>
-    </SwipeNavigator>
+      <Footer />
+    </main>
   );
 };
 
