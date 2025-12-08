@@ -1081,7 +1081,7 @@ header {
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: transparent; /* Allow parent background image to show through */
+  /* Background now applied directly via inline styles and Tailwind classes */
 }
 
 .hero-bg {

@@ -43,15 +43,9 @@ const Index = () => {
         id="app-home"
         className="min-h-screen flex flex-col relative"
         style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
           backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
         }}
       >
-        <div className="fixed inset-0 z-0 pointer-events-none"></div>
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
           <AISEOHead
@@ -108,10 +102,8 @@ const Index = () => {
           />
 
           <div className="flex-1" style={{ minHeight: "60vh" }}>
-            {/* All sections now use 85% opacity to match secondary pages */}
-            <div className="bg-background/85 backdrop-blur-[2px]" style={{ willChange: "transform" }}>
-              <HeroRoiDuo />
-            </div>
+            {/* Hero section with scoped background - responsive wallpaper */}
+            <HeroRoiDuo />
             <div className="bg-background/85 backdrop-blur-[2px]">
               <BenefitsGrid />
             </div>
