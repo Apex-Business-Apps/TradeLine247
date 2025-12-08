@@ -99,7 +99,9 @@ const Index = () => {
         />
 
         <div className="flex-1" style={{ minHeight: "60vh" }}>
+        {/* Hero section with scoped background - responsive wallpaper */}
           <HeroRoiDuo />
+          <div className="bg-background/85 backdrop-blur-[2px]">
           <BenefitsGrid />
           <ImpactStrip />
           <HowItWorks />
