@@ -1851,3 +1851,97 @@ button[class*="orange"]:hover:not([class*="outline"]) {
     top: auto !important;
   }
 }
+
+/* =============================================
+   MOBILE WALLPAPER FOCAL POINT FIX
+   December 8, 2025 — Claude Redemption
+   Reference: GOODBUILD d075d9b (Oct 27, 2025)
+   
+   CONSTRAINT: This block ONLY affects mobile.
+   Desktop remains unchanged.
+   ============================================= */
+
+/* Primary mobile fix - show face, not body */
+@media screen and (max-width: 768px) {
+  /* Target all possible hero background containers */
+  .hero-section,
+  .hero-bg,
+  [class*="hero"],
+  [class*="Hero"],
+  main > section:first-child,
+  .min-h-screen:first-of-type,
+  [style*="background-image"] {
+    background-position: center top !important;
+    background-position: center 15% !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+  }
+  
+  /* Also target body pseudo-element if used */
+  body::before {
+    background-position: center 15% !important;
+  }
+}
+
+/* iPhone SE / Small phones (320-375px) */
+@media screen and (max-width: 375px) {
+  .hero-section,
+  .hero-bg,
+  [class*="hero"],
+  [class*="Hero"],
+  main > section:first-child,
+  [style*="background-image"] {
+    background-position: center 10% !important;
+    background-size: 140% auto !important;
+  }
+}
+
+/* Standard phones (376-428px) - iPhone 12/13/14 */
+@media screen and (min-width: 376px) and (max-width: 428px) {
+  .hero-section,
+  .hero-bg,
+  [class*="hero"],
+  [class*="Hero"],
+  main > section:first-child,
+  [style*="background-image"] {
+    background-position: center 12% !important;
+    background-size: 125% auto !important;
+  }
+}
+
+/* Large phones (429-768px) - iPhone Pro Max, etc */
+@media screen and (min-width: 429px) and (max-width: 768px) {
+  .hero-section,
+  .hero-bg,
+  [class*="hero"],
+  [class*="Hero"],
+  main > section:first-child,
+  [style*="background-image"] {
+    background-position: center 15% !important;
+    background-size: 115% auto !important;
+  }
+}
+
+/* Landscape phones */
+@media screen and (max-width: 896px) and (orientation: landscape) {
+  .hero-section,
+  .hero-bg,
+  [class*="hero"],
+  [class*="Hero"],
+  main > section:first-child,
+  [style*="background-image"] {
+    background-position: center 20% !important;
+    background-size: cover !important;
+  }
+}
+
+/* iOS Safari - disable fixed attachment (causes rendering issues) */
+@supports (-webkit-touch-callout: none) {
+  .hero-section,
+  .hero-bg,
+  [class*="hero"],
+  [class*="Hero"],
+  main > section:first-child {
+    background-attachment: scroll !important;
+  }
+}
