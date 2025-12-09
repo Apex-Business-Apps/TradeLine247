@@ -41,6 +41,7 @@ test.describe('Hero Background Responsiveness', () => {
 
     // Mobile CSS override: specific size and focal point (15% from top = face visible)
     expect(styles.backgroundPosition).toContain('10%'); // Face focal point
+    expect(styles.backgroundSize).toContain('cover');
     expect(styles.backgroundRepeat).toBe('no-repeat');
     expect(styles.backgroundAttachment).toBe('scroll');
   });
@@ -63,6 +64,7 @@ test.describe('Hero Background Responsiveness', () => {
 
     // Tablet uses mobile CSS override at 768px boundary
     expect(styles.backgroundPosition).toContain('15%'); // Face focal point
+    expect(styles.backgroundSize).toContain('cover');
     expect(styles.backgroundAttachment).toBe('scroll');
   });
 
@@ -78,12 +80,16 @@ test.describe('Hero Background Responsiveness', () => {
       return {
         backgroundSize: computed.backgroundSize,
         backgroundPosition: computed.backgroundPosition,
+        backgroundRepeat: computed.backgroundRepeat,
+        backgroundAttachment: computed.backgroundAttachment,
       };
     });
 
     // Desktop should use standard cover (no mobile override at this viewport)
     expect(styles.backgroundSize).toContain('cover');
     expect(styles.backgroundPosition).toContain('center');
+    expect(styles.backgroundRepeat).toBe('no-repeat');
+    expect(styles.backgroundAttachment).toBe('fixed');
   });
 
   test('background does not leak into next sections', async ({ page }) => {
