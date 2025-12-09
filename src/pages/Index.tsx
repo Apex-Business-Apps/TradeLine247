@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { CSSProperties, useEffect } from "react";
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
 import { TrustBadgesSlim } from "@/components/sections/TrustBadgesSlim";
@@ -12,7 +12,6 @@ import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
-import { MobileLanding } from "@/components/sections/MobileLanding";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
@@ -38,119 +37,113 @@ const Index = () => {
     };
   }, []);
 
-  return (
-    <>
-      {/* Mobile Landing Page */}
-      <div className="md:hidden">
-        <MobileLanding />
-      </div>
+  const wallpaperStyle = {
+    backgroundImage: `url(${backgroundImage})`,
+  } as CSSProperties;
 
-      {/* Desktop Landing Page */}
+  const wallpaperVariables = {
+    ["--hero-wallpaper-image" as const]: `url(${backgroundImage})`,
+  } as CSSProperties;
+
+  return (
+    <div className="relative min-h-screen" style={wallpaperVariables}>
       <div
         id="app-home"
-        className="min-h-screen flex flex-col relative hidden md:flex"
-        style={{
-          backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-        }}
-      >
+        className="fixed inset-0 z-0 pointer-events-none bg-no-repeat bg-cover bg-center"
+        style={wallpaperStyle}
+        aria-hidden="true"
+      />
+      <main className="landing-shell min-h-screen flex flex-col relative">
         {/* Content with translucency - Optimized for performance */}
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
           <AISEOHead
-            title="TradeLine 24/7 - Enterprise AI Receptionist with Advanced Booking System"
-            description="Enterprise-grade AI receptionist with emotional intelligence, secure booking system, calendar integration, and 99.9% uptime. Transform your customer service with human-like conversations and automated workflows."
-            canonical="/"
-            contentType="service"
-            directAnswer="TradeLine 24/7 is an enterprise AI receptionist platform featuring advanced booking system, emotional intelligence, calendar integration, secure payments, and 99.9% uptime SLA. Complete business automation solution for modern enterprises."
-            primaryEntity={{
-              name: "TradeLine 24/7 Enterprise AI Receptionist Platform",
-              type: "Service",
-              description: "Enterprise-grade AI receptionist with advanced booking system and business automation",
-            }}
-            keyFacts={[
-              { label: "Availability", value: "24/7/365" },
-              { label: "Response Time", value: "<100ms" },
-              { label: "Uptime SLA", value: "99.9%" },
-              { label: "Security", value: "Enterprise-grade" },
-              { label: "Integrations", value: "CRM + Calendar + Payments" },
-              { label: "Compliance", value: "SOC 2 + GDPR + PCI DSS" },
-            ]}
-            faqs={[
-              {
-                question: "What is TradeLine 24/7 Enterprise?",
-                answer:
-                  "TradeLine 24/7 Enterprise is a comprehensive AI receptionist platform with advanced booking system, emotional intelligence, calendar integration, secure payment processing, and enterprise-grade security. It provides complete business automation with 99.9% uptime SLA.",
-              },
-              {
-                question: "How does the advanced booking system work?",
-                answer:
-                  "Our enterprise booking system features secure credit card commitment (authorize without charging), automated calendar integration (Google/Outlook), personalized confirmation emails/SMS, and complete workflow automation with escalation protocols.",
-              },
-              {
-                question: "What security measures are in place?",
-                answer:
-                  "TradeLine 24/7 Enterprise features military-grade security including SOC 2 Type II compliance, PCI DSS payment processing, GDPR compliance, multi-layered authentication, real-time monitoring, and comprehensive audit trails.",
-              },
-              {
-                question: "How does the AI emotional intelligence work?",
-                answer:
-                  "Our AI receptionist recognizes 6 emotion categories (urgency, frustration, confusion, excitement, concern, satisfaction) and adapts responses accordingly. It maintains human-like conversations with personality customization and never interrupts callers.",
-              },
-              {
-                question: "What integrations are supported?",
-                answer:
-                  "TradeLine 24/7 supports CRM integration, Google Calendar/Outlook sync, Stripe payment processing, Slack/Discord alerting, email/SMS delivery, and custom API integrations for complete business automation.",
-              },
-              {
-                question: "What's included in enterprise monitoring?",
-                answer:
-                  "Enterprise monitoring includes 24/7 system health checks, real-time performance metrics, automated alerting, incident response workflows, security event tracking, and comprehensive analytics dashboard.",
-              },
-            ]}
-          />
+              title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
+              description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
+              canonical="/"
+              contentType="service"
+              directAnswer="TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads based on your criteria, and sends clean email transcripts to Canadian businesses. Never miss a call. Work while you sleep."
+              primaryEntity={{
+                name: "TradeLine 24/7 AI Receptionist Service",
+                type: "Service",
+                description: "24/7 AI-powered phone answering service for Canadian businesses",
+              }}
+              keyFacts={[
+                { label: "Availability", value: "24/7" },
+                { label: "Response Time", value: "<2 seconds" },
+                { label: "Uptime", value: "99.9%" },
+                { label: "Service Area", value: "Canada" },
+              ]}
+              faqs={[
+                {
+                  question: "What is TradeLine 24/7?",
+                  answer:
+                    "TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads based on your criteria, and sends clean email transcripts. It never misses a call and works while you sleep.",
+                },
+                {
+                  question: "How does TradeLine 24/7 work?",
+                  answer:
+                    "When a call comes in, our AI answers immediately, has a natural conversation with the caller, qualifies them based on your criteria, and sends you a clean email transcript with all the details.",
+                },
+                {
+                  question: "What areas does TradeLine 24/7 serve?",
+                  answer:
+                    "TradeLine 24/7 serves businesses across Canada, with primary operations in Edmonton, Alberta.",
+                },
+                {
+                  question: "How much does TradeLine 24/7 cost?",
+                  answer:
+                    "TradeLine 24/7 offers flexible pricing: $149 CAD per qualified appointment (pay-per-use) or $249 CAD per month for the Predictable Plan.",
+                },
+              ]}
+            />
 
-          <div className="flex-1" style={{ minHeight: "60vh" }}>
-            {/* Hero section with scoped background - responsive wallpaper */}
+          {/* Hero section with 55% opacity gradient - Background image visible */}
+          <div
+            className="relative"
+            style={{
+              backgroundImage: `linear-gradient(
+                to bottom,
+                rgba(255, 107, 53, 0.55) 0%,
+                rgba(104, 182, 233, 0.55) 100%
+              )`,
+            }}
+          >
             <HeroRoiDuo />
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <BenefitsGrid />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <ImpactStrip />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <HowItWorks />
-            </div>
-            <div className="bg-background/85 backdrop-blur-[2px]">
-              <div className="container mx-auto px-4 py-12">
-                <div className="mx-auto max-w-4xl space-y-6 text-center">
-                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                    Quick actions for operators
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-                  </p>
-                  <QuickActionsCard />
-                </div>
+          </div>
+
+          {/* Rest of page with 72% opacity gradient - Text readable, image visible */}
+          <div
+            className="relative"
+            style={{
+              backgroundImage: `linear-gradient(
+                to bottom,
+                rgba(255, 107, 53, 0.72) 0%,
+                rgba(104, 182, 233, 0.72) 100%
+              )`,
+            }}
+          >
+            <BenefitsGrid />
+            <ImpactStrip />
+            <HowItWorks />
+            <div className="container mx-auto px-4 py-12">
+              <div className="mx-auto max-w-4xl space-y-6 text-center">
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                  Quick actions for operators
+                </h2>
+                <p className="text-muted-foreground">
+                  Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+                </p>
+                <QuickActionsCard />
               </div>
             </div>
-          </div>
-
-          <div className="bg-background/85 backdrop-blur-[2px]">
             <TrustBadgesSlim />
-          </div>
-
-          <div className="bg-background/85 backdrop-blur-[2px]">
             <LeadCaptureForm />
-          </div>
-
-          <div className="bg-background/85 backdrop-blur-[2px]">
             <Footer />
+            <NoAIHypeFooter />
           </div>
-
-          <NoAIHypeFooter />
         </div>
-      </div>
-    </>
+      </main>
+    </div>
   );
 };
 
