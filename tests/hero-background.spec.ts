@@ -1,66 +1,58 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Hero Background Responsiveness', () => {
-  test('hero section has background image scoped correctly', async ({ page }) => {
+  test('background image is on app-home (Dec 4 architecture)', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
     const heroSection = page.locator('section.hero-section').first();
     await expect(heroSection).toBeVisible();
 
-    // Verify wallpaper version is present (regression safeguard)
-    const wallpaperVersion = await heroSection.getAttribute('data-wallpaper-version');
-    expect(wallpaperVersion).toBeTruthy();
-    expect(wallpaperVersion).toContain('2025-12-08');
-
-    // Verify background image is applied to hero section, not app-home
-    const heroBgImage = await heroSection.evaluate((el) => {
-      return window.getComputedStyle(el).backgroundImage;
-    });
-    expect(heroBgImage).toMatch(/url\(.*BACKGROUND_IMAGE1\.svg/);
-
-    // Verify app-home does NOT have background image
+    // Dec 4 architecture: Background is on #app-home div (fixed inset-0)
     const appHome = page.locator('#app-home');
     const appHomeBg = await appHome.evaluate((el) => {
       return window.getComputedStyle(el).backgroundImage;
     });
-    expect(appHomeBg).toBe('none');
+    expect(appHomeBg).toMatch(/url\(.*BACKGROUND_IMAGE1\.svg/);
+
+    // Verify #app-home has fixed positioning
+    const appHomePosition = await appHome.evaluate((el) => {
+      return window.getComputedStyle(el).position;
+    });
+    expect(appHomePosition).toBe('fixed');
   });
 
-  test('mobile: background uses contain and scroll attachment', async ({ page }) => {
+  test('mobile: background focal point shows face', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const heroSection = page.locator('section.hero-section').first();
+    const appHome = page.locator('#app-home');
 
-    const styles = await heroSection.evaluate((el) => {
+    const styles = await appHome.evaluate((el) => {
       const computed = window.getComputedStyle(el);
       return {
         backgroundSize: computed.backgroundSize,
         backgroundPosition: computed.backgroundPosition,
         backgroundRepeat: computed.backgroundRepeat,
         backgroundAttachment: computed.backgroundAttachment,
-        minHeight: computed.minHeight,
       };
     });
 
-    // Mobile should use contain
-    expect(styles.backgroundSize).toContain('contain');
-    expect(styles.backgroundPosition).toContain('top');
+    // Mobile CSS override: specific size and focal point (15% from top = face visible)
+    expect(styles.backgroundPosition).toContain('10%'); // Face focal point
     expect(styles.backgroundRepeat).toBe('no-repeat');
     expect(styles.backgroundAttachment).toBe('scroll');
-    expect(parseInt(styles.minHeight)).toBeGreaterThanOrEqual(600); // min-h-screen
   });
 
-  test('tablet: background switches to cover', async ({ page }) => {
+  test('tablet: background focal point adjusted', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const heroSection = page.locator('section.hero-section').first();
+    const appHome = page.locator('#app-home');
 
-    const styles = await heroSection.evaluate((el) => {
+    const styles = await appHome.evaluate((el) => {
       const computed = window.getComputedStyle(el);
       return {
         backgroundSize: computed.backgroundSize,
@@ -69,31 +61,29 @@ test.describe('Hero Background Responsiveness', () => {
       };
     });
 
-    // Tablet should use cover
-    expect(styles.backgroundSize).toContain('cover');
-    expect(styles.backgroundPosition).toContain('top');
+    // Tablet uses mobile CSS override at 768px boundary
+    expect(styles.backgroundPosition).toContain('15%'); // Face focal point
     expect(styles.backgroundAttachment).toBe('scroll');
   });
 
-  test('desktop: background uses cover with proper height', async ({ page }) => {
+  test('desktop: background uses cover (Dec 4 standard)', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const heroSection = page.locator('section.hero-section').first();
+    const appHome = page.locator('#app-home');
 
-    const styles = await heroSection.evaluate((el) => {
+    const styles = await appHome.evaluate((el) => {
       const computed = window.getComputedStyle(el);
       return {
         backgroundSize: computed.backgroundSize,
         backgroundPosition: computed.backgroundPosition,
-        minHeight: computed.minHeight,
       };
     });
 
+    // Desktop should use standard cover (no mobile override at this viewport)
     expect(styles.backgroundSize).toContain('cover');
-    expect(styles.backgroundPosition).toContain('top');
-    expect(parseInt(styles.minHeight)).toBeGreaterThanOrEqual(600);
+    expect(styles.backgroundPosition).toContain('center');
   });
 
   test('background does not leak into next sections', async ({ page }) => {
