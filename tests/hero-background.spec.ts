@@ -8,6 +8,11 @@ test.describe('Hero Background Responsiveness', () => {
     const heroSection = page.locator('section.hero-section').first();
     await expect(heroSection).toBeVisible();
 
+    // Verify wallpaper version is present (regression safeguard)
+    const wallpaperVersion = await heroSection.getAttribute('data-wallpaper-version');
+    expect(wallpaperVersion).toBeTruthy();
+    expect(wallpaperVersion).toContain('2025-12-08');
+
     // Verify background image is applied to hero section, not app-home
     const heroBgImage = await heroSection.evaluate((el) => {
       return window.getComputedStyle(el).backgroundImage;
