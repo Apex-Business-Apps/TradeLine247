@@ -1,5 +1,5 @@
-// Service Worker v5 - Versioned cache discipline
-const SW_VERSION = '5';
+// Service Worker v6 - Force cache bust for hero button fix
+const SW_VERSION = '6';
 const CACHE_NAME = `app-v${SW_VERSION}`;
 const STATIC_CACHE = `tradeline247-static-v${SW_VERSION}`;
 const API_CACHE = `tradeline247-api-v${SW_VERSION}`;
