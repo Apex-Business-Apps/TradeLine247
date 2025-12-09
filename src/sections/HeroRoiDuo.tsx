@@ -14,17 +14,10 @@
  * - Safe area insets (REQUIRED for mobile/PWA)
  * - Logo optimization (eager loading + aspectRatio)
  * - Fluid typography (clamp() only, NO fixed units)
- * - Responsive wallpaper CSS (CRITICAL - DO NOT REMOVE)
  *
  * Performance Targets (ENFORCED):
  * - LCP ≤ 2.5s
  * - CLS ≤ 0.05
- *
- * Responsive Wallpaper Behavior (LOCKED):
- * - Mobile (≤md): bg-contain bg-top bg-no-repeat bg-scroll
- * - Tablet/Desktop (≥md): bg-cover bg-top
- * - Height: min-h-screen for full viewport coverage
- * - Attachment: scroll (prevent iOS issues)
  *
  * Any violations will trigger console errors and may block deployment.
  */
@@ -35,36 +28,13 @@ import "../styles/hero-roi.css";
 import { LeadCaptureCard } from "../components/sections/LeadCaptureCard";
 import RoiCalculator from "../components/RoiCalculator";
 import officialLogo from '@/assets/official-logo.png';
-import backgroundImage from '@/assets/BACKGROUND_IMAGE1.svg';
-
-/**
- * HERO RESPONSIVE WALLPAPER CONSTANTS
- * These CSS classes control the responsive background behavior
- * DO NOT MODIFY without regression testing on mobile/tablet/desktop
- */
-const HERO_RESPONSIVE_CLASSES = {
-  // Base container
-  container: 'hero-section section-heavy overflow-hidden',
-  // Responsive wallpaper - CRITICAL for visual standard
-  wallpaper: 'min-h-screen bg-contain bg-top bg-no-repeat bg-scroll md:bg-cover md:bg-top lg:min-h-screen',
-} as const;
-
-const HERO_INLINE_STYLES = {
-  paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
-  paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
-  paddingLeft: 'env(safe-area-inset-left, 0)',
-  paddingRight: 'env(safe-area-inset-right, 0)',
-  backgroundImage: `url(${backgroundImage})`,
-  backgroundAttachment: 'scroll', // Critical for mobile - prevents fixed attachment issues
-} as const;
-
 export default function HeroRoiDuo() {
-  return <section
-    className={`${HERO_RESPONSIVE_CLASSES.container} ${HERO_RESPONSIVE_CLASSES.wallpaper}`}
-    style={HERO_INLINE_STYLES}
-    data-lovable-lock="structure-only"
-    data-wallpaper-version="2025-12-08-rollback"
-  >
+  return <section className="hero-section section-heavy overflow-hidden" style={{
+    paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
+    paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
+    paddingLeft: 'env(safe-area-inset-left, 0)',
+    paddingRight: 'env(safe-area-inset-right, 0)'
+  }} data-lovable-lock="structure-only">
       <div className="hero-gradient" aria-hidden="true" data-testid="hero-bg"></div>
       <div className="hero-gradient-overlay" aria-hidden="true"></div>
       <div className="hero-vignette" aria-hidden="true"></div>
@@ -90,7 +60,7 @@ export default function HeroRoiDuo() {
             />
           </div>
 
-          <h1 id="hero-h1" className="hero-headline font-extrabold mb-6" style={{ fontSize: 'clamp(2rem, 5vw + 1rem, 4.5rem)', lineHeight: '1.1' }} data-lovable-lock="permanent">
+          <h1 id="hero-h1" className="hero-headline hero-heading font-extrabold mb-6" style={{ fontSize: 'clamp(2rem, 5vw + 1rem, 4.5rem)', lineHeight: '1.1' }} data-lovable-lock="structure-only">
             Your 24/7 Ai Receptionist!
           </h1>
           <p className="hero-tagline mb-8 max-w-3xl mx-auto font-semibold" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5' }} data-lovable-lock="structure-only">
