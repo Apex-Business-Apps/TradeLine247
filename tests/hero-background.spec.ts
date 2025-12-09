@@ -13,7 +13,7 @@ test.describe('Hero Background Responsiveness', () => {
     const appHomeBg = await appHome.evaluate((el) => {
       return window.getComputedStyle(el).backgroundImage;
     });
-    expect(appHomeBg).toMatch(/url\(.*BACKGROUND_IMAGE1\.svg/);
+    expect(appHomeBg).toMatch(/url\(.*BACKGROUND_IMAGE1.*\.svg/);
 
     // Verify #app-home has fixed positioning
     const appHomePosition = await appHome.evaluate((el) => {
