@@ -192,7 +192,10 @@ const CRMIntegration = () => {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="sync-frequency">Sync Frequency</Label>
-                <select className="w-full p-2 rounded-md border border-input bg-background">
+                <select
+                  id="sync-frequency"
+                  className="w-full p-2 rounded-md border border-input bg-background"
+                >
                   <option>Real-time</option>
                   <option>Every 5 minutes</option>
                   <option>Every 15 minutes</option>

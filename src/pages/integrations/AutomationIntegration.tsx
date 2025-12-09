@@ -205,7 +205,7 @@ const AutomationIntegration = () => {
 
               <CardContent className="relative z-10 space-y-4">
                 <div>
-                  <h4 className="font-semibold text-sm mb-2">Features:</h4>
+                  <h3 className="font-semibold text-sm mb-2">Features:</h3>
                   <div className="grid grid-cols-1 gap-1">
                     {provider.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
@@ -285,7 +285,10 @@ const AutomationIntegration = () => {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="events">Trigger Events</Label>
-                <select className="w-full p-2 rounded-md border border-input bg-background">
+                <select
+                  id="events"
+                  className="w-full p-2 rounded-md border border-input bg-background"
+                >
                   <option>All events</option>
                   <option>Call completed</option>
                   <option>Call missed</option>
@@ -296,7 +299,10 @@ const AutomationIntegration = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="format">Data Format</Label>
-                <select className="w-full p-2 rounded-md border border-input bg-background">
+                <select
+                  id="format"
+                  className="w-full p-2 rounded-md border border-input bg-background"
+                >
                   <option>JSON</option>
                   <option>Form data</option>
                   <option>XML</option>

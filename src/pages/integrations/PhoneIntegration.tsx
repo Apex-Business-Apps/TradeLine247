@@ -174,7 +174,7 @@ const PhoneIntegration = () => {
 
                 <CardContent className="relative z-10 space-y-4">
                   <div>
-                    <h4 className="font-semibold text-sm mb-2">Features:</h4>
+                    <h3 className="font-semibold text-sm mb-2">Features:</h3>
                     <div className="grid grid-cols-1 gap-1">
                       {integration.features.map((feature) => (
                         <div key={feature} className="flex items-center gap-2 text-xs">
@@ -234,7 +234,7 @@ const PhoneIntegration = () => {
 
                 <CardContent className="relative z-10 space-y-4">
                   <div>
-                    <h4 className="font-semibold text-sm mb-2">Features:</h4>
+                    <h3 className="font-semibold text-sm mb-2">Features:</h3>
                     <div className="grid grid-cols-2 gap-1">
                       {provider.features.map((feature) => (
                         <div key={feature} className="flex items-center gap-2 text-xs">
