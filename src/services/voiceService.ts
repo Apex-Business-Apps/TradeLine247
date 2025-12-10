@@ -1,14 +1,18 @@
 /**
  * ElevenLabs Text-to-Speech client (server-side only).
  *
- * Reads credentials from environment variables:
- *  - ELEVEN_LABS_API_KEY
- *  - ELEVEN_VOICE_ID
- *  - ELEVEN_MODEL_ID
- *
  * NOTE: Do NOT call this from the browser; keep execution on the server to avoid
  * exposing the API key. Throw if we detect a browser environment.
  */
+
+import { getElevenConfig } from './elevenEnv';
+
+function getEnv(name: string): string | undefined {
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[name];
+  }
+  return undefined;
+}
 
 export interface VoiceOptions {
   voiceId?: string;
@@ -21,17 +25,6 @@ export interface VoiceOptions {
 export interface VoiceResponse {
   audio: ArrayBuffer;
   mimeType: string;
-}
-
-function getEnv(name: string): string | undefined {
-  // Prefer server-side env; fall back to Vite-style env if available.
-  if (typeof process !== 'undefined' && process.env) {
-    return process.env[name];
-  }
-  if (typeof import.meta !== 'undefined' && (import.meta as any).env) {
-    return (import.meta as any).env[name];
-  }
-  return undefined;
 }
 
 function assertServer() {
@@ -47,12 +40,9 @@ export async function generateSpeech(
 ): Promise<VoiceResponse> {
   assertServer();
 
-  const apiKey = getEnv('ELEVEN_LABS_API_KEY');
-  const voiceId = options.voiceId || getEnv('ELEVEN_VOICE_ID');
-  const modelId = options.modelId || getEnv('ELEVEN_MODEL_ID') || 'eleven_multilingual_v2';
-
-  if (!apiKey) throw new Error('ELEVEN_LABS_API_KEY is not set');
-  if (!voiceId) throw new Error('ELEVEN_VOICE_ID is not set');
+  const { apiKey, voiceId: defaultVoiceId, modelId: defaultModelId } = getElevenConfig();
+  const voiceId = options.voiceId || defaultVoiceId;
+  const modelId = options.modelId || defaultModelId;
 
   const stability = options.stability ?? 0.7;
   const similarity = options.similarity ?? 0.75;
@@ -74,7 +64,7 @@ export async function generateSpeech(
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'xi-api-key': apiKey,
+      'xi-api-key': apiKey!,
       'Content-Type': 'application/json',
       Accept: 'audio/mpeg',
     },
