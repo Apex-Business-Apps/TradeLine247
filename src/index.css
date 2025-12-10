@@ -1800,6 +1800,8 @@ button[class*="orange"]:hover:not([class*="outline"]) {
   background-image: var(--hero-wallpaper-image);
   background-size: cover;
   background-position: center center;
+  background-position-x: center;
+  background-position-y: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
