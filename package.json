@@ -53,6 +53,7 @@
     "capacitor:sync:before": "npm run build"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.4",
     "@capacitor/cli": "^7.4.3",
     "@capacitor/core": "^7.4.3",
     "@capacitor/ios": "^7.4.4",
@@ -105,6 +106,7 @@
     "react-router-dom": "^7.9.4",
     "react-swipeable": "^7.0.2",
     "recharts": "^3.5.0",
+    "sentiment": "^5.0.2",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",

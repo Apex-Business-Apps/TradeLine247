@@ -87,6 +87,16 @@ VITE_SUPABASE_URL=... VITE_SUPABASE_ANON_KEY=... npm run verify:env:public
 
 The CI workflow runs this script automatically; ensure the variables are available in your environment to avoid failures.
 
+### Voice assistant (server-side) secrets
+
+Configure these in CI/secret stores (never commit them):
+
+- `ELEVEN_LABS_API_KEY`
+- `ELEVEN_VOICE_ID`
+- `ELEVEN_MODEL_ID` (e.g., `eleven_multilingual_v2` or `eleven_flash_v2_5`)
+
+See `docs/voice-assistant.md` for usage, tuning, and deployment notes.
+
 ## Verification before committing changes
 
 Run the quality checks from the repository root to confirm your changes are safe to commit:
