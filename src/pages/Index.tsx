@@ -40,6 +40,7 @@ const Index = () => {
   const wallpaperStyle = {
     backgroundImage: `url(${backgroundImage})`,
     backgroundPosition: 'center',
+    backgroundSize: 'cover',
   } as CSSProperties;
 
   const wallpaperVariables = {
