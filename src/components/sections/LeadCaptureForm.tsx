@@ -207,18 +207,6 @@ export const LeadCaptureForm = () => {
       </section>;
   }
   return <section className="py-20 pb-32 bg-gradient-to-br from-primary/10 to-accent/10 relative">
-      {/* Mobile: Orange status bar */}
-      <div className="md:hidden bg-[#FF6B35] text-white px-4 py-2 fixed top-0 left-0 right-0 z-50 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">11:36</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-1 rounded-full bg-white"></div>
-          <div className="w-1 h-1 rounded-full bg-white"></div>
-          <div className="w-1 h-1 rounded-full bg-white"></div>
-        </div>
-      </div>
-
       <div className="container pt-16 md:pt-0">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
