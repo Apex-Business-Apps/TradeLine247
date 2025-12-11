@@ -180,7 +180,7 @@ const RoiCalculator = () => {
                 </div>
               </div>
 
-              <Badge className="w-full justify-center py-2 text-white" style={{ backgroundColor: '#E55A2B' }}>
+              <Badge variant="outline" className="w-full justify-center py-2 border-0 bg-brand-accentSoft text-brand-navy hover:bg-brand-accentStrong/90">
                 Best value this month: {results.bestPlan}
               </Badge>
 

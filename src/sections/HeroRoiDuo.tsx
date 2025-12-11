@@ -69,15 +69,20 @@ export default function HeroRoiDuo() {
           </div>
           
           <h1 id="hero-h1" className="hero-headline font-extrabold mb-6" style={{ fontSize: 'clamp(2rem, 5vw + 1rem, 4.5rem)', lineHeight: '1.1' }} data-lovable-lock="permanent">
-            Your 24/7 Ai Receptionist!
+            <span className="text-[#1e556b]">trA</span>
+            <span className="text-[#FF6B35]">deline</span>
+            <span className="text-[#FF6B35]"> 24/7</span>
           </h1>
-          <p className="hero-tagline mb-8 max-w-3xl mx-auto font-semibold" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5' }} data-lovable-lock="structure-only">
+          <p className="hero-tagline mb-4 max-w-3xl mx-auto font-semibold" style={{ fontSize: 'clamp(1rem, 2vw + 0.5rem, 2.5rem)', lineHeight: '1.5', color: '#FF6B35' }} data-lovable-lock="structure-only">
+            Your 24/7 AI Receptionist!
+          </p>
+          <p className="hero-tagline mb-8 max-w-3xl mx-auto font-semibold" style={{ fontSize: 'clamp(0.9rem, 1.5vw + 0.5rem, 1.5rem)', lineHeight: '1.5', color: '#1e556b' }} data-lovable-lock="structure-only">
             Never miss a call. Work while you sleep.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-8 text-sm md:text-base">
-            <a href="/security" className="feature-badge font-medium">🔒 Enterprise Security</a>
-            <a href="/compare" className="feature-badge font-medium">📊 Compare Services</a>
-            <a href="/pricing" className="feature-badge font-medium">💰 See Pricing</a>
+            <a href="/security" className="feature-badge font-medium bg-white text-[#FF6B35] px-4 py-2 rounded-lg shadow-md">🔒 Enterprise Security</a>
+            <a href="/compare" className="feature-badge font-medium bg-white text-[#FF6B35] px-4 py-2 rounded-lg shadow-md">📊 Compare Services</a>
+            <a href="/pricing" className="feature-badge font-medium bg-white text-[#FF6B35] px-4 py-2 rounded-lg shadow-md">💰 See Pricing</a>
           </div>
           
           {/* Premium Phone Number - Hero text orange (#FF6B35) */}

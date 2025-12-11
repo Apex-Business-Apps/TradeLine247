@@ -1109,27 +1109,28 @@ header {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  /* Orange mask overlay - proper brand orange with reduced opacity for better background visibility */
+  /* Orange mask overlay - proper brand orange with increased opacity for better text contrast */
   /* Using brand orange #FF6B35 (hsl(21, 100%, 60%)) for consistent brand identity */
-  background: rgba(255, 107, 53, 0.20); /* Brand orange #FF6B35 with 20% opacity - baseline for non-landing pages */
+  background: rgba(255, 107, 53, 0.80); /* Brand orange #FF6B35 at 80% opacity for non-hero landing sections */
   pointer-events: none;
   z-index: 1;
 }
 
-/* Landing page overlay - 20% more transparent (20% * 0.8 = 16%) */
+/* Hero landing section overlay - slightly lighter to keep content readable */
+.hero-section .hero-gradient-overlay,
 [data-page="landing"] .hero-gradient-overlay {
-  background: rgba(255, 107, 53, 0.16); /* Brand orange #FF6B35 with 16% opacity - landing page lighter baseline */
+  background: rgba(255, 107, 53, 0.60); /* Brand orange #FF6B35 at 60% opacity for hero */
 }
 
 .hero-vignette {
   position: absolute;
   inset: 0;
-  /* Subtle vignette for depth, but lighter to not obscure background */
+  /* Increased vignette for better text contrast on edges */
   background: radial-gradient(
     ellipse at center,
     transparent 0%,
-    rgba(0,0,0,0.1) 70%,
-    rgba(0,0,0,0.25) 100%
+    rgba(0,0,0,0.15) 70%,
+    rgba(0,0,0,0.30) 100%
   );
   pointer-events: none;
   z-index: 2;
@@ -1147,6 +1148,7 @@ header {
   color: #1e556b !important;
   /* text-shadow removed for a11y - causes color-contrast violations */
   line-height: 1.3;
+}
 
 /* Global Orange Color Unification - All orange elements use hero text orange (#FF6B35) */
 :root {

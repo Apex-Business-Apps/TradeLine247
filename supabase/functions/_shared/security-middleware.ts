@@ -373,21 +373,17 @@ export class EnterpriseSecurity {
    * Geo-based security checks
    */
   private async getGeoData(ip: string): Promise<GeoData | undefined> {
-    try {
-      // This would integrate with a GeoIP service like MaxMind
-      // Placeholder implementation
-      return {
-        country: 'US',
-        region: 'CA',
-        city: 'San Francisco',
-        latitude: 37.7749,
-        longitude: -122.4194,
-        timezone: 'America/Los_Ang_Angeles'
-      };
-    } catch (error) {
-      console.error('Geo lookup failed:', error);
-      return undefined;
-    }
+    // This would integrate with a GeoIP service like MaxMind
+    // Placeholder implementation
+    // TODO: Replace with actual GeoIP service integration that may throw errors
+    return {
+      country: 'US',
+      region: 'CA',
+      city: 'San Francisco',
+      latitude: 37.7749,
+      longitude: -122.4194,
+      timezone: 'America/Los_Ang_Angeles'
+    };
   }
 
   /**
@@ -562,27 +558,21 @@ export function withSecurityCheck<T extends any[], R>(
   return async (...args: T): Promise<R> => {
     const req = args[0] as Request; // Assume first argument is request
 
-    try {
-      // Perform security check
-      const securityContext = await enterpriseSecurity.performSecurityCheck(req, securityOptions);
+    // Perform security check
+    const securityContext = await enterpriseSecurity.performSecurityCheck(req, securityOptions);
 
-      // Add security headers to response
-      const result = await fn(securityContext, ...args);
+    // Add security headers to response
+    const result = await fn(securityContext, ...args);
 
-      // If result is a Response object, add security headers
-      if (result && typeof result === 'object' && 'headers' in result) {
-        const securityHeaders = enterpriseSecurity.getSecurityHeaders();
-        for (const [key, value] of Object.entries(securityHeaders)) {
-          (result.headers as any).set(key, value);
-        }
+    // If result is a Response object, add security headers
+    if (result && typeof result === 'object' && 'headers' in result) {
+      const securityHeaders = enterpriseSecurity.getSecurityHeaders();
+      for (const [key, value] of Object.entries(securityHeaders)) {
+        (result.headers as any).set(key, value);
       }
-
-      return result;
-
-    } catch (error) {
-      // Security violations are already logged in performSecurityCheck
-      throw error;
     }
+
+    return result;
   };
 }
 

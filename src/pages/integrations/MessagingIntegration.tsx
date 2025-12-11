@@ -131,7 +131,7 @@ const MessagingIntegration = () => {
           {messagingApps.map((app) => (
             <Card 
               key={app.id}
-              className={`relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm group hover:shadow-[var(--premium-shadow-medium)] transition-all duration-300 ${
+              className={`relative overflow-hidden border-0 bg-card/75 backdrop-blur-sm group hover:shadow-[var(--premium-shadow-medium)] transition-all duration-300 ${
                 app.status === 'coming-soon' ? 'opacity-75' : ''
               }`}
               style={{ 
@@ -218,7 +218,7 @@ const MessagingIntegration = () => {
 
         {/* Auto-response Configuration */}
         <Card 
-          className="relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm"
+          className="relative overflow-hidden border-0 bg-card/75 backdrop-blur-sm"
           style={{ 
             boxShadow: 'var(--premium-shadow-subtle)',
             background: 'linear-gradient(135deg, hsl(var(--card) / 0.8) 0%, hsl(var(--card) / 0.6) 100%)',

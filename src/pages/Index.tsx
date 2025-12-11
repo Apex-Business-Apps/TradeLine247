@@ -12,6 +12,7 @@ import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
+import { MobileLanding } from "@/components/sections/MobileLanding";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
@@ -39,9 +40,15 @@ const Index = () => {
 
   return (
     <>
+      {/* Mobile Landing Page */}
+      <div className="md:hidden">
+        <MobileLanding />
+      </div>
+
+      {/* Desktop Landing Page */}
       <div
         id="app-home"
-        className="min-h-screen flex flex-col relative"
+        className="min-h-screen flex flex-col relative hidden md:flex"
         style={{
           backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
         }}

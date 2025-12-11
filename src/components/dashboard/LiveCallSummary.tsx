@@ -52,7 +52,7 @@ export const LiveCallSummary: React.FC = () => {
 
   if (loading && calls.length === 0) {
     return (
-      <Card className="relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm">
+      <Card className="relative overflow-hidden border-0 bg-card/75 backdrop-blur-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg font-bold text-foreground flex items-center space-x-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5">
@@ -73,7 +73,7 @@ export const LiveCallSummary: React.FC = () => {
 
   if (error) {
     return (
-      <Card className="relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm">
+      <Card className="relative overflow-hidden border-0 bg-card/75 backdrop-blur-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg font-bold text-foreground flex items-center space-x-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5">
@@ -95,7 +95,7 @@ export const LiveCallSummary: React.FC = () => {
   if (recentCalls.length === 0) {
     return (
       <Card 
-        className="relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm group"
+        className="relative overflow-hidden border-0 bg-card/75 backdrop-blur-sm group"
         style={{ 
           boxShadow: 'var(--premium-shadow-subtle)',
           background: 'linear-gradient(135deg, hsl(var(--card) / 0.8) 0%, hsl(var(--card) / 0.6) 100%)',
@@ -127,7 +127,7 @@ export const LiveCallSummary: React.FC = () => {
 
   return (
     <Card 
-      className="relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm group"
+      className="relative overflow-hidden border-0 bg-card/75 backdrop-blur-sm group"
       style={{ 
         boxShadow: 'var(--premium-shadow-subtle)',
         background: 'linear-gradient(135deg, hsl(var(--card) / 0.8) 0%, hsl(var(--card) / 0.6) 100%)',

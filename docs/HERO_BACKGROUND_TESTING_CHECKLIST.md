@@ -206,3 +206,7 @@ Compare screenshots against Dec 4, 2025 build:
 
 **Automated Tests**: Run `npm run test:e2e -- tests/hero-background.spec.ts`
 
+
+
+
+

@@ -1,0 +1,22 @@
+[33m2e976b9d[m fix(ui): restore hero background responsiveness (wallpaper-rollback-20251208)
+[33m4dcdbe3e[m fix: resolve ESLint no-case-declarations errors in edge functions (#577)
+[33mf13612f3[m feat: implement robust iOS versioning for Codemagic pipeline
+[33m22f3014c[m docs: Add Claude system prompt v2.0.0 with CEO profile
+[33m3af7786b[m Fix/build loop hardening v2 (#330)
+[33mbe05ae57[m ci/build: soften public env verification; decouple iOS sync (#328)
+[33mf085b35a[m ci/build: soften public env verification; decouple iOS sync
+[33m283cbd87[m Claude/webapp testing devops 011 c uq4 z rq nd2 m ngny l9 zb36 (#320)
+[33m87e46fbf[m Claude/webapp testing devops 011 c uq4 z rq nd2 m ngny l9 zb36 (#318)
+[33m92d30e4e[m Fix mfa verify async
+[33m4edc3687[m Claude/webapp testing devops 011 c uq4 z rq nd2 m ngny l9 zb36 (#317)
+[33mc2a45884[m[33m ([m[1;31morigin/claude/webapp-testing-devops-011CUq4ZRqND2MNgnyL9Zb36[m[33m, [m[1;32mclaude/webapp-testing-devops-011CUq4ZRqND2MNgnyL9Zb36[m[33m)[m fix(supabase): add braces around case blocks with lexical declarations
+[33m555e5612[m 🔧 Production Audit Complete - Critical Security & Performance Fixes (#300)
+[33ma6fd2eb1[m Production Audit Fixes - Environment Variables & Test Performance
+[33mc582b199[m Remove duplicate feature icons
+[33mcabdd05d[m Move orbit icons into card headers
+[33mcca81616[m Refactor security icons and visuals
+[33mb5701271[m Fix missing icons in overlay cards
+[33mb488cc32[m Fix/mask overlay and icons  (#237)
+[33m33e98fc6[m 2025 11 10 xpjq c9dea (#207)
+[33m77b4b618[m feat(ui): apply orange outline and navy styling to Features, Pricing, and FAQ pages - Add orange border around Features section with navy decorative lines - Add orange border around Pricing section - Add orange border around FAQ section - Change all headings and descriptions to navy blue - Change feature icons to orange with navy outlines - Change all text content to navy blue
+[33me434c8ab[m feat(ui): add orange outline and navy decorative elements to Security page - Add orange border (3px solid) around Enterprise-Grade Security section - Add navy blue decorative lines connecting title to feature cards - Add navy blue border around icon containers - Change icons to orange with navy outline - Change title, subtitle, and descriptions to navy blue

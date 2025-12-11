@@ -179,3 +179,7 @@ test.describe('Hero Background Responsiveness', () => {
   });
 });
 
+
+
+
+

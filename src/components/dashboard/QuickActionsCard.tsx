@@ -6,6 +6,7 @@ import { paths } from '@/routes/paths';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { toast } from 'sonner';
 import { errorReporter } from '@/lib/errorReporter';
+import { cn } from '@/lib/utils';
 
 const actions = [
   {
@@ -89,6 +90,7 @@ export const QuickActionsCard: React.FC = () => {
         {actions.map((action) => {
           const Icon = action.icon;
           const isActionLoading = isNavigating && clickedAction === action.label;
+          const isDefaultAction = action.variant === 'default';
           const descriptionId = `quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}-description`;
 
           return (
@@ -97,7 +99,10 @@ export const QuickActionsCard: React.FC = () => {
               variant={action.variant}
               onClick={() => handleActionClick(action)}
               disabled={isNavigating}
-              className="w-full justify-start gap-2 relative"
+              className={cn(
+                "w-full justify-start gap-2 relative",
+                isDefaultAction && "bg-brand-accentStrong text-brand-navy hover:bg-brand-accentStrong/90 focus-visible:ring-brand-navy/50"
+              )}
               aria-label={action.label}
               aria-describedby={descriptionId}
               title={action.description}
@@ -107,9 +112,9 @@ export const QuickActionsCard: React.FC = () => {
               {isActionLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-              <Icon className="h-4 w-4" />
+              <Icon className={cn("h-4 w-4", isDefaultAction && "text-brand-navy")} />
               )}
-              <span className={isActionLoading ? 'opacity-70' : ''}>
+              <span className={cn(isActionLoading && 'opacity-70', isDefaultAction && 'text-brand-navy')}>
               {action.label}
               </span>
               <span id={descriptionId} className="sr-only">

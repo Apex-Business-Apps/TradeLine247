@@ -35,7 +35,7 @@ export const TrustBadges = () => {
           {badges.map((badge, index) => {
             const Icon = badge.icon;
             return (
-              <div key={index} className="group flex flex-col items-center text-center p-8 rounded-xl border bg-card/60 backdrop-blur-sm hover:bg-card transition-all duration-300 hover:shadow-lg hover:scale-105">
+              <div key={index} className="group flex flex-col items-center text-center p-8 rounded-xl border bg-card/75 backdrop-blur-sm hover:bg-card transition-all duration-300 hover:shadow-lg hover:scale-105">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <Icon className="h-8 w-8 text-primary" />
                 </div>

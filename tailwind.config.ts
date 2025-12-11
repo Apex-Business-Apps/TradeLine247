@@ -22,6 +22,11 @@ export default {
         'brand': ['BrandFont', 'system-ui', 'sans-serif'],
       },
       colors: {
+        brand: {
+          navy: "#1a4d66",
+          accentSoft: "#ffa03c",
+          accentStrong: "#faa500",
+        },
         'brand-orange': {
           DEFAULT: "hsl(var(--brand-orange-primary))",
           light: "hsl(var(--brand-orange-light))",
