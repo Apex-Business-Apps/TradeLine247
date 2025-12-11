@@ -6,6 +6,8 @@ import cors from 'cors';
 import { fileURLToPath } from 'node:url';
 import { getSecurityHeaders, additionalSecurityHeaders, getCorsOptions } from './server/securityHeaders.ts';
 import { createRateLimiter, cleanupRateLimits } from './server/middleware/rateLimit.ts';
+import pushRoutes from './server/push/routes.ts';
+import { initializeFCM } from './server/push/fcm.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(__dirname, 'dist');
@@ -77,6 +79,16 @@ setInterval(async () => {
   }
 }, 60 * 60 * 1000);
 
+// Initialize FCM (non-blocking, will fail gracefully if not configured)
+try {
+  initializeFCM();
+} catch (error) {
+  console.warn('[Server] FCM not initialized (push notifications disabled):', error.message);
+}
+
+// API routes
+app.use('/api/push', pushRoutes);
+
 // Health checks
 app.get('/healthz', (_req, res) => {
   res.type('text/plain').send('ok');
@@ -90,6 +102,47 @@ app.get('/readyz', (_req, res) => {
       res.type('text/plain').send('ready');
     }
   });
+});
+
+function parseOmniLinkEnabled(value) {
+  if (!value) return false;
+  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
+}
+
+async function checkOmniLinkHealth() {
+  const enabled = parseOmniLinkEnabled(process.env.OMNILINK_ENABLED);
+  const baseUrl = process.env.OMNILINK_BASE_URL;
+  const tenantId = process.env.OMNILINK_TENANT_ID;
+
+  if (!enabled) {
+    return { status: 'disabled', message: 'OmniLink is disabled' };
+  }
+
+  const missing = [];
+  if (!baseUrl) missing.push('OMNILINK_BASE_URL');
+  if (!tenantId) missing.push('OMNILINK_TENANT_ID');
+
+  if (missing.length) {
+    return { status: 'error', message: `Missing required config: ${missing.join(', ')}` };
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const resp = await fetch(`${baseUrl.replace(/\/$/, '')}/health`, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!resp.ok) {
+      return { status: 'error', message: `Health probe failed with status ${resp.status}` };
+    }
+    return { status: 'ok' };
+  } catch (error) {
+    return { status: 'error', message: `Health probe error: ${error.message}` };
+  }
+}
+
+app.get('/health/omnlink', async (_req, res) => {
+  const result = await checkOmniLinkHealth();
+  res.json(result);
 });
 
 // Static mounts (order matters - before fallback)

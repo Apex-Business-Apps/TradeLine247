@@ -26,7 +26,7 @@ export default function Compare() {
         <div className="flex-1">
           <section className="py-20 pb-16">
             <div className="container text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent  text-foreground">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 text-foreground">
                 TradeLine 24/7 vs Alternatives
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-3xl mx-auto">

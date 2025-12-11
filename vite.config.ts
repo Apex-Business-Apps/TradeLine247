@@ -1,16 +1,16 @@
-import { defineConfig } from "vite";
+import { defineConfig, type ConfigEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { componentTagger } from "lovable-tagger";
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }: ConfigEnv) => ({
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
     mode === 'production' && {
       name: 'csp-headers',
-      configureServer(server) {
-        server.middlewares.use((req, res, next) => {
+      configureServer(server: any) {
+        server.middlewares.use((req: any, res: any, next: any) => {
           res.setHeader(
             'Content-Security-Policy',
             [

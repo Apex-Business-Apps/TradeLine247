@@ -1,4 +1,5 @@
 workflows:
+
   ios-capacitor-testflight:
 
     name: TradeLine 24/7 iOS TestFlight
@@ -75,7 +76,7 @@ workflows:
       - name: Sync Capacitor
 
         script: |
-          set -euo pipefail
+          set -eo pipefail
           npx cap sync ios
 
       - name: Install CocoaPods
