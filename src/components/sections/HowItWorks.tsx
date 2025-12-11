@@ -17,7 +17,7 @@ const steps = [{
   description: "We handle inquiries, book appointments, and grab leads while you sleep. If something needs you, we'll pass it along."
 }];
 export const HowItWorks = () => {
-  return <section className="py-20 bg-gradient-to-br from-secondary/20 to-accent/15">
+  return <section className="py-20 bg-gradient-to-br from-secondary/10 to-accent/5">
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -33,7 +33,10 @@ export const HowItWorks = () => {
             const IconComponent = step.icon;
             return (
             <Card key={index} className="relative text-center group hover:shadow-lg transition-all duration-300">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: 'hsl(21 100% 20%)' }}>
+              <div
+                className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                style={{ backgroundColor: 'hsl(var(--brand-orange-dark))' }}
+              >
                 {step.step}
               </div>
               <CardHeader className="pt-8">

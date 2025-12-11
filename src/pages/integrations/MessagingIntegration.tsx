@@ -162,7 +162,7 @@ const MessagingIntegration = () => {
 
               <CardContent className="relative z-10 space-y-4">
                 <div>
-                  <h4 className="font-semibold text-sm mb-2">Features:</h4>
+                  <h3 className="font-semibold text-sm mb-2">Features:</h3>
                   <div className="space-y-1">
                     {app.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
@@ -241,7 +241,10 @@ const MessagingIntegration = () => {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="response-delay">Response Delay</Label>
-                <select className="w-full p-2 rounded-md border border-input bg-background">
+                <select
+                  id="response-delay"
+                  className="w-full p-2 rounded-md border border-input bg-background"
+                >
                   <option>Immediate</option>
                   <option>30 seconds</option>
                   <option>1 minute</option>
@@ -251,7 +254,10 @@ const MessagingIntegration = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="business-hours">Business Hours Only</Label>
-                <select className="w-full p-2 rounded-md border border-input bg-background">
+                <select
+                  id="business-hours"
+                  className="w-full p-2 rounded-md border border-input bg-background"
+                >
                   <option>Yes</option>
                   <option>No</option>
                   <option>Custom schedule</option>

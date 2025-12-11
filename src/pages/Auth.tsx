@@ -15,6 +15,7 @@ import { usePasswordSecurity } from '@/hooks/usePasswordSecurity';
 import { errorReporter } from '@/lib/errorReporter';
 import backgroundImage from '@/assets/BACKGROUND_IMAGE1.svg';
 import { createBrandGradientStyle } from '@/styles/brandGradients';
+import { useAuth } from '@/hooks/useAuth';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -30,6 +31,7 @@ const Auth = () => {
   const [passwordBreached, setPasswordBreached] = useState(false);
   const navigate = useNavigate();
   const { validatePassword: secureValidatePassword } = usePasswordSecurity();
+  const { user: currentUser, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (!isSupabaseEnabled || !supabase) {
@@ -93,6 +95,12 @@ const Auth = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  useEffect(() => {
+    if (!authLoading && currentUser) {
+      navigate(paths.dashboard, { replace: true });
+    }
+  }, [authLoading, currentUser, navigate]);
 
   const validatePassword = (password: string): { isValid: boolean; strength: string; message?: string } => {
     if (password.length < 8) {
@@ -264,6 +272,22 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="w-full py-8 text-center text-sm text-slate-500">
+        Loading…
+      </div>
+    );
+  }
+
+  if (currentUser) {
+    return (
+      <div className="w-full py-8 text-center text-sm text-slate-500">
+        Redirecting to your dashboard…
+      </div>
+    );
+  }
 
   const gradientBackgroundStyle = createBrandGradientStyle(backgroundImage);
 

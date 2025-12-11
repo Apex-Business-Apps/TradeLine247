@@ -1,68 +1,111 @@
 import { CSSProperties, useEffect } from "react";
+
 import { Footer } from "@/components/layout/Footer";
+
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
+
 import { TrustBadgesSlim } from "@/components/sections/TrustBadgesSlim";
+
 import { BenefitsGrid } from "@/components/sections/BenefitsGrid";
+
 import { ImpactStrip } from "@/components/sections/ImpactStrip";
+
 import { HowItWorks } from "@/components/sections/HowItWorks";
+
 import { LeadCaptureForm } from "@/components/sections/LeadCaptureForm";
+
 import { NoAIHypeFooter } from "@/components/sections/NoAIHypeFooter";
+
 import { useAnalytics } from "@/hooks/useAnalytics";
+
 import { AISEOHead } from "@/components/seo/AISEOHead";
+
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
+
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
+
 import { errorReporter } from "@/lib/errorReporter";
 
+
+
 const Index = () => {
+
   const { trackPageView } = useAnalytics();
 
+
+
   useEffect(() => {
+
     trackPageView("home");
+
   }, [trackPageView]);
 
+
+
   // Preload background image for faster rendering
+
   useEffect(() => {
+
     const img = new Image();
+
     img.src = backgroundImage;
+
     img.onerror = () => {
+
       errorReporter.report({
+
         type: 'error',
+
         message: 'Background image failed to load',
+
         timestamp: new Date().toISOString(),
+
         url: window.location.href,
+
         userAgent: navigator.userAgent,
+
         environment: errorReporter['getEnvironment'](),
+
         metadata: { imageSrc: backgroundImage }
+
       });
+
     };
+
   }, []);
 
+
+
   const wallpaperStyle = {
-    backgroundImage: `url(${backgroundImage})`,
+
+    // Keeps the wallpaper constrained to the hero wrapper only
+
+    "--landing-wallpaper": `url(${backgroundImage})`,
+
   } as CSSProperties;
 
-  const wallpaperVariables = {
-    ["--hero-wallpaper-image" as const]: `url(${backgroundImage})`,
-  } as CSSProperties;
 
-  const landingBackgroundStyle = {
-    backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-  } as CSSProperties;
 
   return (
-    <div className="relative min-h-screen" style={wallpaperVariables}>
-      <div
-        id="app-home"
-        className="fixed inset-0 -z-10 pointer-events-none bg-no-repeat bg-cover bg-center"
-        style={wallpaperStyle}
-        aria-hidden="true"
-      />
-      <main
-        className="landing-shell min-h-screen flex flex-col relative"
-        style={landingBackgroundStyle}
-      >
+
+    <main
+
+      id="app-home"
+
+      className="landing-shell min-h-screen flex flex-col relative"
+
+      style={{
+
+        backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
+
+      }}
+
+    >
+
         {/* Content with translucency - Optimized for performance */}
+
         <div className="relative z-10" style={{ minHeight: "100vh" }}>
+
           <AISEOHead
               title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
               description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
@@ -125,16 +168,31 @@ const Index = () => {
                   <QuickActionsCard />
                 </div>
               </div>
-              <TrustBadgesSlim />
-              <LeadCaptureForm />
-              <Footer />
-              <NoAIHypeFooter />
+
             </div>
+
           </div>
+
+
+
+          <TrustBadgesSlim />
+
+          <LeadCaptureForm />
+
+          <Footer />
+
+
+
+          <NoAIHypeFooter />
+
         </div>
-      </main>
-    </div>
+
+    </main>
+
   );
+
 };
+
+
 
 export default Index;

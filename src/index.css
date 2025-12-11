@@ -51,34 +51,10 @@ html {
   transform: translateZ(0);
 }
 
-.hero-gradient-tint {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
-    linear-gradient(
-      to bottom,
-      rgba(255, 107, 53, 0.62) 0%,
-      rgba(104, 182, 233, 0.72) 100%
-    );
-  background-position: center top, center top;
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@media (max-width: 1024px) {
-  .hero-gradient-tint {
-    background-position: center 10%, center 10%;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-gradient-tint {
-    background-position: center 14%, center 14%;
-  }
-}
+/* REMOVED: .hero-gradient-tint class - no longer used
+ * Gradient overlays now applied as inline background-image styles
+ * on section containers in Index.tsx (45% hero, 65% rest)
+ */
 
 @media (max-width: 1024px) {
   .landing-shell {
@@ -159,6 +135,30 @@ body {
   overflow-x: hidden;
   background-color: hsl(var(--background));
   position: relative;
+}
+
+/* Shell containers for landing and dashboard pages */
+.landing-shell,
+.dashboard-shell {
+  min-height: 100dvh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Always paint content above wallpaper */
+.landing-shell > *,
+.dashboard-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* iOS-specific: avoid fixed background issues */
+@supports (-webkit-touch-callout: none) {
+  .landing-shell,
+  .dashboard-shell {
+    background-attachment: scroll !important;
+  }
 }
 
 /* REMOVED: Global body overlay for non-landing pages
@@ -1192,7 +1192,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: transparent; /* Allow parent background image to show through */
+  /* Background now applied directly via inline styles and Tailwind classes */
 }
 
 .hero-bg {
@@ -1234,57 +1234,14 @@ textarea:focus-visible {
 }
 
 /* ============================================================================
-   LANDING PAGE OVERLAY SYSTEM - REGRESSION SAFEGUARDS
+   LANDING PAGE OVERLAY SYSTEM - REMOVED
    ============================================================================
-   DO NOT MODIFY: These rules ensure 65% orange overlay covers full landing page
-   Critical z-index stack: Background (-10) < Overlays (99-100) < Header (9999)
+   Previous "regression safeguards" were forcing gradients to position: fixed,
+   causing them to overlay content instead of serving as backgrounds.
+
+   Current approach: Clean inline background-image gradients applied directly
+   to section containers. No global CSS overrides needed.
    ============================================================================ */
-
-/* Ensure landing page content doesn't interfere with overlays */
-[data-page="landing"] .landing-shell {
-  position: relative;
-  isolation: isolate;
-}
-
-[data-page="landing"] .landing-shell > * {
-  position: relative;
-  z-index: 1 !important; /* Below overlays (99-100) but above background */
-}
-
-/* Prevent any z-index escalation that could hide overlays */
-[data-page="landing"] main,
-[data-page="landing"] section:not(header),
-[data-page="landing"] div:not([style*="zIndex: 99"]):not([style*="zIndex: 100"]) {
-  z-index: auto;
-}
-
-/* iOS-specific fixes for fixed overlays */
-@supports (-webkit-touch-callout: none) {
-  /* iOS Safari fix for fixed positioning */
-  [data-page="landing"] body {
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* Prevent iOS scroll jank with overlays */
-  [data-page="landing"] .fixed {
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-/* Idempotency guard: Ensure overlays always work even if applied multiple times */
-[data-page="landing"] [style*="rgba(255, 107, 53, 0.65)"] {
-  z-index: 99 !important;
-  position: fixed !important;
-}
-
-[data-page="landing"] [style*="radial-gradient"] {
-  z-index: 100 !important;
-  position: fixed !important;
-}
 
 .hero-vignette {
   position: absolute;
@@ -1315,8 +1272,8 @@ textarea:focus-visible {
 
 /* Global Orange Color Unification - All orange elements use hero text orange (#FF6B35) */
 :root {
-  --unified-orange: #FF6B35;
-  --unified-orange-dark: #CC4A1F; /* Darker orange for text on white (WCAG AA: 4.5:1 contrast) */
+  --unified-orange: hsl(var(--brand-orange-primary));
+  --unified-orange-dark: hsl(var(--brand-orange-dark)); /* Darker orange for text on white (WCAG AA: 4.5:1 contrast) */
 }
 
 /* Force all black text to navy blue globally */
@@ -1377,21 +1334,40 @@ html.dark a[class*="hover:text-primary"]:hover,
 html.dark [style*="color"][style*="primary"],
 html.dark button[class*="hover:text-primary"]:hover,
 html.dark a[class*="hover:text-primary"]:hover {
-  /* Use lighter orange (#FF6B35) for better contrast on dark backgrounds (#020817) - 4.6:1 contrast */
-  color: #FF6B35 !important;
+  /* Use the unified brand orange for consistent contrast */
+  color: var(--unified-orange) !important;
 }
 
 /* For backgrounds and borders, use the original bright orange */
-.bg-primary,
-[class*="bg-primary"],
-button.bg-primary,
-a.bg-primary {
-  background-color: #FF6B35 !important;
+/* IMPORTANT: Only match exact bg-primary, NOT opacity variants like bg-primary/10 */
+/* The [class*="bg-primary"] selector was matching bg-primary/10 and breaking icons */
+.bg-primary:not([class*="/"]),
+button.bg-primary:not([class*="/"]),
+a.bg-primary:not([class*="/"]) {
+  background-color: var(--unified-orange) !important;
+}
+
+/* Preserve opacity variants for icon backgrounds - these need to stay semi-transparent */
+/* Without these overrides, icons show as solid orange squares instead of actual icons */
+.bg-primary\/5 {
+  background-color: hsl(var(--brand-orange-primary) / 0.05) !important;
+}
+
+.bg-primary\/10 {
+  background-color: hsl(var(--brand-orange-primary) / 0.10) !important;
+}
+
+.bg-primary\/20 {
+  background-color: hsl(var(--brand-orange-primary) / 0.20) !important;
+}
+
+.bg-primary\/30 {
+  background-color: hsl(var(--brand-orange-primary) / 0.30) !important;
 }
 
 .border-primary,
 [class*="border-primary"] {
-  border-color: #FF6B35 !important;
+  border-color: var(--unified-orange) !important;
 }
 
 /* Special case: outline buttons with primary text on white background need darker orange for WCAG AA */
@@ -1427,7 +1403,7 @@ button[class*="default"],
 a[class*="default"],
 button.btn-aa,
 button[class*="btn-aa"] {
-  background-color: #FF6B35 !important;
+  background-color: var(--unified-orange) !important;
   color: white !important;
 }
 
@@ -1490,47 +1466,10 @@ button[class*="btn-aa"] {
   .hero-gradient { animation: none; }
   .hero-cta-button:hover, .feature-badge:hover { transform: none; }
 }
-/* ========== A11Y FIXES - DO NOT MODIFY ========== */
 
-/* Fix 1: Step badge text (01, 02, 03) */
-[class*="group"] > [class*="-top-4"][class*="rounded-full"][class*="w-8"],
-[class*="-top-4"][class*="left-1/2"][class*="rounded-full"] {
-  color: #ffffff !important;
-}
+:root { --vh-safe: 100vh; }
 
-/* Fix 2: Dashboard text in dark mode */
-.dark [class*="text-xs"][class*="text-muted-foreground\/70"],
-.dark [class*="text-xs"][class*="text-foreground\/70"],
-.dark [class*="text-xs"][class*="text-foreground\/80"] {
-  opacity: 0.95 !important;
-}
-
-/* Fix 3: Nav links in dark mode */
-.dark nav a[class*="text-muted-foreground"],
-.dark [role="navigation"] a[class*="text-muted-foreground"],
-.dark header a[class*="text-muted-foreground"] {
-  color: #8793a3 !important;
-}
-
-.dark nav a[class*="text-muted-foreground"]:hover,
-.dark [role="navigation"] a[class*="text-muted-foreground"]:hover,
-.dark header a[class*="text-muted-foreground"]:hover {
-  color: hsl(var(--foreground)) !important;
-}
-
-/* Fix 4: Dark mode foreground colors for WCAG AA compliance */
-.dark .text-foreground,
-.dark [class*="text-foreground"] {
-  color: #d4dce4 !important; /* Lighter foreground for 7:1 contrast on dark bg */
-}
-
-/* Fix 5: Dark mode slate colors */
-.dark .text-slate-400,
-.dark .text-slate-600,
-.dark [class*="text-slate-400"],
-.dark [class*="text-slate-600"] {
-  color: #b8c5d0 !important; /* Lighter slate for 4.5:1+ contrast */
-}
+@supports (-webkit-touch-callout: none) { :root { --vh-safe: -webkit-fill-available; } }
 
 /* Fix 6: Dark mode headings */
 .dark h1,
@@ -1753,23 +1692,23 @@ section h1,
   color: hsl(var(--foreground)) !important;
 }
 
-/* Add brand orange shadow to hero text for depth and readability */
+/* Add brand blue shadow to hero text for depth and readability */
 .hero-gradient h1,
 .hero-gradient h2,
 [data-testid="hero-bg"] h1,
 [data-testid="hero-bg"] h2,
 .page-hero h1,
 .page-hero h2 {
-  text-shadow: 0 3px 8px rgba(255, 107, 53, 0.45),
-               0 1px 4px rgba(255, 107, 53, 0.35) !important;
+  text-shadow: 0 3px 8px rgba(104, 182, 233, 0.45), 
+               0 1px 4px rgba(104, 182, 233, 0.35) !important;
 }
 
-/* Add brand orange shadow to hero subtext */
+/* Add brand blue shadow to hero subtext */
 .hero-gradient p,
 [data-testid="hero-bg"] p,
 .page-hero p {
-  text-shadow: 0 2px 6px rgba(255, 107, 53, 0.35),
-               0 1px 3px rgba(255, 107, 53, 0.25) !important;
+  text-shadow: 0 2px 6px rgba(104, 182, 233, 0.35), 
+               0 1px 3px rgba(104, 182, 233, 0.25) !important;
 }
 
 /* LOGO COLOR GRADIENT - Removed these duplicate layers that were obscuring the blue gradient */
@@ -1857,79 +1796,46 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 /* ================================================ */
 
 #app-home {
-  background-size: auto, auto, cover;
-  background-position: center, center, center;
-  background-attachment: scroll, scroll, scroll;
+  /* Single source of truth for hero wallpaper */
+  background-image: var(--hero-wallpaper-image);
+  background-size: cover;
+  background-position: center center;
+  background-position-x: center;
+  background-position-y: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
   #app-home {
-    background-size: auto, auto, contain;
-    background-position: center, center, center top;
-    background-attachment: scroll, scroll, scroll;
+    background-size: cover;
+    background-position: center 15%;
+    background-attachment: scroll;
   }
 }
-
-@media (min-width: 601px) and (max-width: 1024px) {
-  #app-home {
-    background-size: auto, auto, cover;
-    background-position: center, center, center top;
-    background-attachment: scroll, scroll, scroll;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   MOBILE BACKGROUND FIX — HeroSection
-   Added: 2025-11-27
-   ═══════════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
-  .hero-bg,
-  [class*="hero-section"],
-  [class*="HeroSection"] {
+  #app-home {
+    background-size: cover;
+    background-position: center 10%;
+    background-attachment: scroll;
+  }
+}
+
+@media (max-width: 768px) {
+  #app-home, .hero-bg, [class*="hero-section"] {
     background-attachment: scroll !important;
-    background-position: center 20% !important;
-    background-size: cover !important;
-    min-height: 100vh !important;
-    min-height: 100dvh !important; /* Dynamic viewport height for iOS Safari */
+    background-position: center 20%;
   }
 }
 
-@media (max-width: 375px) {
-  .hero-bg,
-  [class*="hero-section"],
-  [class*="HeroSection"] {
-    background-position: center 15% !important;
-    background-size: 120% auto !important;
-  }
+@supports (-webkit-touch-callout: none) {
+  #app-home, .hero-bg, [class*="hero-section"] { min-height: -webkit-fill-available; }
 }
 
-/* Hero text contrast for readability - unified orange shadow */
+/* Hero text contrast for readability */
 .hero-text,
 .hero-headline,
 .hero-tagline {
-  text-shadow: 0 2px 8px rgba(255, 107, 53, 0.45),
-               0 1px 4px rgba(255, 107, 53, 0.35);
-}
-
-.hero-heading {
-  text-shadow:
-    0 0 8px rgba(249, 115, 22, 0.85),
-    0 0 20px rgba(249, 115, 22, 0.75);
-}
-
-.quick-actions {
-  z-index: 2;
-}
-
-/* On iOS, disable sticky behavior for quick action cards */
-@supports (-webkit-touch-callout: none) {
-  .ios-no-sticky {
-    position: static !important;
-    top: auto !important;
-  }
-}
-
-.connection-pill {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
