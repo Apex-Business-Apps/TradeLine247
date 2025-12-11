@@ -1839,3 +1839,36 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 .hero-tagline {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
+
+/* =============================================
+   MOBILE WALLPAPER FOCAL POINT FIX
+   December 8, 2025 — Claude Redemption
+   Reference: GOODBUILD d075d9b (Oct 27, 2025)
+
+   CONSTRAINT: This block ONLY adjusts focal point on mobile.
+   Desktop and size remain unchanged.
+   ============================================= */
+
+/* Mobile focal point adjustment - show AI face, not body */
+@media screen and (max-width: 768px) {
+  /* Target the #app-home background div */
+  #app-home {
+    background-position: center 15% !important;
+  }
+
+  /* Extra adjustment for very small phones */
+  @media screen and (max-width: 375px) {
+    #app-home {
+      background-position: center 10% !important;
+    }
+  }
+}
+
+/* iOS Safari - ensure scroll attachment on mobile */
+@supports (-webkit-touch-callout: none) {
+  @media screen and (max-width: 768px) {
+    #app-home {
+      background-attachment: scroll !important;
+    }
+  }
+}
