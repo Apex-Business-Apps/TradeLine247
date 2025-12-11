@@ -3,210 +3,213 @@ workflows:
   ios-capacitor-testflight:
 
     name: TradeLine 24/7 iOS TestFlight
-    max_build_duration: 60
-    instance_type: mac_mini_m2
 
+    max_build_duration: 60
+
+    instance_type: mac_mini_m2
 
     environment:
       groups:
         - ios_config
         - appstore_credentials
       vars:
+
         XCODE_WORKSPACE: ios/App/App.xcworkspace
+
         XCODE_SCHEME: App
+
         BUNDLE_ID: com.apex.tradeline
+
       xcode: 16.4
+
       node: 20.11.1
       npm: 10
+
       cocoapods: default
 
-
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.apex.tradeline
 
+        distribution_type: app_store
+
+        bundle_identifier: com.apex.tradeline
 
     cache:
       cache_paths:
         - ~/.npm
         - ~/.cocoapods
         - ios/Pods
+    
+    scripts:
+
+      - name: Install Node dependencies
+
+        script: |
+
+          set -eo pipefail
+
+          npm ci
+
+      - name: Quality gates
+
+        script: |
+
+          set -eo pipefail
+
+          npm run lint && npm run typecheck && npm run test:unit
+
+      - name: Playwright smoke
+        script: |
+
+          set -eo pipefail
+
+          npx playwright install --with-deps chromium
+          npm run test:e2e:smoke
+
+      - name: Build web assets
+
+        script: |
+
+          set -eo pipefail
+
+          npm run build
+
+      - name: Sync Capacitor
+
+        script: |
+          set -eo pipefail
+          npx cap sync ios
+
+      - name: Install CocoaPods
+        script: |
+
+          set -eo pipefail
+
+          cd ios/App && pod install --repo-update
+
+      - name: Configure code signing
+
+        script: |
+          set -eo pipefail
+
+          xcode-project use-profiles --custom-export-options '{"testFlightInternalTestingOnly": true}'
+
+      - name: Build archive and IPA
+
+        script: |
+
+          set -eo pipefail
+
+          xcode-project build-ipa \
+
+            --workspace "$XCODE_WORKSPACE" \
+
+            --scheme "$XCODE_SCHEME" \
+
+            --config Release \
+
+            --archive-flags="-destination 'generic/platform=iOS'"
+
+
+
+    artifacts:
+
+      - build/ios/ipa/*.ipa
+
+      - /tmp/xcodebuild_logs/*.log
+
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+
+      - playwright-report/**/*
+      - dist/**/*
+
+
+    publishing:
+      app_store_connect:
+
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+
+        submit_to_testflight: true
+
+        beta_groups:
+
+          - Internal Testers
 
 
     triggering:
       events:
         - push
       branch_patterns:
+
         - pattern: main
+
           include: true
+
           source: true
 
-
-    scripts:
-      - name: Install Node dependencies
-        script: |
-          set -eo pipefail
-          npm ci
-
-
-      - name: Build web assets
-        script: |
-          set -eo pipefail
-          npm run build
-
-
-      - name: Sync Capacitor iOS
-        script: |
-          set -eo pipefail
-          npx cap sync ios
-
-
-      - name: Install CocoaPods
-        script: |
-          set -eo pipefail
-          cd ios/App && pod install --repo-update
-
-
-      - name: Configure code signing
-        script: |
-          set -eo pipefail
-          xcode-project use-profiles \
-            --custom-export-options='{"testFlightInternalTestingOnly": true}'
-
-
-      - name: Build archive and IPA
-        script: |
-          set -eo pipefail
-          echo "════════════════════════════════════════════════════════════"
-          echo "🔨 Building iOS Archive"
-          echo "════════════════════════════════════════════════════════════"
-          echo "Workspace: $XCODE_WORKSPACE"
-          echo "Scheme:    $XCODE_SCHEME"
-          echo "Config:    Release"
-          echo "════════════════════════════════════════════════════════════"
-          
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME" \
-            --config Release \
-            --archive-flags="-destination 'generic/platform=iOS'"
-          
-          echo ""
-          echo "════════════════════════════════════════════════════════════"
-          echo "✅ iOS Archive & IPA Successfully Built"
-          echo "════════════════════════════════════════════════════════════"
-
-
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-
-
-    publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-
-
-  # ──────────────────────────────────────────────────────────────────────────
+  # ────────────────────────────────────────────────────────────────────────────
   # ANDROID BUILD
-  # ──────────────────────────────────────────────────────────────────────────
+  # ────────────────────────────────────────────────────────────────────────────
   android-capacitor-release:
-
-    name: TradeLine 24/7 Android Release
+    name: Android • Capacitor bundleRelease
     instance_type: linux_x2
     max_build_duration: 60
-
-
     environment:
       groups:
         - android_signing
       node: 20.11.1
       npm: 10
       java: 17
-      vars:
-        ANDROID_BUILD_TYPE: bundleRelease
-
-
     cache:
       cache_paths:
         - ~/.npm
         - ~/.gradle
-        - android/.gradle
-
-
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
-
-
     scripts:
-      - name: Install Node dependencies
+      - name: Install dependencies
+        script: npm ci
+      - name: Quality gates
+        script: npm run lint && npm run typecheck && npm run test:unit
+      - name: Playwright smoke
         script: |
-          set -eo pipefail
-          npm ci
-
-
-      - name: Build web assets
-        script: |
-          set -eo pipefail
-          npm run build
-
-
-      - name: Sync Capacitor Android
-        script: |
-          set -eo pipefail
-          npx cap sync android
-
-
+          npx playwright install --with-deps chromium
+          npm run test:e2e:smoke
       - name: Build Android App Bundle
-        script: |
-          set -eo pipefail
-          echo "════════════════════════════════════════════════════════════"
-          echo "🤖 Building Android App Bundle (AAB)"
-          echo "════════════════════════════════════════════════════════════"
-          
-          cd android
-          
-          # Set up keystore from environment
-          if [ -n "$CM_KEYSTORE" ]; then
-            echo "$CM_KEYSTORE" | base64 --decode > keystore.jks
-            echo "storeFile=keystore.jks" >> key.properties
-            echo "storePassword=$CM_KEYSTORE_PASSWORD" >> key.properties
-            echo "keyAlias=$CM_KEY_ALIAS" >> key.properties
-            echo "keyPassword=$CM_KEY_PASSWORD" >> key.properties
-          fi
-          
-          # Build release AAB
-          ./gradlew bundleRelease \
-            --no-daemon \
-            --warning-mode all \
-            -Pandroid.injected.signing.store.file=keystore.jks \
-            -Pandroid.injected.signing.store.password="$CM_KEYSTORE_PASSWORD" \
-            -Pandroid.injected.signing.key.alias="$CM_KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$CM_KEY_PASSWORD"
-          
-          echo ""
-          echo "════════════════════════════════════════════════════════════"
-          echo "✅ Android AAB Successfully Built"
-          echo "════════════════════════════════════════════════════════════"
-          ls -la app/build/outputs/bundle/release/
-
-
+        script: bash scripts/build-android.sh
+      - name: Verify artifacts
+        script: bash scripts/verify-codemagic.sh
     artifacts:
       - android/app/build/outputs/**/*.aab
-      - android/app/build/outputs/**/*.apk
-      - android/app/build/reports/**/*
+      - playwright-report/**/*
+      - dist/**/*
+      - build-artifacts-sha256.txt
 
-
-    publishing:
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal
-        submit_as_draft: true
+  # ────────────────────────────────────────────────────────────────────────────
+  # WEB TESTS
+  # ────────────────────────────────────────────────────────────────────────────
+  web-tests-only:
+    name: Web Tests & Smoke
+    instance_type: linux
+    max_build_duration: 45
+    environment:
+      node: 20.11.1
+      npm: 10
+    cache:
+      cache_paths:
+        - ~/.npm
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Lint, typecheck, unit tests
+        script: npm run lint && npm run typecheck && npm run test:unit
+      - name: Build web bundle
+        script: npm run build:web
+      - name: Install Playwright browsers
+        script: npm run test:install-browsers
+      - name: Run full Playwright test suite
+        script: npx playwright test --reporter=html
+    artifacts:
+      - playwright-report/**/*
+      - dist/**/*
