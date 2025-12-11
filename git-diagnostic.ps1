@@ -89,3 +89,5 @@ try {
 # Write to file
 $output | Out-File -FilePath "git-diagnostic-output.txt" -Encoding UTF8
 Write-Output "Diagnostic complete. Check git-diagnostic-output.txt"
+
+

@@ -1,52 +1,56 @@
-# Push Instructions for New PR Branch
+# Push Instructions for wallpaper-rollback-20251208
 
-## Quick Push Command
+## Manual Push Steps
 
-Run this in PowerShell (replace `YOUR_BRANCH_NAME` with your actual branch name):
+Since automated push isn't working, please run these commands manually in PowerShell:
 
 ```powershell
-# 1. Set remote
-git remote set-url origin https://github.com/Apex-Business-Apps/TradeLine247.git
+cd c:\Users\sinyo\TradeLine24-7\TradeLine247
 
-# 2. Get your branch name
-$branch = git rev-parse --abbrev-ref HEAD
-Write-Host "Pushing branch: $branch"
+# 1. Ensure you're on main and up to date
+git checkout main
+git pull origin main
 
-# 3. Stage and commit any uncommitted changes
-git add -A
-git commit -m "Fix build blockers: path resolution and GitHub Actions updates"
+# 2. Create the branch
+git checkout -b wallpaper-rollback-20251208
 
-# 4. Push
-git push -u origin $branch
+# 3. Stage the changed files
+git add src/sections/HeroRoiDuo.tsx
+git add src/pages/Index.tsx
+git add src/index.css
+git add tests/hero-background.spec.ts
+git add docs/HERO_BACKGROUND_TESTING_CHECKLIST.md
+git add scripts/verify-hero-background.mjs
 
-# 5. Get PR link
-Write-Host "PR Link: https://github.com/Apex-Business-Apps/TradeLine247/compare/main...$branch"
+# 4. Verify what will be committed
+git status
+
+# 5. Commit
+git commit -m "fix(ui): restore hero background responsiveness (wallpaper-rollback-20251208)
+
+- Remove background from #app-home div (scoped to hero only)
+- Add responsive Tailwind classes to HeroRoiDuo section
+  - Mobile: bg-contain bg-top bg-no-repeat bg-scroll
+  - Tablet+: md:bg-cover md:bg-top
+  - Height: min-h-screen lg:min-h-screen
+- Fix CSS conflict (remove background: transparent override)
+- Add comprehensive test suite and verification scripts
+- Preserve overlays, gradients, and all hero content
+
+Fixes visual regression from recent commit. Restores Dec 4, 2025 build behavior."
+
+# 6. Push to GitHub
+git push -u origin wallpaper-rollback-20251208
 ```
 
-## Files Ready to Push
+## After Push - Create PR
 
-✅ **scripts/production-rubric.mjs** - Created (production readiness validation)
-✅ **scripts/check-required-files.mjs** - Fixed (absolute path resolution)
-✅ **.github/workflows/ci.yml** - Updated (checkout@v4 → checkout@v6)
-✅ **.github/workflows/ios-build.yml** - Updated (checkout@v4 → checkout@v6)
-✅ **.github/workflows/app-deploy.yml** - Updated (checkout@v4 → checkout@v6)
+Once pushed, create PR at:
+**https://github.com/Apex-Business-Apps/TradeLine247/compare/main...wallpaper-rollback-20251208**
 
-## Verification
+## Troubleshooting
 
-After pushing, verify:
-1. Go to: https://github.com/Apex-Business-Apps/TradeLine247/branches
-2. Check if your branch appears
-3. Click "New pull request" next to your branch
-
-## Alternative: Use the Script
-
-Run the simplified script:
-```powershell
-.\push-current-branch.ps1
-```
-
-This will:
-- Detect your current branch automatically
-- Stage and commit any changes
-- Push to remote
-- Show you the PR link
+If push fails with authentication error:
+1. Check GitHub credentials: `git config --get credential.helper`
+2. Use GitHub CLI: `gh auth login`
+3. Or use SSH: `git remote set-url origin git@github.com:Apex-Business-Apps/TradeLine247.git`
