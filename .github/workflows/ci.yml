@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --no-audit --fund=false
+      - run: npm ci --legacy-peer-deps --no-audit --fund=false
       - run: npm run -s typecheck --if-present
       - run: npm run -s build
       - name: Run preflight verifications
@@ -65,7 +65,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --no-audit --fund=false
+      - run: npm ci --legacy-peer-deps --no-audit --fund=false
 
       # Merged from props-guard.yml: Check fetchpriority attribute casing
       - name: Check fetchpriority attribute casing
@@ -102,7 +102,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --no-audit --fund=false
+      - run: npm ci --legacy-peer-deps --no-audit --fund=false
       - run: npm run test:ci --if-present
       - name: Report status (ci/test)
         if: always()
@@ -128,7 +128,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --no-audit --fund=false
+      - run: npm ci --legacy-peer-deps --no-audit --fund=false
       - run: npx playwright install --with-deps
       - run: npm run -s build
       - run: npx playwright test tests/cta-smoke.spec.ts --reporter=line
@@ -145,7 +145,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci --no-audit --fund=false
+      - run: npm ci --legacy-peer-deps --no-audit --fund=false
       - run: npx playwright install --with-deps
       - run: npm run -s build
       - run: npx playwright test --reporter=line
