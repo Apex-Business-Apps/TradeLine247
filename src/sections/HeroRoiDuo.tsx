@@ -28,13 +28,43 @@ import "../styles/hero-roi.css";
 import { LeadCaptureCard } from "../components/sections/LeadCaptureCard";
 import RoiCalculator from "../components/RoiCalculator";
 import officialLogo from '@/assets/official-logo.png';
+import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 export default function HeroRoiDuo() {
-  return <section className="hero-section section-heavy overflow-hidden" style={{
+  return <section className="hero-section section-heavy overflow-hidden relative" style={{
     paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
     paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
+      {/* Hero background image layer - positioned behind overlays and content */}
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+        aria-hidden="true"
+      />
+      {/* Hero gradient overlay - orange and blue gradients */}
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          backgroundImage: `
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
+            linear-gradient(
+              to bottom,
+              rgba(255, 107, 53, 0.62) 0%,
+              rgba(104, 182, 233, 0.72) 100%
+            )
+          `,
+          backgroundRepeat: "no-repeat, no-repeat",
+          backgroundSize: "cover, cover",
+          backgroundPosition: "center, center",
+        }}
+        aria-hidden="true"
+      />
       <div className="hero-gradient" aria-hidden="true" data-testid="hero-bg"></div>
       <div className="hero-gradient-overlay" aria-hidden="true"></div>
       <div className="hero-vignette" aria-hidden="true"></div>
