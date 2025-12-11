@@ -27,8 +27,9 @@ const CTAS = [
 test.describe('CTA Smoke Tests', () => {
   for (const cta of CTAS) {
     test(`${cta.name} should navigate to ${cta.expectedUrl}`, async ({ page }) => {
-      await page.goto(`${BASE_URL}${cta.page}`);
-      await page.waitForLoadState('networkidle'); // Playwright page load state
+      await page.goto(`${BASE_URL}${cta.page}`, {
+        waitUntil: 'domcontentloaded',
+      });
 
       const button = page.locator(cta.selector).first();
       await expect(button).toBeVisible({ timeout: 5000 });

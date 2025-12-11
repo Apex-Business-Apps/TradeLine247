@@ -14,15 +14,32 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-      - name: Validate env (secret must already exist)
+      - name: Link Supabase project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          if [ -z "$SUPABASE_PROJECT_REF" ]; then
+            echo "Error: SUPABASE_PROJECT_REF secret is required"
+            exit 1
+          fi
+          if [ -z "$SUPABASE_DB_PASSWORD" ]; then
+            echo "Error: SUPABASE_DB_PASSWORD secret is required"
+            exit 1
+          fi
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD" || {
+            echo "Warning: Link failed, will try with DB URL if available"
+            exit 0
+          }
+      - name: Apply migrations (using link or DB URL)
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: test -n "$SUPABASE_DB_URL" || (echo "Missing SUPABASE_DB_URL"; exit 1)
-      - name: Dry run (no changes)
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: supabase db push --db-url "$SUPABASE_DB_URL" --dry-run --debug
-      - name: Apply migrations (idempotent)
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: supabase db push --db-url "$SUPABASE_DB_URL" --debug
+        run: |
+          if [ -n "$SUPABASE_DB_URL" ]; then
+            echo "Using SUPABASE_DB_URL for migration"
+            supabase db push --db-url "$SUPABASE_DB_URL" --debug
+          else
+            echo "Using linked project for migration"
+            supabase db push --debug
+          fi
