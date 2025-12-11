@@ -104,6 +104,47 @@ app.get('/readyz', (_req, res) => {
   });
 });
 
+function parseOmniLinkEnabled(value) {
+  if (!value) return false;
+  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
+}
+
+async function checkOmniLinkHealth() {
+  const enabled = parseOmniLinkEnabled(process.env.OMNILINK_ENABLED);
+  const baseUrl = process.env.OMNILINK_BASE_URL;
+  const tenantId = process.env.OMNILINK_TENANT_ID;
+
+  if (!enabled) {
+    return { status: 'disabled', message: 'OmniLink is disabled' };
+  }
+
+  const missing = [];
+  if (!baseUrl) missing.push('OMNILINK_BASE_URL');
+  if (!tenantId) missing.push('OMNILINK_TENANT_ID');
+
+  if (missing.length) {
+    return { status: 'error', message: `Missing required config: ${missing.join(', ')}` };
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const resp = await fetch(`${baseUrl.replace(/\/$/, '')}/health`, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!resp.ok) {
+      return { status: 'error', message: `Health probe failed with status ${resp.status}` };
+    }
+    return { status: 'ok' };
+  } catch (error) {
+    return { status: 'error', message: `Health probe error: ${error.message}` };
+  }
+}
+
+app.get('/health/omnlink', async (_req, res) => {
+  const result = await checkOmniLinkHealth();
+  res.json(result);
+});
+
 // Static mounts (order matters - before fallback)
 app.use(express.static(distDir, {
   index: false,

@@ -39,6 +39,7 @@
     "test:ci:full": "npm run test:install-browsers && npx playwright test --reporter=html",
     "test:a11y": "playwright test tests/e2e/a11y-comprehensive.spec.ts tests/e2e/a11y-smoke.spec.ts",
     "test:security": "playwright test tests/e2e/security-validation.spec.ts",
+    "omnlink:health": "node scripts/omnlink-health.mjs",
     "start": "node server.mjs",
     "// supabase function (secret-encrypt)": "───────────────",
     "check:fn:secret-encrypt": "npx deno@latest check supabase/functions/secret-encrypt/index.ts",
