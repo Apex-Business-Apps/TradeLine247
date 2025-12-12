@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

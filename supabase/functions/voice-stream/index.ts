@@ -151,7 +151,7 @@ Deno.serve(async (req) => {
   let silenceCheckInterval: number;
   let transcript = '';
   let capturedFields: any = {};
-  let conversationStartTime = Date.now();
+  const conversationStartTime = Date.now();
   let turnCount = 0;
   let sentimentHistory: number[] = [];
   let userTranscript = ''; // Track user speech separately for safety checks

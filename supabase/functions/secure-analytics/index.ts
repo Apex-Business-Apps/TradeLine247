@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // Requires standard JWT auth via supabase-js when invoked from the app.
 import { preflight, corsHeaders } from '../_shared/cors.ts';
 import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';

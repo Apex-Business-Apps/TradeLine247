@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
         const bookingLink = 'https://calendly.com/tradeline247/demo'; // Replace with actual
         const unsubscribeLink = `https://www.tradeline247ai.com/unsubscribe?e=${encodeURIComponent(member.email)}`;
 
-        let body = member.body_template
+        const body = member.body_template
           .replace(/\{\{first_name\}\}/g, firstName)
           .replace(/\{\{booking_link\}\}/g, bookingLink)
           .replace(/\{\{unsubscribe_link\}\}/g, unsubscribeLink);

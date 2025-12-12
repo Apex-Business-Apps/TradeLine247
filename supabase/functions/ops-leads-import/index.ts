@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { parse } from "https://deno.land/std@0.224.0/csv/parse.ts";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";

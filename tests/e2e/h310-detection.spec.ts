@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+ 
 /**
  * H310-5: E2E Test to detect React Error #310
  *

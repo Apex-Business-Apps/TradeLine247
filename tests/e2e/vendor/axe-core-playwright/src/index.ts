@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+ 
 import { createRequire } from 'module';
 import type { Page } from '@playwright/test';
 

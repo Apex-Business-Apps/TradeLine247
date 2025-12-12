@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // DRIFT-04: Campaign creation and member attachment (CASL-compliant)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";

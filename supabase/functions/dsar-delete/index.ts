@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // P13: DSAR Delete - Right to be Forgotten
 // PIPEDA-compliant data deletion with audit trail
 

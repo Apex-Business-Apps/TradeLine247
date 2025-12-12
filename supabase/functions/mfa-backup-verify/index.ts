@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 /**
  * MFA Backup Code Verification Edge Function
  * Verifies backup codes for account recovery

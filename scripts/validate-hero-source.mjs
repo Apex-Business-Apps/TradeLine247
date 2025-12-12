@@ -68,8 +68,8 @@ function validateHeroSource() {
   const lines = content.split('\n');
   const lineCount = lines.length;
 
-  let errors = [];
-  let warnings = [];
+  const errors = [];
+  const warnings = [];
 
   // 1. Check file length (truncation detection)
   console.log(`📏 File Length: ${lineCount} lines`);

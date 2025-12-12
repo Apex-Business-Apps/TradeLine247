@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { test, expect } from '@playwright/test';
 import AxeBuilder from './vendor/axe-core-playwright/src/index';
 import { waitForReactHydration } from './helpers';

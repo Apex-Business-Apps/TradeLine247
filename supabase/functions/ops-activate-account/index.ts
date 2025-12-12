@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireAdmin, unauthorizedResponse } from '../_shared/authorizationMiddleware.ts';
 

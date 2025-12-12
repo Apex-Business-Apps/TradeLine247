@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Report Error Fallback Tests - P0 Fix Verification
  * Tests for localStorage fallback and error suppression fix

@@ -150,7 +150,7 @@ export function generateAISummary(
   maxLength: number = 200
 ): string {
   // Remove markdown and HTML
-  let clean = content
+  const clean = content
     .replace(/<[^>]+>/g, '')
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .replace(/\*\*(.*?)\*\*/g, '$1')

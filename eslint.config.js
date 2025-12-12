@@ -96,5 +96,19 @@ export default tseslint.config(
 
     },
   },
+  // Phase 2: Test file overrides - stop tests from polluting lint noise
+  {
+    files: [
+      "**/__tests__/*.{ts,tsx}",
+      "tests/**/*.{ts,tsx}",
+      "**/*.spec.{ts,tsx}",
+      "**/*.test.{ts,tsx}"
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "no-console": "off",
+    },
+  },
 );
 

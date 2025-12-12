@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
       .single();
 
     let temporaryDid = null;
-    let quickStartNeeded = !existingQuickStart;
+    const quickStartNeeded = !existingQuickStart;
 
     // If no Quick-Start exists, trigger it now for temporary forwarding
     if (quickStartNeeded && fallback_e164) {

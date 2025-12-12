@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { preflight, corsHeaders } from '../_shared/cors.ts';
 import { secureHeaders, mergeHeaders } from '../_shared/secure_headers.ts';
