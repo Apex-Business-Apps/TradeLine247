@@ -1221,13 +1221,16 @@ textarea:focus-visible {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 107, 53, 0.20);
+  background: rgba(255, 107, 53, 0.80);
   pointer-events: none;
   z-index: 1;
 }
 
+.hero-section .hero-gradient-overlay {
+  background: rgba(255, 107, 53, 0.60);
+}
+
 /* Hide hero-section internal overlays on landing page since unified gradient-tint is applied at root level */
-[data-page="landing"] .hero-section .hero-gradient-overlay,
 [data-page="landing"] .hero-section .hero-vignette,
 [data-page="landing"] .hero-section .hero-gradient {
   display: none !important;

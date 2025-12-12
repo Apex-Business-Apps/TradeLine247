@@ -196,47 +196,53 @@ const Index = () => {
 
             </div>
 
-            <BenefitsGrid />
+            <div className="relative isolate">
 
-            <ImpactStrip />
+              <div className="hero-gradient-overlay" aria-hidden="true" />
 
-            <HowItWorks />
+              <div className="relative z-10 space-y-0">
 
-            <div className="container mx-auto px-4 py-12">
+                <BenefitsGrid />
 
-              <div className="mx-auto max-w-4xl space-y-6 text-center">
+                <ImpactStrip />
 
-                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                <HowItWorks />
 
-                  Quick actions for operators
+                <div className="container mx-auto px-4 py-12">
 
-                </h2>
+                  <div className="mx-auto max-w-4xl space-y-6 text-center">
 
-                <p className="text-muted-foreground">
+                    <h2 className="text-2xl font-semibold tracking-tight text-foreground">
 
-                  Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+                      Quick actions for operators
 
-                </p>
+                    </h2>
 
-                <QuickActionsCard />
+                    <p className="text-muted-foreground">
+
+                      Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+
+                    </p>
+
+                    <QuickActionsCard />
+
+                  </div>
+
+                </div>
+
+                <TrustBadgesSlim />
+
+                <LeadCaptureForm />
+
+                <Footer />
+
+                <NoAIHypeFooter />
 
               </div>
 
             </div>
 
           </div>
-
-
-
-          <TrustBadgesSlim />
-
-          <LeadCaptureForm />
-
-          <Footer />
-
-
-
-          <NoAIHypeFooter />
 
         </div>
 
