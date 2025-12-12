@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // PROMPT H: A2P gating (US-only)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 

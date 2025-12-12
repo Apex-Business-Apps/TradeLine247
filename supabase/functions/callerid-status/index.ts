@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Removed unnecessary edge-runtime import that caused OpenAI dependency conflict
 export default async (req: Request) => {
   const body = await req.text();

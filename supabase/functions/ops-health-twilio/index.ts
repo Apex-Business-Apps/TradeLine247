@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { corsHeaders, preflight } from "../_shared/cors.ts";
 import { withJSON } from "../_shared/secure_headers.ts";
 

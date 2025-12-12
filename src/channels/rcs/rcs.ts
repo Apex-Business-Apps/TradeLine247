@@ -34,11 +34,6 @@ export interface RcsOutboundPayload {
   statusCallbackUrl?: string;
 }
 
-interface TwilioModule {
-  default?: (accountSid: string, authToken: string) => any;
-  (accountSid: string, authToken: string): any;
-}
-
 let clientPromise: Promise<any> | undefined;
 
 async function loadClient(): Promise<any> {

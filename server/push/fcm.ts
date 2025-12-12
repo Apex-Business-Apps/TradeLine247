@@ -31,7 +31,7 @@ export function initializeFCM(): void {
     // Use JSON credentials if provided
     try {
       credentials = JSON.parse(credentialsJson) as admin.ServiceAccount;
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Invalid FCM_CREDENTIALS_JSON format');
     }
   } else if (clientEmail && privateKey) {

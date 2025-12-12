@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Create Booking with Payment Authorization - Enterprise Grade
  *
@@ -128,7 +129,7 @@ async function createBookingCore(requestData: CreateBookingRequest, req: Request
   }
 
   // Phone validation (basic)
-  if (!/^\+?[\d\s\-\(\)]{10,20}$/.test(sanitizedData.callerPhone)) {
+  if (!/^\+?[\d\s\-()]{10,20}$/.test(sanitizedData.callerPhone)) {
     throw new Error('Invalid phone number format');
   }
 

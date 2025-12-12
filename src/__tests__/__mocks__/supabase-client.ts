@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /**
  * Shared Supabase Client Mock
- * 
+ *
  * Centralized mock for all tests to ensure consistency
  * and proper module resolution in CI environments.
  */

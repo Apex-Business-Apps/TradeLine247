@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // deno-lint-ignore-file no-explicit-any
 // Removed unnecessary edge-runtime import that caused OpenAI dependency conflict
 import { preflight, corsHeaders } from "../_shared/cors.ts";

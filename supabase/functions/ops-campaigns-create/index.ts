@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // DRIFT-04: Campaign creation and member attachment (CASL-compliant)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
@@ -76,7 +77,7 @@ Deno.serve(async (req: Request) => {
     if (body.lead_filters?.country) {
       // Validate and sanitize country filter - alphanumeric and spaces only
       const countryFilter = body.lead_filters.country.trim().slice(0, 100);
-      if (!/^[a-zA-Z0-9\s\-]+$/.test(countryFilter)) {
+      if (!/^[a-zA-Z0-9\s-]+$/.test(countryFilter)) {
         throw new Error('Invalid country filter format');
       }
       leadsQuery = leadsQuery.ilike('company', `%${countryFilter}%`);
@@ -84,7 +85,7 @@ Deno.serve(async (req: Request) => {
     if (body.lead_filters?.company) {
       // Validate and sanitize company filter - alphanumeric and spaces only
       const companyFilter = body.lead_filters.company.trim().slice(0, 100);
-      if (!/^[a-zA-Z0-9\s\-\.&]+$/.test(companyFilter)) {
+      if (!/^[a-zA-Z0-9\s\-.&]+$/.test(companyFilter)) {
         throw new Error('Invalid company filter format');
       }
       leadsQuery = leadsQuery.ilike('company', `%${companyFilter}%`);

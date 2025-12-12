@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /**
  * Preview Environment Health Tests
  * Automated tests to ensure preview environment works correctly

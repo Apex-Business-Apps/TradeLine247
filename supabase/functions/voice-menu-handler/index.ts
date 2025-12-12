@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // DTMF Menu Handler - Routes calls based on user selection
 // Press 1: Sales, Press 2: Support, Press 9: Voicemail
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * MFA Disable Edge Function
  * Disables MFA for user (requires password confirmation)

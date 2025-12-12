@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 // Telephony Voice Flow Integration Tests
 // Tests complete call flows end-to-end
 

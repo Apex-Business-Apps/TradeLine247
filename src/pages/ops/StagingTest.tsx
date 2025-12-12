@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle, XCircle, Phone, Loader2 } from "lucide-react";
+import { Phone, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function StagingTest() {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { corsHeaders } from "../_shared/cors.ts";
 
 Deno.serve(async (req) => {

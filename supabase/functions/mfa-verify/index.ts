@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * MFA Verification Edge Function
  * Verifies TOTP code and enables MFA

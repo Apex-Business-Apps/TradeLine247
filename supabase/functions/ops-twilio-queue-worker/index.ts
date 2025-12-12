@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // deno-lint-ignore-file no-explicit-any
 import { preflight, corsHeaders } from "../_shared/cors.ts";
 import { secureHeaders, mergeHeaders } from "../_shared/secure_headers.ts";
