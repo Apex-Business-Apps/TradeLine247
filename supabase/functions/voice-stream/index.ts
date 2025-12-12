@@ -148,7 +148,6 @@ Deno.serve(async (req) => {
   let openaiWs: WebSocket;
   let streamSid: string | null = null;
   let lastActivityTime = Date.now();
-  let silenceCheckInterval: number;
   let transcript = '';
   let capturedFields: any = {};
   const conversationStartTime = Date.now();
@@ -156,6 +155,7 @@ Deno.serve(async (req) => {
   let sentimentHistory: number[] = [];
   let userTranscript = ''; // Track user speech separately for safety checks
   const safetyConfig = preset.safety_guardrails;
+  let silenceCheckInterval: ReturnType<typeof setInterval> | undefined;
 
   // Connect to OpenAI Realtime API
   try {
@@ -308,7 +308,7 @@ Deno.serve(async (req) => {
 
     openaiWs.onclose = () => {
       console.log('OpenAI WebSocket closed');
-      clearInterval(silenceCheckInterval);
+      if (silenceCheckInterval) clearInterval(silenceCheckInterval);
     };
 
   } catch (error) {
@@ -463,14 +463,14 @@ Deno.serve(async (req) => {
       }).catch(err => console.error('Failed to trigger transcript email:', err));
       
       openaiWs.close();
-      clearInterval(silenceCheckInterval);
+      if (silenceCheckInterval) clearInterval(silenceCheckInterval);
     }
   };
 
   socket.onclose = () => {
     console.log('Twilio stream closed');
     openaiWs?.close();
-    clearInterval(silenceCheckInterval);
+    if (silenceCheckInterval) clearInterval(silenceCheckInterval);
   };
 
   socket.onerror = (error) => {
