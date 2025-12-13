@@ -47,21 +47,11 @@ export default function HeroRoiDuo() {
         }}
         aria-hidden="true"
       />
-      {/* Hero gradient overlay - orange and blue gradients */}
+      {/* Hero gradient overlay - single-color brand orange at 60% opacity to meet GOODBUILD hero mask spec */}
       <div
         className="absolute inset-0 -z-10"
         style={{
-          backgroundImage: `
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
-            linear-gradient(
-              to bottom,
-              rgba(255, 107, 53, 0.62) 0%,
-              rgba(104, 182, 233, 0.72) 100%
-            )
-          `,
-          backgroundRepeat: "no-repeat, no-repeat",
-          backgroundSize: "cover, cover",
-          backgroundPosition: "center, center",
+          backgroundColor: "hsl(var(--brand-orange-primary) / 0.6)",
         }}
         aria-hidden="true"
       />

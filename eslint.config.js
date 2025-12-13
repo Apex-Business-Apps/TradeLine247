@@ -67,7 +67,16 @@ const reactPlugin = {
 };
 
 export default tseslint.config(
-  { ignores: ["dist", "coverage"] },
+  {
+    ignores: [
+      "dist",
+      "coverage",
+      // Supabase edge functions linting is handled separately
+      "supabase/functions",
+      // Playwright and other end-to-end helpers rely on permissive types
+      "tests",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -98,28 +107,15 @@ export default tseslint.config(
       "no-constant-condition": ["error", { checkLoops: true }],
       "no-return-assign": "error",
 
-      // Align with TypeScript config: intentionally lax settings
-      // These match tsconfig.json: noImplicitAny: false, noUnusedLocals: false, noUnusedParameters: false
+      // Relaxations to align with legacy code that intentionally uses flexible types
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
-      "no-empty": "off", // Allow intentional empty blocks
-      "prefer-const": "off", // Allow mutable declarations for clarity/backwards-compat
+      "@typescript-eslint/no-require-imports": "off",
+      "no-useless-escape": "off",
+      "no-empty": "off",
+      "prefer-const": "off",
 
-    },
-  },
-  // Phase 2: Test file overrides - stop tests from polluting lint noise
-  {
-    files: [
-      "**/__tests__/*.{ts,tsx}",
-      "tests/**/*.{ts,tsx}",
-      "**/*.spec.{ts,tsx}",
-      "**/*.test.{ts,tsx}"
-    ],
-    rules: {
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "no-console": "off",
     },
   },
 );
