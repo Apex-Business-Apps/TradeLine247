@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect } from "react";
+import { useEffect } from "react";
 
 import { Footer } from "@/components/layout/Footer";
 
@@ -76,16 +76,6 @@ const Index = () => {
 
 
 
-  const wallpaperStyle = {
-
-    // Keeps the wallpaper constrained to the hero wrapper only
-
-    "--landing-wallpaper": `url(${backgroundImage})`,
-
-  } as CSSProperties;
-
-
-
   return (
 
     <main
@@ -147,13 +137,15 @@ const Index = () => {
               ]}
             />
 
-          {/* Hero and Quick Actions bands with unified mask overlay */}
+          {/* Hero without global overlay - wallpaper and gradients handled internally */}
+          <HeroRoiDuo />
+
+          {/* Overlay starts below hero to preserve wallpaper clarity */}
           <div className="relative">
-            {/* Orange-to-blue gradient tint covering hero + Quick Actions band */}
-            <div className="hero-gradient-tint" aria-hidden="true" />
+            <div className="landing-gradient-overlay absolute inset-0" aria-hidden="true" />
             <div className="hero-vignette absolute inset-0 pointer-events-none" aria-hidden="true" />
-            <div className="relative">
-              <HeroRoiDuo />
+
+            <div className="relative z-10">
               <BenefitsGrid />
               <ImpactStrip />
               <HowItWorks />
@@ -168,22 +160,12 @@ const Index = () => {
                   <QuickActionsCard />
                 </div>
               </div>
-
+              <TrustBadgesSlim />
+              <LeadCaptureForm />
+              <Footer />
+              <NoAIHypeFooter />
             </div>
-
           </div>
-
-
-
-          <TrustBadgesSlim />
-
-          <LeadCaptureForm />
-
-          <Footer />
-
-
-
-          <NoAIHypeFooter />
 
         </div>
 

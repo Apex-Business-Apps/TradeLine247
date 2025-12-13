@@ -1221,16 +1221,21 @@ textarea:focus-visible {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 107, 53, 0.20);
+  background: hsl(var(--brand-orange-primary) / 0.6);
   pointer-events: none;
   z-index: 1;
 }
 
-/* Hide hero-section internal overlays on landing page since unified gradient-tint is applied at root level */
-[data-page="landing"] .hero-section .hero-gradient-overlay,
-[data-page="landing"] .hero-section .hero-vignette,
-[data-page="landing"] .hero-section .hero-gradient {
-  display: none !important;
+.landing-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    hsl(var(--brand-orange-primary) / 0.8) 0%,
+    hsl(var(--brand-blue-primary) / 0.8) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* ============================================================================

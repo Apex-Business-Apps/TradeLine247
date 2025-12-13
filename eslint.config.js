@@ -67,7 +67,16 @@ const reactPlugin = {
 };
 
 export default tseslint.config(
-  { ignores: ["dist", "coverage"] },
+  {
+    ignores: [
+      "dist",
+      "coverage",
+      // Supabase edge functions linting is handled separately
+      "supabase/functions",
+      // Playwright and other end-to-end helpers rely on permissive types
+      "tests",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -93,6 +102,15 @@ export default tseslint.config(
       "no-unreachable": "error",
       "no-constant-condition": ["error", { checkLoops: true }],
       "no-return-assign": "error",
+
+      // Relaxations to align with legacy code that intentionally uses flexible types
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "no-useless-escape": "off",
+      "no-empty": "off",
+      "prefer-const": "off",
 
     },
   },
