@@ -10,13 +10,9 @@ import { useState, useEffect } from "react";
 import {
   AlertTriangle,
   Clock,
-  User,
   Phone,
-  MessageSquare,
   CheckCircle,
-  XCircle,
   ArrowUpCircle,
-  Filter,
   Search,
   RefreshCw,
 } from "lucide-react";

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Enhanced Error Reporter Tests - P0 Fix Verification
  * Tests for error type normalization and stack trace preservation

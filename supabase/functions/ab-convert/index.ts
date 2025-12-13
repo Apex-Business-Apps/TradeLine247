@@ -1,3 +1,4 @@
+ 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.79.0';
 import { preflight, jsonResponse, unexpectedErrorResponse, withCors, mergeHeaders, corsHeaders } from '../_shared/cors.ts';
 import { secureHeaders } from '../_shared/secure_headers.ts';

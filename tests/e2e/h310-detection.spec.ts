@@ -1,6 +1,7 @@
+ 
 /**
  * H310-5: E2E Test to detect React Error #310
- * 
+ *
  * Catches "Rendered more hooks than during the previous render" errors
  * across critical routes before they reach production.
  */

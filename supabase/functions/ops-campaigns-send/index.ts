@@ -1,3 +1,4 @@
+ 
 // DRIFT-04: Campaign batch sending via Resend (CASL-compliant)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";

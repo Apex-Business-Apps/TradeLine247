@@ -20,6 +20,10 @@ workflows:
 
         BUNDLE_ID: com.apex.tradeline
 
+        APP_VERSION: "1.1.0"
+
+        PROJECT_BUILD_NUMBER: $CM_BUILD_NUMBER
+
       xcode: 16.4
 
       node: 20.11.1
@@ -57,6 +61,16 @@ workflows:
 
           npm run lint && npm run typecheck && npm run test:unit
 
+      - name: Verify visual assets
+
+        script: |
+
+          set -eo pipefail
+
+          STRICT_ICONS=true npm run verify:icons
+
+          node scripts/validate-hero-source.mjs
+
       - name: Playwright smoke
         script: |
 
@@ -85,6 +99,14 @@ workflows:
           set -eo pipefail
 
           cd ios/App && pod install --repo-update
+
+      - name: Set iOS version numbers
+        script: |
+
+          set -eo pipefail
+
+          export PROJECT_BUILD_NUMBER="${CM_BUILD_NUMBER:-1}"
+          bash scripts/set-ios-version-from-codemagic.sh
 
       - name: Configure code signing
 
@@ -138,6 +160,8 @@ workflows:
 
           - Internal Testers
 
+        release_notes: "Internal build ${APP_VERSION} (${CM_BUILD_NUMBER})"
+
 
     triggering:
       events:
@@ -160,6 +184,8 @@ workflows:
     environment:
       groups:
         - android_signing
+      vars:
+        APP_VERSION: "1.1.0"
       node: 20.11.1
       npm: 10
       java: 17
@@ -172,10 +198,19 @@ workflows:
         script: npm ci
       - name: Quality gates
         script: npm run lint && npm run typecheck && npm run test:unit
+      - name: Verify visual assets
+        script: |
+          set -eo pipefail
+          STRICT_ICONS=true npm run verify:icons
+          node scripts/validate-hero-source.mjs
       - name: Playwright smoke
         script: |
           npx playwright install --with-deps chromium
           npm run test:e2e:smoke
+      - name: Set Android version numbers
+        script: |
+          set -eo pipefail
+          bash scripts/set-android-version.sh
       - name: Build Android App Bundle
         script: bash scripts/build-android.sh
       - name: Verify artifacts

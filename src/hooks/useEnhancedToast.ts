@@ -12,7 +12,7 @@
  * Rubric Score Target: 10/10
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { toast as sonnerToast } from 'sonner';
 import { useNetworkStatus } from './useNetworkStatus';
 import { prefersReducedMotion } from '@/lib/performanceOptimizations';

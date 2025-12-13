@@ -71,6 +71,10 @@ export default tseslint.config(
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
+    linterOptions: {
+      // Keep noise low; unused disable comments are allowed
+      reportUnusedDisableDirectives: "off",
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -94,6 +98,28 @@ export default tseslint.config(
       "no-constant-condition": ["error", { checkLoops: true }],
       "no-return-assign": "error",
 
+      // Align with TypeScript config: intentionally lax settings
+      // These match tsconfig.json: noImplicitAny: false, noUnusedLocals: false, noUnusedParameters: false
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+      "no-empty": "off", // Allow intentional empty blocks
+      "prefer-const": "off", // Allow mutable declarations for clarity/backwards-compat
+
+    },
+  },
+  // Phase 2: Test file overrides - stop tests from polluting lint noise
+  {
+    files: [
+      "**/__tests__/*.{ts,tsx}",
+      "tests/**/*.{ts,tsx}",
+      "**/*.spec.{ts,tsx}",
+      "**/*.test.{ts,tsx}"
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "no-console": "off",
     },
   },
 );

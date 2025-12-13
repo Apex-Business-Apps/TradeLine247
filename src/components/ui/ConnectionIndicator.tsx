@@ -12,7 +12,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { Wifi, WifiOff, Signal, SignalLow, SignalMedium, SignalHigh } from 'lucide-react';
+import { WifiOff, Signal, SignalLow, SignalMedium, SignalHigh } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from '@/lib/performanceOptimizations';
 import { useAuth } from '@/hooks/useAuth';

@@ -17,7 +17,7 @@ const steps = [{
   description: "We handle inquiries, book appointments, and grab leads while you sleep. If something needs you, we'll pass it along."
 }];
 export const HowItWorks = () => {
-  return <section className="py-20 bg-gradient-to-br from-secondary/10 to-accent/5">
+  return <section className="py-20 bg-transparent">
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">

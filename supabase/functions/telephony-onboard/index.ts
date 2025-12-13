@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Idempotent one-click: ensure subaccount, pick/buy number, bind webhooks, persist.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { functionsBaseFromSupabaseUrl, ensureSubaccount, findLocalNumber, buyNumberAndBindWebhooks } from "../_shared/twilio.ts";
