@@ -2,7 +2,7 @@ import React from 'react';
 import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home, AlertTriangle, Bot } from "lucide-react";
+import { ArrowLeft, Home, Bot } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { paths } from '@/routes/paths';
 import { SEOHead } from "@/components/seo/SEOHead";

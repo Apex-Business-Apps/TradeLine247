@@ -64,8 +64,8 @@ function checkModifiedFiles() {
   // For now, we'll check if any UI/UX or backend files exist that shouldn't be modified
   console.log('🔍 Verifying no UI/UX or backend changes...\n');
   
-  let violations = [];
-  let allowedFiles = [];
+  const violations = [];
+  const allowedFiles = [];
   
   // Check test files (should be modified)
   const testFiles = [

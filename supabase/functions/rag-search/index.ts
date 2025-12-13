@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Supabase Edge Function (Deno)
  * Purpose: RAG search with rate limiting and optional language filter.

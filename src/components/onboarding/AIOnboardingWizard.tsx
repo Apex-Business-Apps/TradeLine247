@@ -12,8 +12,6 @@ import {
   Building2,
   Users,
   MessageSquare,
-  Heart,
-  Clock,
   Zap,
   ChevronRight,
   ChevronLeft,

@@ -1,5 +1,4 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Phone, MessageSquare, Mail, User, Calendar, MapPin, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 

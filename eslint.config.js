@@ -80,6 +80,10 @@ export default tseslint.config(
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
+    linterOptions: {
+      // Keep noise low; unused disable comments are allowed
+      reportUnusedDisableDirectives: "off",
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
