@@ -15,10 +15,11 @@ test.describe('Hero Background Responsiveness', () => {
     });
     expect(wallpaperBg).toMatch(/BACKGROUND_IMAGE1.*\.svg/);
 
+    // Wallpaper is scoped to hero section (absolute within hero-shell) to prevent bleed
     const wallpaperPosition = await wallpaper.evaluate((el) => {
       return window.getComputedStyle(el).position;
     });
-    expect(wallpaperPosition).toBe('fixed');
+    expect(wallpaperPosition).toBe('absolute');
   });
 
   test('mobile: background focal point shows face', async ({ page }) => {
@@ -85,10 +86,12 @@ test.describe('Hero Background Responsiveness', () => {
     });
 
     // Desktop should use standard cover (no mobile override at this viewport)
+    // Note: getComputedStyle returns resolved values, so "center" becomes "50% 50%"
+    // Wallpaper is scoped to hero (absolute) so attachment is scroll, not fixed
     expect(styles.backgroundSize).toContain('cover');
-    expect(styles.backgroundPosition).toContain('center');
+    expect(styles.backgroundPosition === 'center' || styles.backgroundPosition === 'center center' || styles.backgroundPosition === '50% 50%' || styles.backgroundPosition.includes('50%')).toBe(true);
     expect(styles.backgroundRepeat).toBe('no-repeat');
-    expect(styles.backgroundAttachment).toBe('fixed');
+    expect(styles.backgroundAttachment).toBe('scroll');
   });
 
   test('background does not leak into next sections', async ({ page }) => {

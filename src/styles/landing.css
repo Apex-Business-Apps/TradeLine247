@@ -18,20 +18,27 @@
   background-color: transparent;
 }
 
+/* Hero-shell: scopes wallpaper + mask to hero section only (prevents bleed) */
+.hero-shell {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
 .landing-wallpaper {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background-image: var(--landing-wallpaper);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-attachment: scroll;
   z-index: 0;
   pointer-events: none;
 }
 
 .landing-mask {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: var(--landing-mask-gradient);
   z-index: 1;
@@ -59,10 +66,5 @@
   }
 }
 
-@supports (-webkit-touch-callout: none) {
-  .landing-wallpaper,
-  .landing-mask {
-    position: absolute;
-  }
-}
+/* iOS-specific: wallpaper/mask already absolute, no change needed */
 

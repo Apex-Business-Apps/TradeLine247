@@ -131,7 +131,7 @@ export const Footer: React.FC = () => {
                   tabIndex={0}
                 >
                   <div
-                    className={`flex h-12 w-16 items-center justify-center rounded-md bg-white/80 p-1 shadow-inner ${
+                    className={`flex h-8 sm:h-10 lg:h-12 w-auto min-w-[4rem] items-center justify-center rounded-md bg-white/80 p-1 shadow-inner ${
                       partner.chip ? "ring-1 ring-primary/10 bg-primary/5" : ""
                     }`}
                     role="img"
@@ -140,7 +140,7 @@ export const Footer: React.FC = () => {
                     <img
                       src={partner.logo}
                       alt={partner.alt}
-                      className="max-h-10 w-full object-contain"
+                      className="h-full w-auto object-contain"
                       loading="lazy"
                       onError={(e) => {
                         // Idempotent error handling: gracefully handle missing logos

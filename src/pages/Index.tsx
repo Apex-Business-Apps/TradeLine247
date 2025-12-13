@@ -78,11 +78,6 @@ const Index = () => {
         backgroundImage: `var(--landing-wallpaper, ${BACKGROUND_IMAGE_URL})`,
       }}
     >
-      {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
-          Do not change or remove these elements or their CSS without design + cofounder sign-off. */}
-      <div className="landing-wallpaper" aria-hidden="true" style={wallpaperStyle} />
-      <div className="landing-mask" aria-hidden="true" />
-
       <div className="landing-content relative z-10 flex-1 flex flex-col" style={{ minHeight: "100vh" }}>
         <AISEOHead
           title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
@@ -126,9 +121,15 @@ const Index = () => {
         />
 
         <div className="flex-1" style={{ minHeight: "60vh" }}>
-          <div className="hero-background">
-            <HeroRoiDuo />
-          </div>
+          {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
+              Scoped to hero section only - do not change or remove these elements or their CSS without design + cofounder sign-off. */}
+          <section className="hero-shell relative isolate overflow-hidden">
+            <div className="landing-wallpaper" aria-hidden="true" style={wallpaperStyle} />
+            <div className="landing-mask" aria-hidden="true" />
+            <div className="hero-background relative z-10">
+              <HeroRoiDuo />
+            </div>
+          </section>
 
           <BenefitsGrid />
           <ImpactStrip />
