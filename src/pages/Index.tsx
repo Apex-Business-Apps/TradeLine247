@@ -1,4 +1,4 @@
-﻿import { CSSProperties, useEffect } from "react";
+import { CSSProperties, useEffect } from "react";
 
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
@@ -38,6 +38,13 @@ const Index = () => {
     };
   }, []);
 
+  const wallpaperStyle: CSSProperties = {
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+  };
+
   const landingWallpaperVars = {
     "--landing-wallpaper": `url(${backgroundImage})`,
     "--hero-wallpaper-image": `url(${backgroundImage})`,
@@ -47,11 +54,11 @@ const Index = () => {
     <main
       id="app-home"
       className="landing-shell min-h-screen flex flex-col relative"
-      style={landingWallpaperVars}
+      style={{ ...landingWallpaperVars, backgroundColor: "hsl(0, 0%, 97%)" }}
     >
       {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
           Do not change or remove these elements or their CSS without design + cofounder sign-off. */}
-      <div className="landing-wallpaper" aria-hidden="true" />
+      <div className="landing-wallpaper" aria-hidden="true" style={wallpaperStyle} />
       <div className="landing-mask" aria-hidden="true" />
 
       <div className="landing-content relative z-10 flex-1 flex flex-col" style={{ minHeight: "100vh" }}>

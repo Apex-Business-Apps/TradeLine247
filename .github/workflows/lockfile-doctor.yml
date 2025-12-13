@@ -1,0 +1,20 @@
+name: lockfile/doctor
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check-lockfile-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Ensure lockfile matches package.json
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --fund=false
+          git diff --exit-code package-lock.json

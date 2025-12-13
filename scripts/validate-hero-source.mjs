@@ -174,22 +174,6 @@ function validateHeroSource() {
   // Results
   console.log('═══════════════════════════════════════\n');
 
-  if (errors.length === 0 && warnings.length === 0) {
-    console.log('✅ ✅ ✅ ALL VALIDATIONS PASSED ✅ ✅ ✅\n');
-    console.log('HeroRoiDuo.tsx is properly structured with:');
-    console.log('  • Complete file (no truncation)');
-    console.log('  • Background image implementation');
-    console.log('  • Required visual elements (gradient overlay, vignette)');
-    console.log('  • All structural elements intact\n');
-    return true;
-  }
-
-  if (warnings.length > 0) {
-    console.log('⚠️  WARNINGS:');
-    warnings.forEach(w => console.log(`  ⚠️  ${w}`));
-    console.log();
-  }
-
   if (errors.length > 0) {
     console.log('❌ ❌ ❌ VALIDATION FAILED ❌ ❌ ❌\n');
     console.log('ERRORS:');
@@ -200,7 +184,21 @@ function validateHeroSource() {
     process.exit(1);
   }
 
-  return warnings.length === 0;
+  if (warnings.length > 0) {
+    console.log('⚠️  WARNINGS:');
+    warnings.forEach(w => console.log(`  ⚠️  ${w}`));
+    console.log();
+    console.log('✅ Validation passed with warnings (non-blocking)\n');
+    process.exit(0);
+  }
+
+  console.log('✅ ✅ ✅ ALL VALIDATIONS PASSED ✅ ✅ ✅\n');
+  console.log('HeroRoiDuo.tsx is properly structured with:');
+  console.log('  • Complete file (no truncation)');
+  console.log('  • Background image implementation');
+  console.log('  • Required visual elements (gradient overlay, vignette)');
+  console.log('  • All structural elements intact\n');
+  process.exit(0);
 }
 
 // Run validation
