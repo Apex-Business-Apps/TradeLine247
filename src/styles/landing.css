@@ -1,0 +1,66 @@
+/* IMPORTANT:
+ * These mask + wallpaper values are the canonical TradeLine 24/7 landing look.
+ * Do not change rgba/opacity/gradient without explicit design approval.
+ */
+:root {
+  --landing-wallpaper: var(--hero-wallpaper-image, url("/assets/BACKGROUND_IMAGE1.svg"));
+  --landing-mask-gradient: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.72) 0%,
+    rgba(15, 23, 42, 0.55) 40%,
+    rgba(15, 23, 42, 0.35) 100%
+  );
+}
+
+.landing-shell {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+}
+
+.landing-wallpaper {
+  position: fixed;
+  inset: 0;
+  background-image: var(--landing-wallpaper);
+  background-size: cover;
+  background-position: center 0%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.landing-mask {
+  position: fixed;
+  inset: 0;
+  background: var(--landing-mask-gradient);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.landing-content {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 1024px) {
+  .landing-wallpaper {
+    background-position: center 15%;
+    background-attachment: scroll;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-wallpaper {
+    background-position: center 20%;
+    background-attachment: scroll;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .landing-wallpaper,
+  .landing-mask {
+    position: absolute;
+  }
+}
+

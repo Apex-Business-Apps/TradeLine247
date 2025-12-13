@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { paths } from '@/routes/paths';
-import { ArrowLeft, Smartphone, Download, Settings, CheckCircle, ExternalLink, QrCode } from 'lucide-react';
+import { ArrowLeft, Smartphone, Download, Settings, ExternalLink, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 
 const mobileFeatures = [

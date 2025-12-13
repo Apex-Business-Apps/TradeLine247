@@ -11,12 +11,6 @@ interface DashboardSummary {
   lastUpdated: string;
 }
 
-interface DashboardError {
-  error: string;
-  message?: string;
-  lastUpdated?: string;
-}
-
 const fetchDashboardSummary = async (): Promise<DashboardSummary> => {
   try {
     const { data, error } = await supabase.functions.invoke('dashboard-summary', {

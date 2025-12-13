@@ -8,7 +8,7 @@ const requiredFiles = [
   'vite.config.ts'
 ];
 
-let missingFiles = [];
+const missingFiles = [];
 
 for (const file of requiredFiles) {
   try {

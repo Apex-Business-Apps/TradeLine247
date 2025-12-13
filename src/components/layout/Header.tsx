@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@/components/ui/navigation-menu';
-import { Menu, X, LogOut, User, Settings, Phone, Smartphone } from 'lucide-react';
+import { Menu, X, LogOut, Settings, Phone, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, useLocation } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
-import { errorReporter } from '@/lib/errorReporter';
 import builtCanadianBadge from '@/assets/badges/built-canadian.svg';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {

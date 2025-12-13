@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Idempotency Key Manager
 // Prevents duplicate operations from retries or race conditions
 
