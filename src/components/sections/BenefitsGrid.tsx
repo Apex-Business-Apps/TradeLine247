@@ -23,7 +23,7 @@ export const BenefitsGrid = () => {
   }];
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-16 bg-transparent">
       <div className="container">
         <div className="text-center mb-12 animate-fade-in">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">

@@ -1,25 +1,24 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Hero Background Responsiveness', () => {
-  test('background image is on app-home (Dec 4 architecture)', async ({ page }) => {
+  test('landing wallpaper layer renders BACKGROUND_IMAGE1', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
     const heroSection = page.locator('section.hero-section').first();
     await expect(heroSection).toBeVisible();
 
-    // Dec 4 architecture: Background is on #app-home div (fixed inset-0)
-    const appHome = page.locator('#app-home');
-    const appHomeBg = await appHome.evaluate((el) => {
+    const wallpaper = page.locator('.landing-wallpaper');
+    await expect(wallpaper).toBeVisible();
+    const wallpaperBg = await wallpaper.evaluate((el) => {
       return window.getComputedStyle(el).backgroundImage;
     });
-    expect(appHomeBg).toMatch(/url\(.*BACKGROUND_IMAGE1.*\.svg/);
+    expect(wallpaperBg).toMatch(/BACKGROUND_IMAGE1.*\.svg/);
 
-    // Verify #app-home has fixed positioning
-    const appHomePosition = await appHome.evaluate((el) => {
+    const wallpaperPosition = await wallpaper.evaluate((el) => {
       return window.getComputedStyle(el).position;
     });
-    expect(appHomePosition).toBe('fixed');
+    expect(wallpaperPosition).toBe('fixed');
   });
 
   test('mobile: background focal point shows face', async ({ page }) => {
@@ -27,9 +26,9 @@ test.describe('Hero Background Responsiveness', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const appHome = page.locator('#app-home');
+    const wallpaper = page.locator('.landing-wallpaper');
 
-    const styles = await appHome.evaluate((el) => {
+    const styles = await wallpaper.evaluate((el) => {
       const computed = window.getComputedStyle(el);
       return {
         backgroundSize: computed.backgroundSize,
@@ -39,8 +38,8 @@ test.describe('Hero Background Responsiveness', () => {
       };
     });
 
-    // Mobile CSS override: specific size and focal point (15% from top = face visible)
-    expect(styles.backgroundPosition).toContain('10%'); // Face focal point
+    // Mobile CSS override: specific size and focal point (20% from top = face visible)
+    expect(styles.backgroundPosition).toContain('20%'); // Face focal point
     expect(styles.backgroundSize).toContain('cover');
     expect(styles.backgroundRepeat).toBe('no-repeat');
     expect(styles.backgroundAttachment).toBe('scroll');
@@ -51,9 +50,9 @@ test.describe('Hero Background Responsiveness', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const appHome = page.locator('#app-home');
+    const wallpaper = page.locator('.landing-wallpaper');
 
-    const styles = await appHome.evaluate((el) => {
+    const styles = await wallpaper.evaluate((el) => {
       const computed = window.getComputedStyle(el);
       return {
         backgroundSize: computed.backgroundSize,
@@ -73,9 +72,9 @@ test.describe('Hero Background Responsiveness', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const appHome = page.locator('#app-home');
+    const wallpaper = page.locator('.landing-wallpaper');
 
-    const styles = await appHome.evaluate((el) => {
+    const styles = await wallpaper.evaluate((el) => {
       const computed = window.getComputedStyle(el);
       return {
         backgroundSize: computed.backgroundSize,

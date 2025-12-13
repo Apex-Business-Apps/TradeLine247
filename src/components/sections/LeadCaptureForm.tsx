@@ -169,7 +169,7 @@ export const LeadCaptureForm = () => {
   const ctaText = variantData.text || "Grow Now";
   const ctaVariant = variantData.color === "secondary" ? "secondary" : "default";
   if (isSuccess) {
-    return <section className="py-20 bg-gradient-to-br from-primary/10 to-accent/10">
+    return <section className="py-20 bg-transparent">
         <div className="container">
           <Card className="max-w-md mx-auto text-center shadow-2xl border-0 bg-gradient-to-br from-[hsl(142_85%_95%)] to-[hsl(142_69%_95%)] backdrop-blur-sm animate-scale-in">
             <CardHeader>
@@ -205,7 +205,7 @@ export const LeadCaptureForm = () => {
         </div>
       </section>;
   }
-  return <section className="py-20 pb-32 bg-gradient-to-br from-primary/10 to-accent/10 relative">
+  return <section className="py-20 pb-32 bg-transparent relative">
       <div className="container pt-16 md:pt-0">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
