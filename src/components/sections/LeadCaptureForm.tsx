@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, Sparkles } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client.ts";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSecureABTest } from "@/hooks/useSecureABTest";
 import { useSecureFormSubmission } from "@/hooks/useSecureFormSubmission";
@@ -21,7 +20,7 @@ const leadFormSchema = z.object({
     .trim()
     .min(1, "Name is required")
     .max(100, "Name must be less than 100 characters")
-    .regex(/^[a-zA-Z\s\-'\.]+$/, "Name contains invalid characters"),
+    .regex(/^[a-zA-Z\s\-'.]+$/, "Name contains invalid characters"),
   email: z.string()
     .trim()
     .email("Invalid email address")
@@ -170,7 +169,7 @@ export const LeadCaptureForm = () => {
   const ctaText = variantData.text || "Grow Now";
   const ctaVariant = variantData.color === "secondary" ? "secondary" : "default";
   if (isSuccess) {
-    return <section className="py-20 bg-gradient-to-br from-primary/10 to-accent/10">
+    return <section className="py-20 bg-transparent">
         <div className="container">
           <Card className="max-w-md mx-auto text-center shadow-2xl border-0 bg-gradient-to-br from-[hsl(142_85%_95%)] to-[hsl(142_69%_95%)] backdrop-blur-sm animate-scale-in">
             <CardHeader>
@@ -206,7 +205,7 @@ export const LeadCaptureForm = () => {
         </div>
       </section>;
   }
-  return <section className="py-20 pb-32 bg-gradient-to-br from-primary/10 to-accent/10 relative">
+  return <section className="py-20 pb-32 bg-transparent relative">
       <div className="container pt-16 md:pt-0">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">

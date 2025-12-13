@@ -1,3 +1,4 @@
+ 
 // Requires standard JWT auth via supabase-js when invoked from the app.
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response(null, { status: 405 })

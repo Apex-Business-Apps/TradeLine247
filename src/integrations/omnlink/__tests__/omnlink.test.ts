@@ -1,3 +1,4 @@
+ 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { loadOmniLinkConfig } from '../config';
 import { healthCheck, isEnabled, sendEvent } from '../OmniLinkClient';

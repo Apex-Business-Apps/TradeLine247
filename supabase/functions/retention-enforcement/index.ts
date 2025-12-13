@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // P13: Retention Enforcement Job - Automated data retention policy enforcement
 // Runs daily via pg_cron to delete old data per retention policies
 

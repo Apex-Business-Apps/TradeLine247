@@ -1,3 +1,4 @@
+ 
 // Removed unnecessary edge-runtime import that caused OpenAI dependency conflict
 export default async () => {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

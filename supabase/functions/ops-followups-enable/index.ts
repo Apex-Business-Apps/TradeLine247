@@ -1,3 +1,4 @@
+ 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkAdminAuth } from "../_shared/adminAuth.ts";
 import { corsHeaders, preflight } from "../_shared/cors.ts";
@@ -70,7 +71,7 @@ Deno.serve(async (req) => {
       // Day 3 nudge at 09:15 Vancouver time
       if (day3_enabled) {
         // Add 3 days to sent date
-        let day3Date = addDays(sentDate, 3);
+        const day3Date = addDays(sentDate, 3);
         
         // Convert to Vancouver timezone and set to 09:15
         const day3Vancouver = toZonedTime(day3Date, timezone);
@@ -97,7 +98,7 @@ Deno.serve(async (req) => {
       // Day 7 final at 09:15 Vancouver time
       if (day7_enabled) {
         // Add 7 days to sent date
-        let day7Date = addDays(sentDate, 7);
+        const day7Date = addDays(sentDate, 7);
         
         // Convert to Vancouver timezone and set to 09:15
         const day7Vancouver = toZonedTime(day7Date, timezone);

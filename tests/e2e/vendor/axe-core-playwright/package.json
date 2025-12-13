@@ -1,5 +1,5 @@
 {
-  "name": "@axe-core/playwright",
+  "name": "axe-core-playwright-vendor",
   "version": "0.0.0-local",
   "type": "module",
   "exports": {

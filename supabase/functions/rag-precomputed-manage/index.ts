@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * RAG Pre-computed Answers Management Edge Function
  * CRUD operations for pre-computed answers

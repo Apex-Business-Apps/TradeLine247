@@ -33,6 +33,7 @@ export function sanitizeText(input: string, options: SanitizationOptions = {}): 
     .replace(/[<>`]/g, '')
     .replace(/javascript:/gi, '')
     .replace(/on\w+=/gi, '')
+    // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x1F\x7F]/g, '')
     .replace(/\s+/g, ' ');
 
@@ -61,7 +62,7 @@ export function sanitizeEmail(email: string): string {
 export function sanitizeName(name: string, maxLength: number = 100): string {
   return sanitizeText(name, {
     maxLength,
-    allowedChars: /^[a-zA-Z0-9\s\-'\.&,()]+$/,
+    allowedChars: /^[a-zA-Z0-9\s\-'.&,()]+$/,
     removeHtml: true,
     removeSql: true,
     removeScripts: true,

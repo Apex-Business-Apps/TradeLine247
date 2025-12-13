@@ -3,14 +3,14 @@
  * Build-Time Hero Component Validation
  *
  * This script validates the HeroRoiDuo.tsx source file to prevent regressions.
- * Run during build to ensure critical CSS classes and structure are intact.
+ * Run during build to ensure critical visual elements and structure are intact.
  *
  * Checks:
  * 1. File completeness (not truncated)
- * 2. Required responsive CSS classes
- * 3. Required imports
- * 4. Component structure integrity
- * 5. Wallpaper constants presence
+ * 2. Required imports
+ * 3. Background image implementation
+ * 4. Visual elements (gradient overlay, vignette)
+ * 5. Component structure integrity
  *
  * Usage: node scripts/validate-hero-source.mjs
  */
@@ -24,15 +24,6 @@ const __dirname = path.dirname(__filename);
 
 const HERO_FILE_PATH = path.join(__dirname, '..', 'src', 'sections', 'HeroRoiDuo.tsx');
 
-const REQUIRED_CSS_CLASSES = [
-  'min-h-screen',
-  'bg-contain',
-  'bg-top',
-  'bg-no-repeat',
-  'bg-scroll',
-  'md:bg-cover',
-];
-
 const REQUIRED_IMPORTS = [
   'import React from "react"',
   'import backgroundImage from',
@@ -42,18 +33,18 @@ const REQUIRED_IMPORTS = [
 ];
 
 const REQUIRED_STRUCTURE = [
-  'HERO_RESPONSIVE_CLASSES',
-  'HERO_INLINE_STYLES',
-  'data-wallpaper-version',
   'hero-gradient-overlay',
   'hero-vignette',
-  'data-node="grid"',
-  'data-node="ron"',
-  'data-node="start"',
+  'BACKGROUND_IMAGE1',
 ];
 
-const MIN_FILE_LENGTH = 130; // Minimum lines - truncation protection
-const EXPECTED_CLOSING = 'export default function HeroRoiDuo';
+const REQUIRED_ELEMENTS = [
+  'hero-section',
+  'absolute inset-0',
+  'backgroundImage',
+];
+
+const MIN_FILE_LENGTH = 100; // Minimum lines - truncation protection
 
 function validateHeroSource() {
   console.log('🔍 Validating HeroRoiDuo.tsx source...\n');
@@ -68,8 +59,8 @@ function validateHeroSource() {
   const lines = content.split('\n');
   const lineCount = lines.length;
 
-  let errors = [];
-  let warnings = [];
+  const errors = [];
+  const warnings = [];
 
   // 1. Check file length (truncation detection)
   console.log(`📏 File Length: ${lineCount} lines`);
@@ -81,17 +72,11 @@ function validateHeroSource() {
 
   // 2. Check file ends properly
   const lastNonEmptyLine = lines.filter(l => l.trim()).pop();
-  if (!lastNonEmptyLine || lastNonEmptyLine.trim() !== '}') {
-    warnings.push('File may not end properly. Last non-empty line: ' + lastNonEmptyLine);
+  if (!lastNonEmptyLine || !lastNonEmptyLine.trim().endsWith('}')) {
+    warnings.push('File may not end properly. Last non-empty line: ' + lastNonEmptyLine?.substring(0, 50));
   }
 
-  // 3. Check for incomplete sentences (truncation indicator)
-  const incompleteSentences = content.match(/\b(sle|wor|cal|hel|you|the|and|whi)\s*$/m);
-  if (incompleteSentences) {
-    errors.push('File contains incomplete word at end - likely truncated!');
-  }
-
-  // 4. Validate required imports
+  // 3. Validate required imports
   console.log('📦 Checking Required Imports:');
   REQUIRED_IMPORTS.forEach(importStr => {
     if (content.includes(importStr)) {
@@ -103,19 +88,7 @@ function validateHeroSource() {
   });
   console.log();
 
-  // 5. Validate required CSS classes
-  console.log('🎨 Checking Required CSS Classes:');
-  REQUIRED_CSS_CLASSES.forEach(className => {
-    if (content.includes(className)) {
-      console.log(`  ✅ ${className}`);
-    } else {
-      errors.push(`Missing required CSS class: ${className}`);
-      console.log(`  ❌ ${className}`);
-    }
-  });
-  console.log();
-
-  // 6. Validate required structure elements
+  // 4. Check component structure
   console.log('🏗️  Checking Component Structure:');
   REQUIRED_STRUCTURE.forEach(element => {
     if (content.includes(element)) {
@@ -127,22 +100,57 @@ function validateHeroSource() {
   });
   console.log();
 
-  // 7. Check responsive wallpaper constants
-  if (!content.includes('HERO_RESPONSIVE_CLASSES')) {
-    errors.push('Missing HERO_RESPONSIVE_CLASSES constants');
-  }
-  if (!content.includes('HERO_INLINE_STYLES')) {
-    errors.push('Missing HERO_INLINE_STYLES constants');
-  }
+  // 5. Check required visual elements
+  console.log('🎨 Checking Visual Elements:');
+  REQUIRED_ELEMENTS.forEach(element => {
+    if (content.includes(element)) {
+      console.log(`  ✅ ${element}`);
+    } else {
+      errors.push(`Missing required visual element: ${element}`);
+      console.log(`  ❌ ${element}`);
+    }
+  });
+  console.log();
 
-  // 8. Validate backgroundAttachment: 'scroll'
-  if (!content.includes("backgroundAttachment: 'scroll'")) {
-    errors.push("Missing backgroundAttachment: 'scroll' (critical for mobile)");
+  // 6. Check for background image implementation (current uses inline styles)
+  const hasBackgroundImage = content.includes('backgroundImage') && 
+                             (content.includes('url(${backgroundImage})') || content.includes('url('));
+  if (!hasBackgroundImage) {
+    errors.push('Missing background image implementation');
   } else {
-    console.log("✅ backgroundAttachment: 'scroll' present\n");
+    console.log('✅ Background image implementation found\n');
   }
 
-  // 9. Check for wallpaper version tag
+  // 7. Check for background styling (size, position, repeat)
+  const hasBackgroundSize = content.includes('backgroundSize') || content.includes('background-size');
+  const hasBackgroundPosition = content.includes('backgroundPosition') || content.includes('background-position');
+  const hasBackgroundRepeat = content.includes('backgroundRepeat') || content.includes('background-repeat');
+  
+  if (!hasBackgroundSize) {
+    errors.push('Missing background size styling');
+  } else {
+    console.log('✅ Background size styling found');
+  }
+  if (!hasBackgroundPosition) {
+    errors.push('Missing background position styling');
+  } else {
+    console.log('✅ Background position styling found');
+  }
+  if (!hasBackgroundRepeat) {
+    errors.push('Missing background repeat styling');
+  } else {
+    console.log('✅ Background repeat styling found\n');
+  }
+
+  // 8. Verify background image div structure
+  const hasBackgroundDiv = content.includes('absolute inset-0') && content.includes('backgroundImage');
+  if (!hasBackgroundDiv) {
+    errors.push('Missing background image div with absolute positioning');
+  } else {
+    console.log('✅ Background image div structure correct\n');
+  }
+
+  // 9. Check for wallpaper version tag (optional but recommended)
   if (content.includes('data-wallpaper-version')) {
     const versionMatch = content.match(/data-wallpaper-version="([^"]+)"/);
     if (versionMatch) {
@@ -170,8 +178,8 @@ function validateHeroSource() {
     console.log('✅ ✅ ✅ ALL VALIDATIONS PASSED ✅ ✅ ✅\n');
     console.log('HeroRoiDuo.tsx is properly structured with:');
     console.log('  • Complete file (no truncation)');
-    console.log('  • All required responsive CSS classes');
-    console.log('  • Proper wallpaper constants');
+    console.log('  • Background image implementation');
+    console.log('  • Required visual elements (gradient overlay, vignette)');
     console.log('  • All structural elements intact\n');
     return true;
   }

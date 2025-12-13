@@ -1,136 +1,197 @@
-import React from 'react';
-import { Logo } from '@/components/ui/logo';
-import { usePWA } from '@/hooks/usePWA';
-import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import React from "react";
+import { Mail, Phone, MapPin, ExternalLink } from "lucide-react";
 
-const navLinks = [
-  { href: '/security', label: 'Security' },
-  { href: '/compare', label: 'Compare' },
-  { href: '/privacy', label: 'Privacy' },
-  { href: '/terms', label: 'Terms' },
-  { href: 'mailto:info@tradeline247ai.com', label: 'Contact' },
-];
+// PNG-only partner logos (NO WebP)
+import albertaLogoPng from "@/assets/logos/alberta-innovates.png";
+import erinLogoPng from "@/assets/logos/erin.png";
 
-const trustBadges = [
-  {
-    title: 'Backed by Alberta Innovates',
-    alt: 'Alberta Innovates logo',
-    logo: '/alberta-innovates.png',
-    abbreviation: 'AI',
-  },
-  {
-    title: 'Powered by OpenAI',
-    alt: 'OpenAI logo',
-    logo: '/assets/brand/badges/openai-logo.png',
-    abbreviation: 'OA',
-  },
-  {
-    title: 'Payments by Stripe',
-    alt: 'Stripe logo',
-    logo: '/assets/brand/badges/stripe-logo.png',
-    abbreviation: 'S',
-  },
-  {
-    title: 'Infrastructure on Vercel',
-    alt: 'Vercel logo',
-    logo: '/assets/brand/badges/vercel-logo.png',
-    abbreviation: 'V',
-  },
-];
+type FooterLink = { label: string; href: string; external?: boolean };
 
-export const Footer: React.FC = () => {
-  const { isInstallable, isInstalled, showInstallPrompt } = usePWA();
+function FooterLinkItem({ label, href, external }: FooterLink) {
+  return (
+    <li>
+      <a
+        href={href}
+        target={external ? "_blank" : undefined}
+        rel={external ? "noreferrer noopener" : undefined}
+        className="inline-flex items-center gap-1 rounded-sm text-sm text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-brand-accentStrong/40"
+      >
+        {label}
+        {external ? (
+          <ExternalLink className="h-3.5 w-3.5 opacity-70" aria-hidden="true" />
+        ) : null}
+      </a>
+    </li>
+  );
+}
+
+function FooterGroup({ title, links }: { title: string; links: FooterLink[] }) {
+  return (
+    <div>
+      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <ul className="mt-3 space-y-2">
+        {links.map((l) => (
+          <FooterLinkItem key={`${l.href}-${l.label}`} {...l} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function PartnerLogo({
+  href,
+  name,
+  src,
+  wrapClassName,
+  imgClassName,
+}: {
+  href: string;
+  name: string;
+  src: string;
+  wrapClassName?: string;
+  imgClassName?: string;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      aria-label={name}
+      title={name}
+      className={
+        wrapClassName ??
+        "flex h-14 min-w-[200px] shrink-0 items-center justify-center rounded-xl border border-border bg-muted/30 px-5 hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-brand-accentStrong/40"
+      }
+    >
+      <img
+        src={src}
+        alt={name}
+        className={imgClassName ?? "h-8 w-auto object-contain"}
+        loading="lazy"
+        decoding="async"
+      />
+    </a>
+  );
+}
+
+export function Footer() {
+  const product: FooterLink[] = [
+    { label: "How it works", href: "#how-it-works" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "Security", href: "/security" },
+    { label: "Docs", href: "/docs" },
+  ];
+
+  const solutions: FooterLink[] = [
+    { label: "Trades", href: "/solutions/trades" },
+    { label: "Clinics", href: "/solutions/clinics" },
+    { label: "Drivers", href: "/solutions/drivers" },
+    { label: "Agencies", href: "/solutions/agencies" },
+  ];
+
+  const company: FooterLink[] = [
+    { label: "About", href: "/about" },
+    { label: "Contact", href: "/contact" },
+    { label: "Status", href: "/status" },
+  ];
+
+  const legal: FooterLink[] = [
+    { label: "Privacy", href: "/privacy" },
+    { label: "Terms", href: "/terms" },
+    { label: "Accessibility", href: "/accessibility" },
+  ];
 
   return (
-    <footer className="border-t bg-background mt-auto" role="contentinfo">
-      <div className="container py-8 md:py-10 space-y-8">
-        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-          <div className="space-y-3 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-2">
-              <Logo variant="text" size="sm" />
+    <footer className="relative border-t border-border bg-background">
+      <div className="mx-auto w-full max-w-6xl px-4 py-10">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+          {/* Brand + contact */}
+          <div className="max-w-xl">
+            <div className="text-lg font-extrabold tracking-tight text-foreground">
+              TradeLine <span className="opacity-90">24/7</span>
             </div>
-            <address className="not-italic text-sm text-muted-foreground leading-relaxed">
-              <strong className="text-foreground">Apex Business Systems</strong> • Edmonton, Alberta • Built Canadian<br />
-              <a
-                href="mailto:info@tradeline247ai.com"
-                className="font-medium text-primary hover:text-primary/80 transition-colors"
-              >
-                info@tradeline247ai.com
-              </a>
-            </address>
-            <p className="text-sm text-muted-foreground">
-              © 2025 <span className="text-primary font-semibold">TradeLine 24/7</span>. Never miss a call. We got it.
+
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Never miss a call. Work while you sleep. TradeLine 24/7 answers instantly,
+              qualifies leads, and delivers clean transcripts—so you can focus on the work.
             </p>
+
+            <div className="mt-5 grid gap-2 text-sm text-muted-foreground">
+              <div className="inline-flex items-center gap-2">
+                <Mail className="h-4 w-4" aria-hidden="true" />
+                <a
+                  href="mailto:hello@apexbusinesssystems.ca"
+                  className="rounded-sm hover:text-foreground focus:outline-none focus:ring-2 focus:ring-brand-accentStrong/40"
+                >
+                  hello@apexbusinesssystems.ca
+                </a>
+              </div>
+
+              <div className="inline-flex items-center gap-2">
+                <Phone className="h-4 w-4" aria-hidden="true" />
+                <a
+                  href="tel:+1-587-742-8885"
+                  className="rounded-sm hover:text-foreground focus:outline-none focus:ring-2 focus:ring-brand-accentStrong/40"
+                >
+                  +1 (587) 742-8885
+                </a>
+              </div>
+
+              <div className="inline-flex items-center gap-2">
+                <MapPin className="h-4 w-4" aria-hidden="true" />
+                <span>Edmonton, Alberta • Serving Canada</span>
+              </div>
+            </div>
           </div>
 
-          {/* Apex Business Systems Logo - Center */}
-          <div className="hidden md:flex items-center justify-center">
-            <img
-              src="/assets/brand/apex-logo.png"
-              alt="Apex Business Systems"
-              className="h-12 w-auto object-contain"
-              loading="lazy"
+          {/* Links */}
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+            <FooterGroup title="Product" links={product} />
+            <FooterGroup title="Solutions" links={solutions} />
+            <FooterGroup title="Company" links={company} />
+            <FooterGroup title="Legal" links={legal} />
+          </div>
+        </div>
+
+        {/* Partner logos */}
+        <div className="mt-10 border-t border-border pt-8">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground">
+            Supported by
+          </p>
+
+          {/* Mobile: horizontal scroll. Desktop: wrap. */}
+          <div className="mt-4 flex gap-4 overflow-x-auto pb-2 sm:flex-wrap sm:overflow-visible">
+            <PartnerLogo
+              href="https://albertainnovates.ca/"
+              name="Alberta Innovates"
+              src={albertaLogoPng}
+              wrapClassName="flex h-14 min-w-[230px] shrink-0 items-center justify-center rounded-xl border border-border bg-muted/30 px-5 hover:bg-muted/50"
+              imgClassName="h-7 w-auto object-contain"
+            />
+
+            {/* ERIN includes fine text: keep it larger so it stays legible */}
+            <PartnerLogo
+              href="https://www.edmontonrin.ca/"
+              name="Edmonton Regional Innovation Network (ERIN)"
+              src={erinLogoPng}
+              wrapClassName="flex h-16 min-w-[250px] shrink-0 items-center justify-center rounded-xl border border-border bg-brand-navy/10 dark:bg-brand-navy/35 px-5 hover:bg-brand-navy/15 dark:hover:bg-brand-navy/45"
+              imgClassName="h-10 w-auto object-contain"
             />
           </div>
 
-          <nav className="flex flex-wrap items-center justify-center gap-3 md:gap-5 text-sm text-muted-foreground">
-            {isInstallable && !isInstalled && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={showInstallPrompt}
-                className="text-sm"
-                aria-label="Install TradeLine 24/7 app"
-              >
-                <Download className="w-4 h-4 mr-1" />
-                Install App
-              </Button>
-            )}
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Partner marks are displayed as provided (no recolor, no distortion).
+          </p>
         </div>
+      </div>
 
-        <div className="border-t border-border/70 pt-6">
-          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
-            {trustBadges.map((badge) => (
-              <div
-                key={badge.title}
-                className="flex items-center gap-3 rounded-lg border bg-muted/50 px-3 py-2 shadow-sm max-w-[220px] overflow-hidden"
-                data-testid="trust-badge"
-              >
-                {badge.logo ? (
-                  <img
-                    src={badge.logo}
-                    alt={badge.alt}
-                    className="h-8 w-auto object-contain flex-shrink-0"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div
-                    className="flex h-8 w-8 items-center justify-center rounded-md bg-muted text-xs font-semibold uppercase text-muted-foreground flex-shrink-0"
-                    aria-label={badge.alt}
-                  >
-                    {badge.abbreviation}
-                  </div>
-                )}
-                <div className="text-left min-w-0 flex-1">
-                  <div className="text-sm font-semibold leading-tight text-foreground truncate">{badge.title}</div>
-                  <div className="text-xs text-muted-foreground">Ecosystem partner</div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="border-t border-border">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} APEX Business Systems Ltd. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
   );
-};
+}

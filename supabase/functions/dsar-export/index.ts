@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // P13: DSAR Export - Data Subject Access Request Export
 // PIPEDA-compliant data export with secret redaction
 

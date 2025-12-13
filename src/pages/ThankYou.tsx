@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Mail, Phone, MessageCircle } from 'lucide-react';
+import { CheckCircle2, Mail, Phone } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { Link } from 'react-router-dom';
 import { SEOHead } from '@/components/seo/SEOHead';

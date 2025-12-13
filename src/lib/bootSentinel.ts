@@ -1,15 +1,14 @@
 /**
  * Boot Sentinel
- * 
+ *
  * Silent runtime check to detect if React app fails to mount.
  * Reports telemetry only (no UI changes).
- * 
+ *
  * Runs 3s after DOMContentLoaded to allow for lazy/async loading.
  * When H310_HARDENING flag is ON, captures console errors for debugging.
  */
 
 import { featureFlags } from '@/config/featureFlags';
-import { errorReporter } from '@/lib/errorReporter';
 
 const BOOT_TIMEOUT_MS = 3000;
 const TELEMETRY_ENDPOINT = '/api/telemetry';

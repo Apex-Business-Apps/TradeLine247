@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * RAG Performance Optimization Tools
  * Analyzes slow queries, recommends pre-computed answers, and optimizes vector indexes

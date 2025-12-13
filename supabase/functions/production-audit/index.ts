@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Comprehensive Production Audit Edge Function
  * Performs security, performance, data integrity, and system health checks
