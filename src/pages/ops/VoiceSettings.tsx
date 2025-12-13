@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Settings, Zap, Clock, MessageSquare, Shield, ChevronRight, Check } from "lucide-react";
+import { AlertTriangle, Settings, Zap, Clock, MessageSquare, Shield, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client.ts";
 

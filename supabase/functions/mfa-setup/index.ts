@@ -1,3 +1,4 @@
+ 
 /**
  * MFA Setup Edge Function
  * Generates TOTP secret and backup codes for user

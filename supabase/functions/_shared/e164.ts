@@ -39,7 +39,7 @@ export function normalizeToE164(phone: string, defaultCountryCode: string = '1')
   }
 
   // Remove all non-digit characters except leading +
-  let cleaned = phone.replace(/[^\d+]/g, '');
+  const cleaned = phone.replace(/[^\d+]/g, '');
 
   // If already in E.164 format, validate and return
   if (cleaned.startsWith('+')) {

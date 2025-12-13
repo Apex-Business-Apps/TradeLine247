@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * RAG Pre-computed Answers Edge Function
  * Serves frequently asked questions instantly without vector search

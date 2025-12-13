@@ -1,3 +1,4 @@
+ 
 // DRIFT-03: One-click unsubscribe Edge Function (CASL compliant)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 

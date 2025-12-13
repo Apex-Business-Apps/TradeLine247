@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase, isSupabaseEnabled } from "@/integrations/supabase/client";
-import { API_CONFIG, TWILIO_CONFIG, SUPABASE_FUNCTIONS } from "@/config/api";
+import { TWILIO_CONFIG, SUPABASE_FUNCTIONS } from "@/config/api";
 
 type Carrier = "ROGERS_FIDO" | "TELUS_KOODO" | "BELL_MOBILITY" | "LANDLINE";
 

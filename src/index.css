@@ -4,6 +4,7 @@
 @import './styles/hero-roi.css';
 /* CRITICAL: header-align.css must load synchronously to prevent header layout shifts and z-index conflicts */
 @import './styles/header-align.css';
+@import './styles/landing.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -69,7 +70,7 @@ html {
 }
 
 /* Always paint content above wallpaper */
-.landing-shell > *,
+.landing-shell > *:not(.landing-wallpaper):not(.landing-mask),
 .dashboard-shell > * {
   position: relative;
   z-index: 1;
@@ -147,7 +148,7 @@ body {
 }
 
 /* Always paint content above wallpaper */
-.landing-shell > *,
+.landing-shell > *:not(.landing-wallpaper):not(.landing-mask),
 .dashboard-shell > * {
   position: relative;
   z-index: 1;
@@ -1801,37 +1802,9 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 /* ================================================ */
 
 #app-home {
-  /* Single source of truth for hero wallpaper */
-  background-image: var(--hero-wallpaper-image);
-  background-size: cover;
-  background-position: center center;
-  background-position-x: center;
-  background-position-y: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
-
-@media (max-width: 1024px) {
-  #app-home {
-    background-size: cover;
-    background-position: center 15%;
-    background-attachment: scroll;
-  }
-}
-
-@media (max-width: 768px) {
-  #app-home {
-    background-size: cover;
-    background-position: center 10%;
-    background-attachment: scroll;
-  }
-}
-
-@media (max-width: 768px) {
-  #app-home, .hero-bg, [class*="hero-section"] {
-    background-attachment: scroll !important;
-    background-position: center 20%;
-  }
+  position: relative;
+  isolation: isolate;
+  background: transparent;
 }
 
 @supports (-webkit-touch-callout: none) {

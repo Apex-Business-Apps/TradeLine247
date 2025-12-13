@@ -18,7 +18,7 @@ export const ImpactStrip = () => {
     description: "Coverage without hiring overhead.",
     color: "#FF6B35" // Hero text orange
   }];
-  return <section className="py-16 bg-muted/40">
+  return <section className="py-16 bg-transparent">
       <div className="container">
         <div className="text-center mb-12 animate-fade-in">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
