@@ -1,11 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Download, X } from 'lucide-react';
 import { installPWA, getPWAPrompt } from '@/lib/pwaInstall';
 
+const PWA_DISMISSAL_KEY = 'tl247:pwa-banner-dismissed';
+const PWA_DISMISSAL_DURATION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
+
+function isBannerDismissed(): boolean {
+  if (typeof window === 'undefined' || !window.localStorage) return false;
+  const dismissed = localStorage.getItem(PWA_DISMISSAL_KEY);
+  if (!dismissed) return false;
+  const dismissedTime = parseInt(dismissed, 10);
+  const now = Date.now();
+  return (now - dismissedTime) < PWA_DISMISSAL_DURATION_MS;
+}
+
+function setBannerDismissed(): void {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  localStorage.setItem(PWA_DISMISSAL_KEY, Date.now().toString());
+}
+
 export const PWAInstallBanner: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(!isBannerDismissed());
+
+  useEffect(() => {
+    // Check dismissal on mount
+    if (isBannerDismissed()) {
+      setIsVisible(false);
+    }
+  }, []);
 
   const handleInstall = async () => {
     const success = await installPWA();
@@ -15,6 +39,7 @@ export const PWAInstallBanner: React.FC = () => {
   };
 
   const handleDismiss = () => {
+    setBannerDismissed();
     setIsVisible(false);
   };
 
