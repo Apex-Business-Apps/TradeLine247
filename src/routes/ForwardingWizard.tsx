@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase, isSupabaseEnabled } from "@/integrations/supabase/client";
+import { TWILIO_CONFIG, SUPABASE_FUNCTIONS } from "@/config/api";
 
 type Carrier = "ROGERS_FIDO" | "TELUS_KOODO" | "BELL_MOBILITY" | "LANDLINE";
 
-// CRITICAL: Hardcoded fallbacks for production (VITE_* env vars not supported in Lovable)
-const FUNCTIONS_BASE = import.meta.env.VITE_FUNCTIONS_BASE || 'https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1';
-const FORWARD_TO = import.meta.env.VITE_TWILIO_VOICE_NUMBER_E164 || '+18336062247';
+const FORWARD_TO = TWILIO_CONFIG.voiceNumber;
 
 type Status = "idle" | "pending" | "verified" | "failed";
 
@@ -184,7 +183,7 @@ function CallerIdPanel() {
   const [msg, setMsg] = useState("Twilio will place a quick call to confirm ownership.");
   async function start() {
     try {
-      const res = await fetch(`${import.meta.env.VITE_FUNCTIONS_BASE || 'https://hysvqdwmhxnblxfqnszn.supabase.co/functions/v1'}/callerid-verify-start`, {
+      const res = await fetch(SUPABASE_FUNCTIONS.callerIdVerifyStart, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone_number_e164: num, friendly_name: label }),

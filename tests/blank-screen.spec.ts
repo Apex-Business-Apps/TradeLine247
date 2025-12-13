@@ -161,10 +161,11 @@ test.describe('PIPEDA Compliance', () => {
 
   test('privacy link in footer works', async ({ page }) => {
     await page.goto('/');
-    
-    const privacyLink = page.getByRole('link', { name: /privacy/i });
+
+    // Use .first() to handle multiple Privacy links (main footer + secondary footer)
+    const privacyLink = page.getByRole('link', { name: /privacy/i }).first();
     await expect(privacyLink).toBeVisible();
-    
+
     await privacyLink.click();
     await expect(page).toHaveURL('/privacy');
   });

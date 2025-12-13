@@ -1,0 +1,31 @@
+# Cursor/Lovable AI Rules
+
+## TypeScript Configuration
+
+This project uses **intentionally lax** TypeScript settings:
+- strict: false
+- noImplicitAny: false
+- noUnusedLocals: false
+- noUnusedParameters: false
+
+## Verification Before Claiming Errors
+
+Before reporting TypeScript errors, verify with:
+```bash
+npm run typecheck  # Must pass
+npm run lint       # Must pass
+npm run build      # Must succeed
+```
+
+## Rules
+
+1. Do not apply stricter TypeScript rules than tsconfig.json specifies
+2. Do not "fix" unused parameters/variables (intentionally allowed)
+3. Do not "fix" 'any' types (intentionally allowed)
+4. Respect file headers that say "DO NOT MODIFY TYPESCRIPT"
+5. Trust the build pipeline, not your LSP
+
+## Current Status
+
+✅ All checks pass (typecheck, lint, build)
+❌ Do not override project configuration

@@ -12,10 +12,7 @@ const PAGES = [
   { path: "/faq", h1: /FAQ|Frequently Asked Questions/i },
 ];
 
-// CI-specific timeout settings
-test.describe.configure({
-  timeout: process.env.CI ? 60000 : 30000, // 60s in CI, 30s local
-});
+// Timeout settings are configured in playwright.config.ts
 
 for (const page of PAGES) {
   test(`renders ${page.path} with correct heading`, async ({ page: browserPage }) => {

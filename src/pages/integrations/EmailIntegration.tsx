@@ -144,7 +144,7 @@ TradeLine 24/7 Team`);
 
               <CardContent className="relative z-10 space-y-4">
                 <div>
-                  <h4 className="font-semibold text-sm mb-2">Features:</h4>
+                  <h3 className="font-semibold text-sm mb-2">Features:</h3>
                   <div className="space-y-1">
                     {provider.features.map((feature) => (
                       <div key={feature} className="flex items-center gap-2 text-xs">
@@ -231,7 +231,10 @@ TradeLine 24/7 Team`);
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="auto-send">Auto-send emails</Label>
-                <select className="w-full p-2 rounded-md border border-input bg-background">
+                <select
+                  id="auto-send"
+                  className="w-full p-2 rounded-md border border-input bg-background"
+                >
                   <option>After every call</option>
                   <option>Only for qualified leads</option>
                   <option>Manual approval required</option>
@@ -241,7 +244,10 @@ TradeLine 24/7 Team`);
 
               <div className="space-y-2">
                 <Label htmlFor="send-delay">Send delay</Label>
-                <select className="w-full p-2 rounded-md border border-input bg-background">
+                <select
+                  id="send-delay"
+                  className="w-full p-2 rounded-md border border-input bg-background"
+                >
                   <option>Immediate</option>
                   <option>5 minutes</option>
                   <option>15 minutes</option>

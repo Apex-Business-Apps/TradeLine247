@@ -23,7 +23,7 @@ export const BenefitsGrid = () => {
   }];
 
   return (
-    <section className="py-16 bg-muted/40">
+    <section className="py-16 bg-transparent">
       <div className="container">
         <div className="text-center mb-12 animate-fade-in">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
@@ -44,15 +44,15 @@ export const BenefitsGrid = () => {
                 style={{ animationDelay: `${index * 200}ms` }}
               >
                 <CardHeader className="text-center pb-4">
-                  <div className={`mx-auto w-16 h-16 bg-gradient-to-br ${benefit.gradient} rounded-2xl flex items-center justify-center mb-4 group-hover:shadow-lg group-hover:shadow-current/20 transition-all duration-300 hover-scale`}>
-                    <Icon className="h-8 w-8 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" style={{ color: benefit.color }} />
+                  <div className={`mx-auto w-16 h-16 bg-[#FFE5D9] rounded-xl flex items-center justify-center mb-4 group-hover:shadow-lg group-hover:shadow-current/20 transition-all duration-300 hover-scale`}>
+                    <Icon className="h-8 w-8 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6" style={{ color: '#FF6B35' }} />
                   </div>
-                  <CardTitle className="text-xl mb-2 transition-colors duration-300" style={{ color: '#FF6B35' }}>
+                  <CardTitle className="text-xl mb-2 transition-colors duration-300 font-bold" style={{ color: '#1e556b' }}>
                     {benefit.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <CardDescription className="text-center leading-relaxed text-base text-foreground/90 group-hover:text-foreground transition-colors duration-300">
+                  <CardDescription className="text-center leading-relaxed text-base text-gray-600 group-hover:text-foreground transition-colors duration-300">
                     {benefit.description}
                   </CardDescription>
                 </CardContent>

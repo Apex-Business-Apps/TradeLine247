@@ -4,6 +4,7 @@ import { supabase, isSupabaseEnabled } from '@/integrations/supabase/client';
 import { ensureMembership } from '@/lib/ensureMembership';
 import { toast } from '@/hooks/use-toast';
 import { errorReporter } from '@/lib/errorReporter';
+import { AUTH_CONFIG } from '@/config/api';
 
 export type UserRole = 'admin' | 'moderator' | 'user';
 
@@ -117,6 +118,16 @@ export const useAuth = () => {
               description: result.error,
             });
           }
+        }).catch((error) => {
+          errorReporter.report({
+            type: 'error',
+            message: `Failed to ensure membership: ${error instanceof Error ? error.message : String(error)}`,
+            stack: error instanceof Error ? error.stack : undefined,
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            environment: errorReporter['getEnvironment']()
+          });
         });
       }
       
@@ -188,8 +199,6 @@ export const useAuth = () => {
   };
 
   const signUp = async (email: string, password: string, displayName?: string) => {
-    const redirectUrl = `https://tradeline247ai.com/auth/callback`;
-    
     if (!isSupabaseEnabled) {
       return { error: new Error('Supabase is disabled') };
     }
@@ -198,7 +207,7 @@ export const useAuth = () => {
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl,
+        emailRedirectTo: AUTH_CONFIG.callbackUrl,
         data: {
           display_name: displayName
         }

@@ -54,4 +54,7 @@ vendor/
 
 # Exclude jubee.love - this is a separate project, not part of tradeline247aicom
 jubee.love/
-tradeline247aicom
+tradeline247aicom/
+flowbills/
+*.backup
+*.before-*

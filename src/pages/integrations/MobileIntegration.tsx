@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { paths } from '@/routes/paths';
-import { ArrowLeft, Smartphone, Download, Settings, CheckCircle, ExternalLink, QrCode } from 'lucide-react';
+import { ArrowLeft, Smartphone, Download, Settings, ExternalLink, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 
 const mobileFeatures = [
@@ -291,7 +291,7 @@ const MobileIntegration = () => {
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">1</div>
                 <div>
-                  <h4 className="font-semibold text-foreground">Download the App</h4>
+                  <h3 className="font-semibold text-foreground">Download the App</h3>
                   <p className="text-sm text-muted-foreground">Get the TradeLine 24/7 app from your device's app store</p>
                 </div>
               </div>
@@ -299,7 +299,7 @@ const MobileIntegration = () => {
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</div>
                 <div>
-                  <h4 className="font-semibold text-foreground">Sign In</h4>
+                  <h3 className="font-semibold text-foreground">Sign In</h3>
                   <p className="text-sm text-muted-foreground">Use your TradeLine 24/7 account credentials to sign in</p>
                 </div>
               </div>
@@ -307,7 +307,7 @@ const MobileIntegration = () => {
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">3</div>
                 <div>
-                  <h4 className="font-semibold text-foreground">Enable Notifications</h4>
+                  <h3 className="font-semibold text-foreground">Enable Notifications</h3>
                   <p className="text-sm text-muted-foreground">Allow push notifications to stay updated on calls and messages</p>
                 </div>
               </div>
@@ -315,7 +315,7 @@ const MobileIntegration = () => {
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">4</div>
                 <div>
-                  <h4 className="font-semibold text-foreground">Configure Settings</h4>
+                  <h3 className="font-semibold text-foreground">Configure Settings</h3>
                   <p className="text-sm text-muted-foreground">Customize your preferences and sync with your dashboard settings</p>
                 </div>
               </div>

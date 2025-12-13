@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { CSSProperties, useEffect, useMemo } from "react";
+
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
 import { TrustBadgesSlim } from "@/components/sections/TrustBadgesSlim";
@@ -13,6 +14,22 @@ import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
 
+// Idempotent constants: computed once, reused across renders
+const BACKGROUND_IMAGE_URL = backgroundImage;
+const LANDING_BACKGROUND_COLOR = "hsl(0, 0%, 97%)";
+
+const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
+  backgroundImage: `url(${imageUrl})`,
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "cover",
+});
+
+const createLandingWallpaperVars = (imageUrl: string): CSSProperties => ({
+  "--landing-wallpaper": `url(${imageUrl})`,
+  "--hero-wallpaper-image": `url(${imageUrl})`,
+} as CSSProperties);
+
 const Index = () => {
   const { trackPageView } = useAnalytics();
 
@@ -23,112 +40,112 @@ const Index = () => {
   // Preload background image for faster rendering
   useEffect(() => {
     const img = new Image();
-    img.src = backgroundImage;
+    img.src = BACKGROUND_IMAGE_URL;
     img.onerror = () => {
       errorReporter.report({
-        type: 'error',
-        message: 'Background image failed to load',
+        type: "error",
+        message: "Background image failed to load",
         timestamp: new Date().toISOString(),
         url: window.location.href,
         userAgent: navigator.userAgent,
-        environment: errorReporter['getEnvironment'](),
-        metadata: { imageSrc: backgroundImage }
+        environment: errorReporter["getEnvironment"](),
+        metadata: { imageSrc: BACKGROUND_IMAGE_URL },
       });
     };
   }, []);
 
-  return (
-    <>
-      <div
-        id="app-home"
-        className="min-h-screen flex flex-col relative"
-        style={{
-          backgroundImage: `
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14)),
-            linear-gradient(
-              to bottom,
-              rgba(255, 107, 53, 0.62) 0%,
-              rgba(104, 182, 233, 0.72) 100%
-            ),
-            url(${backgroundImage})
-          `,
-          backgroundRepeat: "no-repeat, no-repeat, no-repeat",
-          backgroundSize: "cover, cover, cover",
-          backgroundPosition: "center, center, center",
-          backgroundAttachment: "scroll, scroll, fixed",
-          backgroundColor: "hsl(0, 0%, 97%)", // Fallback color if image fails (light gray)
-          minHeight: "100vh",
-        }}
-      >
-        {/* Content with translucency - Optimized for performance */}
-        <div className="relative z-10" style={{ minHeight: "100vh" }}>
-          <AISEOHead
-            title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
-            description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
-            canonical="/"
-            contentType="service"
-            directAnswer="TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads, and sends clean transcripts via email to Canadian businesses. Never miss a call. Work while you sleep."
-            primaryEntity={{
-              name: "TradeLine 24/7 AI Receptionist Service",
-              type: "Service",
-              description: "24/7 AI-powered phone answering service for Canadian businesses",
-            }}
-            keyFacts={[
-              { label: "Availability", value: "24/7" },
-              { label: "Response Time", value: "<2 seconds" },
-              { label: "Uptime", value: "99.9%" },
-              { label: "Service Area", value: "Canada" },
-            ]}
-            faqs={[
-              {
-                question: "What is TradeLine 24/7?",
-                answer:
-                  "TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads based on your criteria, and sends clean email transcripts. It never misses a call and works while you sleep.",
-              },
-              {
-                question: "How does TradeLine 24/7 work?",
-                answer:
-                  "When a call comes in, our AI answers immediately, has a natural conversation with the caller, qualifies them based on your criteria, and sends you a clean email transcript with all the details.",
-              },
-              {
-                question: "What areas does TradeLine 24/7 serve?",
-                answer:
-                  "TradeLine 24/7 serves businesses across Canada, with primary operations in Edmonton, Alberta.",
-              },
-              {
-                question: "How much does TradeLine 24/7 cost?",
-                answer:
-                  "TradeLine 24/7 offers flexible pricing: $149 CAD per qualified appointment (pay-per-use) or $249 CAD per month for the Predictable Plan.",
-              },
-            ]}
-          />
+  // Memoize styles to prevent recreation on every render (idempotent)
+  const wallpaperStyle = useMemo(
+    () => createWallpaperStyle(BACKGROUND_IMAGE_URL),
+    []
+  );
 
-          <div className="flex-1" style={{ minHeight: "60vh" }}>
+  const landingWallpaperVars = useMemo(
+    () => createLandingWallpaperVars(BACKGROUND_IMAGE_URL),
+    []
+  );
+
+  return (
+    <main
+      id="app-home"
+      className="landing-shell min-h-screen flex flex-col relative"
+      style={{ ...landingWallpaperVars, backgroundColor: LANDING_BACKGROUND_COLOR }}
+    >
+      {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
+          Do not change or remove these elements or their CSS without design + cofounder sign-off. */}
+      <div className="landing-wallpaper" aria-hidden="true" style={wallpaperStyle} />
+      <div className="landing-mask" aria-hidden="true" />
+
+      <div className="landing-content relative z-10 flex-1 flex flex-col" style={{ minHeight: "100vh" }}>
+        <AISEOHead
+          title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
+          description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
+          canonical="/"
+          contentType="service"
+          directAnswer="TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads, and sends clean transcripts via email to Canadian businesses. Never miss a call. Work while you sleep."
+          primaryEntity={{
+            name: "TradeLine 24/7 AI Receptionist Service",
+            type: "Service",
+            description: "24/7 AI-powered phone answering service for Canadian businesses",
+          }}
+          keyFacts={[
+            { label: "Availability", value: "24/7" },
+            { label: "Response Time", value: "<2 seconds" },
+            { label: "Uptime", value: "99.9%" },
+            { label: "Service Area", value: "Canada" },
+          ]}
+          faqs={[
+            {
+              question: "What is TradeLine 24/7?",
+              answer:
+                "TradeLine 24/7 is an AI-powered receptionist service that answers phone calls 24/7, qualifies leads based on your criteria, and sends clean email transcripts. It never misses a call and works while you sleep.",
+            },
+            {
+              question: "How does TradeLine 24/7 work?",
+              answer:
+                "When a call comes in, our AI answers immediately, has a natural conversation with the caller, qualifies them based on your criteria, and sends you a clean email transcript with all the details.",
+            },
+            {
+              question: "What areas does TradeLine 24/7 serve?",
+              answer:
+                "TradeLine 24/7 serves businesses across Canada, with primary operations in Edmonton, Alberta.",
+            },
+            {
+              question: "How much does TradeLine 24/7 cost?",
+              answer:
+                "TradeLine 24/7 offers flexible pricing: $149 CAD per qualified appointment (pay-per-use) or $249 CAD per month for the Predictable Plan.",
+            },
+          ]}
+        />
+
+        <div className="flex-1" style={{ minHeight: "60vh" }}>
+          <div className="hero-background">
             <HeroRoiDuo />
-            <BenefitsGrid />
-            <ImpactStrip />
-            <HowItWorks />
-            <div className="container mx-auto px-4 py-12">
-              <div className="mx-auto max-w-4xl space-y-6 text-center">
-                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                  Quick actions for operators
-                </h2>
-                <p className="text-muted-foreground">
-                  Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-                </p>
-                <QuickActionsCard />
-              </div>
-            </div>
           </div>
 
-          <TrustBadgesSlim />
-          <LeadCaptureForm />
-          <Footer />
+          <BenefitsGrid />
+          <ImpactStrip />
+          <HowItWorks />
 
-          <NoAIHypeFooter />
+          <div className="container mx-auto px-4 py-12">
+            <div className="mx-auto max-w-4xl space-y-6 text-center">
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                Quick actions for operators
+              </h2>
+              <p className="text-muted-foreground">
+                Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+              </p>
+              <QuickActionsCard />
+            </div>
+          </div>
         </div>
+
+        <TrustBadgesSlim />
+        <LeadCaptureForm />
+        <Footer />
+        <NoAIHypeFooter />
       </div>
-    </>
+    </main>
   );
 };
 

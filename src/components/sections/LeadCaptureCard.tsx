@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, Sparkles, Clock, DollarSign } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client.ts";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSecureABTest } from "@/hooks/useSecureABTest";
 import { useSecureFormSubmission } from "@/hooks/useSecureFormSubmission";
@@ -19,7 +16,7 @@ const leadFormSchema = z.object({
     .trim()
     .min(1, "Name is required")
     .max(100, "Name must be less than 100 characters")
-    .regex(/^[a-zA-Z\s\-'\.]+$/, "Name contains invalid characters"),
+    .regex(/^[a-zA-Z\s\-'.]+$/, "Name contains invalid characters"),
   email: z.string()
     .trim()
     .email("Invalid email address")

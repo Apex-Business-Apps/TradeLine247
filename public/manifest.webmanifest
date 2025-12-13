@@ -1,10 +1,12 @@
 {
   "name": "TradeLine 24/7",
   "short_name": "TL247",
+  "description": "Your 24/7 AI Receptionist - Never miss a call. Work while you sleep. Professional call handling, forwarding, and management.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#141414",
+  "theme_color": "#ff6b35",
   "icons": [
     {
       "src": "/assets/brand/App_Icons/icon-192.png",

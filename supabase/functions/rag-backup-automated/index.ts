@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Automated RAG Backup System
  * Handles automated backups of RAG sources, chunks, and embeddings

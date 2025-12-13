@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Test Utilities and Helpers
- * 
+ *
  * Centralized test utilities for consistent testing across the codebase.
  */
 

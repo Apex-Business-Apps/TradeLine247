@@ -14,8 +14,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 
-let errors = [];
-let warnings = [];
+const errors = [];
+const warnings = [];
 
 function checkFile(filePath, description, required = true) {
   const fullPath = path.join(ROOT_DIR, filePath);

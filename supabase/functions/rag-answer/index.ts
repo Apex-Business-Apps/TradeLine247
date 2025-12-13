@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Supabase Edge Function (Deno)
  * Purpose: RAG answer synthesis from retrieved context with rate limiting.

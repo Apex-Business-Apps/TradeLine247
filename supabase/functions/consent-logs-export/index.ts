@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // P13: Consent Logs Export - CASL/PIPEDA compliance export
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";

@@ -1,3 +1,4 @@
+ 
 // Authenticated update of org voice settings. Non-critical audit logging.
 // Requires standard JWT auth via supabase-js when invoked from the app (token forwarded automatically).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'

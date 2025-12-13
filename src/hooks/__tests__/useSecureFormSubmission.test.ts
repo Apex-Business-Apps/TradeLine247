@@ -1,10 +1,14 @@
+ 
 /**
  * useSecureFormSubmission Hook Tests
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
-import { useSecureFormSubmission } from '../useSecureFormSubmission';
+import {
+  RATE_LIMIT_ERROR_MESSAGE,
+  useSecureFormSubmission,
+} from '../useSecureFormSubmission';
 
 vi.mock('@/lib/errorReporter', () => ({
   errorReporter: {
@@ -159,6 +163,109 @@ describe('useSecureFormSubmission', () => {
       });
     });
 
+    it('should use server-provided limit when calculating attempts and remaining', async () => {
+      mockRpc.mockResolvedValue({
+        data: { allowed: true, remaining: 1, limit: 3 },
+        error: null,
+      });
+
+      const { result } = renderHook(() =>
+        useSecureFormSubmission({
+          rateLimitKey: 'test-key',
+          maxAttemptsPerHour: 10,
+        })
+      );
+
+      await act(async () => {
+        await result.current.checkRateLimit();
+      });
+
+      await waitFor(() => {
+        expect(result.current.attempts).toBe(2);
+        expect(result.current.getRemainingAttempts()).toBe(1);
+      });
+    });
+
+    it('should preserve the server limit when a subsequent rate limit check errors', async () => {
+      mockRpc
+        .mockResolvedValueOnce({
+          data: { allowed: true, remaining: 9, limit: 10 },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          data: null,
+          error: { message: 'Database error' },
+        });
+
+      const { result } = renderHook(() =>
+        useSecureFormSubmission({
+          rateLimitKey: 'test-key',
+          maxAttemptsPerHour: 5,
+        })
+      );
+
+      await act(async () => {
+        await result.current.checkRateLimit();
+      });
+
+      await waitFor(() => {
+        expect(result.current.attempts).toBe(1);
+      });
+
+      const allowed = await result.current.checkRateLimit();
+
+      expect(allowed).toBe(false);
+
+      await waitFor(() => {
+        expect(result.current.attempts).toBe(10);
+        expect(result.current.getRemainingAttempts()).toBe(0);
+      });
+    });
+
+    it('should reuse the last server-provided limit on subsequent checks', async () => {
+      mockRpc
+        .mockResolvedValueOnce({
+          data: { allowed: true, remaining: 8, limit: 10 },
+          error: null,
+        })
+        .mockResolvedValueOnce({
+          data: { allowed: true, remaining: 7, limit: 10 },
+          error: null,
+        });
+
+      const { result } = renderHook(() =>
+        useSecureFormSubmission({
+          rateLimitKey: 'test-key',
+          maxAttemptsPerHour: 5,
+        })
+      );
+
+      await act(async () => {
+        await result.current.checkRateLimit();
+      });
+
+      await waitFor(() => {
+        expect(result.current.attempts).toBe(2);
+        expect(result.current.getRemainingAttempts()).toBe(8);
+      });
+
+      await act(async () => {
+        await result.current.checkRateLimit();
+      });
+
+      expect(mockRpc).toHaveBeenNthCalledWith(1, 'secure_rate_limit', {
+        identifier: 'test-key',
+        max_requests: 5,
+        window_seconds: 3600,
+      });
+
+      expect(mockRpc).toHaveBeenNthCalledWith(2, 'secure_rate_limit', {
+        identifier: 'test-key',
+        max_requests: 10,
+        window_seconds: 3600,
+      });
+    });
+
     it('should deny when rate limit exceeded', async () => {
       mockRpc.mockResolvedValue({
         data: { allowed: false, remaining: 0, limit: 5 },
@@ -174,8 +281,13 @@ describe('useSecureFormSubmission', () => {
       await act(async () => {
         allowed = await result.current.checkRateLimit();
       });
-      
+
       expect(allowed).toBe(false);
+
+      await waitFor(() => {
+        expect(result.current.attempts).toBe(5);
+        expect(result.current.getRemainingAttempts()).toBe(0);
+      });
     });
 
     it('should deny on rate limit check error (fail closed)', async () => {
@@ -187,10 +299,14 @@ describe('useSecureFormSubmission', () => {
       const { result } = renderHook(() => useSecureFormSubmission({
         rateLimitKey: 'test-key',
       }));
-      
+
       const allowed = await result.current.checkRateLimit();
-      
+
       expect(allowed).toBe(false);
+
+      await waitFor(() => {
+        expect(result.current.attempts).toBe(5);
+      });
     });
 
     it('should deny on rate limit check exception (fail closed)', async () => {
@@ -205,8 +321,12 @@ describe('useSecureFormSubmission', () => {
       await act(async () => {
         allowed = await result.current.checkRateLimit();
       });
-      
+
       expect(allowed).toBe(false);
+
+      await waitFor(() => {
+        expect(result.current.attempts).toBe(5);
+      });
     });
   });
 
@@ -361,9 +481,11 @@ describe('useSecureFormSubmission', () => {
       await act(async () => {
         await expect(
           result.current.secureSubmit('test-endpoint', {})
-        ).rejects.toThrow('Rate limit exceeded');
+        ).rejects.toThrow(RATE_LIMIT_ERROR_MESSAGE);
       });
 
+      expect(result.current.attempts).toBe(5);
+      expect(result.current.getRemainingAttempts()).toBe(0);
       expect(mockInvoke).not.toHaveBeenCalled();
     });
 

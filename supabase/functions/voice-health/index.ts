@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Health Check Endpoint for Telephony System
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 

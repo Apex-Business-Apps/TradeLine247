@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Clock, DollarSign } from 'lucide-react';
+import { TrendingUp, DollarSign } from 'lucide-react';
 const RoiCalculator = () => {
   // Input states with sane defaults
   const [calls, setCalls] = useState(120);

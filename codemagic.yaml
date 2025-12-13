@@ -2,19 +2,34 @@ workflows:
 
   ios-capacitor-testflight:
 
-    name: iOS • Capacitor -> TestFlight
+    name: TradeLine 24/7 iOS TestFlight
+
+    max_build_duration: 60
 
     instance_type: mac_mini_m2
 
-    max_build_duration: 75
-
     environment:
-
       groups:
-
         - ios_config
-
         - appstore_credentials
+      vars:
+
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
+
+        XCODE_SCHEME: App
+
+        BUNDLE_ID: com.apex.tradeline
+
+        APP_VERSION: "1.1.0"
+
+        PROJECT_BUILD_NUMBER: $CM_BUILD_NUMBER
+
+      xcode: 16.4
+
+      node: 20.11.1
+      npm: 10
+
+      cocoapods: default
 
       ios_signing:
 
@@ -22,308 +37,214 @@ workflows:
 
         bundle_identifier: com.apex.tradeline
 
-      vars:
-
-        XCODE_SCHEME: App
-
-        XCODE_WORKSPACE: App/App.xcworkspace
-
-        BUNDLE_ID: com.apex.tradeline
-
-        TEAM_ID: NWGUYF42KW
-
-      node: 20.11.1
-
-      npm: 10
-
-      xcode: latest
-
-      cocoapods: default
-
     cache:
-
       cache_paths:
-
         - ~/.npm
-
         - ~/.cocoapods
-
         - ios/Pods
-
+    
     scripts:
 
-      - name: Install dependencies
+      - name: Install Node dependencies
 
-        script: npm ci
+        script: |
 
+          set -eo pipefail
 
+          npm ci
 
       - name: Quality gates
 
-        script: npm run lint && npm run typecheck && npm run test:unit
+        script: |
 
+          set -eo pipefail
 
+          npm run lint && npm run typecheck && npm run test:unit
+
+      - name: Verify visual assets
+
+        script: |
+
+          set -eo pipefail
+
+          STRICT_ICONS=true npm run verify:icons
+
+          node scripts/validate-hero-source.mjs
 
       - name: Playwright smoke
-
         script: |
+
+          set -eo pipefail
 
           npx playwright install --with-deps chromium
-
           npm run test:e2e:smoke
 
-
-
-      - name: Build archive & IPA
-
-        script: bash scripts/build-ios.sh
-
-
-
-      - name: 🚀 Upload to TestFlight
+      - name: Build web assets
 
         script: |
 
-          set -euo pipefail
+          set -eo pipefail
 
+          npm run build
 
+      - name: Sync Capacitor
 
-          echo "════════════════════════════════════════════════════"
+        script: |
+          set -eo pipefail
+          npx cap sync ios
 
-          echo "📤 TESTFLIGHT UPLOAD"
+      - name: Install CocoaPods
+        script: |
 
-          echo "════════════════════════════════════════════════════"
+          set -eo pipefail
 
+          cd ios/App && pod install --repo-update
 
+      - name: Set iOS version numbers
+        script: |
 
-          # Setup
+          set -eo pipefail
 
-          KEY_FILE="/tmp/AuthKey.p8"
+          export PROJECT_BUILD_NUMBER="${CM_BUILD_NUMBER:-1}"
+          bash scripts/set-ios-version-from-codemagic.sh
 
-          MAX_RETRIES=3
+      - name: Configure code signing
 
+        script: |
+          set -eo pipefail
 
+          xcode-project use-profiles --custom-export-options '{"testFlightInternalTestingOnly": true}'
 
-          cleanup() { rm -f "$KEY_FILE"; }
+      - name: Build archive and IPA
 
-          trap cleanup EXIT
+        script: |
 
+          set -eo pipefail
 
+          xcode-project build-ipa \
 
-          # Validate
+            --workspace "$XCODE_WORKSPACE" \
 
-          for VAR in APP_STORE_CONNECT_KEY_IDENTIFIER APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_PRIVATE_KEY; do
+            --scheme "$XCODE_SCHEME" \
 
-            [ -z "${!VAR}" ] && echo "❌ $VAR not set" && exit 1
+            --config Release \
 
-          done
-
-
-
-          # Create key
-
-          echo "$APP_STORE_CONNECT_PRIVATE_KEY" | base64 --decode > "$KEY_FILE"
-
-          chmod 600 "$KEY_FILE"
-
-          grep -q "BEGIN PRIVATE KEY" "$KEY_FILE" || { echo "❌ Invalid key"; exit 1; }
-
-
-
-          # Find IPA
-
-          IPA_PATH=$(cat /Users/builder/clone/ipa_path.txt 2>/dev/null || find /Users/builder/clone/ios/build/export -name "*.ipa" | head -1)
-
-          [ ! -f "$IPA_PATH" ] && echo "❌ No IPA found" && exit 1
-
-
-
-          echo "✅ IPA: $IPA_PATH ($(du -h "$IPA_PATH" | cut -f1))"
-
-
-
-          # Upload with retry
-
-          for attempt in $(seq 1 $MAX_RETRIES); do
-
-            echo ""
-
-            echo "📤 Attempt $attempt/$MAX_RETRIES..."
-
-
-
-            if xcrun altool --upload-app --type ios --file "$IPA_PATH" \
-
-              --apiKey "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-
-              --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
-
-              --verbose; then
-
-              echo ""
-
-              echo "🎉 UPLOAD SUCCESSFUL"
-
-              exit 0
-
-            fi
-
-
-
-            [ $attempt -lt $MAX_RETRIES ] && echo "⏳ Retry in 30s..." && sleep 30
-
-          done
-
-
-
-          echo "❌ Upload failed"
-
-          exit 1
-
-
-
-      - name: Verify artifacts
-
-        script: bash scripts/verify-codemagic.sh
+            --archive-flags="-destination 'generic/platform=iOS'"
 
 
 
     artifacts:
 
-      - ios/build/export/*.ipa
+      - build/ios/ipa/*.ipa
 
-      - ios/build/TradeLine247.xcarchive
+      - /tmp/xcodebuild_logs/*.log
+
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
 
       - playwright-report/**/*
-
       - dist/**/*
 
-      - build-artifacts-sha256.txt
 
+    publishing:
+      app_store_connect:
+
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+
+        submit_to_testflight: true
+
+        beta_groups:
+
+          - Internal Testers
+
+        release_notes: "Internal build ${APP_VERSION} (${CM_BUILD_NUMBER})"
 
 
     triggering:
-
       events:
-
         - push
-
       branch_patterns:
 
-        - pattern: 'main'
+        - pattern: main
 
+          include: true
 
+          source: true
 
+  # ────────────────────────────────────────────────────────────────────────────
+  # ANDROID BUILD
+  # ────────────────────────────────────────────────────────────────────────────
   android-capacitor-release:
-
     name: Android • Capacitor bundleRelease
-
     instance_type: linux_x2
-
     max_build_duration: 60
-
     environment:
-
       groups:
-
         - android_signing
-
+      vars:
+        APP_VERSION: "1.1.0"
       node: 20.11.1
-
       npm: 10
-
       java: 17
-
     cache:
-
       cache_paths:
-
         - ~/.npm
-
         - ~/.gradle
-
     scripts:
-
       - name: Install dependencies
-
         script: npm ci
-
       - name: Quality gates
-
         script: npm run lint && npm run typecheck && npm run test:unit
-
-      - name: Playwright smoke
-
+      - name: Verify visual assets
         script: |
-
+          set -eo pipefail
+          STRICT_ICONS=true npm run verify:icons
+          node scripts/validate-hero-source.mjs
+      - name: Playwright smoke
+        script: |
           npx playwright install --with-deps chromium
-
           npm run test:e2e:smoke
-
+      - name: Set Android version numbers
+        script: |
+          set -eo pipefail
+          bash scripts/set-android-version.sh
       - name: Build Android App Bundle
-
         script: bash scripts/build-android.sh
-
       - name: Verify artifacts
-
         script: bash scripts/verify-codemagic.sh
-
     artifacts:
-
       - android/app/build/outputs/**/*.aab
-
       - playwright-report/**/*
-
       - dist/**/*
-
       - build-artifacts-sha256.txt
 
-
-
+  # ────────────────────────────────────────────────────────────────────────────
+  # WEB TESTS
+  # ────────────────────────────────────────────────────────────────────────────
   web-tests-only:
-
     name: Web Tests & Smoke
-
     instance_type: linux
-
     max_build_duration: 45
-
     environment:
-
       node: 20.11.1
-
       npm: 10
-
     cache:
-
       cache_paths:
-
         - ~/.npm
-
     scripts:
-
       - name: Install dependencies
-
         script: npm ci
-
       - name: Lint, typecheck, unit tests
-
         script: npm run lint && npm run typecheck && npm run test:unit
-
       - name: Build web bundle
-
         script: npm run build:web
-
       - name: Install Playwright browsers
-
         script: npm run test:install-browsers
-
       - name: Run full Playwright test suite
-
         script: npx playwright test --reporter=html
-
     artifacts:
-
       - playwright-report/**/*
-
       - dist/**/*

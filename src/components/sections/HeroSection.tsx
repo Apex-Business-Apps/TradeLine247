@@ -13,7 +13,7 @@ export const HeroSection = () => {
     }}>
       <div
         data-testid="hero-bg"
-        className="hero-bg"
+        className="hero-bg bg-scroll md:bg-fixed bg-center md:bg-center bg-cover"
         aria-hidden="true"
         style={{ backgroundImage: `url(${backgroundImage})` }}
       />

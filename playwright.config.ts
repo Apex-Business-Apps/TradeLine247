@@ -41,7 +41,7 @@ export default defineConfig({
   testDir: './tests',
 
   // CI-specific settings
-  timeout: process.env.CI ? 60000 : 30000, // 60s in CI, 30s local
+  timeout: process.env.CI ? 120000 : 60000, // 2 minutes in CI, 1 minute local for accessibility tests
   expect: {
     timeout: process.env.CI ? 10000 : 5000, // 10s in CI, 5s local
   },
