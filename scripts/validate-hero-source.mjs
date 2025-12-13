@@ -23,6 +23,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const HERO_FILE_PATH = path.join(__dirname, '..', 'src', 'sections', 'HeroRoiDuo.tsx');
+const INDEX_FILE_PATH = path.join(__dirname, '..', 'src', 'pages', 'Index.tsx');
+const LANDING_CSS_PATH = path.join(__dirname, '..', 'src', 'styles', 'landing.css');
 
 const REQUIRED_IMPORTS = [
   'import React from "react"',
@@ -171,35 +173,132 @@ function validateHeroSource() {
     errors.push('Missing closing function brace');
   }
 
+  return { errors, warnings };
+}
+
+function validateLandingWallpaper() {
+  console.log('🔍 Validating landing wallpaper implementation...\n');
+
+  const errors = [];
+  const warnings = [];
+
+  // Check Index.tsx
+  if (!fs.existsSync(INDEX_FILE_PATH)) {
+    errors.push(`Index.tsx not found at ${INDEX_FILE_PATH}`);
+    return { errors, warnings };
+  }
+
+  const indexContent = fs.readFileSync(INDEX_FILE_PATH, 'utf-8');
+
+  // 1. Check .landing-wallpaper element exists
+  if (!indexContent.includes('landing-wallpaper')) {
+    errors.push('Missing .landing-wallpaper element in Index.tsx');
+  } else {
+    console.log('✅ .landing-wallpaper element found');
+  }
+
+  // 2. Check backgroundImage is set (not hardcoded "none")
+  if (!indexContent.includes('backgroundImage') || indexContent.includes('backgroundImage: "none"')) {
+    errors.push('Missing or invalid backgroundImage in wallpaper style');
+  } else {
+    console.log('✅ backgroundImage is set');
+  }
+
+  // 3. CRITICAL: Check backgroundPosition is NOT hardcoded in inline style (CSS handles responsive focal points)
+  // Mobile must be 20%, tablet 15%, desktop center - handled by CSS media queries
+  if (indexContent.includes('backgroundPosition:') && indexContent.includes('"center"')) {
+    // Check if it's in createWallpaperStyle - if so, it should be commented out
+    const styleFunctionMatch = indexContent.match(/createWallpaperStyle[\s\S]*?backgroundPosition[^}]*}/);
+    if (styleFunctionMatch && !styleFunctionMatch[0].includes('removed') && !styleFunctionMatch[0].includes('CSS handles')) {
+      errors.push('CRITICAL: backgroundPosition is hardcoded in inline style. CSS media queries must handle responsive focal points (20% mobile, 15% tablet, center desktop).');
+    } else {
+      console.log('✅ backgroundPosition correctly delegated to CSS (responsive focal points)');
+    }
+  } else {
+    console.log('✅ backgroundPosition not hardcoded (CSS handles it)');
+  }
+
+  // 4. Check CSS variable is set
+  if (!indexContent.includes('--landing-wallpaper')) {
+    warnings.push('--landing-wallpaper CSS variable not found in Index.tsx');
+  } else {
+    console.log('✅ --landing-wallpaper CSS variable is set');
+  }
+
+  // 5. Check landing.css has responsive media queries
+  if (fs.existsSync(LANDING_CSS_PATH)) {
+    const landingCss = fs.readFileSync(LANDING_CSS_PATH, 'utf-8');
+    
+    if (!landingCss.includes('@media (max-width: 768px)') || !landingCss.includes('20%')) {
+      errors.push('Missing mobile media query with 20% focal point in landing.css');
+    } else {
+      console.log('✅ Mobile media query (20% focal point) found');
+    }
+
+    if (!landingCss.includes('@media (max-width: 1024px)') || !landingCss.includes('15%')) {
+      errors.push('Missing tablet media query with 15% focal point in landing.css');
+    } else {
+      console.log('✅ Tablet media query (15% focal point) found');
+    }
+
+    if (!landingCss.includes('center') && !landingCss.includes('background-position: center')) {
+      warnings.push('Desktop background-position (center) not explicitly found in landing.css');
+    } else {
+      console.log('✅ Desktop background-position (center) found');
+    }
+  } else {
+    errors.push(`landing.css not found at ${LANDING_CSS_PATH}`);
+  }
+
+  // 6. Check DO NOT CHANGE comment exists
+  if (!indexContent.includes('DO NOT CHANGE') && !indexContent.includes('Do not change')) {
+    warnings.push('Missing "DO NOT CHANGE" comment near wallpaper implementation');
+  } else {
+    console.log('✅ Wallpaper protection comment found');
+  }
+
+  console.log();
+  return { errors, warnings };
+}
+
+// Main validation
+function runAllValidations() {
+  const heroResults = validateHeroSource();
+  const wallpaperResults = validateLandingWallpaper();
+
+  const allErrors = [...heroResults.errors, ...wallpaperResults.errors];
+  const allWarnings = [...heroResults.warnings, ...wallpaperResults.warnings];
+
   // Results
   console.log('═══════════════════════════════════════\n');
 
-  if (errors.length > 0) {
+  if (allErrors.length > 0) {
     console.log('❌ ❌ ❌ VALIDATION FAILED ❌ ❌ ❌\n');
     console.log('ERRORS:');
-    errors.forEach(e => console.log(`  ❌ ${e}`));
+    allErrors.forEach(e => console.log(`  ❌ ${e}`));
     console.log();
     console.log('🚨 DO NOT DEPLOY - Hero component has critical issues!');
     console.log('📋 Review: docs/HERO_BACKGROUND_TESTING_CHECKLIST.md\n');
     process.exit(1);
   }
 
-  if (warnings.length > 0) {
+  if (allWarnings.length > 0) {
     console.log('⚠️  WARNINGS:');
-    warnings.forEach(w => console.log(`  ⚠️  ${w}`));
+    allWarnings.forEach(w => console.log(`  ⚠️  ${w}`));
     console.log();
     console.log('✅ Validation passed with warnings (non-blocking)\n');
     process.exit(0);
   }
 
   console.log('✅ ✅ ✅ ALL VALIDATIONS PASSED ✅ ✅ ✅\n');
-  console.log('HeroRoiDuo.tsx is properly structured with:');
-  console.log('  • Complete file (no truncation)');
+  console.log('Hero components are properly structured with:');
+  console.log('  • Complete files (no truncation)');
   console.log('  • Background image implementation');
   console.log('  • Required visual elements (gradient overlay, vignette)');
+  console.log('  • Landing wallpaper with responsive focal points (CSS media queries)');
   console.log('  • All structural elements intact\n');
   process.exit(0);
 }
 
-// Run validation
-validateHeroSource();
+// Run all validations
+runAllValidations();

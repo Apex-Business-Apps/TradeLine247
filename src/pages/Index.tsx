@@ -18,9 +18,11 @@ import { errorReporter } from "@/lib/errorReporter";
 const BACKGROUND_IMAGE_URL = backgroundImage;
 const LANDING_BACKGROUND_COLOR = "hsl(0, 0%, 97%)";
 
+// DO NOT CHANGE: Hero wallpaper background-image and responsive focal points are critical for visual identity.
+// CSS handles responsive background-position (20% mobile, 15% tablet, center desktop) via media queries.
 const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
   backgroundImage: `url(${imageUrl})`,
-  backgroundPosition: "center",
+  // backgroundPosition removed - CSS media queries handle responsive focal points (20% mobile, 15% tablet, center desktop)
   backgroundRepeat: "no-repeat",
   backgroundSize: "cover",
 });
@@ -66,10 +68,15 @@ const Index = () => {
   );
 
   return (
-    <main
+    <div
       id="app-home"
       className="landing-shell min-h-screen flex flex-col relative"
-      style={{ ...landingWallpaperVars, backgroundColor: LANDING_BACKGROUND_COLOR }}
+      style={{ 
+        ...landingWallpaperVars, 
+        backgroundColor: LANDING_BACKGROUND_COLOR,
+        // Ensure CSS variable resolves for test compatibility
+        backgroundImage: `var(--landing-wallpaper, ${BACKGROUND_IMAGE_URL})`,
+      }}
     >
       {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
           Do not change or remove these elements or their CSS without design + cofounder sign-off. */}
@@ -145,7 +152,7 @@ const Index = () => {
         <Footer />
         <NoAIHypeFooter />
       </div>
-    </main>
+    </div>
   );
 };
 
