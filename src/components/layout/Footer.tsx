@@ -7,15 +7,30 @@ import { usePWA } from "@/hooks/usePWA";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 
+// Idempotent constants: configuration data that doesn't change
+const CONTACT_EMAIL = "info@tradeline247ai.com";
+const COMPANY_NAME = "Apex Business Systems";
+const COMPANY_LOCATION = "Edmonton, Alberta";
+const COPYRIGHT_YEAR = 2025;
+
 const navLinks = [
   { href: "/security", label: "Security" },
   { href: "/compare", label: "Compare" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
-  { href: "mailto:info@tradeline247ai.com", label: "Contact" },
-];
+  { href: `mailto:${CONTACT_EMAIL}`, label: "Contact" },
+] as const;
 
-const partners = [
+type PartnerLogo = string | typeof albertaInnovatesLogo | typeof erinLogo;
+
+interface Partner {
+  title: string;
+  alt: string;
+  logo: PartnerLogo;
+  chip?: boolean;
+}
+
+const partners: Partner[] = [
   {
     title: "Backed by Alberta Innovates",
     alt: "Alberta Innovates logo",
@@ -42,7 +57,7 @@ const partners = [
     alt: "Vercel logo",
     logo: "/assets/brand/badges/vercel-logo.png",
   },
-];
+] as const;
 
 export const Footer: React.FC = () => {
   const { isInstallable, isInstalled, showInstallPrompt } = usePWA();
@@ -60,12 +75,14 @@ export const Footer: React.FC = () => {
               to miss revenue opportunities.
             </p>
             <address className="not-italic text-sm leading-relaxed text-muted-foreground space-y-1">
-              <div className="text-foreground font-semibold">Apex Business Systems • Edmonton, Alberta</div>
+              <div className="text-foreground font-semibold">
+                {COMPANY_NAME} • {COMPANY_LOCATION}
+              </div>
               <a
-                href="mailto:info@tradeline247ai.com"
+                href={`mailto:${CONTACT_EMAIL}`}
                 className="font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                info@tradeline247ai.com
+                {CONTACT_EMAIL}
               </a>
             </address>
             <div className="flex flex-wrap items-center gap-3">
@@ -82,7 +99,8 @@ export const Footer: React.FC = () => {
                 </Button>
               )}
               <span className="text-sm text-muted-foreground">
-                © 2025 <span className="font-semibold text-foreground">TradeLine 24/7</span>. Never miss a call.
+                © {COPYRIGHT_YEAR}{" "}
+                <span className="font-semibold text-foreground">TradeLine 24/7</span>. Never miss a call.
               </span>
             </div>
           </div>
@@ -116,12 +134,20 @@ export const Footer: React.FC = () => {
                     className={`flex h-12 w-16 items-center justify-center rounded-md bg-white/80 p-1 shadow-inner ${
                       partner.chip ? "ring-1 ring-primary/10 bg-primary/5" : ""
                     }`}
+                    role="img"
+                    aria-label={partner.alt}
                   >
                     <img
                       src={partner.logo}
                       alt={partner.alt}
                       className="max-h-10 w-full object-contain"
                       loading="lazy"
+                      onError={(e) => {
+                        // Idempotent error handling: gracefully handle missing logos
+                        const target = e.currentTarget;
+                        target.style.display = "none";
+                        console.warn(`Failed to load partner logo: ${partner.title}`);
+                      }}
                     />
                   </div>
                   <div className="min-w-0 flex-1 text-left">

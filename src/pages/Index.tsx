@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect } from "react";
+import { CSSProperties, useEffect, useMemo } from "react";
 
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
@@ -14,6 +14,22 @@ import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
 
+// Idempotent constants: computed once, reused across renders
+const BACKGROUND_IMAGE_URL = backgroundImage;
+const LANDING_BACKGROUND_COLOR = "hsl(0, 0%, 97%)";
+
+const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
+  backgroundImage: `url(${imageUrl})`,
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "cover",
+});
+
+const createLandingWallpaperVars = (imageUrl: string): CSSProperties => ({
+  "--landing-wallpaper": `url(${imageUrl})`,
+  "--hero-wallpaper-image": `url(${imageUrl})`,
+} as CSSProperties);
+
 const Index = () => {
   const { trackPageView } = useAnalytics();
 
@@ -24,7 +40,7 @@ const Index = () => {
   // Preload background image for faster rendering
   useEffect(() => {
     const img = new Image();
-    img.src = backgroundImage;
+    img.src = BACKGROUND_IMAGE_URL;
     img.onerror = () => {
       errorReporter.report({
         type: "error",
@@ -33,28 +49,27 @@ const Index = () => {
         url: window.location.href,
         userAgent: navigator.userAgent,
         environment: errorReporter["getEnvironment"](),
-        metadata: { imageSrc: backgroundImage },
+        metadata: { imageSrc: BACKGROUND_IMAGE_URL },
       });
     };
   }, []);
 
-  const wallpaperStyle: CSSProperties = {
-    backgroundImage: `url(${backgroundImage})`,
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "cover",
-  };
+  // Memoize styles to prevent recreation on every render (idempotent)
+  const wallpaperStyle = useMemo(
+    () => createWallpaperStyle(BACKGROUND_IMAGE_URL),
+    []
+  );
 
-  const landingWallpaperVars = {
-    "--landing-wallpaper": `url(${backgroundImage})`,
-    "--hero-wallpaper-image": `url(${backgroundImage})`,
-  } as CSSProperties;
+  const landingWallpaperVars = useMemo(
+    () => createLandingWallpaperVars(BACKGROUND_IMAGE_URL),
+    []
+  );
 
   return (
     <main
       id="app-home"
       className="landing-shell min-h-screen flex flex-col relative"
-      style={{ ...landingWallpaperVars, backgroundColor: "hsl(0, 0%, 97%)" }}
+      style={{ ...landingWallpaperVars, backgroundColor: LANDING_BACKGROUND_COLOR }}
     >
       {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
           Do not change or remove these elements or their CSS without design + cofounder sign-off. */}

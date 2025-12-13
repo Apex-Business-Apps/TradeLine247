@@ -9,12 +9,42 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git diff
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
+
       - name: Ensure lockfile matches package.json
+        id: lockfile-check
         run: |
+          set -euo pipefail
+          
+          # Store original lockfile state
+          if [ -f package-lock.json ]; then
+            cp package-lock.json package-lock.json.original
+          fi
+          
+          # Regenerate lockfile from package.json (idempotent operation)
           npm install --package-lock-only --ignore-scripts --no-audit --fund=false
-          git diff --exit-code package-lock.json
+          
+          # Check if lockfile changed (idempotent: should be no diff if already in sync)
+          if [ -f package-lock.json.original ]; then
+            if ! git diff --no-index --exit-code package-lock.json.original package-lock.json > /dev/null 2>&1; then
+              echo "❌ package-lock.json is out of sync with package.json"
+              echo "Run 'npm install --package-lock-only' and commit the updated lockfile"
+              git diff package-lock.json.original package-lock.json || true
+              exit 1
+            else
+              echo "✅ package-lock.json is in sync with package.json"
+            fi
+            rm -f package-lock.json.original
+          else
+            # First-time lockfile generation
+            echo "✅ Generated initial package-lock.json"
+          fi
