@@ -1430,7 +1430,8 @@ button[class*="btn-aa"] {
   border-radius: 9999px;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #FF6B35;
+  /* WCAG AA compliant: brand-orange-dark (7.14:1 contrast on white) */
+  color: hsl(var(--brand-orange-dark));
   box-shadow: 
     0 2px 8px rgba(0,0,0,0.15),
     0 4px 16px rgba(0,0,0,0.1);
