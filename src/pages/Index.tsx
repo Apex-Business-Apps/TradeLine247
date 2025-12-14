@@ -57,7 +57,7 @@ export default function Index() {
   );
 
   return (
-    <main
+    <div
       id="app-home"
       className="landing-shell min-h-screen flex flex-col relative"
       style={{ backgroundColor: LANDING_BACKGROUND_COLOR }}
@@ -144,6 +144,6 @@ export default function Index() {
         <Footer />
         <NoAIHypeFooter />
       </div>
-    </main>
+    </div>
   );
 }
