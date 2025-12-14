@@ -30,6 +30,7 @@ const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
 const createLandingWallpaperVars = (imageUrl: string): CSSProperties => ({
   "--landing-wallpaper": `url(${imageUrl})`,
   "--hero-wallpaper-image": `url(${imageUrl})`,
+  backgroundImage: `url(${imageUrl})`,
 } as CSSProperties);
 
 const Index = () => {
@@ -74,7 +75,6 @@ const Index = () => {
       style={{
         ...landingWallpaperVars,
         backgroundColor: LANDING_BACKGROUND_COLOR,
-        backgroundImage: `url(${BACKGROUND_IMAGE_URL}) !important`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
       }}
