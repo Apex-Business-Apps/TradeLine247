@@ -21,6 +21,7 @@ const LANDING_BACKGROUND_COLOR = "hsl(0, 0%, 97%)";
 // NOTE: sizing/position are handled by CSS on .landing-wallpaper to remain stable + non-cropping.
 const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
   backgroundImage: `url(${imageUrl})`,
+  backgroundAttachment: "fixed",
 });
 
 export default function Index() {
