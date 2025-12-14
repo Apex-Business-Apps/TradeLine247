@@ -1810,7 +1810,7 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 #app-home {
   position: relative;
   isolation: isolate;
-  background: transparent;
+  /* background: transparent; - Removed to allow inline background-image for testing */
 }
 
 @supports (-webkit-touch-callout: none) {
