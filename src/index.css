@@ -35,9 +35,8 @@ html {
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center 20%;
-  background-attachment: fixed;
+  background-attachment: fixed !important;
   opacity: 1;
-  transform: translateZ(0);
 }
 
 .landing-mask {

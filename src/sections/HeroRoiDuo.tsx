@@ -35,11 +35,11 @@ export default function HeroRoiDuo() {
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
-      {/* Hero gradient overlay - single-color brand orange at 60% opacity to meet GOODBUILD hero mask spec */}
+      {/* Hero gradient overlay - white veil under 40% opacity to keep hero readable */}
       <div
         className="absolute inset-0 -z-10"
         style={{
-          backgroundColor: "hsl(var(--brand-orange-primary) / 0.6)",
+          backgroundColor: "rgba(255, 255, 255, 0.35)",
         }}
         aria-hidden="true"
       />
