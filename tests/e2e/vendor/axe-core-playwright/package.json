@@ -1,9 +1,16 @@
 {
-  "name": "axe-core-playwright-vendor",
-  "version": "0.0.0-local",
+  "name": "@axe-core/playwright",
+  "version": "4.10.0",
   "type": "module",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "types": "src/index.ts",
   "exports": {
-    "./package.json": "./package.json",
-    ".": "./src/index.ts"
+    ".": {
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
   }
 }

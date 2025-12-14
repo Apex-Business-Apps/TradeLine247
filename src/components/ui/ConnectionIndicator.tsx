@@ -117,7 +117,7 @@ function getStatusColor(quality: string): string {
   const isSlowConnection = status.quality === 'slow';
 
   const isUserAdmin = user
-    ? (typeof isAdmin === 'function' ? isAdmin() : userRole === 'admin' || userRole === 'owner')
+    ? (typeof isAdmin === 'function' ? isAdmin() : userRole === 'admin')
     : false;
 
   // Show/hide logic

@@ -90,7 +90,11 @@ test.describe('Hero Background Responsiveness', () => {
     // Wallpaper is scoped to hero (absolute) so attachment is scroll, not fixed
     expect(styles.backgroundSize).toContain('cover');
     const pos = styles.backgroundPosition;
-    expect(pos === 'center' || pos === 'center center' || pos === '50% 50%').toBeTruthy();
+    expect(
+      pos === 'center' ||
+      pos === 'center center' ||
+      pos === '50% 50%'
+    ).toBeTruthy();
     expect(styles.backgroundRepeat).toBe('no-repeat');
     expect(styles.backgroundAttachment).toBe('scroll');
   });
