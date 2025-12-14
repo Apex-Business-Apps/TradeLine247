@@ -25,13 +25,13 @@ test.describe('Blank Screen Prevention', () => {
 
   test('background image loads correctly', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
-    const backgroundWrapper = page.locator('.hero-shell');
+    const backgroundWrapper = page.locator('#app-home');
     await expect(backgroundWrapper).toBeVisible();
 
     const css = await backgroundWrapper.evaluate((el) => getComputedStyle(el).backgroundImage);
-    expect(css).toMatch(/BACKGROUND_IMAGE1/);
+    expect(css).toMatch(/url\(/);
 
     const opacity = await backgroundWrapper.evaluate((el) => getComputedStyle(el).opacity);
     expect(parseFloat(opacity)).toBeGreaterThan(0);

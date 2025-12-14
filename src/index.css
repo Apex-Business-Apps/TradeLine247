@@ -1810,12 +1810,9 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 #app-home {
   position: relative;
   isolation: isolate;
-}
-
-#app-home.has-background {
-  background-image: var(--landing-wallpaper) !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
+  background-image: var(--landing-wallpaper);
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 @supports (-webkit-touch-callout: none) {
