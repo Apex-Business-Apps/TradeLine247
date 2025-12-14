@@ -61,7 +61,6 @@ html {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: var(--hero-wallpaper-image);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center top;
@@ -156,9 +155,7 @@ body {
 .landing-shell,
 .dashboard-shell {
   min-height: 100dvh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  /* DO NOT set background properties here - only .landing-wallpaper paints the background */
 }
 
 /* Always paint content above wallpaper */
@@ -1823,9 +1820,6 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 #app-home {
   position: relative;
   isolation: isolate;
-  background-image: var(--landing-wallpaper);
-  background-size: cover;
-  background-repeat: no-repeat;
 }
 
 @supports (-webkit-touch-callout: none) {

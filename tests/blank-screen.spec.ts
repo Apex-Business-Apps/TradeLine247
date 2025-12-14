@@ -27,13 +27,13 @@ test.describe('Blank Screen Prevention', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    const backgroundWrapper = page.locator('#app-home');
-    await expect(backgroundWrapper).toBeVisible();
+    const wallpaper = page.locator('.landing-wallpaper');
+    await expect(wallpaper).toBeVisible();
 
-    const css = await backgroundWrapper.evaluate((el) => getComputedStyle(el).backgroundImage);
+    const css = await wallpaper.evaluate((el) => getComputedStyle(el).backgroundImage);
     expect(css).toMatch(/url\(/);
 
-    const opacity = await backgroundWrapper.evaluate((el) => getComputedStyle(el).opacity);
+    const opacity = await wallpaper.evaluate((el) => getComputedStyle(el).opacity);
     expect(parseFloat(opacity)).toBeGreaterThan(0);
   });
 
