@@ -4,31 +4,49 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Download, X } from 'lucide-react';
 import { installPWA, getPWAPrompt } from '@/lib/pwaInstall';
 
-const PWA_DISMISSAL_KEY = 'tl247:pwa-banner-dismissed';
+const PWA_DISMISSED_AT_KEY = 'tl247:pwa-dismissedAt';
 const PWA_DISMISSAL_DURATION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
 function isBannerDismissed(): boolean {
   if (typeof window === 'undefined' || !window.localStorage) return false;
-  const dismissed = localStorage.getItem(PWA_DISMISSAL_KEY);
-  if (!dismissed) return false;
-  const dismissedTime = parseInt(dismissed, 10);
+  const dismissedAt = localStorage.getItem(PWA_DISMISSED_AT_KEY);
+  if (!dismissedAt) return false;
+  const dismissedTime = parseInt(dismissedAt, 10);
   const now = Date.now();
   return (now - dismissedTime) < PWA_DISMISSAL_DURATION_MS;
 }
 
 function setBannerDismissed(): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
-  localStorage.setItem(PWA_DISMISSAL_KEY, Date.now().toString());
+  localStorage.setItem(PWA_DISMISSED_AT_KEY, Date.now().toString());
 }
 
 export const PWAInstallBanner: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(!isBannerDismissed());
+  const [isVisible, setIsVisible] = useState(false);
+  const [hasUserGesture, setHasUserGesture] = useState(false);
 
   useEffect(() => {
     // Check dismissal on mount
     if (isBannerDismissed()) {
-      setIsVisible(false);
+      return;
     }
+
+    // Listen for user gesture to enable banner visibility
+    const handleUserGesture = () => {
+      setHasUserGesture(true);
+      setIsVisible(true);
+    };
+
+    const gestureEvents = ['click', 'touchstart', 'keydown'];
+    gestureEvents.forEach(event => {
+      window.addEventListener(event, handleUserGesture, { once: true, passive: true });
+    });
+
+    return () => {
+      gestureEvents.forEach(event => {
+        window.removeEventListener(event, handleUserGesture);
+      });
+    };
   }, []);
 
   const handleInstall = async () => {
@@ -43,7 +61,7 @@ export const PWAInstallBanner: React.FC = () => {
     setIsVisible(false);
   };
 
-  if (!isVisible || !getPWAPrompt()) return null;
+  if (!isVisible || !hasUserGesture || !getPWAPrompt()) return null;
 
   return (
     <Card 

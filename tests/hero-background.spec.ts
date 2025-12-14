@@ -89,7 +89,8 @@ test.describe('Hero Background Responsiveness', () => {
     // Note: getComputedStyle returns resolved values, so "center" becomes "50% 50%"
     // Wallpaper is scoped to hero (absolute) so attachment is scroll, not fixed
     expect(styles.backgroundSize).toContain('cover');
-    expect(styles.backgroundPosition === 'center' || styles.backgroundPosition === 'center center' || styles.backgroundPosition === '50% 50%' || styles.backgroundPosition.includes('50%')).toBe(true);
+    const pos = styles.backgroundPosition;
+    expect(pos === 'center' || pos === 'center center' || pos === '50% 50%').toBeTruthy();
     expect(styles.backgroundRepeat).toBe('no-repeat');
     expect(styles.backgroundAttachment).toBe('scroll');
   });
