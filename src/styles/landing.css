@@ -16,6 +16,7 @@
   position: relative;
   isolation: isolate;
   background-color: transparent;
+  /* DO NOT set backgroundImage here - only .landing-wallpaper paints the background */
 }
 
 /* Hero-shell: scopes wallpaper + mask to hero section only (prevents bleed) */
@@ -26,23 +27,34 @@
 }
 
 .landing-wallpaper {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background-image: var(--landing-wallpaper);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: scroll;
   z-index: 0;
   pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* background-position handled by existing media queries (20% mobile, 15% tablet, center desktop) */
+  transform: translateZ(0);
 }
 
 .landing-mask {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background: var(--landing-mask-gradient);
   z-index: 1;
   pointer-events: none;
+
+  /* Restore "best iteration" look: darken + warm tint + subtle gradient */
+  background:
+    linear-gradient(180deg,
+      rgba(0, 0, 0, 0.20) 0%,
+      rgba(0, 0, 0, 0.40) 55%,
+      rgba(0, 0, 0, 0.55) 100%
+    ),
+    radial-gradient(circle at 30% 20%,
+      rgba(255, 122, 0, 0.18),
+      rgba(255, 122, 0, 0.04) 55%,
+      rgba(255, 122, 0, 0.00) 75%
+    );
 }
 
 .landing-content {
@@ -50,19 +62,19 @@
   z-index: 2;
 }
 
-/* Tablet: 768px-1024px gets 15% focal point */
-@media (min-width: 768px) and (max-width: 1024px) {
+/* Tablet: 641px-1023px gets 15% focal point */
+@media (min-width: 641px) and (max-width: 1023px) {
   .landing-wallpaper {
-    background-position: center 15%;
-    background-attachment: scroll;
+    background-position: 15% center;
   }
 }
 
-/* Mobile: <768px gets 20% focal point */
-@media (max-width: 767px) {
+/* Mobile: <640px gets 20% focal point */
+@media (max-width: 640px) {
   .landing-wallpaper {
-    background-position: center 20%;
-    background-attachment: scroll;
+    background-size: contain;
+    background-position: center top;
+    background-color: hsl(0 0% 97%);
   }
 }
 

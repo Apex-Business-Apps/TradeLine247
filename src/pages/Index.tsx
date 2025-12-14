@@ -12,26 +12,15 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
-import { errorReporter } from "@/lib/errorReporter";
 
-// Idempotent constants: computed once, reused across renders
-const BACKGROUND_IMAGE_URL = backgroundImage;
+// Idempotent constants
 const LANDING_BACKGROUND_COLOR = "hsl(0, 0%, 97%)";
 
-// DO NOT CHANGE: Hero wallpaper background-image and responsive focal points are critical for visual identity.
-// CSS handles responsive background-position (20% mobile, 15% tablet, center desktop) via media queries.
-const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
-  backgroundImage: `url(${imageUrl})`,
-  // backgroundPosition removed - CSS media queries handle responsive focal points (20% mobile, 15% tablet, center desktop)
-  backgroundRepeat: "no-repeat",
-  backgroundSize: "cover",
-});
-
-const createLandingWallpaperVars = (imageUrl: string): CSSProperties => ({
-  "--landing-wallpaper": `url(${imageUrl})`,
-  "--hero-wallpaper-image": `url(${imageUrl})`,
-  backgroundImage: `url(${imageUrl})`,
-} as CSSProperties);
+const createLandingWallpaperVars = (imageUrl: string): CSSProperties =>
+  ({
+    "--landing-wallpaper": `url(${imageUrl})`,
+    "--hero-wallpaper-image": `url(${imageUrl})`,
+  }) as CSSProperties;
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
@@ -40,44 +29,37 @@ const Index = () => {
     trackPageView("home");
   }, [trackPageView]);
 
-  // Preload background image for faster rendering
-  useEffect(() => {
-    const img = new Image();
-    img.src = BACKGROUND_IMAGE_URL;
-    img.onerror = () => {
-      errorReporter.report({
-        type: "error",
-        message: "Background image failed to load",
-        timestamp: new Date().toISOString(),
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        environment: errorReporter["getEnvironment"](),
-        metadata: { imageSrc: BACKGROUND_IMAGE_URL },
-      });
-    };
-  }, []);
-
-  // Memoize styles to prevent recreation on every render (idempotent)
-  const wallpaperStyle = useMemo(
-    () => createWallpaperStyle(BACKGROUND_IMAGE_URL),
+  const landingWallpaperVars = useMemo(
+    () => createLandingWallpaperVars(backgroundImage),
     []
   );
 
-  const landingWallpaperVars = useMemo(
-    () => createLandingWallpaperVars(BACKGROUND_IMAGE_URL),
+  // Single rendered wallpaper source: CSS variable -> landing-wallpaper layer
+  const wallpaperStyle = useMemo<CSSProperties>(
+    () => ({
+      backgroundImage: "var(--landing-wallpaper)",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+      // DO NOT set backgroundPosition inline: CSS media queries handle focal points
+    }),
     []
   );
 
   return (
-    <div
+    <main
       id="app-home"
-      className="landing-shell min-h-screen flex flex-col relative bg-[position:20%_center] md:bg-[position:15%_center] lg:bg-center"
+      className="landing-shell min-h-screen flex flex-col relative"
       style={{
         ...landingWallpaperVars,
         backgroundColor: LANDING_BACKGROUND_COLOR,
       }}
     >
-      <div className="landing-content relative z-10 flex-1 flex flex-col" style={{ minHeight: "100vh" }}>
+      {/* Single wallpaper layer + single mask layer.
+          Do not duplicate backgroundImage on the root element. */}
+      <div className="landing-wallpaper" aria-hidden="true" style={wallpaperStyle} />
+      <div className="landing-mask" aria-hidden="true" />
+
+      <div className="landing-content relative z-10 flex-1 flex flex-col">
         <AISEOHead
           title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
           description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
@@ -119,16 +101,10 @@ const Index = () => {
           ]}
         />
 
-        <div className="flex-1" style={{ minHeight: "60vh" }}>
-          {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
-              Scoped to hero section only - do not change or remove these elements or their CSS without design + cofounder sign-off. */}
-          <section className="hero-shell relative isolate bg-cover bg-[position:20%_center] md:bg-[position:15%_center] lg:bg-center" style={{ backgroundImage: `url(${BACKGROUND_IMAGE_URL})` }}>
-            <div className="landing-wallpaper absolute inset-0" aria-hidden="true" style={wallpaperStyle}/>
-            <div className="landing-mask absolute inset-0" aria-hidden="true"/>
-            <div className="relative z-10">
-              <HeroRoiDuo />
-            </div>
-          </section>
+        <div className="flex-1">
+          <div className="hero-background">
+            <HeroRoiDuo />
+          </div>
 
           <BenefitsGrid />
           <ImpactStrip />
@@ -152,7 +128,7 @@ const Index = () => {
         <Footer />
         <NoAIHypeFooter />
       </div>
-    </div>
+    </main>
   );
 };
 
