@@ -20,17 +20,11 @@ const LANDING_BACKGROUND_COLOR = "hsl(0, 0%, 97%)";
 
 // DO NOT CHANGE: Hero wallpaper background-image and responsive focal points are critical for visual identity.
 // CSS handles responsive background-position (20% mobile, 15% tablet, center desktop) via media queries.
-const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
-  backgroundImage: `url(${imageUrl})`,
-  // backgroundPosition removed - CSS media queries handle responsive focal points (20% mobile, 15% tablet, center desktop)
-  backgroundRepeat: "no-repeat",
-  backgroundSize: "cover",
-});
+const HERO_WALLPAPER = `url(${BACKGROUND_IMAGE_URL})`;
 
 const createLandingWallpaperVars = (imageUrl: string): CSSProperties => ({
-  "--landing-wallpaper": `url(${imageUrl})`,
-  "--hero-wallpaper-image": `url(${imageUrl})`,
-  backgroundImage: `url(${imageUrl})`,
+  ["--hero-wallpaper-image" as any]: HERO_WALLPAPER,
+  ["--landing-wallpaper" as any]: "var(--hero-wallpaper-image)"
 } as CSSProperties);
 
 const Index = () => {
@@ -57,12 +51,6 @@ const Index = () => {
     };
   }, []);
 
-  // Memoize styles to prevent recreation on every render (idempotent)
-  const wallpaperStyle = useMemo(
-    () => createWallpaperStyle(BACKGROUND_IMAGE_URL),
-    []
-  );
-
   const landingWallpaperVars = useMemo(
     () => createLandingWallpaperVars(BACKGROUND_IMAGE_URL),
     []
@@ -71,7 +59,7 @@ const Index = () => {
   return (
     <div
       id="app-home"
-      className="landing-shell min-h-screen flex flex-col relative bg-[position:20%_center] md:bg-[position:15%_center] lg:bg-center"
+      className="landing-shell min-h-screen flex flex-col relative"
       style={{
         ...landingWallpaperVars,
         backgroundColor: LANDING_BACKGROUND_COLOR,
@@ -123,9 +111,9 @@ const Index = () => {
           {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
               Scoped to hero section only - do not change or remove these elements or their CSS without design + cofounder sign-off. */}
           <section className="hero-shell relative isolate">
-            <div className="landing-wallpaper absolute inset-0" aria-hidden="true" style={wallpaperStyle}/>
-            <div className="landing-mask absolute inset-0" aria-hidden="true"/>
-            <div className="relative z-10">
+            <div className="landing-wallpaper" aria-hidden="true"/>
+            <div className="landing-mask" aria-hidden="true"/>
+            <div className="landing-content relative z-10">
               <HeroRoiDuo />
             </div>
           </section>
