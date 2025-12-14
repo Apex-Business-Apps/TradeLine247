@@ -71,12 +71,10 @@ const Index = () => {
   return (
     <div
       id="app-home"
-      className="landing-shell min-h-screen flex flex-col relative bg-[position:20%_center] md:bg-[position:15%_center] lg:bg-center"
+      className="landing-shell min-h-screen flex flex-col relative has-background bg-[position:20%_center] md:bg-[position:15%_center] lg:bg-center"
       style={{
         ...landingWallpaperVars,
         backgroundColor: LANDING_BACKGROUND_COLOR,
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
       }}
     >
       <div className="landing-content relative z-10 flex-1 flex flex-col" style={{ minHeight: "100vh" }}>
