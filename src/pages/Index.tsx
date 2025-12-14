@@ -71,11 +71,9 @@ const Index = () => {
     <div
       id="app-home"
       className="landing-shell min-h-screen flex flex-col relative"
-      style={{ 
-        ...landingWallpaperVars, 
+      style={{
+        ...landingWallpaperVars,
         backgroundColor: LANDING_BACKGROUND_COLOR,
-        // Ensure CSS variable resolves for test compatibility
-        backgroundImage: `var(--landing-wallpaper, ${BACKGROUND_IMAGE_URL})`,
       }}
     >
       <div className="landing-content relative z-10 flex-1 flex flex-col" style={{ minHeight: "100vh" }}>
@@ -123,7 +121,7 @@ const Index = () => {
         <div className="flex-1" style={{ minHeight: "60vh" }}>
           {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
               Scoped to hero section only - do not change or remove these elements or their CSS without design + cofounder sign-off. */}
-          <section className="hero-shell relative isolate">
+          <section className="hero-shell relative isolate bg-cover bg-[position:20%_center] md:bg-[position:15%_center] lg:bg-center" style={{ backgroundImage: `url(${BACKGROUND_IMAGE_URL})` }}>
             <div className="landing-wallpaper absolute inset-0" aria-hidden="true" style={wallpaperStyle}/>
             <div className="landing-mask absolute inset-0" aria-hidden="true"/>
             <div className="relative z-10">

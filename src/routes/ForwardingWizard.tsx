@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase, isSupabaseEnabled } from "@/integrations/supabase/client";
-import { TWILIO_CONFIG, SUPABASE_FUNCTIONS } from "@/config/api";
+import { TWILIO_CONFIG, SUPABASE_FUNCTIONS, API_CONFIG } from "@/config/api";
 
 type Carrier = "ROGERS_FIDO" | "TELUS_KOODO" | "BELL_MOBILITY" | "LANDLINE";
 
 const FORWARD_TO = TWILIO_CONFIG.voiceNumber;
+
+const FUNCTIONS_BASE = API_CONFIG.supabaseFunctionsUrl;
 
 type Status = "idle" | "pending" | "verified" | "failed";
 

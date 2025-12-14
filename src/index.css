@@ -232,7 +232,9 @@ All colors MUST be HSL.
     --brand-blue-600: 201 84% 45%;
     --brand-blue-light: 199 90% 92%;
     --brand-blue-dark: 204 86% 32%;
-    
+    --brand-accentSoft: var(--brand-orange-light);
+    --brand-navy: var(--brand-blue-dark);
+
     /* Green Colors for Login/Success Actions */
     --brand-green-primary: 142 76% 36%;
     --brand-green-light: 142 69% 58%;
@@ -1425,11 +1427,11 @@ button[class*="btn-aa"] {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  background: hsl(var(--brand-orange-light));
+  background: hsl(var(--brand-accentSoft));
   border-radius: 9999px;
   font-size: 0.95rem;
   font-weight: 600;
-  color: hsl(var(--brand-blue-dark));
+  color: hsl(var(--brand-navy));
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
 }
