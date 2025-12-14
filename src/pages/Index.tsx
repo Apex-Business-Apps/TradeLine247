@@ -30,6 +30,7 @@ const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
 const createLandingWallpaperVars = (imageUrl: string): CSSProperties => ({
   "--landing-wallpaper": `url(${imageUrl})`,
   "--hero-wallpaper-image": `url(${imageUrl})`,
+  backgroundImage: `url(${imageUrl})`,
 } as CSSProperties);
 
 const Index = () => {
@@ -70,7 +71,7 @@ const Index = () => {
   return (
     <div
       id="app-home"
-      className="landing-shell min-h-screen flex flex-col relative"
+      className="landing-shell min-h-screen flex flex-col relative bg-[position:20%_center] md:bg-[position:15%_center] lg:bg-center"
       style={{
         ...landingWallpaperVars,
         backgroundColor: LANDING_BACKGROUND_COLOR,
