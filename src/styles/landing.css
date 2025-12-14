@@ -4,17 +4,13 @@
  */
 :root {
   --landing-wallpaper: var(--hero-wallpaper-image, url("/assets/BACKGROUND_IMAGE1.svg"));
-  --landing-mask-gradient: linear-gradient(
-    180deg,
-    rgba(15, 23, 42, 0.72) 0%,
-    rgba(15, 23, 42, 0.55) 40%,
-    rgba(15, 23, 42, 0.35) 100%
-  );
 }
 
 .landing-shell {
   position: relative;
   isolation: isolate;
+  overflow-x: clip;
+  min-height: 100dvh;
   background-color: transparent;
   /* DO NOT set backgroundImage here - only .landing-wallpaper paints the background */
 }
@@ -25,6 +21,7 @@
   isolation: isolate;
   overflow: hidden;
 }
+
 
 .landing-wallpaper {
   position: fixed;
@@ -54,18 +51,16 @@
 
 .landing-content {
   position: relative;
-  z-index: 2;
+  z-index: 10;
 }
 
-/* Tablet: 641px-1023px gets 15% focal point */
-@media (min-width: 641px) and (max-width: 1023px) {
+@media (min-width: 640px) {
   .landing-wallpaper {
-    background-position: 15% center;
+    background-position: center 15%;
   }
 }
 
-/* Mobile: <640px gets 20% focal point */
-@media (max-width: 640px) {
+@media (min-width: 1024px) {
   .landing-wallpaper {
     background-size: cover;
     background-position: center top;

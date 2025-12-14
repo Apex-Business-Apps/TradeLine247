@@ -28,7 +28,6 @@ import "../styles/hero-roi.css";
 import { LeadCaptureCard } from "../components/sections/LeadCaptureCard";
 import RoiCalculator from "../components/RoiCalculator";
 import officialLogo from '@/assets/official-logo.png';
-import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 export default function HeroRoiDuo() {
   return <section className="hero-section section-heavy overflow-hidden relative" style={{
     paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
@@ -36,7 +35,7 @@ export default function HeroRoiDuo() {
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
-      {/* Hero background image layer - positioned behind overlays and content */}
+      {/* Hero gradient overlay - white veil under 40% opacity to keep hero readable */}
       <div
         className="absolute inset-0 -z-10"
         style={{

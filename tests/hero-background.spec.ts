@@ -15,11 +15,11 @@ test.describe('Hero Background Responsiveness', () => {
     });
     expect(wallpaperBg).toMatch(/BACKGROUND_IMAGE1.*\.svg/);
 
-    // Wallpaper is scoped to hero section (absolute within hero-shell) to prevent bleed
+    // Wallpaper is a single fixed layer covering the viewport
     const wallpaperPosition = await wallpaper.evaluate((el) => {
       return window.getComputedStyle(el).position;
     });
-    expect(wallpaperPosition).toBe('absolute');
+    expect(wallpaperPosition).toBe('fixed');
   });
 
   test('mobile: background focal point shows face', async ({ page }) => {
@@ -41,9 +41,9 @@ test.describe('Hero Background Responsiveness', () => {
 
     // Mobile CSS override: specific size and focal point (20% from top = face visible)
     expect(styles.backgroundPosition).toContain('20%'); // Face focal point
-    expect(styles.backgroundSize).toContain('cover');
+    expect(styles.backgroundSize).toContain('contain');
     expect(styles.backgroundRepeat).toBe('no-repeat');
-    expect(styles.backgroundAttachment).toBe('scroll');
+    expect(styles.backgroundAttachment).toBe('fixed');
   });
 
   test('tablet: background focal point adjusted', async ({ page }) => {
@@ -64,8 +64,8 @@ test.describe('Hero Background Responsiveness', () => {
 
     // Tablet uses mobile CSS override at 768px boundary
     expect(styles.backgroundPosition).toContain('15%'); // Face focal point
-    expect(styles.backgroundSize).toContain('cover');
-    expect(styles.backgroundAttachment).toBe('scroll');
+    expect(styles.backgroundSize).toContain('contain');
+    expect(styles.backgroundAttachment).toBe('fixed');
   });
 
   test('desktop: background uses cover (Dec 4 standard)', async ({ page }) => {
@@ -85,10 +85,9 @@ test.describe('Hero Background Responsiveness', () => {
       };
     });
 
-    // Desktop should use standard cover (no mobile override at this viewport)
+    // Desktop should use standard contain sizing and fixed attachment (single wallpaper layer)
     // Note: getComputedStyle returns resolved values, so "center" becomes "50% 50%"
-    // Wallpaper is scoped to hero (absolute) so attachment is scroll, not fixed
-    expect(styles.backgroundSize).toContain('cover');
+    expect(styles.backgroundSize).toContain('contain');
     const pos = styles.backgroundPosition;
     expect(
       pos === 'center' ||
@@ -96,7 +95,7 @@ test.describe('Hero Background Responsiveness', () => {
       pos === '50% 50%'
     ).toBeTruthy();
     expect(styles.backgroundRepeat).toBe('no-repeat');
-    expect(styles.backgroundAttachment).toBe('scroll');
+    expect(styles.backgroundAttachment).toBe('fixed');
   });
 
   test('background does not leak into next sections', async ({ page }) => {
