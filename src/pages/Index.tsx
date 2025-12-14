@@ -123,10 +123,10 @@ const Index = () => {
         <div className="flex-1" style={{ minHeight: "60vh" }}>
           {/* WARNING: Landing wallpaper + mask define the TradeLine 24/7 visual identity.
               Scoped to hero section only - do not change or remove these elements or their CSS without design + cofounder sign-off. */}
-          <section className="hero-shell relative isolate overflow-hidden">
-            <div className="landing-wallpaper" aria-hidden="true" style={wallpaperStyle} />
-            <div className="landing-mask" aria-hidden="true" />
-            <div className="hero-background relative z-10">
+          <section className="hero-shell relative isolate">
+            <div className="landing-wallpaper absolute inset-0" aria-hidden="true" style={wallpaperStyle}/>
+            <div className="landing-mask absolute inset-0" aria-hidden="true"/>
+            <div className="relative z-10">
               <HeroRoiDuo />
             </div>
           </section>
