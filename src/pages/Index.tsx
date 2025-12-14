@@ -75,6 +75,9 @@ const Index = () => {
       style={{
         ...landingWallpaperVars,
         backgroundColor: LANDING_BACKGROUND_COLOR,
+        backgroundImage: `url(${BACKGROUND_IMAGE_URL})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
       }}
     >
       <div className="landing-content relative z-10 flex-1 flex flex-col" style={{ minHeight: "100vh" }}>
