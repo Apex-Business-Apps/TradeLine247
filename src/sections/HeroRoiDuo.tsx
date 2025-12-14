@@ -44,14 +44,15 @@ export default function HeroRoiDuo() {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
+          pointerEvents: "none",
         }}
         aria-hidden="true"
       />
-      {/* Hero gradient overlay - single-color brand orange at 60% opacity to meet GOODBUILD hero mask spec */}
+      {/* Hero gradient overlay - single-color brand orange at 40% opacity */}
       <div
         className="absolute inset-0 -z-10"
         style={{
-          backgroundColor: "hsl(var(--brand-orange-primary) / 0.6)",
+          backgroundColor: "hsl(var(--brand-orange-primary) / 0.4)",
         }}
         aria-hidden="true"
       />

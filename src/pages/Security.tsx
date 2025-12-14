@@ -122,6 +122,18 @@ const Security = () => {
       className="min-h-screen flex flex-col relative"
       style={gradientBackgroundStyle}
     >
+      {/* Background image layer - bottom layer, no pointer events */}
+      <div
+        className="fixed inset-0 -z-[1]"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      />
       <SEOHead
         title="Security & Privacy - TradeLine 24/7"
         description="Enterprise-grade security and privacy for your business. SOC 2, GDPR, and PIPEDA compliant. End-to-end encryption, 24/7 monitoring, and Canadian data sovereignty."

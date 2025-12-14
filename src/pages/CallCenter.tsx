@@ -72,6 +72,18 @@ export default function CallCenter() {
         className="min-h-screen flex flex-col relative"
         style={gradientBackgroundStyle}
       >
+        {/* Background image layer - bottom layer, no pointer events */}
+        <div
+          className="fixed inset-0 -z-[1]"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            pointerEvents: "none",
+          }}
+          aria-hidden="true"
+        />
         <div className="relative z-10 container mx-auto px-4 py-8">
           <div className="mb-8">
             <div className="flex items-center justify-between">

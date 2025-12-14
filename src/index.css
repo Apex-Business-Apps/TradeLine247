@@ -5,13 +5,42 @@
 /* CRITICAL: header-align.css must load synchronously to prevent header layout shifts and z-index conflicts */
 @import './styles/header-align.css';
 @import './styles/landing.css';
+@import './styles/apple-native.css';
+@import './styles/android-native.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Scroll behavior: Account for sticky header when jumping to anchors */
+/* ============================================================================
+   PREMIUM NATIVE APPLE APP EXPERIENCE - iOS/iPadOS Optimizations
+   ============================================================================ */
+
+/* Smooth, native-like scrolling with momentum (iOS-style) */
 html {
   scroll-padding-top: 70px; /* Sticky header height + safe margin */
+  -webkit-overflow-scrolling: touch; /* iOS momentum scrolling */
+  scroll-behavior: smooth; /* Smooth scroll to anchors */
+}
+
+/* Native-like body scrolling */
+body {
+  -webkit-overflow-scrolling: touch; /* iOS momentum scrolling */
+  overscroll-behavior-y: contain; /* Prevent overscroll bounce on desktop, allow on iOS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* iOS Safari: Enable native rubber-band scrolling */
+@supports (-webkit-touch-callout: none) {
+  body {
+    overscroll-behavior-y: auto; /* Allow native iOS bounce */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Smooth page transitions */
+  * {
+    -webkit-tap-highlight-color: rgba(255, 107, 53, 0.1); /* Subtle tap highlight */
+  }
 }
 
 /* Shell containers for landing and dashboard pages */
@@ -22,26 +51,8 @@ html {
   min-height: 100dvh;
 }
 
-.landing-wallpaper,
-.landing-mask {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-}
-
-.landing-wallpaper {
-  z-index: 0;
-  background-image: var(--hero-wallpaper-image);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  opacity: 1;
-  transform: translateZ(0);
-}
-
-.landing-mask {
-  z-index: 1;
-}
+/* Landing wallpaper and mask styles are defined in landing.css */
+/* This section removed to avoid conflicts - see src/styles/landing.css */
 
 .landing-content {
   position: relative;
@@ -89,11 +100,16 @@ html {
   z-index: 1;
 }
 
-/* iOS-specific: avoid fixed background issues */
+/* ============================================================================
+   iOS-SPECIFIC: Premium Native App Experience
+   ============================================================================ */
 @supports (-webkit-touch-callout: none) {
+  /* Native-like scrolling containers */
   .landing-shell,
   .dashboard-shell {
     background-attachment: scroll !important;
+    -webkit-overflow-scrolling: touch; /* Momentum scrolling */
+    overscroll-behavior-y: auto; /* Native bounce */
   }
 
   /* iOS: avoid fixed attachment jitter by using fixed positioning + scroll attachment */
@@ -101,6 +117,82 @@ html {
     position: fixed;
     background-attachment: scroll !important;
     transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Premium iOS-style button press effects */
+  button,
+  a[role="button"],
+  [role="button"],
+  .btn,
+  [class*="button"] {
+    -webkit-tap-highlight-color: rgba(255, 107, 53, 0.2);
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  button:active,
+  a[role="button"]:active,
+  [role="button"]:active,
+  .btn:active,
+  [class*="button"]:active {
+    transform: scale(0.97); /* Native-like press effect */
+    opacity: 0.9;
+  }
+
+  /* Smooth card interactions */
+  [class*="card"],
+  [class*="Card"] {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  [class*="card"]:active,
+  [class*="Card"]:active {
+    transform: scale(0.98);
+  }
+
+  /* Native-like input focus */
+  input,
+  textarea,
+  select {
+    -webkit-appearance: none;
+    border-radius: 8px;
+    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+  }
+
+  /* Smooth list scrolling */
+  ul,
+  ol {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Native-like modal/overlay animations */
+  [role="dialog"],
+  [class*="modal"],
+  [class*="Modal"],
+  [class*="overlay"],
+  [class*="Overlay"] {
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 }
 
@@ -1208,6 +1300,72 @@ textarea:focus-visible {
   /* Background now applied directly via inline styles and Tailwind classes */
 }
 
+/* ============================================================================
+   GLOBAL BACKGROUND IMAGE RULES - ALL PLATFORMS
+   ============================================================================
+   Ensures background images are always at bottom layer and never interfere
+   with scrolling or user interactions across all platforms:
+   - Android Mobile, iOS, iPad, Tablet, Chrome, Safari, Desktop
+   ============================================================================ */
+
+/* Global rule: All background images must be at bottom layer with no pointer events */
+[style*="backgroundImage"],
+.hero-bg,
+.landing-wallpaper,
+[class*="background-image"] {
+  pointer-events: none !important; /* Never interfere with scrolling or interactions */
+  -webkit-touch-callout: none; /* iOS Safari: prevent callout menu */
+  -webkit-user-select: none; /* Prevent text selection on background */
+  user-select: none;
+}
+
+/* Platform-specific fixes for background images */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific fixes - Premium native app feel */
+  [style*="backgroundImage"],
+  .hero-bg,
+  .landing-wallpaper {
+    -webkit-transform: translateZ(0); /* Force GPU acceleration */
+    transform: translateZ(0);
+    will-change: transform; /* Optimize for scrolling */
+    -webkit-backface-visibility: hidden; /* Smooth animations */
+    backface-visibility: hidden;
+  }
+
+  /* Premium iOS scrolling performance */
+  * {
+    -webkit-transform: translateZ(0); /* GPU acceleration for all elements */
+  }
+
+  /* Smooth page transitions */
+  main,
+  section,
+  [class*="page"],
+  [class*="Page"] {
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Android Chrome/WebView fixes */
+@supports (-webkit-appearance: none) {
+  [style*="backgroundImage"],
+  .hero-bg,
+  .landing-wallpaper {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+/* Desktop browser optimizations */
+@media (min-width: 1024px) {
+  [style*="backgroundImage"],
+  .hero-bg,
+  .landing-wallpaper {
+    will-change: transform;
+  }
+}
+
 .hero-bg {
   /* Background image layer for hero section - visible for tests */
   position: absolute;
@@ -1216,8 +1374,8 @@ textarea:focus-visible {
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0.15; /* Subtle background visibility */
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none; /* Never interfere with scrolling or interactions */
+  z-index: -10; /* Bottom layer - below all content and overlays */
 }
 
 .hero-gradient {
@@ -1714,23 +1872,23 @@ section h1,
   color: hsl(var(--foreground)) !important;
 }
 
-/* Add brand blue shadow to hero text for depth and readability */
+/* Add brand orange shadow to hero text for depth and readability */
 .hero-gradient h1,
 .hero-gradient h2,
 [data-testid="hero-bg"] h1,
 [data-testid="hero-bg"] h2,
 .page-hero h1,
 .page-hero h2 {
-  text-shadow: 0 3px 8px rgba(104, 182, 233, 0.45), 
-               0 1px 4px rgba(104, 182, 233, 0.35) !important;
+  text-shadow: 0 3px 8px rgba(255, 107, 53, 0.45), 
+               0 1px 4px rgba(255, 107, 53, 0.35) !important;
 }
 
-/* Add brand blue shadow to hero subtext */
+/* Add brand orange shadow to hero subtext */
 .hero-gradient p,
 [data-testid="hero-bg"] p,
 .page-hero p {
-  text-shadow: 0 2px 6px rgba(104, 182, 233, 0.35), 
-               0 1px 3px rgba(104, 182, 233, 0.25) !important;
+  text-shadow: 0 2px 6px rgba(255, 107, 53, 0.35), 
+               0 1px 3px rgba(255, 107, 53, 0.25) !important;
 }
 
 /* LOGO COLOR GRADIENT - Removed these duplicate layers that were obscuring the blue gradient */
@@ -1826,9 +1984,10 @@ button[class*="orange"]:hover:not([class*="outline"]) {
   #app-home, .hero-bg, [class*="hero-section"] { min-height: -webkit-fill-available; }
 }
 
-/* Hero text contrast for readability */
+/* Hero text contrast for readability - Brand orange shadows */
 .hero-text,
 .hero-headline,
 .hero-tagline {
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 3px 8px rgba(255, 107, 53, 0.45),
+               0 1px 4px rgba(255, 107, 53, 0.35);
 }

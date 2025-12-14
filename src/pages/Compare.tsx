@@ -21,6 +21,18 @@ export default function Compare() {
       className="min-h-screen flex flex-col relative"
       style={gradientBackgroundStyle}
     >
+      {/* Background image layer - bottom layer, no pointer events */}
+      <div
+        className="fixed inset-0 -z-[1]"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      />
       {/* Simple title/description to avoid SEOHead until we're stable */}
       <div className="relative z-10" style={{ minHeight: "100vh" }}>
         <div className="flex-1">

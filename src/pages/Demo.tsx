@@ -19,16 +19,24 @@ const Demo = () => {
         canonical="https://www.tradeline247ai.com/demo"
       />
       
+      {/* Background image layer - bottom layer, no pointer events */}
+      <div
+        className="fixed inset-0 -z-[1]"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      />
+      
       <div className="flex-1 relative z-10">
         {/* Hero Section */}
         <section 
           className="hero-section py-20 relative"
           style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "100% auto",
-            backgroundPosition: "center top",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "fixed",
             paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
             paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
             paddingLeft: 'env(safe-area-inset-left, 0)',
