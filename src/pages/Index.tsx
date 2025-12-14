@@ -12,52 +12,68 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
+import { errorReporter } from "@/lib/errorReporter";
 
-// Idempotent constants
+const BACKGROUND_IMAGE_URL = backgroundImage;
 const LANDING_BACKGROUND_COLOR = "hsl(0, 0%, 97%)";
 
-const createLandingWallpaperVars = (imageUrl: string): CSSProperties =>
-  ({
-    "--landing-wallpaper": `url(${imageUrl})`,
-    "--hero-wallpaper-image": `url(${imageUrl})`,
-  }) as CSSProperties;
+// Single wallpaper layer — DO NOT DUPLICATE elsewhere.
+// NOTE: sizing/position are handled by CSS on .landing-wallpaper to remain stable + non-cropping.
+const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
+  backgroundImage: `url(${imageUrl})`,
+});
 
-const Index = () => {
+export default function Index() {
   const { trackPageView } = useAnalytics();
 
   useEffect(() => {
     trackPageView("home");
   }, [trackPageView]);
 
-  const landingWallpaperVars = useMemo(
-    () => createLandingWallpaperVars(backgroundImage),
-    []
-  );
+  // Preload background to reduce flash + improve perceived performance
+  useEffect(() => {
+    const img = new Image();
+    img.src = BACKGROUND_IMAGE_URL;
+    img.onerror = () => {
+      // keep error reporting best-effort and non-blocking
+      try {
+        errorReporter.report({
+          type: "error",
+          message: "Background image failed to load",
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          metadata: { imageSrc: BACKGROUND_IMAGE_URL },
+        });
+      } catch {
+        // no-op
+      }
+    };
+  }, []);
 
-  // Single rendered wallpaper source: CSS variable -> landing-wallpaper layer
-  const wallpaperStyle = useMemo<CSSProperties>(
-    () => ({
-      backgroundImage: "var(--landing-wallpaper)",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "cover",
-      // DO NOT set backgroundPosition inline: CSS media queries handle focal points
-    }),
+  const wallpaperStyle = useMemo(
+    () => createWallpaperStyle(BACKGROUND_IMAGE_URL),
     []
   );
 
   return (
-    <main
+    <div
       id="app-home"
       className="landing-shell min-h-screen flex flex-col relative"
-      style={{
-        ...landingWallpaperVars,
-        backgroundColor: LANDING_BACKGROUND_COLOR,
-      }}
+      style={{ backgroundColor: LANDING_BACKGROUND_COLOR }}
     >
-      {/* Single wallpaper layer + single mask layer.
-          Do not duplicate backgroundImage on the root element. */}
-      <div className="landing-wallpaper" aria-hidden="true" style={wallpaperStyle} />
-      <div className="landing-mask" aria-hidden="true" />
+      {/* Single wallpaper + single mask. Do not remove without founder sign-off. */}
+      <div
+        className="landing-wallpaper"
+        data-testid="landing-wallpaper"
+        aria-hidden="true"
+        style={wallpaperStyle}
+      />
+      <div
+        className="landing-mask"
+        data-testid="landing-mask"
+        aria-hidden="true"
+      />
 
       <div className="landing-content relative z-10 flex-1 flex flex-col">
         <AISEOHead
@@ -128,8 +144,6 @@ const Index = () => {
         <Footer />
         <NoAIHypeFooter />
       </div>
-    </main>
+    </div>
   );
-};
-
-export default Index;
+}
