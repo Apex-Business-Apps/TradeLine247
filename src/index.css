@@ -20,6 +20,7 @@ html {
   position: relative;
   isolation: isolate;
   min-height: 100dvh;
+  overflow-x: clip;
 }
 
 .landing-wallpaper,
@@ -31,10 +32,9 @@ html {
 
 .landing-wallpaper {
   z-index: 0;
-  background-image: var(--hero-wallpaper-image);
   background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
+  background-size: contain;
+  background-position: center 20%;
   opacity: 1;
   transform: translateZ(0);
 }
@@ -45,7 +45,7 @@ html {
 
 .landing-content {
   position: relative;
-  z-index: 2;
+  z-index: 10;
 }
 
 .hero-background {
@@ -76,11 +76,15 @@ html {
  */
 
 @media (max-width: 640px) {
-  .landing-wallpaper { background-position: 20% center; }
+  .landing-wallpaper { background-position: center 20%; }
 }
 
 @media (min-width: 641px) and (max-width: 1023px) {
-  .landing-wallpaper { background-position: 15% center; }
+  .landing-wallpaper { background-position: center 15%; }
+}
+
+@media (min-width: 1024px) {
+  .landing-wallpaper { background-position: center; }
 }
 
 /* Always paint content above wallpaper */

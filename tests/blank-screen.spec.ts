@@ -27,7 +27,8 @@ test.describe('Blank Screen Prevention', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    const wallpaper = page.locator('.landing-wallpaper');
+    const wallpaper = page.locator('[data-testid="landing-wallpaper"]');
+    await expect(wallpaper).toHaveCount(1);
     await expect(wallpaper).toBeVisible();
 
     const css = await wallpaper.evaluate((el) => getComputedStyle(el).backgroundImage);
@@ -35,6 +36,13 @@ test.describe('Blank Screen Prevention', () => {
 
     const opacity = await wallpaper.evaluate((el) => getComputedStyle(el).opacity);
     expect(parseFloat(opacity)).toBeGreaterThan(0);
+
+    const mask = page.locator('[data-testid="landing-mask"]');
+    await expect(mask).toHaveCount(1);
+    const maskBg = await mask.evaluate((el) => getComputedStyle(el).backgroundImage || getComputedStyle(el).background);
+    expect(maskBg).not.toBe('none');
+    const maskOpacity = await mask.evaluate((el) => getComputedStyle(el).opacity);
+    expect(parseFloat(maskOpacity)).toBeGreaterThan(0.05);
   });
 
   test('startup splash does not block content', async ({ page }) => {
