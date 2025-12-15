@@ -60,6 +60,13 @@ export default function Index() {
         style={{ backgroundImage: "var(--hero-wallpaper-image)" }}
       />
 
+      {/* Mask layer - brand gradient overlay */}
+      <div
+        className="landing-mask"
+        data-testid="landing-mask"
+        aria-hidden="true"
+      />
+
       {/* Content layer */}
       <div className="landing-content relative z-10 flex-1 flex flex-col">
         <AISEOHead
