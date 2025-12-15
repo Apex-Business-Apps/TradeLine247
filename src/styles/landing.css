@@ -1,9 +1,3 @@
-/* IMPORTANT:
- * These mask + wallpaper values are the canonical TradeLine 24/7 landing look.
- * Wallpaper: position fixed, covers full viewport, NO background-attachment fixed
- * Mask: Subtle orange overlay (50% opacity)
- */
-
 .landing-shell {
   position: relative;
   isolation: isolate;
@@ -32,7 +26,7 @@
   right: 0;
   bottom: 0;
   z-index: 0;
-  background: rgba(255, 107, 53, 0.5);
+  background: rgba(255, 107, 53, 0.65); /* Rest-of-page tint */
   pointer-events: none;
 }
 
