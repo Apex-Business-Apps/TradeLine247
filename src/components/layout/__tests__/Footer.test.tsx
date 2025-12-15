@@ -21,6 +21,7 @@ describe('Footer', () => {
 
     const badges = screen.getAllByTestId('trust-badge');
     expect(badges.length).toBeGreaterThanOrEqual(4);
-    expect(screen.getByText(/Backed by Alberta Innovates/i)).toBeInTheDocument();
+    // Partner badges now show abbreviated names with full title on hover
+    expect(screen.getByTitle(/Backed by Alberta Innovates/i)).toBeInTheDocument();
   });
 });
