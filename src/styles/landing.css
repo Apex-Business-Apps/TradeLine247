@@ -7,27 +7,29 @@
 
 .landing-wallpaper {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: center center;
-  pointer-events: none;
-  /* NO background-attachment: fixed - that causes mobile issues */
+  background-position: center 20%;
+  background-attachment: fixed;
+  opacity: 1;
+  transform: translateZ(0);
 }
 
 .landing-mask {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-  background: rgba(255, 107, 53, 0.65); /* Rest-of-page tint */
+  inset: 0;
+  z-index: 1;
   pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 107, 53, 0.38) 0%,        /* Brand orange #ff6b35 */
+    rgba(255, 120, 70, 0.30) 40%,       /* Warm transition */
+    rgba(26, 77, 102, 0.28) 70%,        /* Brand blue blend */
+    rgba(26, 77, 102, 0.35) 100%        /* Brand blue #1a4d66 */
+  );
 }
 
 .landing-content {
