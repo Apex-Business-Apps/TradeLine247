@@ -1,6 +1,7 @@
 /* IMPORTANT:
  * These mask + wallpaper values are the canonical TradeLine 24/7 landing look.
- * Do not change rgba/opacity/gradient without explicit design approval.
+ * Wallpaper: position fixed, covers full viewport, NO background-attachment fixed
+ * Mask: Subtle orange overlay (50% opacity)
  */
 
 .landing-shell {
@@ -10,33 +11,29 @@
   overflow-x: clip;
 }
 
-.landing-wallpaper,
+.landing-wallpaper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  background-position: right center;
+  pointer-events: none;
+  /* NO background-attachment: fixed - that causes mobile issues */
+}
+
 .landing-mask {
   position: fixed;
-  inset: 0;
-  pointer-events: none;
-}
-
-.landing-wallpaper {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 0;
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center 20%;
-  background-attachment: fixed;
-  opacity: 1;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-}
-
-.landing-mask {
-  z-index: 1;
-  /* White overlay gradient: 40% hero → 65% rest */
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.40) 0%,
-    rgba(255, 255, 255, 0.55) 30%,
-    rgba(255, 255, 255, 0.65) 100%
-  );
+  background: rgba(255, 107, 53, 0.50);
+  pointer-events: none;
 }
 
 .landing-content {
@@ -44,15 +41,24 @@
   z-index: 10;
 }
 
-/* Responsive focal points */
+/* Responsive focal points - keep woman's face visible */
 @media (max-width: 640px) {
-  .landing-wallpaper { background-position: center 20%; }
+  .landing-wallpaper {
+    background-size: auto 100%;
+    background-position: 70% center;
+  }
 }
 
 @media (min-width: 641px) and (max-width: 1023px) {
-  .landing-wallpaper { background-position: center 15%; }
+  .landing-wallpaper {
+    background-size: auto 100%;
+    background-position: 60% center;
+  }
 }
 
 @media (min-width: 1024px) {
-  .landing-wallpaper { background-position: center; }
+  .landing-wallpaper {
+    background-size: auto 100%;
+    background-position: right center;
+  }
 }

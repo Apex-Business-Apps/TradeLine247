@@ -66,8 +66,13 @@ body {
   background-color: transparent; /* Allow wallpaper to show through */
   min-height: 100vh;
   height: auto;
-  overflow: visible;
+  overflow: visible; /* Allow fixed elements to render */
 }
+
+/* REMOVED: .hero-gradient-tint class - no longer used
+ * Gradient overlays now applied as inline background-image styles
+ * on section containers in Index.tsx (45% hero, 65% rest)
+ */
 
 /* Responsive landing-wallpaper rules are in src/styles/landing.css */
 
@@ -84,17 +89,8 @@ body {
   /* Native-like scrolling containers */
   .landing-shell,
   .dashboard-shell {
-    background-attachment: scroll !important;
     -webkit-overflow-scrolling: touch; /* Momentum scrolling */
     overscroll-behavior-y: auto; /* Native bounce */
-  }
-
-  /* iOS: avoid fixed attachment jitter by using fixed positioning + scroll attachment */
-  .hero-background::before {
-    position: fixed;
-    background-attachment: scroll !important;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
   }
 
   /* Premium iOS-style button press effects */
@@ -234,12 +230,7 @@ body {
 }
 
 /* iOS-specific: avoid fixed background issues */
-@supports (-webkit-touch-callout: none) {
-  .landing-shell,
-  .dashboard-shell {
-    background-attachment: scroll !important;
-  }
-}
+/* Landing wallpaper now uses position: absolute - see landing.css */
 
 /* REMOVED: Global body overlay for non-landing pages
  * This was causing visual inconsistency across pages.
@@ -1952,22 +1943,13 @@ button[class*="orange"]:hover:not([class*="outline"]) {
   isolation: isolate;
 }
 
-#app-home, .hero-bg, [class*="hero-section"] {
-  background-attachment: scroll;
-  background-position: center top;
-  background-size: cover;
+/* Landing page visual restoration - see landing.css for wallpaper styles */
+#app-home {
   min-height: var(--vh-safe);
 }
 
-@media (max-width: 768px) {
-  #app-home, .hero-bg, [class*="hero-section"] {
-    background-attachment: scroll !important;
-    background-position: center 20%;
-  }
-}
-
 @supports (-webkit-touch-callout: none) {
-  #app-home, .hero-bg, [class*="hero-section"] {
+  #app-home {
     min-height: -webkit-fill-available;
   }
 }

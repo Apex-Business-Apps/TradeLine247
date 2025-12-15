@@ -122,16 +122,16 @@ export const Footer: React.FC = () => {
 
           <div className="space-y-3">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Partners</h2>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="flex flex-wrap gap-2">
               {partners.map((partner) => (
                 <div
                   key={partner.title}
-                  className="group flex min-h-[72px] items-center gap-3 rounded-lg border border-border/70 bg-muted/50 px-3 py-2 shadow-sm transition-colors hover:bg-muted focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+                  className="group flex h-12 items-center gap-2 rounded-lg border border-border/70 bg-muted/50 px-2 py-1.5 shadow-sm transition-colors hover:bg-muted"
                   data-testid="trust-badge"
-                  tabIndex={0}
+                  title={partner.title}
                 >
                   <div
-                    className={`flex h-8 sm:h-10 lg:h-12 w-auto min-w-[4rem] items-center justify-center rounded-md bg-white/80 p-1 shadow-inner ${
+                    className={`flex h-8 w-8 items-center justify-center rounded bg-white/80 p-1 ${
                       partner.chip ? "ring-1 ring-primary/10 bg-primary/5" : ""
                     }`}
                     role="img"
@@ -140,20 +140,17 @@ export const Footer: React.FC = () => {
                     <img
                       src={partner.logo}
                       alt={partner.alt}
-                      className="h-full w-auto object-contain"
+                      className="h-6 w-6 object-contain"
                       loading="lazy"
                       onError={(e) => {
-                        // Idempotent error handling: gracefully handle missing logos
                         const target = e.currentTarget;
                         target.style.display = "none";
-                        console.warn(`Failed to load partner logo: ${partner.title}`);
                       }}
                     />
                   </div>
-                  <div className="min-w-0 flex-1 text-left">
-                    <div className="truncate text-sm font-semibold leading-tight text-foreground">{partner.title}</div>
-                    <div className="text-xs text-muted-foreground">Ecosystem partner</div>
-                  </div>
+                  <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                    {partner.title.split(" ").slice(-1)[0]}
+                  </span>
                 </div>
               ))}
             </div>
