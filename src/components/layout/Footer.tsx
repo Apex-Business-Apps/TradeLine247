@@ -3,6 +3,9 @@ import { Logo } from '@/components/ui/logo';
 import { usePWA } from '@/hooks/usePWA';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import apexLogo from '@/assets/logos/apex-wordmark.png';
+import albertaLogo from '@/assets/logos/alberta-innovates.png';
+import erinLogo from '@/assets/logos/erin.png';
 
 export const Footer: React.FC = () => {
   const { isInstallable, isInstalled, showInstallPrompt } = usePWA();
@@ -29,7 +32,7 @@ export const Footer: React.FC = () => {
               className="opacity-70 hover:opacity-100 transition-opacity"
             >
               <img 
-                src="/partners/apex-wordmark.png" 
+                src={apexLogo} 
                 alt="Apex Business Systems" 
                 className="h-8 md:h-10 w-auto"
               />
@@ -43,7 +46,7 @@ export const Footer: React.FC = () => {
               className="opacity-70 hover:opacity-100 transition-opacity"
             >
               <img 
-                src="/partners/alberta-innovates.png" 
+                src={albertaLogo} 
                 alt="Alberta Innovates" 
                 className="h-8 md:h-10 w-auto"
               />
@@ -57,7 +60,7 @@ export const Footer: React.FC = () => {
               className="opacity-70 hover:opacity-100 transition-opacity"
             >
               <img 
-                src="/partners/erin-logo.png" 
+                src={erinLogo} 
                 alt="ERIN - Edmonton Regional Innovation Network" 
                 className="h-8 md:h-10 w-auto"
               />
