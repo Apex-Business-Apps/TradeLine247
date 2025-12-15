@@ -6,7 +6,6 @@ import { paths } from '@/routes/paths';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
 import { toast } from 'sonner';
 import { errorReporter } from '@/lib/errorReporter';
-import { cn } from '@/lib/utils';
 
 const actions = [
   {
@@ -98,10 +97,7 @@ export const QuickActionsCard: React.FC = () => {
               variant={action.variant}
               onClick={() => handleActionClick(action)}
               disabled={isNavigating}
-              className={cn(
-                "w-full justify-start gap-2 relative",
-                action.variant === 'default' ? 'text-white' : undefined
-              )}
+              className="w-full justify-start gap-2 relative"
               aria-label={action.label}
               aria-describedby={descriptionId}
               title={action.description}

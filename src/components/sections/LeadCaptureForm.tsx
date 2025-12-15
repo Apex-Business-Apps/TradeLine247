@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client.ts";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useSecureABTest } from "@/hooks/useSecureABTest";
 import { useSecureFormSubmission } from "@/hooks/useSecureFormSubmission";
@@ -20,7 +21,7 @@ const leadFormSchema = z.object({
     .trim()
     .min(1, "Name is required")
     .max(100, "Name must be less than 100 characters")
-    .regex(/^[a-zA-Z\s\-'.]+$/, "Name contains invalid characters"),
+    .regex(/^[a-zA-Z\s\-'\.]+$/, "Name contains invalid characters"),
   email: z.string()
     .trim()
     .email("Invalid email address")
@@ -169,7 +170,7 @@ export const LeadCaptureForm = () => {
   const ctaText = variantData.text || "Grow Now";
   const ctaVariant = variantData.color === "secondary" ? "secondary" : "default";
   if (isSuccess) {
-    return <section className="py-20 bg-transparent">
+    return <section className="py-20 bg-gradient-to-br from-primary/20 to-accent/20">
         <div className="container">
           <Card className="max-w-md mx-auto text-center shadow-2xl border-0 bg-gradient-to-br from-[hsl(142_85%_95%)] to-[hsl(142_69%_95%)] backdrop-blur-sm animate-scale-in">
             <CardHeader>
@@ -205,8 +206,8 @@ export const LeadCaptureForm = () => {
         </div>
       </section>;
   }
-  return <section className="py-20 pb-32 bg-transparent relative">
-      <div className="container pt-16 md:pt-0">
+  return <section className="py-20 pb-32 bg-gradient-to-br from-primary/20 to-accent/20">
+      <div className="container">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Tell us about your business
@@ -219,13 +220,11 @@ export const LeadCaptureForm = () => {
         <Card className="max-w-lg mx-auto shadow-2xl border-0 bg-background/95 backdrop-blur-sm">
           <CardHeader className="text-center space-y-4">
             <div className="animate-fade-in">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Sparkles className="w-6 h-6 text-[#FF6B35] animate-pulse" />
-              </div>
-              <CardTitle className="text-2xl font-bold text-[#1e556b]">
+              <CardTitle className="text-2xl flex items-center justify-center gap-2">
+                <Sparkles className="w-6 h-6 text-primary animate-pulse" />
                 Start Your Free Trial
               </CardTitle>
-              <CardDescription className="text-center mt-2 text-gray-600">
+              <CardDescription className="text-center mt-2">
                 Tell us about your business and we'll get you set up
               </CardDescription>
             </div>
@@ -320,7 +319,8 @@ export const LeadCaptureForm = () => {
                 <Button 
                   type="submit" 
                   size="lg" 
-                  className="w-full bg-[#FF6B35] hover:bg-[#FF6B35]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover-scale" 
+                  variant={ctaVariant} 
+                  className="w-full shadow-lg hover:shadow-xl transition-all duration-300 hover-scale" 
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? <>
@@ -335,43 +335,6 @@ export const LeadCaptureForm = () => {
             </form>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Orange FAB for mobile */}
-      <div className="fixed bottom-20 right-4 z-50 md:hidden">
-        <button
-          className="w-14 h-14 bg-[#FF6B35] rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
-          aria-label="Chat support"
-        >
-          <svg
-            className="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-            />
-          </svg>
-        </button>
-      </div>
-
-      {/* Bottom Navigation Bar for mobile */}
-      <div className="fixed bottom-0 left-0 right-0 bg-black text-white px-4 py-3 flex items-center justify-between md:hidden z-40">
-        <div className="w-6 h-6 flex flex-col gap-1">
-          <div className="h-0.5 bg-white"></div>
-          <div className="h-0.5 bg-white"></div>
-          <div className="h-0.5 bg-white"></div>
-        </div>
-        <div className="w-6 h-6 border-2 border-white rounded-full"></div>
-        <div className="w-6 h-6">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </div>
       </div>
     </section>;
 };

@@ -18,7 +18,7 @@ export const ImpactStrip = () => {
     description: "Coverage without hiring overhead.",
     color: "#FF6B35" // Hero text orange
   }];
-  return <section className="py-16 bg-transparent">
+  return <section className="py-16 bg-muted/40">
       <div className="container">
         <div className="text-center mb-12 animate-fade-in">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -26,7 +26,7 @@ export const ImpactStrip = () => {
           </h2>
         </div>
         
-        <div className="max-w-[1280px] mx-auto mb-16">
+        <div className="max-w-4xl mx-auto mb-16">
           <div className="animate-fade-in" style={{
           animationDelay: '400ms'
         }}>
@@ -34,7 +34,7 @@ export const ImpactStrip = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1280px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {impacts.map((impact, index) => {
           const Icon = impact.icon;
           {/* Increased card opacity to 90% (from 50%) for WCAG contrast */}

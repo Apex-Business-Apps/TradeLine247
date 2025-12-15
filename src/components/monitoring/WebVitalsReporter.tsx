@@ -89,7 +89,7 @@ export function WebVitalsReporter() {
         reportMetric('LCP', value, getRating('LCP', value));
       });
       lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-    } catch (_e) {
+    } catch (e) {
       errorReporter.report({
         type: 'error',
         message: 'LCP observer not supported',
@@ -113,7 +113,7 @@ export function WebVitalsReporter() {
         reportMetric('CLS', clsValue, getRating('CLS', clsValue));
       });
       clsObserver.observe({ type: 'layout-shift', buffered: true });
-    } catch (_e) {
+    } catch (e) {
       errorReporter.report({
         type: 'error',
         message: 'CLS observer not supported',
@@ -133,7 +133,7 @@ export function WebVitalsReporter() {
         reportMetric('FID', value, getRating('INP', value)); // Use INP thresholds
       });
       fidObserver.observe({ type: 'first-input', buffered: true });
-    } catch (_e) {
+    } catch (e) {
       errorReporter.report({
         type: 'error',
         message: 'FID observer not supported',
@@ -155,7 +155,7 @@ export function WebVitalsReporter() {
         }
       });
       fcpObserver.observe({ type: 'paint', buffered: true });
-    } catch (_e) {
+    } catch (e) {
       errorReporter.report({
         type: 'error',
         message: 'FCP observer not supported',
@@ -173,7 +173,7 @@ export function WebVitalsReporter() {
         const ttfb = navEntry.responseStart - navEntry.requestStart;
         reportMetric('TTFB', ttfb, getRating('TTFB', ttfb));
       }
-    } catch (_e) {
+    } catch (e) {
       errorReporter.report({
         type: 'error',
         message: 'TTFB calculation not supported',

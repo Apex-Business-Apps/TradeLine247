@@ -17,7 +17,7 @@ const steps = [{
   description: "We handle inquiries, book appointments, and grab leads while you sleep. If something needs you, we'll pass it along."
 }];
 export const HowItWorks = () => {
-  return <section className="py-20 bg-transparent">
+  return <section className="py-20 bg-gradient-to-br from-secondary/20 to-accent/15">
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -28,29 +28,26 @@ export const HowItWorks = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1280px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {steps.map((step, index) => {
             const IconComponent = step.icon;
             return (
-              <Card key={index} className="relative text-center group hover:shadow-lg transition-all duration-300">
-                <div
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                  style={{ backgroundColor: 'hsl(var(--brand-orange-dark))' }}
-                >
-                  {step.step}
+            <Card key={index} className="relative text-center group hover:shadow-lg transition-all duration-300">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: 'hsl(21 100% 20%)' }}>
+                {step.step}
+              </div>
+              <CardHeader className="pt-8">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
+                  <IconComponent className="w-8 h-8" style={{ color: 'hsl(21 100% 41%)' }} />
                 </div>
-                <CardHeader className="pt-8">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-                    <IconComponent className="w-8 h-8" style={{ color: 'hsl(21 100% 41%)' }} />
-                  </div>
-                  <CardTitle className="text-xl">{step.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base text-foreground">
-                    {step.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+                <CardTitle className="text-xl">{step.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base text-foreground">
+                  {step.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
             );
           })}
         </div>

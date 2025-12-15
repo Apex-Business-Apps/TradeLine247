@@ -49,8 +49,6 @@ const ThemeSync = () => {
   return null;
 };
 
-// Translation enforcement is handled by i18n/config.ts override - no duplicate logic needed
-
 interface AppLayoutProps {
   children?: ReactNode;
 }

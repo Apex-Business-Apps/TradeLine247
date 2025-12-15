@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '@/components/ui/navigation-menu';
-import { Menu, X, LogOut, Settings, Phone, Smartphone } from 'lucide-react';
+import { Menu, X, LogOut, User, Settings, Phone, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, useLocation } from 'react-router-dom';
 import { paths } from '@/routes/paths';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useSafeNavigation } from '@/hooks/useSafeNavigation';
+import { errorReporter } from '@/lib/errorReporter';
 import builtCanadianBadge from '@/assets/badges/built-canadian.svg';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -56,7 +57,6 @@ export const Header: React.FC = () => {
   const location = useLocation();
   const mobileMenuId = 'mobile-menu';
   const isUserAdmin = typeof isAdmin === 'function' ? isAdmin() : false;
-  const isLoggedIn = Boolean(user);
   const isMarketingHome = location?.pathname === paths.home;
 
   useEffect(() => {
@@ -179,16 +179,13 @@ export const Header: React.FC = () => {
       className={cn(
         'sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur',
         'supports-[backdrop-filter]:bg-background/60 transition-all duration-300 isolate',
-        isScrolled ? 'shadow-lg' : ''
+        isScrolled ? 'shadow-lg py-2' : 'py-4'
       )}
       style={{ isolation: 'isolate' }}
     >
-      <div
+      <div 
         data-header-inner 
-        className={cn(
-          'flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center gap-4',
-          isScrolled ? 'py-2' : 'py-4'
-        )}
+        className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 items-center gap-4"
       >
         {/* Left: Home Button & Badge */}
         <div 
@@ -295,17 +292,16 @@ export const Header: React.FC = () => {
           data-slot="right"
           className="flex items-center gap-2 ml-auto"
         >
-          {isLoggedIn && (
+          {user && (
             <Button
               variant="default"
               size={isScrolled ? 'sm' : 'default'}
               onClick={() => handleNavigation(paths.dashboard, 'Dashboard')}
-              className="hidden sm:inline-flex hover-scale transition-all duration-300"
+              className="hover-scale transition-all duration-300"
             >
               Dashboard
             </Button>
           )}
-
           <LanguageSwitcher />
 
           {/* Burger Menu Button - Always visible */}
@@ -493,15 +489,6 @@ export const Header: React.FC = () => {
             <div className="border-t border-border" />
             <div className="space-y-3">
               <LanguageSwitcher className="w-full" />
-              {isLoggedIn && (
-                <Button
-                  variant="default"
-                  onClick={() => handleNavigation(paths.dashboard, 'Dashboard', true)}
-                  className="w-full justify-center px-4 py-2.5 text-sm font-semibold"
-                >
-                  Dashboard
-                </Button>
-              )}
               {user ? (
                 <Button
                   variant="outline"

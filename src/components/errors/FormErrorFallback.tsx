@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Phone, Mail } from 'lucide-react';
+import { AlertTriangle, Phone, Mail, MessageCircle } from 'lucide-react';
 import { PUBLIC_HELPLINE_E164, PUBLIC_HELPLINE_DISPLAY, PUBLIC_EMAIL } from "@/config/public";
 
 interface FormErrorFallbackProps {

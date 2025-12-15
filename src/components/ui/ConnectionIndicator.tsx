@@ -12,7 +12,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { WifiOff, Signal, SignalLow, SignalMedium, SignalHigh } from 'lucide-react';
+import { Wifi, WifiOff, Signal, SignalLow, SignalMedium, SignalHigh } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { prefersReducedMotion } from '@/lib/performanceOptimizations';
 import { useAuth } from '@/hooks/useAuth';
@@ -102,39 +102,30 @@ function getStatusColor(quality: string): string {
  * Connection Indicator Component
  * Memoized to prevent unnecessary re-renders when network status hasn't changed
  */
-  export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.memo(({
-    showOnlyWhenIssues = true,
-    position = 'bottom-right',
-    className,
-  }) => {
-    const { status, queuedRequestCount } = useNetworkStatus();
-    const { user, isAdmin, userRole } = useAuth();
-    const authIsAdmin = isAdmin;
-    const [isVisible, setIsVisible] = useState(false);
-    const [announced, setAnnounced] = useState(false);
-
-    const isAdminUser = Boolean(user) && (typeof authIsAdmin === 'function' ? authIsAdmin() : userRole === 'admin');
-  const isSlowConnection = status.quality === 'slow';
+export const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = React.memo(({
+  showOnlyWhenIssues = true,
+  position = 'bottom-right',
+  className,
+}) => {
+  const { status, queuedRequestCount } = useNetworkStatus();
+  const { user, isAdmin, userRole } = useAuth();
+  const [isVisible, setIsVisible] = useState(false);
+  const [announced, setAnnounced] = useState(false);
 
   const isUserAdmin = user
-    ? (typeof isAdmin === 'function' ? isAdmin() : userRole === 'admin')
+    ? (typeof isAdmin === 'function' ? isAdmin() : userRole === 'admin' || userRole === 'owner')
     : false;
 
   // Show/hide logic
   useEffect(() => {
-    if (!isAdminUser) {
-      setIsVisible(false);
-      return;
-    }
-
     if (showOnlyWhenIssues) {
       // Show only when offline or slow
-      setIsVisible(isSlowConnection);
+      setIsVisible(!status.online || status.quality === 'slow' || status.quality === 'offline');
     } else {
       // Always show (for debugging/demo)
       setIsVisible(true);
     }
-  }, [isAdminUser, isSlowConnection, showOnlyWhenIssues]);
+  }, [status.online, status.quality, showOnlyWhenIssues]);
 
   // Screen reader announcement (only announce changes)
   useEffect(() => {
@@ -179,7 +170,9 @@ function getStatusColor(quality: string): string {
     'top-left': 'top-4 left-4',
   };
 
-  if (!isAdminUser || !isSlowConnection || !isVisible) return null;
+  const shouldHideSlowPill = status.quality === 'slow' && !isUserAdmin;
+
+  if (!isVisible || shouldHideSlowPill) return null;
 
   const shouldAnimate = !prefersReducedMotion();
   const statusMessage = getStatusMessage(status.type, status.quality, status.online);
