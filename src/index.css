@@ -63,41 +63,13 @@ body {
 .hero-background {
   position: relative;
   isolation: isolate;
-  /* Removed solid background-color - wallpaper should show through */
+  background-color: transparent; /* Allow wallpaper to show through */
   min-height: 100vh;
   height: auto;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.hero-background::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center top;
-  background-attachment: fixed;
-  pointer-events: none;
-  z-index: -1;
-  transform: translateZ(0);
-}
-
-/* REMOVED: .hero-gradient-tint class - no longer used
- * Gradient overlays now applied as inline background-image styles
- * on section containers in Index.tsx (45% hero, 65% rest)
- */
-
-@media (max-width: 640px) {
-  .landing-wallpaper { background-position: center 20%; }
-}
-
-@media (min-width: 641px) and (max-width: 1023px) {
-  .landing-wallpaper { background-position: center 15%; }
-}
-
-@media (min-width: 1024px) {
-  .landing-wallpaper { background-position: center; }
-}
+/* Responsive landing-wallpaper rules are in src/styles/landing.css */
 
 /* Always paint content above wallpaper */
 .dashboard-shell > * {

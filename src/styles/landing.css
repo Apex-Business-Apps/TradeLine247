@@ -2,53 +2,41 @@
  * These mask + wallpaper values are the canonical TradeLine 24/7 landing look.
  * Do not change rgba/opacity/gradient without explicit design approval.
  */
-:root {
-  --landing-wallpaper: var(--hero-wallpaper-image, url("/assets/BACKGROUND_IMAGE1.svg"));
-}
 
 .landing-shell {
   position: relative;
   isolation: isolate;
-  overflow-x: clip;
   min-height: 100dvh;
-  background-color: transparent;
-  /* DO NOT set backgroundImage here - only .landing-wallpaper paints the background */
+  overflow-x: clip;
 }
 
-/* Hero-shell: scopes wallpaper + mask to hero section only (prevents bleed) */
-.hero-shell {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-
-
-.landing-wallpaper {
-  position: fixed;
-  inset: 0;
-  z-index: -1; /* Bottom layer - below all content */
-  pointer-events: none; /* Never interfere with scrolling or interactions */
-  background-repeat: no-repeat;
-  background-size: 100% 100%; /* Stretch to fill viewport, adapt to viewport aspect ratio */
-  background-attachment: scroll; /* Changed from fixed - fixed causes issues on mobile */
-  background-position: center center; /* Center the image */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0); /* iOS Safari GPU acceleration */
-  -webkit-touch-callout: none; /* iOS Safari: prevent callout menu */
-  -webkit-user-select: none; /* Prevent text selection */
-  user-select: none;
-  will-change: transform; /* Optimize for scrolling performance */
-  opacity: 1; /* Ensure wallpaper is fully visible */
-}
-
+.landing-wallpaper,
 .landing-mask {
   position: fixed;
   inset: 0;
-  z-index: 1;
   pointer-events: none;
+}
 
-  /* Simple 30% overlay for consistent darkening - reduced for better background visibility */
-  background: hsl(var(--brand-orange-primary) / 0.3);
+.landing-wallpaper {
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center 20%;
+  background-attachment: fixed;
+  opacity: 1;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.landing-mask {
+  z-index: 1;
+  /* White overlay gradient: 40% hero → 65% rest */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.40) 0%,
+    rgba(255, 255, 255, 0.55) 30%,
+    rgba(255, 255, 255, 0.65) 100%
+  );
 }
 
 .landing-content {
@@ -56,51 +44,15 @@
   z-index: 10;
 }
 
-@media (min-width: 640px) {
-  .landing-wallpaper {
-    background-position: center 15%;
-  }
+/* Responsive focal points */
+@media (max-width: 640px) {
+  .landing-wallpaper { background-position: center 20%; }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .landing-wallpaper { background-position: center 15%; }
 }
 
 @media (min-width: 1024px) {
-  .landing-wallpaper {
-    background-size: 100% 100%; /* Stretch to fill viewport, adapt to viewport aspect ratio */
-    background-position: center center;
-    /* Removed background-color - wallpaper image should show through */
-  }
+  .landing-wallpaper { background-position: center; }
 }
-
-/* Desktop: Fixed attachment for persistent viewport fill */
-@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
-  .landing-wallpaper {
-    background-attachment: fixed; /* Desktop: persistent viewport fill */
-    background-size: 100% 100%; /* Stretch to fill viewport, adapt to viewport aspect ratio */
-  }
-}
-
-/* iOS/iPadOS: Scroll attachment, optimize for touch and safe areas */
-@supports (-webkit-touch-callout: none) {
-  .landing-wallpaper {
-    background-attachment: scroll; /* iOS: scroll prevents rendering issues */
-    -webkit-transform: translateZ(0); /* GPU acceleration */
-    transform: translateZ(0);
-  }
-}
-
-/* Android: Scroll attachment, optimize for Material Design */
-@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
-  .landing-wallpaper {
-    background-attachment: scroll; /* Android: scroll prevents rendering issues */
-    transform: translateZ(0); /* GPU acceleration */
-  }
-}
-
-/* Tablet: Adaptive based on orientation */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .landing-wallpaper {
-    background-attachment: scroll; /* Tablet: scroll for better performance */
-  }
-}
-
-/* iOS-specific: wallpaper/mask already absolute, no change needed */
-
