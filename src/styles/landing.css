@@ -19,8 +19,8 @@
   bottom: 0;
   z-index: -1;
   background-repeat: no-repeat;
-  background-size: auto 100%;
-  background-position: right center;
+  background-size: cover;
+  background-position: center center;
   pointer-events: none;
   /* NO background-attachment: fixed - that causes mobile issues */
 }
@@ -32,7 +32,7 @@
   right: 0;
   bottom: 0;
   z-index: 0;
-  background: rgba(255, 107, 53, 0.50);
+  background: rgba(255, 107, 53, 0.5);
   pointer-events: none;
 }
 
@@ -44,21 +44,21 @@
 /* Responsive focal points - keep woman's face visible */
 @media (max-width: 640px) {
   .landing-wallpaper {
-    background-size: auto 100%;
-    background-position: 70% center;
+    background-size: cover;
+    background-position: 60% center;
   }
 }
 
 @media (min-width: 641px) and (max-width: 1023px) {
   .landing-wallpaper {
-    background-size: auto 100%;
-    background-position: 60% center;
+    background-size: cover;
+    background-position: center center;
   }
 }
 
 @media (min-width: 1024px) {
   .landing-wallpaper {
-    background-size: auto 100%;
-    background-position: right center;
+    background-size: cover;
+    background-position: center center;
   }
 }
