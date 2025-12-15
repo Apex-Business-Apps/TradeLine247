@@ -10,6 +10,61 @@ export const Footer: React.FC = () => {
   return (
     <footer className="border-t bg-background mt-auto" role="contentinfo">
       <div className="container py-4">
+        {/* ============================================
+            ECOSYSTEM PARTNERS STRIP
+            Added: December 15, 2025
+            ============================================ */}
+        <div className="w-full border-t border-gray-700 mt-8 pt-6">
+          <div className="text-center mb-4">
+            <span className="text-xs text-gray-400 uppercase tracking-wider">
+              Ecosystem Partners
+            </span>
+          </div>
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+            {/* APEX Business Systems */}
+            <a 
+              href="https://apexbusinesssystems.ca" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="opacity-70 hover:opacity-100 transition-opacity"
+            >
+              <img 
+                src="/partners/apex-wordmark.png" 
+                alt="Apex Business Systems" 
+                className="h-8 md:h-10 w-auto"
+              />
+            </a>
+            
+            {/* Alberta Innovates */}
+            <a 
+              href="https://albertainnovates.ca" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="opacity-70 hover:opacity-100 transition-opacity"
+            >
+              <img 
+                src="/partners/alberta-innovates.png" 
+                alt="Alberta Innovates" 
+                className="h-8 md:h-10 w-auto"
+              />
+            </a>
+            
+            {/* ERIN - Edmonton Regional Innovation Network */}
+            <a 
+              href="https://edmontonrin.ca" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="opacity-70 hover:opacity-100 transition-opacity"
+            >
+              <img 
+                src="/partners/erin-logo.png" 
+                alt="ERIN - Edmonton Regional Innovation Network" 
+                className="h-8 md:h-10 w-auto"
+              />
+            </a>
+          </div>
+        </div>
+
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-center md:text-left">
             <div className="flex items-center gap-2 mb-2">
