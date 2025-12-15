@@ -8,12 +8,12 @@ const docsLinks = [
   {
     title: 'Project Overview',
     description: 'Primary README covering TradeLine 24/7 setup, scripts, and contribution notes.',
-    href: new URL('../../README.md', import.meta.url).href
+    href: 'https://github.com/Apex-Business-Apps/TradeLine247/raw/main/README.md'
   },
   {
     title: 'Telephony (Twilio Voice) Guide',
     description: 'Archived telephony integration notes for voice flows and configuration.',
-    href: new URL('../../docs/archive/telephony/TWILIO_VOICE_README.md', import.meta.url).href
+    href: 'https://github.com/Apex-Business-Apps/TradeLine247/raw/main/docs/archive/telephony/TWILIO_VOICE_README.md'
   }
 ];
 

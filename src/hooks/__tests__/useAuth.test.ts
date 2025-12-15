@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { useAuth } from '../useAuth';
 import { createMockUser, createMockSession } from '@/__tests__/utils/test-utils';
 
@@ -51,9 +51,13 @@ describe('useAuth', () => {
   let mockFrom: ReturnType<typeof vi.fn>;
   let mockMaybeSingle: ReturnType<typeof vi.fn>;
   let ensureMembership: ReturnType<typeof vi.fn>;
+  let authChangeCallback: any;
+  let unsubscribe: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    authChangeCallback = undefined;
+    unsubscribe = vi.fn();
 
     // Use ES imports instead of require() for proper module resolution
     const { supabase } = await import('@/integrations/supabase/client');
@@ -79,8 +83,11 @@ describe('useAuth', () => {
       error: null,
     });
 
-    mockOnAuthStateChange.mockReturnValue({
-      data: { subscription: { unsubscribe: vi.fn() } },
+    mockOnAuthStateChange.mockImplementation((callback) => {
+      authChangeCallback = callback;
+      return {
+        data: { subscription: { unsubscribe } },
+      };
     });
 
     // Mock signOut to return a resolved Promise
@@ -128,14 +135,10 @@ describe('useAuth', () => {
       });
 
       // Trigger the auth state change callback
-      mockOnAuthStateChange.mockImplementation((callback) => {
-        setTimeout(() => callback('SIGNED_IN', mockSession), 0);
-        return {
-          data: { subscription: { unsubscribe: vi.fn() } },
-        };
-      });
-
       const { result } = renderHook(() => useAuth());
+      await act(async () => {
+        authChangeCallback?.('SIGNED_IN', mockSession);
+      });
 
       await waitFor(() => {
         expect(result.current.user).toBeTruthy();
@@ -150,16 +153,6 @@ describe('useAuth', () => {
     it('should clear session on sign out', async () => {
       const mockUser = createMockUser();
       const mockSession = createMockSession(mockUser);
-
-      let authChangeCallback: any;
-      mockOnAuthStateChange.mockImplementation((callback) => {
-        authChangeCallback = callback;
-        setTimeout(() => callback('SIGNED_IN', mockSession), 0);
-        return {
-          data: { subscription: { unsubscribe: vi.fn() } },
-        };
-      });
-
       mockGetSession.mockResolvedValue({
         data: { session: mockSession },
         error: null,
@@ -167,13 +160,19 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
 
+      await act(async () => {
+        authChangeCallback?.('SIGNED_IN', mockSession);
+      });
+
       await waitFor(() => {
         expect(result.current.user).toBeTruthy();
       });
 
       // Simulate auth state change to null (sign out)
       if (authChangeCallback) {
-        authChangeCallback('SIGNED_OUT', null);
+        await act(async () => {
+          authChangeCallback('SIGNED_OUT', null);
+        });
       }
 
       await waitFor(() => {
@@ -241,12 +240,14 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
-      // Wait for user to be set first
+      await act(async () => {
+        authChangeCallback?.('SIGNED_IN', mockSession);
+      });
+      
       await waitFor(() => {
         expect(result.current.user).toBeTruthy();
       });
       
-      // Then wait for role to be fetched
       await waitFor(() => {
         expect(result.current.userRole).toBe('admin');
       }, { timeout: 3000 });
@@ -269,12 +270,14 @@ describe('useAuth', () => {
 
       const { result } = renderHook(() => useAuth());
       
-      // Wait for user to be set first
+      await act(async () => {
+        authChangeCallback?.('SIGNED_IN', mockSession);
+      });
+      
       await waitFor(() => {
         expect(result.current.user).toBeTruthy();
       });
       
-      // Then wait for default role to be set
       await waitFor(() => {
         expect(result.current.userRole).toBe('user');
       }, { timeout: 3000 });
@@ -293,6 +296,10 @@ describe('useAuth', () => {
 
       renderHook(() => useAuth());
       
+      await act(async () => {
+        authChangeCallback?.('SIGNED_IN', mockSession);
+      });
+      
       await waitFor(() => {
         expect(ensureMembership).toHaveBeenCalledWith(mockUser);
       });
@@ -301,11 +308,6 @@ describe('useAuth', () => {
 
   describe('cleanup', () => {
     it('should unsubscribe from auth state changes on unmount', () => {
-      const unsubscribe = vi.fn();
-      mockOnAuthStateChange.mockReturnValue({
-        data: { subscription: { unsubscribe } },
-      });
-
       const { unmount } = renderHook(() => useAuth());
       
       unmount();

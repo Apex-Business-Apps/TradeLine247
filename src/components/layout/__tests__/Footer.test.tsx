@@ -19,9 +19,10 @@ describe('Footer', () => {
       expect(screen.getByRole('link', { name: label })).toBeInTheDocument();
     });
 
-    const badges = screen.getAllByTestId('trust-badge');
-    expect(badges.length).toBeGreaterThanOrEqual(4);
-    // Partner badges now show abbreviated names with full title on hover
-    expect(screen.getByTitle(/Backed by Alberta Innovates/i)).toBeInTheDocument();
+    const partnerBadges = screen.getAllByAltText(
+      /(Apex Business Systems|Alberta Innovates|ERIN - Edmonton Regional Innovation Network)/i
+    );
+    expect(partnerBadges.length).toBeGreaterThanOrEqual(3);
+    expect(screen.getByAltText(/Alberta Innovates/i)).toBeInTheDocument();
   });
 });

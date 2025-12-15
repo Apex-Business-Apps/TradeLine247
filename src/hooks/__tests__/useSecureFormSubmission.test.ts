@@ -128,7 +128,10 @@ describe('useSecureFormSubmission', () => {
     it('should skip rate limit check when no rateLimitKey provided', async () => {
       const { result } = renderHook(() => useSecureFormSubmission());
 
-      const allowed = await result.current.checkRateLimit();
+      let allowed = false;
+      await act(async () => {
+        allowed = await result.current.checkRateLimit();
+      });
 
       expect(allowed).toBe(true);
       expect(mockRpc).not.toHaveBeenCalled();
@@ -300,7 +303,10 @@ describe('useSecureFormSubmission', () => {
         rateLimitKey: 'test-key',
       }));
 
-      const allowed = await result.current.checkRateLimit();
+      let allowed = false;
+      await act(async () => {
+        allowed = await result.current.checkRateLimit();
+      });
 
       expect(allowed).toBe(false);
 
