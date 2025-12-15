@@ -35,7 +35,7 @@ export default function HeroRoiDuo() {
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
-      {/* Background and overlay handled by .landing-wallpaper and .landing-mask in Index.tsx */}
+      {/* Background and overlay handled by #app-home in Index.tsx */}
       {/* hero-bg div kept for test compatibility */}
       <div className="hero-bg" aria-hidden="true" data-testid="hero-bg"></div>
       <div className="container relative z-10" data-lovable-lock="structure-only">
