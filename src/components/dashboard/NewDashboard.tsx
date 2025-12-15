@@ -43,6 +43,7 @@ export const NewDashboard = () => {
     showQuickActions,
     showServiceHealth,
     showRecentActivity,
+    translationsEnabled,
   } = useUserPreferencesStore();
   const { isWelcomeDialogOpen, setWelcomeDialogOpen } = useDashboardStore();
 
@@ -54,38 +55,39 @@ export const NewDashboard = () => {
   }, [hasCompletedOnboarding, isWelcomeDialogOpen, setWelcomeDialogOpen]);
 
   const getKpiConfig = (id: string) => {
+    // Use English text directly when translations are disabled, otherwise use translations
     const configs = {
       bookings: {
-        title: t('kpi.bookings'),
-        subtitle: t('kpi.bookings_subtitle'),
+        title: translationsEnabled ? t('kpi.bookings') : 'Bookings this week',
+        subtitle: translationsEnabled ? t('kpi.bookings_subtitle') : 'New appointments scheduled',
         icon: Calendar,
         color: 'text-info dark:text-blue-400',
         bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-        ariaLabel: t('kpi.bookings_aria')
+        ariaLabel: translationsEnabled ? t('kpi.bookings_aria') : 'Weekly bookings performance'
       },
       payout: {
-        title: t('kpi.payout'),
-        subtitle: t('kpi.payout_subtitle'),
+        title: translationsEnabled ? t('kpi.payout') : 'Expected payout',
+        subtitle: translationsEnabled ? t('kpi.payout_subtitle') : 'Revenue from active calls',
         icon: DollarSign,
         color: 'text-success dark:text-green-400',
         bgColor: 'bg-green-100 dark:bg-green-900/30',
-        ariaLabel: t('kpi.payout_aria')
+        ariaLabel: translationsEnabled ? t('kpi.payout_aria') : 'Expected revenue payout'
       },
       answerRate: {
-        title: t('kpi.answerRate'),
-        subtitle: t('kpi.answerRate_subtitle'),
+        title: translationsEnabled ? t('kpi.answerRate') : 'Calls we caught',
+        subtitle: translationsEnabled ? t('kpi.answerRate_subtitle') : 'Answer rate this period',
         icon: Phone,
         color: 'text-neutral dark:text-purple-400',
         bgColor: 'bg-purple-100 dark:bg-purple-900/30',
-        ariaLabel: t('kpi.answerRate_aria')
+        ariaLabel: translationsEnabled ? t('kpi.answerRate_aria') : 'Call answer rate performance'
       },
       rescued: {
-        title: t('kpi.rescued'),
-        subtitle: t('kpi.rescued_subtitle'),
+        title: translationsEnabled ? t('kpi.rescued') : 'Missed but saved',
+        subtitle: translationsEnabled ? t('kpi.rescued_subtitle') : 'Calls recovered by AI',
         icon: Shield,
         color: 'text-brand-primary dark:text-orange-400',
         bgColor: 'bg-orange-100 dark:bg-orange-900/30',
-        ariaLabel: t('kpi.rescued_aria')
+        ariaLabel: translationsEnabled ? t('kpi.rescued_aria') : 'Calls rescued from being missed'
       }
     };
     return configs[id] || configs.bookings;
@@ -133,10 +135,10 @@ export const NewDashboard = () => {
           // Empty state - No data yet
           Array.from({ length: 4 }).map((_, i) => {
             const configs = [
-              { title: t('kpi.bookings'), subtitle: t('kpi.bookings_empty') },
-              { title: t('kpi.payout'), subtitle: t('kpi.payout_empty') },
-              { title: t('kpi.answerRate'), subtitle: t('kpi.answerRate_empty') },
-              { title: t('kpi.rescued'), subtitle: t('kpi.rescued_empty') }
+              { title: translationsEnabled ? t('kpi.bookings') : 'Bookings this week', subtitle: translationsEnabled ? t('kpi.bookings_empty') : 'No appointments yet this week' },
+              { title: translationsEnabled ? t('kpi.payout') : 'Expected payout', subtitle: translationsEnabled ? t('kpi.payout_empty') : 'Revenue will calculate from calls' },
+              { title: translationsEnabled ? t('kpi.answerRate') : 'Calls we caught', subtitle: translationsEnabled ? t('kpi.answerRate_empty') : 'No calls received yet' },
+              { title: translationsEnabled ? t('kpi.rescued') : 'Missed but saved', subtitle: translationsEnabled ? t('kpi.rescued_empty') : 'No recovered calls yet' }
             ];
             return (
               <Card key={i} className="relative overflow-hidden border-0 opacity-70 hover:opacity-90 transition-opacity">

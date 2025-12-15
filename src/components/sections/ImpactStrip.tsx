@@ -26,7 +26,7 @@ export const ImpactStrip = () => {
           </h2>
         </div>
         
-        <div className="max-w-4xl mx-auto mb-16">
+        <div className="max-w-[1280px] mx-auto mb-16">
           <div className="animate-fade-in" style={{
           animationDelay: '400ms'
         }}>
@@ -34,7 +34,7 @@ export const ImpactStrip = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1280px] mx-auto">
           {impacts.map((impact, index) => {
           const Icon = impact.icon;
           {/* Increased card opacity to 90% (from 50%) for WCAG contrast */}

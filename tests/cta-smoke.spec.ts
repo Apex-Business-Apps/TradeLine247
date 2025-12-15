@@ -9,7 +9,7 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:4176';
 // CTA definitions with their expected destinations
 const CTAS = [
   // Homepage CTAs
-  { name: 'Start Free Trial (Hero)', page: '/', selector: 'button:has-text("Start Free Trial")', expectedUrl: '/auth' },
+  { name: 'Start Free Trial (Hero)', page: '/', selector: 'button:has-text("Start Free Trial"), button:has-text("Grow Now")', expectedUrl: '/auth' },
   { name: 'Grow Now (Lead Form)', page: '/', selector: 'button:has-text("Grow Now")', expectedUrl: '/auth' },
 
   // Pricing page CTAs

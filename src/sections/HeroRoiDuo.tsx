@@ -35,19 +35,8 @@ export default function HeroRoiDuo() {
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
-      {/* Hero gradient overlay - single-color brand orange at 40% opacity */}
-      {/* NOTE: Background image comes from .landing-wallpaper in Index.tsx - do not duplicate here */}
-      <div
-        className="absolute inset-0 z-[1]"
-        style={{
-          backgroundColor: "hsl(var(--brand-orange-primary) / 0.4)",
-          pointerEvents: "none",
-        }}
-        aria-hidden="true"
-      />
-      <div className="hero-gradient" aria-hidden="true" data-testid="hero-bg"></div>
-      <div className="hero-gradient-overlay" aria-hidden="true"></div>
-      <div className="hero-vignette" aria-hidden="true"></div>
+      {/* Hero background and gradient overlay are handled by inline gradients in Index.tsx */}
+      {/* Removed duplicate overlay divs - overlays are applied via inline styles in Index.tsx */}
       <div className="container relative z-10" data-lovable-lock="structure-only">
         {/* Hero Content */}
         <div className="text-center mb-16" data-lovable-lock="structure-only">

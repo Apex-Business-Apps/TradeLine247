@@ -43,6 +43,9 @@ export interface UserPreferences {
   // Analytics & tracking consent
   analyticsEnabled: boolean;
 
+  // Translation preferences
+  translationsEnabled: boolean;
+
   // Recent activity tracking
   recentActions: Array<{
     action: string;
@@ -61,6 +64,7 @@ interface UserPreferencesStore extends UserPreferences {
   toggleDashboardSection: (section: keyof Pick<UserPreferences, 'showWelcomeMessage' | 'showQuickActions' | 'showServiceHealth' | 'showRecentActivity'>) => void;
   setNotificationSettings: (settings: Partial<Pick<UserPreferences, 'enableNotifications' | 'enableSoundEffects' | 'notificationFrequency'>>) => void;
   setDisplayPreferences: (preferences: Partial<Pick<UserPreferences, 'compactMode' | 'showAnimations' | 'reduceMotion'>>) => void;
+  setTranslationsEnabled: (enabled: boolean) => void;
   addRecentAction: (action: string) => void;
   resetPreferences: () => void;
 }
@@ -83,6 +87,7 @@ const defaultPreferences: UserPreferences = {
   showAnimations: true,
   reduceMotion: false,
   analyticsEnabled: true,
+  translationsEnabled: false, // Default: English only, translations must be activated
   recentActions: [],
 };
 
@@ -117,6 +122,9 @@ export const useUserPreferencesStore = create<UserPreferencesStore>()(
 
       setDisplayPreferences: (preferences) =>
         set((state) => ({ ...state, ...preferences })),
+
+      setTranslationsEnabled: (enabled) =>
+        set({ translationsEnabled: enabled }),
 
       addRecentAction: (action) =>
         set((state) => ({
