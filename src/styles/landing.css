@@ -2,51 +2,41 @@
  * These mask + wallpaper values are the canonical TradeLine 24/7 landing look.
  * Do not change rgba/opacity/gradient without explicit design approval.
  */
-:root {
-  --landing-wallpaper: var(--hero-wallpaper-image, url("/assets/BACKGROUND_IMAGE1.svg"));
-}
 
 .landing-shell {
   position: relative;
   isolation: isolate;
-  overflow-x: clip;
   min-height: 100dvh;
-  background-color: transparent;
-  /* DO NOT set backgroundImage here - only .landing-wallpaper paints the background */
+  overflow-x: clip;
 }
 
-/* Hero-shell: scopes wallpaper + mask to hero section only (prevents bleed) */
-.hero-shell {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-
-
-.landing-wallpaper {
-  position: fixed;
-  inset: 0;
-  z-index: -1; /* Below mask and content */
-  pointer-events: none; /* Never interfere with scrolling or interactions */
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center top;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0); /* iOS Safari GPU acceleration */
-  -webkit-touch-callout: none; /* iOS Safari: prevent callout menu */
-  -webkit-user-select: none; /* Prevent text selection */
-  user-select: none;
-  will-change: transform; /* Optimize for scrolling performance */
-}
-
+.landing-wallpaper,
 .landing-mask {
   position: fixed;
   inset: 0;
-  z-index: 0; /* Above wallpaper, below content */
   pointer-events: none;
+}
 
-  /* Semi-transparent overlay - lets background image show through */
-  background: hsl(var(--brand-orange-primary) / 0.50);
+.landing-wallpaper {
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center 20%;
+  background-attachment: fixed;
+  opacity: 1;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.landing-mask {
+  z-index: 1;
+  /* White overlay gradient: 40% hero → 65% rest */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.40) 0%,
+    rgba(255, 255, 255, 0.55) 30%,
+    rgba(255, 255, 255, 0.65) 100%
+  );
 }
 
 .landing-content {
@@ -54,19 +44,15 @@
   z-index: 10;
 }
 
-@media (min-width: 640px) {
-  .landing-wallpaper {
-    background-position: center 15%;
-  }
+/* Responsive focal points */
+@media (max-width: 640px) {
+  .landing-wallpaper { background-position: center 20%; }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .landing-wallpaper { background-position: center 15%; }
 }
 
 @media (min-width: 1024px) {
-  .landing-wallpaper {
-    background-size: cover;
-    background-position: center top;
-    /* No background-color - let the image show */
-  }
+  .landing-wallpaper { background-position: center; }
 }
-
-/* iOS-specific: wallpaper/mask already absolute, no change needed */
-

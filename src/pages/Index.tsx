@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useMemo } from "react";
+import { CSSProperties, useEffect } from "react";
 
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
@@ -15,14 +15,6 @@ import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
 
 const BACKGROUND_IMAGE_URL = backgroundImage;
-const LANDING_BACKGROUND_COLOR = "hsl(0, 0%, 97%)";
-
-// Single wallpaper layer — DO NOT DUPLICATE elsewhere.
-// NOTE: sizing/position are handled by CSS on .landing-wallpaper to remain stable + non-cropping.
-const createWallpaperStyle = (imageUrl: string): CSSProperties => ({
-  backgroundImage: `url(${imageUrl})`,
-  backgroundAttachment: "fixed",
-});
 
 export default function Index() {
   const { trackPageView } = useAnalytics();
@@ -36,7 +28,6 @@ export default function Index() {
     const img = new Image();
     img.src = BACKGROUND_IMAGE_URL;
     img.onerror = () => {
-      // keep error reporting best-effort and non-blocking
       try {
         errorReporter.report({
           type: "error",
@@ -52,30 +43,31 @@ export default function Index() {
     };
   }, []);
 
-  const wallpaperStyle = useMemo(
-    () => createWallpaperStyle(BACKGROUND_IMAGE_URL),
-    []
-  );
-
   return (
     <div
       id="app-home"
       className="landing-shell min-h-screen flex flex-col relative"
-      style={{ backgroundColor: LANDING_BACKGROUND_COLOR }}
+      style={{
+        "--hero-wallpaper-image": `url(${BACKGROUND_IMAGE_URL})`,
+        backgroundColor: "hsl(0, 0%, 97%)",
+      } as CSSProperties}
     >
-      {/* Single wallpaper + single mask. Do not remove without founder sign-off. */}
+      {/* Wallpaper layer - ONLY place background image is set */}
       <div
         className="landing-wallpaper"
         data-testid="landing-wallpaper"
         aria-hidden="true"
-        style={wallpaperStyle}
+        style={{ backgroundImage: "var(--hero-wallpaper-image)" }}
       />
+
+      {/* Mask layer - gradient/tint only, NO background-image */}
       <div
         className="landing-mask"
         data-testid="landing-mask"
         aria-hidden="true"
       />
 
+      {/* Content layer */}
       <div className="landing-content relative z-10 flex-1 flex flex-col">
         <AISEOHead
           title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
