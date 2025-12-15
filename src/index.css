@@ -63,7 +63,7 @@ body {
 .hero-background {
   position: relative;
   isolation: isolate;
-  background-color: hsl(0, 0%, 97%);
+  /* Removed solid background-color - wallpaper should show through */
   min-height: 100vh;
   height: auto;
   overflow: hidden;
@@ -1815,7 +1815,7 @@ code[class*="bg-primary"],
     rgba(229, 90, 43, 0.5) 100%);
   opacity: 0.8;
   pointer-events: none;
-}
+} */
 
 .hero-gradient h1,
 [data-testid="hero-bg"] h1,
@@ -1844,7 +1844,7 @@ a[href*="/auth"] {
 [data-page="home"] .hero-gradient::after,
 .landing-hero::after {
   content: none !important;
-} */
+}
 
 /* ======================================== */
 
@@ -1978,6 +1978,20 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 #app-home {
   position: relative;
   isolation: isolate;
+}
+
+#app-home, .hero-bg, [class*="hero-section"] {
+  background-attachment: scroll;
+  background-position: center top;
+  background-size: cover;
+  min-height: var(--vh-safe);
+}
+
+@media (max-width: 768px) {
+  #app-home, .hero-bg, [class*="hero-section"] {
+    background-attachment: scroll !important;
+    background-position: center 20%;
+  }
 }
 
 @supports (-webkit-touch-callout: none) {

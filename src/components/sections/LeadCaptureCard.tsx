@@ -370,7 +370,7 @@ export const LeadCaptureCard = ({ compact = false }: LeadCaptureCardProps) => {
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 mr-2" />
-                          Start Free Trial
+                          {ctaText}
                         </>
                       )}
                     </Button>

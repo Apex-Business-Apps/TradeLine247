@@ -66,7 +66,7 @@
   .landing-wallpaper {
     background-size: 100% 100%; /* Stretch to fill viewport, adapt to viewport aspect ratio */
     background-position: center center;
-    background-color: hsl(0 0% 97%);
+    /* Removed background-color - wallpaper image should show through */
   }
 }
 

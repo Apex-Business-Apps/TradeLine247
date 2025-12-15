@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { SUPPORTED_LOCALES } from '@/i18n/config';
+import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 
 interface LanguageSwitcherProps {
   className?: string;
@@ -16,11 +17,28 @@ interface LanguageSwitcherProps {
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ className }) => {
   const { t, i18n } = useTranslation('common');
+  const { translationsEnabled, setTranslationsEnabled } = useUserPreferencesStore();
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
   };
 
+  // If translations are disabled, show button that enables them
+  if (!translationsEnabled) {
+    return (
+      <Button 
+        variant="ghost" 
+        size="icon"
+        className={className}
+        onClick={() => setTranslationsEnabled(true)}
+        aria-label="Enable translations"
+      >
+        <Globe className="h-5 w-5" />
+      </Button>
+    );
+  }
+
+  // If translations are enabled, show language switcher dropdown
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
