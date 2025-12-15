@@ -26,11 +26,11 @@
 .landing-wallpaper {
   position: fixed;
   inset: 0;
-  z-index: 0; /* Bottom layer - at base level, not negative */
+  z-index: -1; /* Below mask and content */
   pointer-events: none; /* Never interfere with scrolling or interactions */
   background-repeat: no-repeat;
   background-size: cover;
-  /* background-position handled by existing media queries (20% mobile, 15% tablet, center desktop) */
+  background-position: center top;
   transform: translateZ(0);
   -webkit-transform: translateZ(0); /* iOS Safari GPU acceleration */
   -webkit-touch-callout: none; /* iOS Safari: prevent callout menu */
@@ -42,11 +42,11 @@
 .landing-mask {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 0; /* Above wallpaper, below content */
   pointer-events: none;
 
-  /* Simple 65% overlay for consistent darkening */
-  background: hsl(var(--brand-orange-primary) / 0.65);
+  /* Semi-transparent overlay - lets background image show through */
+  background: hsl(var(--brand-orange-primary) / 0.50);
 }
 
 .landing-content {
@@ -64,7 +64,7 @@
   .landing-wallpaper {
     background-size: cover;
     background-position: center top;
-    background-color: hsl(0 0% 97%);
+    /* No background-color - let the image show */
   }
 }
 

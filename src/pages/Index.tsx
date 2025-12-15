@@ -65,7 +65,7 @@ export default function Index() {
     >
       {/* Single wallpaper + single mask. Do not remove without founder sign-off. */}
       <div
-        className="landing-wallpaper z-0"
+        className="landing-wallpaper"
         data-testid="landing-wallpaper"
         aria-hidden="true"
         style={wallpaperStyle}

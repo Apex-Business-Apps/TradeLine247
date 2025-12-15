@@ -63,23 +63,10 @@ body {
 .hero-background {
   position: relative;
   isolation: isolate;
-  background-color: hsl(0, 0%, 97%);
+  background-color: transparent; /* Allow wallpaper to show through */
   min-height: 100vh;
   height: auto;
-  overflow: hidden;
-}
-
-.hero-background::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center top;
-  background-attachment: fixed;
-  pointer-events: none;
-  z-index: -1;
-  transform: translateZ(0);
+  overflow: visible; /* Allow fixed elements to render */
 }
 
 /* REMOVED: .hero-gradient-tint class - no longer used

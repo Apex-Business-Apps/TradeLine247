@@ -184,20 +184,6 @@ export const Header: React.FC = () => {
       style={{ isolation: 'isolate' }}
     >
       <div
-        className="md:hidden bg-[#FF6B35] text-white px-4 py-2 flex items-center justify-between"
-        aria-hidden="true"
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">11:36</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-1 rounded-full bg-white"></div>
-          <div className="w-1 h-1 rounded-full bg-white"></div>
-          <div className="w-1 h-1 rounded-full bg-white"></div>
-        </div>
-      </div>
-
-      <div 
         data-header-inner 
         className={cn(
           'flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 items-center gap-4',
