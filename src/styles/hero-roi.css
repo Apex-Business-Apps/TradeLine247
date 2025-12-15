@@ -65,7 +65,7 @@
   align-items: start !important;
   margin: 0 auto !important;
   width: 100% !important;
-  max-width: 1800px !important;
+  max-width: 1280px !important;
 }
 
 /* Mobile: centered, NO offset - LOCKED */
@@ -95,7 +95,7 @@
 @media (min-width: 1024px) {
   .hero-roi__grid {
     grid-template-columns: repeat(2, minmax(550px, 715px)) !important; /* Increased by 10% */
-    max-width: 1980px !important; /* Increased by 10% from 1800px */
+    max-width: 1280px !important; /* Unified max-width constraint */
     gap: 4rem !important;
     justify-content: center !important;
   }

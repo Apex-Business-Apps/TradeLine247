@@ -7,14 +7,14 @@
 
 export const OVERLAY = {
   /**
-   * Hero section overlay - 40% opacity
+   * Hero section overlay - 20% opacity (reduced for better background visibility)
    * Applied to hero sections to maintain readability while showing background
    */
-  hero: "hsl(var(--brand-orange-primary) / 0.4)",
+  hero: "hsl(var(--brand-orange-primary) / 0.2)",
   
   /**
-   * Non-hero section overlay - 65% opacity
+   * Non-hero section overlay - 30% opacity (reduced for better background visibility)
    * Applied to landing page sections (excluding hero) for consistent darkening
    */
-  section: "hsl(var(--brand-orange-primary) / 0.65)",
+  section: "hsl(var(--brand-orange-primary) / 0.3)",
 } as const;
