@@ -1,8 +1,8 @@
 /* IMPORTANT:
  * These mask + wallpaper values are the canonical TradeLine 24/7 landing look.
  * Do not change rgba/opacity/gradient without explicit design approval.
- * Wallpaper: background-size: cover (fills viewport)
- * Mask: ORANGE gradient overlay (#FF6B35 / rgb(255, 107, 53))
+ * Wallpaper: position absolute, background-size cover, NO fixed attachment
+ * Mask: Subtle orange overlay (50% opacity)
  */
 
 .landing-shell {
@@ -14,7 +14,7 @@
 
 .landing-wallpaper,
 .landing-mask {
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
 }
@@ -23,8 +23,8 @@
   z-index: 0;
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: center 20%;
-  background-attachment: fixed;
+  background-position: center top;
+  /* NO background-attachment: fixed - breaks mobile */
   opacity: 1;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
@@ -32,13 +32,8 @@
 
 .landing-mask {
   z-index: 1;
-  /* Orange overlay gradient: 40% hero → 65% rest */
-  background: linear-gradient(
-    180deg,
-    rgba(255, 107, 53, 0.40) 0%,
-    rgba(255, 107, 53, 0.55) 30%,
-    rgba(255, 107, 53, 0.65) 100%
-  );
+  /* Subtle orange overlay - 50% opacity */
+  background: rgba(255, 107, 53, 0.50);
 }
 
 .landing-content {
@@ -48,13 +43,22 @@
 
 /* Responsive focal points */
 @media (max-width: 640px) {
-  .landing-wallpaper { background-position: center 20%; }
+  .landing-wallpaper {
+    background-position: center 20%;
+    background-size: cover;
+  }
 }
 
 @media (min-width: 641px) and (max-width: 1023px) {
-  .landing-wallpaper { background-position: center 15%; }
+  .landing-wallpaper {
+    background-position: center 15%;
+    background-size: cover;
+  }
 }
 
 @media (min-width: 1024px) {
-  .landing-wallpaper { background-position: center; }
+  .landing-wallpaper {
+    background-position: center;
+    background-size: cover;
+  }
 }
