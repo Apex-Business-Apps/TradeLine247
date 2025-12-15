@@ -1,6 +1,6 @@
 /* IMPORTANT:
  * These mask + wallpaper values are the canonical TradeLine 24/7 landing look.
- * Wallpaper: position fixed, covers full viewport, NO background-attachment fixed
+ * Wallpaper: position fixed, covers full viewport with background-size: cover
  * Mask: Subtle orange overlay (50% opacity)
  */
 
@@ -19,10 +19,9 @@
   bottom: 0;
   z-index: -1;
   background-repeat: no-repeat;
-  background-size: auto 100%;
-  background-position: right center;
+  background-size: cover;
+  background-position: center center;
   pointer-events: none;
-  /* NO background-attachment: fixed - that causes mobile issues */
 }
 
 .landing-mask {
@@ -44,21 +43,18 @@
 /* Responsive focal points - keep woman's face visible */
 @media (max-width: 640px) {
   .landing-wallpaper {
-    background-size: auto 100%;
     background-position: 70% center;
   }
 }
 
 @media (min-width: 641px) and (max-width: 1023px) {
   .landing-wallpaper {
-    background-size: auto 100%;
     background-position: 60% center;
   }
 }
 
 @media (min-width: 1024px) {
   .landing-wallpaper {
-    background-size: auto 100%;
-    background-position: right center;
+    background-position: center center;
   }
 }
