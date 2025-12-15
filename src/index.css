@@ -1995,7 +1995,9 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 }
 
 @supports (-webkit-touch-callout: none) {
-  #app-home, .hero-bg, [class*="hero-section"] { min-height: -webkit-fill-available; }
+  #app-home, .hero-bg, [class*="hero-section"] {
+    min-height: -webkit-fill-available;
+  }
 }
 
 /* Hero text contrast for readability - Brand orange shadows */
