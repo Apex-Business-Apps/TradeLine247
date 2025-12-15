@@ -186,7 +186,7 @@ jobs:
         run: npx playwright test tests/e2e/a11y-comprehensive.spec.ts --reporter=list --reporter=html
       - name: Upload accessibility report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: accessibility-report
           path: playwright-report/
