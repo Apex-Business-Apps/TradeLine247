@@ -26,7 +26,7 @@
 .landing-wallpaper {
   position: fixed;
   inset: 0;
-  z-index: -1; /* Bottom layer - below all content */
+  z-index: 0; /* Bottom layer - at base level, not negative */
   pointer-events: none; /* Never interfere with scrolling or interactions */
   background-repeat: no-repeat;
   background-size: cover;
