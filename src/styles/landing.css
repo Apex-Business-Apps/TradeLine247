@@ -26,13 +26,17 @@
 .landing-wallpaper {
   position: fixed;
   inset: 0;
-  z-index: 0;
-  pointer-events: none;
+  z-index: -1; /* Bottom layer - below all content */
+  pointer-events: none; /* Never interfere with scrolling or interactions */
   background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center 20%;
-  background-attachment: fixed !important;
-  opacity: 1;
+  background-size: cover;
+  /* background-position handled by existing media queries (20% mobile, 15% tablet, center desktop) */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0); /* iOS Safari GPU acceleration */
+  -webkit-touch-callout: none; /* iOS Safari: prevent callout menu */
+  -webkit-user-select: none; /* Prevent text selection */
+  user-select: none;
+  will-change: transform; /* Optimize for scrolling performance */
 }
 
 .landing-mask {
@@ -40,13 +44,9 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  /* White-tint mask with hero opacity <40% and downstream <70% */
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0.5) 50%,
-    rgba(255, 255, 255, 0.65) 100%
-  );
+
+  /* Simple 65% overlay for consistent darkening */
+  background: hsl(var(--brand-orange-primary) / 0.65);
 }
 
 .landing-content {
@@ -62,7 +62,9 @@
 
 @media (min-width: 1024px) {
   .landing-wallpaper {
-    background-position: center;
+    background-size: cover;
+    background-position: center top;
+    background-color: hsl(0 0% 97%);
   }
 }
 

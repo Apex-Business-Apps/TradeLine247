@@ -39,7 +39,19 @@ export default function HeroRoiDuo() {
       <div
         className="absolute inset-0 -z-10"
         style={{
-          backgroundColor: "rgba(255, 255, 255, 0.35)",
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      />
+      {/* Hero gradient overlay - single-color brand orange at 40% opacity */}
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          backgroundColor: "hsl(var(--brand-orange-primary) / 0.4)",
         }}
         aria-hidden="true"
       />

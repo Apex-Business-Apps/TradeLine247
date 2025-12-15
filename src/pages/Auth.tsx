@@ -293,6 +293,18 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative" style={gradientBackgroundStyle}>
+      {/* Background image layer - bottom layer, no pointer events */}
+      <div
+        className="fixed inset-0 -z-[1]"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      />
       <h1 className="sr-only">TradeLine 24/7 Authentication</h1>
       <div className="relative z-10 flex-1 container py-8 px-4 flex items-center justify-center">
         <Card className="w-full max-w-md">

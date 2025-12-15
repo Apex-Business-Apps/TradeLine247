@@ -1,0 +1,519 @@
+/**
+ * Premium Native Android App Experience
+ * 
+ * This file contains Android-specific enhancements to make the app
+ * feel, function, and look like a premium native Android app using
+ * Material Design 3 principles.
+ */
+
+/* ============================================================================
+   MATERIAL DESIGN 3 - ELEVATION & SHADOWS
+   ============================================================================ */
+
+/* Material Design elevation levels */
+:root {
+  --md-elevation-0: none;
+  --md-elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --md-elevation-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --md-elevation-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+  --md-elevation-4: 0px 2px 3px 0px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15);
+  --md-elevation-5: 0px 4px 4px 0px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Android detection */
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  /* Material Design cards with elevation */
+  [class*="card"],
+  [class*="Card"] {
+    box-shadow: var(--md-elevation-2);
+    border-radius: 12px;
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  [class*="card"]:hover,
+  [class*="Card"]:hover {
+    box-shadow: var(--md-elevation-4);
+  }
+
+  [class*="card"]:active,
+  [class*="Card"]:active {
+    box-shadow: var(--md-elevation-1);
+    transform: translateY(1px);
+  }
+
+  /* Material Design buttons */
+  button,
+  [role="button"],
+  a[class*="button"],
+  [class*="Button"] {
+    box-shadow: var(--md-elevation-2);
+    border-radius: 24px;
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  button:active,
+  [role="button"]:active,
+  a[class*="button"]:active,
+  [class*="Button"]:active {
+    box-shadow: var(--md-elevation-1);
+    transform: translateY(2px);
+  }
+}
+
+/* ============================================================================
+   MATERIAL DESIGN RIPPLE EFFECTS
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  /* Ripple effect container */
+  button,
+  [role="button"],
+  a[class*="button"],
+  [class*="Button"],
+  [class*="card"],
+  [class*="Card"] {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Ripple animation */
+  @keyframes materialRipple {
+    0% {
+      transform: scale(0);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
+  /* Ripple effect on tap */
+  button::after,
+  [role="button"]::after,
+  a[class*="button"]::after,
+  [class*="Button"]::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    width: 100px;
+    height: 100px;
+    margin-top: -50px;
+    margin-left: -50px;
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  button:active::after,
+  [role="button"]:active::after,
+  a[class*="button"]:active::after,
+  [class*="Button"]:active::after {
+    animation: materialRipple 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+   ANDROID SMOOTH SCROLLING
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  html,
+  body {
+    overscroll-behavior-y: contain; /* Prevent overscroll glow */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Smooth scrolling containers */
+  * {
+    scroll-behavior: smooth;
+  }
+
+  /* Optimize scrolling performance */
+  main,
+  section,
+  [class*="container"],
+  [class*="Container"] {
+    will-change: scroll-position;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+}
+
+/* ============================================================================
+   MATERIAL DESIGN TOUCH INTERACTIONS
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  /* Material Design tap highlight */
+  * {
+    -webkit-tap-highlight-color: rgba(255, 107, 53, 0.2);
+  }
+
+  /* Material Design input fields */
+  input,
+  textarea,
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 4px;
+    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+    outline: none;
+  }
+
+  /* Material Design floating labels effect */
+  input:focus + label,
+  textarea:focus + label {
+    transform: translateY(-20px) scale(0.85);
+    color: hsl(var(--brand-orange-primary));
+  }
+}
+
+/* ============================================================================
+   MATERIAL DESIGN ANIMATIONS
+   ============================================================================ */
+
+/* Material Design standard easing curves */
+:root {
+  --md-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --md-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --md-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --md-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  /* Material Design fade in */
+  @keyframes materialFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Material Design scale in */
+  @keyframes materialScaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Material Design slide in from bottom */
+  @keyframes materialSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Apply Material Design animations */
+  [role="dialog"],
+  [class*="modal"],
+  [class*="Modal"],
+  [class*="drawer"],
+  [class*="Drawer"] {
+    animation: materialScaleIn 0.3s var(--md-standard);
+  }
+
+  [class*="card"],
+  [class*="Card"] {
+    animation: materialFadeIn 0.4s var(--md-decelerate);
+  }
+
+  [class*="list"] > *,
+  [class*="List"] > *,
+  li,
+  tr {
+    animation: materialSlideUp 0.3s var(--md-decelerate);
+  }
+}
+
+/* ============================================================================
+   MATERIAL DESIGN TYPOGRAPHY
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1;
+    font-kerning: normal;
+  }
+
+  /* Material Design text selection */
+  ::selection {
+    background-color: rgba(255, 107, 53, 0.3);
+    color: inherit;
+  }
+
+  ::-moz-selection {
+    background-color: rgba(255, 107, 53, 0.3);
+    color: inherit;
+  }
+
+  /* Material Design headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* ============================================================================
+   MATERIAL DESIGN FORM ELEMENTS
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  /* Material Design checkbox */
+  input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid hsl(var(--border));
+    border-radius: 4px;
+    transition: all 0.2s var(--md-standard);
+    position: relative;
+  }
+
+  input[type="checkbox"]:checked {
+    background-color: hsl(var(--brand-orange-primary));
+    border-color: hsl(var(--brand-orange-primary));
+  }
+
+  input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Material Design radio */
+  input[type="radio"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid hsl(var(--border));
+    border-radius: 50%;
+    transition: all 0.2s var(--md-standard);
+    position: relative;
+  }
+
+  input[type="radio"]:checked {
+    border-color: hsl(var(--brand-orange-primary));
+  }
+
+  input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: hsl(var(--brand-orange-primary));
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Material Design switch */
+  input[type="checkbox"][role="switch"] {
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background-color: hsl(var(--muted));
+    border: none;
+  }
+
+  input[type="checkbox"][role="switch"]:checked {
+    background-color: hsl(var(--brand-orange-primary));
+  }
+
+  input[type="checkbox"][role="switch"]::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: white;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s var(--md-standard);
+    box-shadow: var(--md-elevation-2);
+  }
+
+  input[type="checkbox"][role="switch"]:checked::after {
+    transform: translateX(20px);
+  }
+}
+
+/* ============================================================================
+   ANDROID STATUS BAR & SAFE AREAS
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  /* Android status bar color */
+  @media (max-width: 768px) {
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+
+  /* Safe area support for Android notches */
+  .safe-area-top {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+  }
+
+  .safe-area-left {
+    padding-left: max(env(safe-area-inset-left), 1rem);
+  }
+
+  .safe-area-right {
+    padding-right: max(env(safe-area-inset-right), 1rem);
+  }
+}
+
+/* ============================================================================
+   MATERIAL DESIGN FAB (FLOATING ACTION BUTTON)
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  [class*="fab"],
+  [class*="FAB"],
+  [class*="floating-action-button"] {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    box-shadow: var(--md-elevation-5);
+    background-color: hsl(var(--brand-orange-primary));
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.2s var(--md-standard),
+                transform 0.2s var(--md-standard);
+    z-index: 1000;
+  }
+
+  [class*="fab"]:hover,
+  [class*="FAB"]:hover,
+  [class*="floating-action-button"]:hover {
+    box-shadow: var(--md-elevation-4);
+  }
+
+  [class*="fab"]:active,
+  [class*="FAB"]:active,
+  [class*="floating-action-button"]:active {
+    box-shadow: var(--md-elevation-3);
+    transform: scale(0.95);
+  }
+}
+
+/* ============================================================================
+   MATERIAL DESIGN SNACKBAR/TOAST
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  [class*="snackbar"],
+  [class*="Snackbar"],
+  [class*="toast"],
+  [class*="Toast"] {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: hsl(var(--muted));
+    color: hsl(var(--foreground));
+    padding: 14px 16px;
+    border-radius: 4px;
+    box-shadow: var(--md-elevation-3);
+    animation: materialSlideUp 0.3s var(--md-decelerate);
+    z-index: 2000;
+    max-width: 90%;
+  }
+}
+
+/* ============================================================================
+   MATERIAL DESIGN BOTTOM SHEET
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  [class*="bottom-sheet"],
+  [class*="BottomSheet"] {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: hsl(var(--background));
+    border-radius: 16px 16px 0 0;
+    box-shadow: var(--md-elevation-5);
+    animation: materialSlideUp 0.3s var(--md-decelerate);
+    z-index: 1500;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* ============================================================================
+   ANDROID-SPECIFIC PERFORMANCE OPTIMIZATIONS
+   ============================================================================ */
+
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  /* GPU acceleration for smooth animations */
+  * {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Optimize images for Android */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Smooth page transitions */
+  main,
+  [class*="page"],
+  [class*="Page"] {
+    animation: materialFadeIn 0.3s var(--md-decelerate);
+  }
+}

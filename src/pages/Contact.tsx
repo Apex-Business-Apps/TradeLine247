@@ -188,6 +188,18 @@ const Contact = () => {
       className="min-h-screen flex flex-col relative"
       style={gradientBackgroundStyle}
     >
+      {/* Background image layer - bottom layer, no pointer events */}
+      <div
+        className="fixed inset-0 -z-[1]"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      />
       <SEOHead 
         title="Contact Us - TradeLine 24/7 AI Receptionist"
         description="Get in touch with TradeLine 24/7 for AI receptionist services. Contact sales, support, or request a demo of our 24/7 customer service automation."

@@ -1,0 +1,291 @@
+/**
+ * Premium Native Apple App Experience
+ * 
+ * This file contains iOS/iPadOS-specific enhancements to make the app
+ * feel, function, and look like a premium native Apple app.
+ */
+
+/* ============================================================================
+   SMOOTH SCROLLING & MOMENTUM
+   ============================================================================ */
+
+/* Enable native iOS momentum scrolling everywhere */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+html,
+body {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* iOS Safari: Allow native bounce */
+@supports (-webkit-touch-callout: none) {
+  html,
+  body {
+    overscroll-behavior-y: auto; /* Native iOS bounce */
+  }
+}
+
+/* ============================================================================
+   NATIVE-LIKE TOUCH INTERACTIONS
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* Subtle tap highlights matching brand color */
+  * {
+    -webkit-tap-highlight-color: rgba(255, 107, 53, 0.15);
+  }
+
+  /* Premium button press effects */
+  button,
+  [role="button"],
+  a[class*="button"],
+  [class*="Button"] {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: rgba(255, 107, 53, 0.2);
+  }
+
+  button:active,
+  [role="button"]:active,
+  a[class*="button"]:active,
+  [class*="Button"]:active {
+    transform: scale(0.96);
+    opacity: 0.85;
+  }
+
+  /* Card press effects */
+  [class*="card"],
+  [class*="Card"] {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  [class*="card"]:active,
+  [class*="Card"]:active {
+    transform: scale(0.98) translateY(1px);
+  }
+
+  /* Native-like input interactions */
+  input,
+  textarea,
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+  }
+
+  input:active,
+  textarea:active,
+  select:active {
+    transform: scale(0.99);
+  }
+}
+
+/* ============================================================================
+   SMOOTH ANIMATIONS & TRANSITIONS
+   ============================================================================ */
+
+/* Native-like fade transitions */
+@keyframes nativeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nativeFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes nativeScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Apply smooth transitions to common elements */
+@supports (-webkit-touch-callout: none) {
+  /* Modal/Overlay animations */
+  [role="dialog"],
+  [class*="modal"],
+  [class*="Modal"],
+  [class*="overlay"],
+  [class*="Overlay"],
+  [class*="drawer"],
+  [class*="Drawer"] {
+    animation: nativeScaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* List item animations */
+  [class*="list"] > *,
+  [class*="List"] > *,
+  li,
+  tr {
+    animation: nativeFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Card entrance animations */
+  [class*="card"],
+  [class*="Card"] {
+    animation: nativeFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* ============================================================================
+   PREMIUM SCROLLING PERFORMANCE
+   ============================================================================ */
+
+/* GPU acceleration for smooth scrolling */
+@supports (-webkit-touch-callout: none) {
+  main,
+  section,
+  [class*="container"],
+  [class*="Container"] {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: scroll-position;
+  }
+
+  /* Optimize images for smooth scrolling */
+  img {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* ============================================================================
+   NATIVE-LIKE FORM ELEMENTS
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* Native iOS checkbox/radio styling */
+  input[type="checkbox"],
+  input[type="radio"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid hsl(var(--border));
+    border-radius: 4px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  input[type="checkbox"]:checked,
+  input[type="radio"]:checked {
+    background-color: hsl(var(--brand-orange-primary));
+    border-color: hsl(var(--brand-orange-primary));
+  }
+
+  input[type="radio"] {
+    border-radius: 50%;
+  }
+
+  /* Native iOS select styling */
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+}
+
+/* ============================================================================
+   SAFE AREA SUPPORT (Notch/Dynamic Island)
+   ============================================================================ */
+
+@supports (padding: max(0px)) {
+  /* Ensure content respects safe areas on all iOS devices */
+  .safe-area-top {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+  }
+
+  .safe-area-left {
+    padding-left: max(env(safe-area-inset-left), 1rem);
+  }
+
+  .safe-area-right {
+    padding-right: max(env(safe-area-inset-right), 1rem);
+  }
+
+  .safe-area-all {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+    padding-left: max(env(safe-area-inset-left), 1rem);
+    padding-right: max(env(safe-area-inset-right), 1rem);
+  }
+}
+
+/* ============================================================================
+   PREMIUM TYPOGRAPHY (iOS-style)
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1;
+    font-kerning: normal;
+  }
+
+  /* Native-like text selection */
+  ::selection {
+    background-color: rgba(255, 107, 53, 0.2);
+    color: inherit;
+  }
+
+  ::-moz-selection {
+    background-color: rgba(255, 107, 53, 0.2);
+    color: inherit;
+  }
+}
+
+/* ============================================================================
+   SMOOTH PAGE TRANSITIONS
+   ============================================================================ */
+
+@supports (-webkit-touch-callout: none) {
+  /* Smooth fade between pages */
+  main,
+  [class*="page"],
+  [class*="Page"] {
+    animation: nativeFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

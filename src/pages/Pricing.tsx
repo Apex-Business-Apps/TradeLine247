@@ -50,6 +50,18 @@ const Pricing = () => {
       className="min-h-screen flex flex-col relative"
       style={gradientBackgroundStyle}
     >
+      {/* Background image layer - bottom layer, no pointer events */}
+      <div
+        className="fixed inset-0 -z-[1]"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          pointerEvents: "none",
+        }}
+        aria-hidden="true"
+      />
       <SEOHead 
         title="Pricing - TradeLine 24/7 AI Receptionist Plans"
         description="Simple, transparent pricing for 24/7 AI receptionist services. Commission-only or $249/month plans. No setup fees. Edmonton, AB business."
