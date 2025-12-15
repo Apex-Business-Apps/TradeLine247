@@ -64,7 +64,8 @@ body {
   position: relative;
   isolation: isolate;
   background-color: transparent; /* Allow wallpaper to show through */
-  min-height: 100vh;
+  min-height: 100vh; /* Fallback for older browsers */
+  min-height: 100svh; /* Mobile-safe viewport height */
   height: auto;
   overflow: visible; /* Allow fixed elements to render */
 }
