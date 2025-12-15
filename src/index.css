@@ -4,7 +4,6 @@
 @import './styles/hero-roi.css';
 /* CRITICAL: header-align.css must load synchronously to prevent header layout shifts and z-index conflicts */
 @import './styles/header-align.css';
-@import './styles/landing.css';
 @import './styles/apple-native.css';
 @import './styles/android-native.css';
 @tailwind base;
@@ -75,7 +74,7 @@ body {
  * on section containers in Index.tsx (45% hero, 65% rest)
  */
 
-/* Responsive landing-wallpaper rules are in src/styles/landing.css */
+/* GOODBUILD 4e01370 rules for #app-home - see below */
 
 /* Always paint content above wallpaper */
 .dashboard-shell > * {
@@ -221,7 +220,6 @@ body {
 .landing-shell,
 .dashboard-shell {
   min-height: 100dvh;
-  /* DO NOT set background properties here - only .landing-wallpaper paints the background */
 }
 
 /* Always paint content above wallpaper */
@@ -229,9 +227,6 @@ body {
   position: relative;
   z-index: 1;
 }
-
-/* iOS-specific: avoid fixed background issues */
-/* Landing wallpaper now uses position: absolute - see landing.css */
 
 /* REMOVED: Global body overlay for non-landing pages
  * This was causing visual inconsistency across pages.
@@ -1280,7 +1275,7 @@ textarea:focus-visible {
 /* Global rule: All background images must be at bottom layer with no pointer events */
 [style*="backgroundImage"],
 .hero-bg,
-.landing-wallpaper,
+#app-home,
 [class*="background-image"] {
   pointer-events: none !important; /* Never interfere with scrolling or interactions */
   -webkit-touch-callout: none; /* iOS Safari: prevent callout menu */
@@ -1293,7 +1288,7 @@ textarea:focus-visible {
   /* iOS Safari specific fixes - Premium native app feel */
   [style*="backgroundImage"],
   .hero-bg,
-  .landing-wallpaper {
+  #app-home {
     -webkit-transform: translateZ(0); /* Force GPU acceleration */
     transform: translateZ(0);
     will-change: transform; /* Optimize for scrolling */
@@ -1320,7 +1315,7 @@ textarea:focus-visible {
 @supports (-webkit-appearance: none) {
   [style*="backgroundImage"],
   .hero-bg,
-  .landing-wallpaper {
+  #app-home {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
   }
@@ -1330,7 +1325,7 @@ textarea:focus-visible {
 @media (min-width: 1024px) {
   [style*="backgroundImage"],
   .hero-bg,
-  .landing-wallpaper {
+  #app-home {
     will-change: transform;
   }
 }
@@ -1944,17 +1939,6 @@ button[class*="orange"]:hover:not([class*="outline"]) {
   isolation: isolate;
 }
 
-/* Landing page visual restoration - see landing.css for wallpaper styles */
-#app-home {
-  min-height: var(--vh-safe);
-}
-
-@supports (-webkit-touch-callout: none) {
-  #app-home {
-    min-height: -webkit-fill-available;
-  }
-}
-
 /* Hero text contrast for readability - Brand orange shadows */
 .hero-text,
 .hero-headline,
@@ -1962,3 +1946,26 @@ button[class*="orange"]:hover:not([class*="outline"]) {
   text-shadow: 0 3px 8px rgba(255, 107, 53, 0.45),
                0 1px 4px rgba(255, 107, 53, 0.35);
 }
+
+/* GOODBUILD 4e01370 — DO NOT MODIFY */
+:root { --vh-safe: 100vh; }
+@supports (-webkit-touch-callout: none) { :root { --vh-safe: -webkit-fill-available; } }
+
+#app-home, .hero-bg, [class*="hero-section"] {
+  background-attachment: scroll;
+  background-position: center top;
+  background-size: cover;
+  min-height: var(--vh-safe);
+}
+
+@media (max-width: 768px) {
+  #app-home, .hero-bg, [class*="hero-section"] {
+    background-attachment: scroll !important;
+    background-position: center 20%;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  #app-home, .hero-bg, [class*="hero-section"] { min-height: -webkit-fill-available; }
+}
+/* END GOODBUILD 4e01370 */

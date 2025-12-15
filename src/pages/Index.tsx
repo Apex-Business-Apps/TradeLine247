@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect } from "react";
+import { useEffect } from "react";
 
 import { Footer } from "@/components/layout/Footer";
 import HeroRoiDuo from "@/sections/HeroRoiDuo";
@@ -14,8 +14,6 @@ import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
 
-const BACKGROUND_IMAGE_URL = backgroundImage;
-
 export default function Index() {
   const { trackPageView } = useAnalytics();
 
@@ -26,7 +24,7 @@ export default function Index() {
   // Preload background to reduce flash + improve perceived performance
   useEffect(() => {
     const img = new Image();
-    img.src = BACKGROUND_IMAGE_URL;
+    img.src = backgroundImage;
     img.onerror = () => {
       try {
         errorReporter.report({
@@ -35,7 +33,7 @@ export default function Index() {
           timestamp: new Date().toISOString(),
           url: window.location.href,
           userAgent: navigator.userAgent,
-          metadata: { imageSrc: BACKGROUND_IMAGE_URL },
+          metadata: { imageSrc: backgroundImage },
         });
       } catch {
         // no-op
@@ -44,31 +42,32 @@ export default function Index() {
   }, []);
 
   return (
-    <div
-      id="app-home"
-      className="landing-shell min-h-screen flex flex-col relative"
-      style={{
-        "--hero-wallpaper-image": `url(${BACKGROUND_IMAGE_URL})`,
-        backgroundColor: "hsl(0, 0%, 97%)",
-      } as CSSProperties}
-    >
-      {/* Wallpaper layer - ONLY place background image is set */}
+    <div className="relative min-h-screen">
+      {/* Wallpaper layer - id="app-home" per GOODBUILD 4e01370 */}
       <div
-        className="landing-wallpaper"
-        data-testid="landing-wallpaper"
+        id="app-home"
+        className="fixed inset-0 z-0 pointer-events-none bg-no-repeat bg-cover bg-center"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
         aria-hidden="true"
-        style={{ backgroundImage: "var(--hero-wallpaper-image)" }}
       />
 
       {/* Mask layer - brand gradient overlay */}
       <div
-        className="landing-mask"
-        data-testid="landing-mask"
+        className="fixed inset-0 z-[1] pointer-events-none"
+        style={{
+          background: `linear-gradient(
+            180deg,
+            rgba(255, 107, 53, 0.38) 0%,
+            rgba(255, 120, 70, 0.30) 40%,
+            rgba(26, 77, 102, 0.28) 70%,
+            rgba(26, 77, 102, 0.35) 100%
+          )`
+        }}
         aria-hidden="true"
       />
 
       {/* Content layer */}
-      <div className="landing-content relative z-10 flex-1 flex flex-col">
+      <main className="landing-shell min-h-screen flex flex-col relative z-10">
         <AISEOHead
           title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
           description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
@@ -111,52 +110,29 @@ export default function Index() {
         />
 
         <div className="flex-1">
-          <div
-            className="hero-background"
-            style={{
-              backgroundImage: `linear-gradient(
-                to bottom,
-                rgba(255, 107, 53, 0.4) 0%,
-                rgba(104, 182, 233, 0.4) 100%
-              )`,
-            }}
-          >
-            <HeroRoiDuo />
-          </div>
+          <HeroRoiDuo />
+          <BenefitsGrid />
+          <ImpactStrip />
+          <HowItWorks />
 
-          <div
-            className="post-hero-background"
-            style={{
-              backgroundImage: `linear-gradient(
-                to bottom,
-                rgba(255, 107, 53, 0.65) 0%,
-                rgba(104, 182, 233, 0.65) 100%
-              )`,
-            }}
-          >
-            <BenefitsGrid />
-            <ImpactStrip />
-            <HowItWorks />
-
-            <div className="container mx-auto px-4 py-12">
-              <div className="mx-auto max-w-4xl space-y-6 text-center">
-                <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                  Quick actions for operators
-                </h2>
-                <p className="text-muted-foreground">
-                  Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
-                </p>
-                <QuickActionsCard />
-              </div>
+          <div className="container mx-auto px-4 py-12">
+            <div className="mx-auto max-w-4xl space-y-6 text-center">
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+                Quick actions for operators
+              </h2>
+              <p className="text-muted-foreground">
+                Jump straight into the workflows you use every day. These shortcuts survive refreshes and deep links.
+              </p>
+              <QuickActionsCard />
             </div>
-
-            <TrustBadgesSlim />
-            <LeadCaptureForm />
-            <Footer />
-            <NoAIHypeFooter />
           </div>
+
+          <TrustBadgesSlim />
+          <LeadCaptureForm />
+          <Footer />
+          <NoAIHypeFooter />
         </div>
-      </div>
+      </main>
     </div>
   );
 }
