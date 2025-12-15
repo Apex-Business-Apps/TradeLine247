@@ -1378,7 +1378,7 @@ textarea:focus-visible {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.15; /* Subtle background visibility */
+  opacity: 1; /* Full visibility - opacity controlled by overlays */
   pointer-events: none; /* Never interfere with scrolling or interactions */
   z-index: -10; /* Bottom layer - below all content and overlays */
 }
@@ -1397,7 +1397,7 @@ textarea:focus-visible {
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  background: hsl(var(--brand-orange-primary) / 0.6);
+  background: hsl(var(--brand-orange-primary) / 0.2); /* Reduced to 20% opacity for better background visibility */
   pointer-events: none;
   z-index: 1;
 }
@@ -1434,13 +1434,8 @@ textarea:focus-visible {
 .hero-vignette {
   position: absolute;
   inset: 0;
-  /* Subtle vignette for depth, but lighter to not obscure background */
-  background: radial-gradient(
-    ellipse at center,
-    transparent 0%,
-    rgba(0,0,0,0.1) 70%,
-    rgba(0,0,0,0.25) 100%
-  );
+  /* Removed dark vignette - too opaque, obscures background */
+  display: none; /* Disabled to show wallpaper clearly */
   pointer-events: none;
   z-index: 2;
 }
@@ -1826,7 +1821,7 @@ code[class*="bg-primary"],
 [data-testid="hero-bg"] h1,
 .page-hero h1 {
   color: #1f2937 !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+  text-shadow: 0 1px 2px rgba(255, 107, 53, 0.1) !important; /* Changed from black to brand orange */
 }
 
 .hero-gradient p,

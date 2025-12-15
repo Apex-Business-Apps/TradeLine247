@@ -29,14 +29,16 @@
   z-index: -1; /* Bottom layer - below all content */
   pointer-events: none; /* Never interfere with scrolling or interactions */
   background-repeat: no-repeat;
-  background-size: cover;
-  /* background-position handled by existing media queries (20% mobile, 15% tablet, center desktop) */
+  background-size: 100% 100%; /* Stretch to fill viewport, adapt to viewport aspect ratio */
+  background-attachment: scroll; /* Changed from fixed - fixed causes issues on mobile */
+  background-position: center center; /* Center the image */
   transform: translateZ(0);
   -webkit-transform: translateZ(0); /* iOS Safari GPU acceleration */
   -webkit-touch-callout: none; /* iOS Safari: prevent callout menu */
   -webkit-user-select: none; /* Prevent text selection */
   user-select: none;
   will-change: transform; /* Optimize for scrolling performance */
+  opacity: 1; /* Ensure wallpaper is fully visible */
 }
 
 .landing-mask {
@@ -45,8 +47,8 @@
   z-index: 1;
   pointer-events: none;
 
-  /* Simple 65% overlay for consistent darkening */
-  background: hsl(var(--brand-orange-primary) / 0.65);
+  /* Simple 30% overlay for consistent darkening - reduced for better background visibility */
+  background: hsl(var(--brand-orange-primary) / 0.3);
 }
 
 .landing-content {
@@ -62,9 +64,41 @@
 
 @media (min-width: 1024px) {
   .landing-wallpaper {
-    background-size: cover;
-    background-position: center top;
+    background-size: 100% 100%; /* Stretch to fill viewport, adapt to viewport aspect ratio */
+    background-position: center center;
     background-color: hsl(0 0% 97%);
+  }
+}
+
+/* Desktop: Fixed attachment for persistent viewport fill */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .landing-wallpaper {
+    background-attachment: fixed; /* Desktop: persistent viewport fill */
+    background-size: 100% 100%; /* Stretch to fill viewport, adapt to viewport aspect ratio */
+  }
+}
+
+/* iOS/iPadOS: Scroll attachment, optimize for touch and safe areas */
+@supports (-webkit-touch-callout: none) {
+  .landing-wallpaper {
+    background-attachment: scroll; /* iOS: scroll prevents rendering issues */
+    -webkit-transform: translateZ(0); /* GPU acceleration */
+    transform: translateZ(0);
+  }
+}
+
+/* Android: Scroll attachment, optimize for Material Design */
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+  .landing-wallpaper {
+    background-attachment: scroll; /* Android: scroll prevents rendering issues */
+    transform: translateZ(0); /* GPU acceleration */
+  }
+}
+
+/* Tablet: Adaptive based on orientation */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .landing-wallpaper {
+    background-attachment: scroll; /* Tablet: scroll for better performance */
   }
 }
 

@@ -35,23 +35,12 @@ export default function HeroRoiDuo() {
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
-      {/* Hero gradient overlay - white veil under 40% opacity to keep hero readable */}
+      {/* Hero background is handled by landing-wallpaper class (global background) */}
+      {/* Hero gradient overlay - single-color brand orange at 20% opacity - reduced for better background visibility */}
       <div
         className="absolute inset-0 -z-10"
         style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          pointerEvents: "none",
-        }}
-        aria-hidden="true"
-      />
-      {/* Hero gradient overlay - single-color brand orange at 40% opacity */}
-      <div
-        className="absolute inset-0 -z-10"
-        style={{
-          backgroundColor: "hsl(var(--brand-orange-primary) / 0.4)",
+          backgroundColor: "hsl(var(--brand-orange-primary) / 0.2)",
         }}
         aria-hidden="true"
       />
