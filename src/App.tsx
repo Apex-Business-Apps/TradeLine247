@@ -1,11 +1,12 @@
 // FILE: src/App.tsx
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LayoutShell from "./components/layout/LayoutShell";
 import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 // CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
+import { initializeNativePlatform } from "./lib/native";
 import { paths } from "./routes/paths";
 import { RequireAuth } from "./components/auth/RequireAuth";
 
@@ -108,6 +109,11 @@ const LoadingFallback = () => (
 );
 
 export default function App() {
+  // Initialize native platform (splash screen, status bar, keyboard) on mount
+  useEffect(() => {
+    initializeNativePlatform();
+  }, []);
+
   return (
     <SafeErrorBoundary>
       <div className="min-h-screen bg-background text-foreground antialiased">

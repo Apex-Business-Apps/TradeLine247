@@ -68,6 +68,23 @@
   <key>ITSAppUsesNonExemptEncryption</key>
   <false/>
 
+  <!-- DEEP LINKS: tradeline247:// URL scheme -->
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>tradeline247</string>
+      </array>
+    </dict>
+  </array>
+
+  <!-- PUSH NOTIFICATIONS: Background mode required -->
+  <key>UIBackgroundModes</key>
+  <array>
+    <string>remote-notification</string>
+  </array>
+
   <!-- Add privacy descriptions ONLY for capabilities you use -->
   <!-- <key>NSCameraUsageDescription</key>
   <string>This app uses the camera to scan IDs and receipts.</string> -->
