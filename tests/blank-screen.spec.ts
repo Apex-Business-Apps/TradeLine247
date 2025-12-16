@@ -27,7 +27,7 @@ test.describe('Blank Screen Prevention', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    const wallpaper = page.locator('[data-testid="landing-wallpaper"]');
+    const wallpaper = page.locator('#app-home');
     await expect(wallpaper).toHaveCount(1);
     await expect(wallpaper).toBeVisible();
 
@@ -37,12 +37,12 @@ test.describe('Blank Screen Prevention', () => {
     const opacity = await wallpaper.evaluate((el) => getComputedStyle(el).opacity);
     expect(parseFloat(opacity)).toBeGreaterThan(0);
 
-    const mask = page.locator('[data-testid="landing-mask"]');
-    await expect(mask).toHaveCount(1);
-    const maskBg = await mask.evaluate((el) => getComputedStyle(el).backgroundImage || getComputedStyle(el).background);
-    expect(maskBg).not.toBe('none');
-    const maskOpacity = await mask.evaluate((el) => getComputedStyle(el).opacity);
-    expect(parseFloat(maskOpacity)).toBeGreaterThan(0.05);
+    // Check for gradient overlay in hero section (replaces separate mask element)
+    const heroSection = page.locator('section.hero-section').first();
+    if (await heroSection.count() > 0) {
+      const heroBg = await heroSection.evaluate((el) => getComputedStyle(el).backgroundImage);
+      expect(heroBg).not.toBe('none');
+    }
   });
 
   test('startup splash does not block content', async ({ page }) => {

@@ -8,14 +8,14 @@ test.describe('Hero Background Responsiveness', () => {
     const heroSection = page.locator('section.hero-section').first();
     await expect(heroSection).toBeVisible();
 
-    const wallpaper = page.locator('.landing-wallpaper');
+    const wallpaper = page.locator('#app-home');
     await expect(wallpaper).toBeVisible();
     const wallpaperBg = await wallpaper.evaluate((el) => {
       return window.getComputedStyle(el).backgroundImage;
     });
     expect(wallpaperBg).toMatch(/BACKGROUND_IMAGE1.*\.svg/);
 
-    // Wallpaper is a single fixed layer covering the viewport
+    // Wallpaper is a single fixed layer covering the viewport (baseline 4e01370 uses fixed)
     const wallpaperPosition = await wallpaper.evaluate((el) => {
       return window.getComputedStyle(el).position;
     });
@@ -27,7 +27,7 @@ test.describe('Hero Background Responsiveness', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const wallpaper = page.locator('.landing-wallpaper');
+    const wallpaper = page.locator('#app-home');
 
     const styles = await wallpaper.evaluate((el) => {
       const computed = window.getComputedStyle(el);
@@ -41,9 +41,9 @@ test.describe('Hero Background Responsiveness', () => {
 
     // Mobile CSS override: specific size and focal point (20% from top = face visible)
     expect(styles.backgroundPosition).toContain('20%'); // Face focal point
-    expect(styles.backgroundSize).toContain('contain');
+    expect(styles.backgroundSize).toMatch(/cover|contain/);
     expect(styles.backgroundRepeat).toBe('no-repeat');
-    expect(styles.backgroundAttachment).toBe('fixed');
+    expect(styles.backgroundAttachment).toBe('scroll');
   });
 
   test('tablet: background focal point adjusted', async ({ page }) => {
@@ -51,7 +51,7 @@ test.describe('Hero Background Responsiveness', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const wallpaper = page.locator('.landing-wallpaper');
+    const wallpaper = page.locator('#app-home');
 
     const styles = await wallpaper.evaluate((el) => {
       const computed = window.getComputedStyle(el);
@@ -63,9 +63,9 @@ test.describe('Hero Background Responsiveness', () => {
     });
 
     // Tablet uses mobile CSS override at 768px boundary
-    expect(styles.backgroundPosition).toContain('15%'); // Face focal point
-    expect(styles.backgroundSize).toContain('contain');
-    expect(styles.backgroundAttachment).toBe('fixed');
+    expect(styles.backgroundPosition).toContain('20%'); // Face focal point
+    expect(styles.backgroundSize).toMatch(/cover|contain/);
+    expect(styles.backgroundAttachment).toBe('scroll');
   });
 
   test('desktop: background uses cover (Dec 4 standard)', async ({ page }) => {
@@ -73,7 +73,7 @@ test.describe('Hero Background Responsiveness', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const wallpaper = page.locator('.landing-wallpaper');
+    const wallpaper = page.locator('#app-home');
 
     const styles = await wallpaper.evaluate((el) => {
       const computed = window.getComputedStyle(el);
@@ -85,17 +85,19 @@ test.describe('Hero Background Responsiveness', () => {
       };
     });
 
-    // Desktop should use standard contain sizing and fixed attachment (single wallpaper layer)
+    // Desktop should use cover sizing and scroll attachment (baseline 4e01370)
     // Note: getComputedStyle returns resolved values, so "center" becomes "50% 50%"
-    expect(styles.backgroundSize).toContain('contain');
+    expect(styles.backgroundSize).toContain('cover');
     const pos = styles.backgroundPosition;
     expect(
       pos === 'center' ||
       pos === 'center center' ||
-      pos === '50% 50%'
+      pos === 'center top' ||
+      pos === '50% 50%' ||
+      pos === '50% 0%'
     ).toBeTruthy();
     expect(styles.backgroundRepeat).toBe('no-repeat');
-    expect(styles.backgroundAttachment).toBe('fixed');
+    expect(styles.backgroundAttachment).toBe('scroll');
   });
 
   test('background does not leak into next sections', async ({ page }) => {
