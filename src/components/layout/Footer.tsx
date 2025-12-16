@@ -48,7 +48,7 @@ export const Footer: React.FC = () => {
               <img 
                 src={albertaLogo} 
                 alt="Alberta Innovates" 
-                className="h-8 md:h-10 w-auto"
+                className="h-8 md:h-10 w-auto max-w-[120px] md:max-w-[150px]"
               />
             </a>
             
