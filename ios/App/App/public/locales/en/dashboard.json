@@ -1,0 +1,61 @@
+{
+  "title": "Dashboard",
+  "welcome": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening",
+    "subtitle": "Your AI receptionist is working hard for you today",
+    "status_active": "AI receptionist is active"
+  },
+  "kpi": {
+    "bookings": "Bookings this week",
+    "bookings_subtitle": "New appointments scheduled",
+    "bookings_empty": "No appointments yet this week",
+    "bookings_aria": "Weekly bookings performance",
+    "payout": "Expected payout",
+    "payout_subtitle": "Revenue from active calls",
+    "payout_empty": "Revenue will calculate from calls",
+    "payout_aria": "Expected revenue payout",
+    "answerRate": "Calls we caught",
+    "answerRate_subtitle": "Answer rate this period",
+    "answerRate_empty": "No calls received yet",
+    "answerRate_aria": "Call answer rate performance",
+    "rescued": "Missed but saved",
+    "rescued_subtitle": "Calls recovered by AI",
+    "rescued_empty": "No recovered calls yet",
+    "rescued_aria": "Calls rescued from being missed"
+  },
+  "insights": {
+    "up": "You're trending up this week. Nice work.",
+    "down": "A little quieter — want reminders turned on?"
+  },
+  "empty": {
+    "next": "Nothing queued right now.",
+    "inbox": "We'll drop new call notes here. Check back soon.",
+    "kpi": "Quiet right now — your next one will show up here."
+  },
+  "actions": {
+    "hint": "Tap to confirm or move an appointment.",
+    "try_again": "Try again"
+  },
+  "appointments": {
+    "title": "Today's appointments",
+    "subtitle": "Upcoming calls and meetings",
+    "actions": {
+      "confirm": "Confirm",
+      "reschedule": "Reschedule",
+      "add_note": "Add note"
+    }
+  },
+  "recent_wins": {
+    "title": "Recent wins",
+    "subtitle": "Good things happening with your AI receptionist",
+    "view_all": "View all activity"
+  },
+  "recent_activity": {
+    "title": "Recent Activity",
+    "needs_reply": "Needs reply",
+    "no_activity": "No activity yet",
+    "no_activity_description": "Your dashboard will populate once calls start coming in"
+  }
+}

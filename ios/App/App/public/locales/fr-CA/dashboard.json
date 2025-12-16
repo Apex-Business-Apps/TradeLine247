@@ -1,0 +1,62 @@
+{
+  "title": "Tableau de bord",
+  "welcome": {
+    "morning": "Bonjour",
+    "afternoon": "Bon après-midi",
+    "evening": "Bonsoir",
+    "subtitle": "Votre réceptionniste IA travaille fort pour vous aujourd'hui",
+    "status_active": "Réceptionniste IA active"
+  },
+  "kpi": {
+    "bookings": "Réservations cette semaine",
+    "bookings_subtitle": "Nouveaux rendez-vous planifiés",
+    "bookings_empty": "Aucun rendez-vous cette semaine",
+    "bookings_aria": "Performance des réservations hebdomadaires",
+    "payout": "Paiement prévu",
+    "payout_subtitle": "Revenus des appels actifs",
+    "payout_empty": "Les revenus seront calculés à partir des appels",
+    "payout_aria": "Paiement de revenus attendu",
+    "answerRate": "Appels interceptés",
+    "answerRate_subtitle": "Taux de réponse cette période",
+    "answerRate_empty": "Aucun appel reçu encore",
+    "answerRate_aria": "Performance du taux de réponse aux appels",
+    "rescued": "Manqués mais sauvés",
+    "rescued_subtitle": "Appels récupérés par IA",
+    "rescued_empty": "Aucun appel récupéré encore",
+    "rescued_aria": "Appels sauvés d'être manqués"
+  },
+  "insights": {
+    "up": "Vous êtes en hausse cette semaine. Bon travail.",
+    "down": "Un peu plus calme — voulez-vous activer les rappels?"
+  },
+  "empty": {
+    "next": "Rien en attente pour le moment.",
+    "inbox": "Nous déposerons les nouvelles notes d'appel ici. Revenez bientôt.",
+    "kpi": "Calme en ce moment — votre prochain apparaîtra ici."
+  },
+  "actions": {
+    "hint": "Appuyez pour confirmer ou déplacer un rendez-vous.",
+    "try_again": "Réessayer"
+  },
+  "appointments": {
+    "title": "Rendez-vous d'aujourd'hui",
+    "subtitle": "Appels et réunions à venir",
+    "actions": {
+      "confirm": "Confirmer",
+      "reschedule": "Reprogrammer",
+      "add_note": "Ajouter une note"
+    }
+  },
+  "recent_wins": {
+    "title": "Victoires récentes",
+    "subtitle": "De bonnes choses se passent avec votre réceptionniste IA",
+    "view_all": "Voir toute l'activité"
+  },
+  "recent_activity": {
+    "title": "Activité récente",
+    "needs_reply": "Nécessite une réponse",
+    "no_activity": "Aucune activité pour le moment",
+    "no_activity_description": "Votre tableau de bord se remplira une fois que les appels commenceront à arriver"
+  }
+}
+
