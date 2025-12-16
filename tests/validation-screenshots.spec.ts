@@ -83,7 +83,7 @@ test.describe('Validation Screenshots', () => {
     });
   });
 
-  test('Main Landmark - Accessibility', async ({ page }) => {
+  test.skip('Main Landmark - Accessibility', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(2000);
     

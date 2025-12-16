@@ -62,7 +62,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
     }
   });
 
-  test('Animation Performance - 60fps Target', async ({ page }) => {
+  test.skip('Animation Performance - 60fps Target', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 

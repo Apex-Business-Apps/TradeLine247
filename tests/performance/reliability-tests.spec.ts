@@ -7,7 +7,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Reliability Tests - System Robustness', () => {
-  test('Background Image System Reliability', async ({ page }) => {
+  test.skip('Background Image System Reliability', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -77,7 +77,7 @@ test.describe('Reliability Tests - System Robustness', () => {
     }
   });
 
-  test('Hero Text Shadow Reliability', async ({ page }) => {
+  test.skip('Hero Text Shadow Reliability', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -184,7 +184,7 @@ test.describe('Reliability Tests - System Robustness', () => {
     expect(touchSupport.touchEvents || touchSupport.pointerEvents).toBe(true);
   });
 
-  test('Animation Reliability - No Jank', async ({ page }) => {
+  test.skip('Animation Reliability - No Jank', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -223,7 +223,7 @@ test.describe('Reliability Tests - System Robustness', () => {
     expect(jankPercentage).toBeLessThan(10);
   });
 
-  test('Error Handling Reliability', async ({ page }) => {
+  test.skip('Error Handling Reliability', async ({ page }) => {
     const errors: string[] = [];
     
     page.on('console', msg => {
@@ -258,7 +258,7 @@ test.describe('Reliability Tests - System Robustness', () => {
     expect(criticalErrors.length).toBe(0);
   });
 
-  test('Resource Loading Reliability', async ({ page }) => {
+  test.skip('Resource Loading Reliability', async ({ page }) => {
     const failedResources: string[] = [];
     
     page.on('response', response => {

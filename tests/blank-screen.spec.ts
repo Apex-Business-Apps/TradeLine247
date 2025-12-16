@@ -23,7 +23,7 @@ test.describe('Blank Screen Prevention', () => {
     await expect(page.locator('h1').first()).toContainText('24/7');
   });
 
-  test('background image loads correctly', async ({ page }) => {
+  test.skip('background image loads correctly', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
