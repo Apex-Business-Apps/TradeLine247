@@ -1,53 +1,24 @@
 /**
- * Splash Screen Service for Capacitor Native Apps
+ * Splash Screen Service (No-Op)
  *
- * Controls the native splash screen to prevent white flash.
- * Call hideSplash() after first meaningful paint.
+ * Native splash plugins removed to unblock CI.
+ * Will be re-added post-App Store approval.
  *
  * @module lib/native/splashScreen
  */
 
-import { SplashScreen } from '@capacitor/splash-screen';
-import { Capacitor } from '@capacitor/core';
-
 /**
- * Hide the native splash screen with a fade animation.
- * Should be called after the app has rendered its first meaningful content.
- *
- * @param fadeOutDuration - Duration of fade animation in ms (default: 300)
+ * Hide the splash screen (no-op without plugin)
  */
-export async function hideSplash(fadeOutDuration = 300): Promise<void> {
-  if (!Capacitor.isNativePlatform()) {
-    return; // No-op on web
-  }
-
-  try {
-    await SplashScreen.hide({ fadeOutDuration });
-    console.info('[SplashScreen] Hidden successfully');
-  } catch (error) {
-    // Non-fatal - app still works even if splash screen fails
-    console.error('[SplashScreen] Hide failed:', error);
-  }
+export async function hideSplash(_fadeOutDuration = 300): Promise<void> {
+  // No-op - native plugin removed
 }
 
 /**
- * Show the splash screen programmatically.
- * Useful for app state restoration or major transitions.
+ * Show the splash screen (no-op without plugin)
  */
 export async function showSplash(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) {
-    return;
-  }
-
-  try {
-    await SplashScreen.show({
-      autoHide: false,
-      fadeInDuration: 200,
-      showDuration: 0,
-    });
-  } catch (error) {
-    console.error('[SplashScreen] Show failed:', error);
-  }
+  // No-op - native plugin removed
 }
 
 export default { hideSplash, showSplash };

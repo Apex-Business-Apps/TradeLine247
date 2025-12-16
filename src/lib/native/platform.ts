@@ -1,15 +1,13 @@
 /**
  * Platform Detection and Native Initialization
  *
- * Provides utilities for detecting the current platform and initializing
- * native plugins when running on iOS or Android.
+ * Provides utilities for detecting the current platform.
+ * Native plugins removed to unblock CI - will be re-added post-App Store approval.
  *
  * @module lib/native/platform
  */
 
 import { Capacitor } from '@capacitor/core';
-import { Keyboard } from '@capacitor/keyboard';
-import { hideSplash } from './splashScreen';
 
 /**
  * Platform detection helpers
@@ -32,53 +30,21 @@ export const platform = {
 };
 
 /**
- * Initialize native plugins and platform-specific settings.
- * Call this once when the app starts, after first render.
+ * Initialize native platform (no-op without plugins)
  */
 export async function initializeNativePlatform(): Promise<void> {
   if (!platform.isNative()) {
-    console.info('[Platform] Running on web - skipping native initialization');
+    console.info('[Platform] Running on web');
     return;
   }
-
-  console.info(`[Platform] Initializing native platform: ${platform.getName()}`);
-
-  try {
-    // Set up keyboard listeners for input focusing
-    Keyboard.addListener('keyboardWillShow', (info) => {
-      document.body.classList.add('keyboard-open');
-      document.body.style.setProperty('--keyboard-height', `${info.keyboardHeight}px`);
-    });
-
-    Keyboard.addListener('keyboardWillHide', () => {
-      document.body.classList.remove('keyboard-open');
-      document.body.style.removeProperty('--keyboard-height');
-    });
-
-    console.info('[Platform] Keyboard listeners configured');
-  } catch (error) {
-    console.error('[Platform] Keyboard configuration failed:', error);
-  }
-
-  // Hide splash screen after initialization
-  await hideSplash();
+  console.info(`[Platform] Native platform: ${platform.getName()}`);
 }
 
 /**
- * Clean up native platform listeners.
- * Call this when the app is unmounting (though typically not needed).
+ * Clean up native platform listeners (no-op without plugins)
  */
 export async function cleanupNativePlatform(): Promise<void> {
-  if (!platform.isNative()) {
-    return;
-  }
-
-  try {
-    await Keyboard.removeAllListeners();
-    console.info('[Platform] Cleaned up native listeners');
-  } catch (error) {
-    console.error('[Platform] Cleanup failed:', error);
-  }
+  // No-op - native plugins removed
 }
 
 export default {
