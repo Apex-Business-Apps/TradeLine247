@@ -48,6 +48,8 @@ ios/App/App/public/
 ios/App/App/capacitor.config.json
 ios/App/App/config.xml
 ios/capacitor-cordova-ios-plugins/
+# iOS marketing icon restored by CI guard script
+ios/App/App/Assets.xcassets/AppIcon.appiconset/icon-1024.png
 
 # Playwright test artifacts
 test-results/
