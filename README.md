@@ -56,6 +56,16 @@ TradeLine 24/7 is a comprehensive telephony SaaS platform that provides AI-power
    npm run test:e2e:smoke  # Smoke tests only
    ```
 
+## Windows: Fix EPERM unlink during npm install
+
+- Close VS Code + stop node processes
+- (Optional) Add Defender exclusion for the repo folder
+- Delete node_modules using: `cmd /c "rd /s /q node_modules"`
+- Run: `npm ci`
+- Run: `npm run build`
+
+`npm ci` is the recommended clean install for CI parity.
+
 ## 📁 Project Structure
 
 ```
