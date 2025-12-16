@@ -36,6 +36,9 @@ jobs:
           npm run verify:app || true
           npm run verify:icons || true
 
+      - name: Ensure iOS 1024 icon exists
+        run: node scripts/ensure-ios-1024-icon.mjs
+
       - name: Sync Capacitor iOS
         run: |
           set -euo pipefail
