@@ -30,7 +30,6 @@ const MARKETING_NAV = [
   { name: 'Security', href: paths.security },
   { name: 'FAQ', href: paths.faq },
   { name: 'Contact', href: paths.contact },
-  { name: 'Docs', href: paths.docs },
 ] as const;
 
 const ADMIN_NAV = [

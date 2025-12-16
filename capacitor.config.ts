@@ -12,11 +12,6 @@ const config: CapacitorConfig = {
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
-    StatusBar: {
-      overlaysWebView: true,
-      style: 'Dark',
-      backgroundColor: '#00000000', // Transparent for edge-to-edge
-    },
     Keyboard: {
       resize: 'body',
       resizeOnFullScreen: true,

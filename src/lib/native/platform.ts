@@ -8,7 +8,6 @@
  */
 
 import { Capacitor } from '@capacitor/core';
-import { StatusBar, Style } from '@capacitor/status-bar';
 import { Keyboard } from '@capacitor/keyboard';
 import { hideSplash } from './splashScreen';
 
@@ -43,21 +42,6 @@ export async function initializeNativePlatform(): Promise<void> {
   }
 
   console.info(`[Platform] Initializing native platform: ${platform.getName()}`);
-
-  try {
-    // Configure status bar for edge-to-edge
-    await StatusBar.setOverlaysWebView({ overlay: true });
-    await StatusBar.setStyle({ style: Style.Dark });
-
-    // Make status bar transparent for edge-to-edge design
-    if (platform.isAndroid()) {
-      await StatusBar.setBackgroundColor({ color: '#00000000' });
-    }
-
-    console.info('[Platform] Status bar configured');
-  } catch (error) {
-    console.error('[Platform] Status bar configuration failed:', error);
-  }
 
   try {
     // Set up keyboard listeners for input focusing
