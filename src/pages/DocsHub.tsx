@@ -1,4 +1,5 @@
 import type { HTMLAttributes } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { paths } from '@/routes/paths';
@@ -6,16 +7,13 @@ import { Link, useSearchParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { FileText, ArrowLeft } from 'lucide-react';
-
-import projectOverviewContent from '../../README.md?raw';
-import twilioVoiceGuideContent from '../../docs/archive/telephony/TWILIO_VOICE_README.md?raw';
+import { toGithubBlobUrl, toGithubRawUrl } from '@/lib/githubDocs';
 
 type DocLink = {
   id: string;
   title: string;
   description: string;
-  rawUrl: string;
-  content: string;
+  repoPath: string;
 };
 
 const docsLinks: DocLink[] = [
@@ -23,15 +21,13 @@ const docsLinks: DocLink[] = [
     id: 'project-overview',
     title: 'Project Overview',
     description: 'Primary README covering TradeLine 24/7 setup, scripts, and contribution notes.',
-    rawUrl: 'https://github.com/Apex-Business-Apps/TradeLine247/raw/main/README.md',
-    content: projectOverviewContent,
+    repoPath: 'README.md',
   },
   {
     id: 'telephony-voice-guide',
     title: 'Telephony (Twilio Voice) Guide',
     description: 'Archived telephony integration notes for voice flows and configuration.',
-    rawUrl: 'https://github.com/Apex-Business-Apps/TradeLine247/raw/main/docs/archive/telephony/TWILIO_VOICE_README.md',
-    content: twilioVoiceGuideContent,
+    repoPath: 'docs/archive/telephony/TWILIO_VOICE_README.md',
   },
 ];
 
@@ -73,6 +69,50 @@ const DocsHub = () => {
   const [searchParams] = useSearchParams();
   const activeDocId = searchParams.get('doc');
   const activeDoc = docsLinks.find((doc) => doc.id === activeDocId);
+  const [content, setContent] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const githubUrl = useMemo(() => {
+    if (!activeDoc) return null;
+    return toGithubBlobUrl(activeDoc.repoPath);
+  }, [activeDoc]);
+
+  useEffect(() => {
+    if (!activeDoc) return;
+
+    let isCancelled = false;
+    setIsLoading(true);
+    setError(null);
+
+    fetch(toGithubRawUrl(activeDoc.repoPath))
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load document (status ${response.status})`);
+        }
+        return response.text();
+      })
+      .then((text) => {
+        if (!isCancelled) {
+          setContent(text);
+        }
+      })
+      .catch((err) => {
+        if (!isCancelled) {
+          setError(err.message);
+          setContent('');
+        }
+      })
+      .finally(() => {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeDoc]);
 
   if (activeDoc) {
     return (
@@ -97,8 +137,8 @@ const DocsHub = () => {
                 <Link to={paths.docs}>Back to list</Link>
               </Button>
               <Button asChild variant="outline" className="rounded-full">
-                <a href={activeDoc.rawUrl} target="_blank" rel="noreferrer">
-                  Open raw source
+                <a href={githubUrl ?? undefined} target="_blank" rel="noreferrer">
+                  View on GitHub
                 </a>
               </Button>
             </div>
@@ -106,13 +146,17 @@ const DocsHub = () => {
 
           <Card className="border-border/70 shadow-sm">
             <CardContent className="p-6 md:p-8">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={markdownComponents}
-                className="space-y-4"
-              >
-                {activeDoc.content}
-              </ReactMarkdown>
+              {isLoading && <p className="text-muted-foreground">Loading document…</p>}
+              {error && <p className="text-destructive">{error}</p>}
+              {!isLoading && !error && (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={markdownComponents}
+                  className="space-y-4"
+                >
+                  {content}
+                </ReactMarkdown>
+              )}
             </CardContent>
           </Card>
         </div>
