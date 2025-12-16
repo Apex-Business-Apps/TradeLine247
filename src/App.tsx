@@ -1,6 +1,6 @@
 // FILE: src/App.tsx
 import React, { Suspense, lazy, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import LayoutShell from "./components/layout/LayoutShell";
 import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
@@ -19,7 +19,6 @@ const Compare = lazy(() => import("./pages/Compare"));
 const Security = lazy(() => import("./pages/Security"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Contact = lazy(() => import("./pages/Contact"));
-const DocsHub = lazy(() => import("./pages/DocsHub"));
 const Auth = lazy(() => import("./pages/Auth"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const AuthLanding = lazy(() => import("./pages/AuthLanding"));
@@ -54,7 +53,6 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.security, element: <Security /> },
   { path: paths.privacy, element: <Privacy /> },
   { path: paths.contact, element: <Contact /> },
-  { path: paths.docs, element: <DocsHub /> },
   { path: paths.login, element: <LoginPage /> },
   { path: paths.auth, element: <Auth /> },
   { path: paths.login, element: <Auth /> },
