@@ -1,26 +1,12 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
-app_dir = File.expand_path(__dir__)
-unless Dir.pwd == app_dir
-  puts "[pods] Switching to #{app_dir} (was #{Dir.pwd})"
-  Dir.chdir(app_dir)
-end
+platform :ios, '14.0'
+use_frameworks!
 
-project_relative = 'App.xcodeproj'
-project_file = File.join(project_relative, 'project.pbxproj')
-
-unless File.directory?(project_relative)
-  abort "[pods] Expected to find #{project_relative} under #{Dir.pwd}. Run `npx cap sync ios` first."
-end
-
-unless File.exist?(project_file)
-  abort "[pods] Missing project.pbxproj inside #{project_relative}. Re-run `npx cap sync ios`."
-end
-
-platform :ios, '15.0'
-use_frameworks! linkage: :static
-
-project project_relative
+# workaround to avoid Xcode caching of Pods that requires
+# Product -> Clean Build Folder after new Cordova plugins installed
+# Requires CocoaPods 1.6 or newer
+install! 'cocoapods', :disable_input_output_paths => true
 
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
@@ -34,18 +20,13 @@ def capacitor_pods
   pod 'CapacitorPushNotifications', :path => '../../node_modules/@capacitor/push-notifications'
   pod 'CapacitorSplashScreen', :path => '../../node_modules/@capacitor/splash-screen'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
-  pod 'SentryCapacitor', :path => '../../node_modules/@sentry/capacitor'
 end
 
 target 'App' do
   capacitor_pods
+  # Add your Pods here
 end
 
 post_install do |installer|
   assertDeploymentTarget(installer)
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-    end
-  end
 end
