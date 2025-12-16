@@ -87,6 +87,23 @@ workflows:
 
           npm run build
 
+      - name: Prepare iOS native project
+        script: |
+          set -eo pipefail
+          # Restore missing 1024×1024 App Store icon (if present in brand assets)
+          mkdir -p ios/App/App/Assets.xcassets/AppIcon.appiconset
+          cp -f public/assets/brand/App_Icons/ios/AppStore1024.png \
+            ios/App/App/Assets.xcassets/AppIcon.appiconset/icon-1024.png || true
+          # Ensure Podfile sets minimum iOS deployment target to 15.0
+          if grep -qE "platform :ios" ios/App/Podfile; then
+            sed -i.bak -E "s/platform :ios, '[0-9.]+'/platform :ios, '15.0'/" ios/App/Podfile
+          else
+            printf "platform :ios, '15.0'\n%s" "$(cat ios/App/Podfile)" > ios/App/Podfile.tmp && mv ios/App/Podfile.tmp ios/App/Podfile
+          fi
+          # Force iOS deployment target to 15.0 in the Xcode project
+          perl -pi -e "s/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]+;/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/g" \
+            ios/App/App.xcodeproj/project.pbxproj
+
       - name: Sync Capacitor
 
         script: |
