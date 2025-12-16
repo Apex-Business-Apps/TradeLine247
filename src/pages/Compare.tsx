@@ -1,6 +1,7 @@
 import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { createBrandGradientStyle } from "@/styles/brandGradients";
@@ -61,8 +62,10 @@ export default function Compare() {
                         <thead>
                           <tr className="border-b">
                             <th className="text-left py-3 px-2 min-w-[120px]">Feature</th>
-                            <th className="text-center py-3 px-2 bg-primary/5 min-w-[100px]">
-                              <Badge className="mb-1 text-xs">TradeLine 24/7</Badge>
+                            <th className="text-center py-3 px-2 min-w-[100px] bg-brand-orange-light text-brand-orange-dark">
+                              <Badge className="mb-1 text-xs border border-brand-orange-dark text-brand-orange-dark bg-transparent font-semibold">
+                                TradeLine 24/7
+                              </Badge>
                             </th>
                             <th className="text-center py-3 px-2 min-w-[100px]">Smith.ai (Human)</th>
                             <th className="text-center py-3 px-2 min-w-[100px]">Smith.ai (AI)</th>
@@ -77,8 +80,8 @@ export default function Compare() {
                                 {row.feature}
                                 <div className="text-xs text-muted-foreground mt-0.5">{row.notes}</div>
                               </td>
-                              <td className="text-center py-3 px-2 bg-primary/5">
-                                <span className="font-semibold text-primary text-xs">{row.tradeline}</span>
+                              <td className="text-center py-3 px-2 bg-brand-orange-light text-brand-orange-dark">
+                                <span className="font-semibold text-brand-orange-dark text-xs">{row.tradeline}</span>
                               </td>
                               <td className="text-center py-3 px-2"><span className="text-muted-foreground text-xs">{row.smithAI}</span></td>
                               <td className="text-center py-3 px-2"><span className="text-muted-foreground text-xs">{row.smithAIBot}</span></td>
@@ -106,12 +109,12 @@ export default function Compare() {
                   Flat monthly pricing with unlimited calls and true 24/7 AI-powered coverage.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link className="inline-flex items-center rounded-md px-6 py-3 bg-primary text-primary-foreground hover:opacity-90" to="/pricing">
-                    View Pricing
-                  </Link>
-                  <Link className="inline-flex items-center rounded-md px-6 py-3 border border-input hover:bg-accent" to="/demo">
-                    Schedule Demo
-                  </Link>
+                  <Button asChild variant="brand" className="px-6 py-3 text-base font-semibold">
+                    <Link to="/pricing">View Pricing</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="px-6 py-3 text-base font-semibold">
+                    <Link to="/demo">Schedule Demo</Link>
+                  </Button>
                 </div>
               </div>
             </div>
