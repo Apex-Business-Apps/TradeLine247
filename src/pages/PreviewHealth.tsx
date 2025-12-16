@@ -26,7 +26,7 @@ function PreviewHealthContent() {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground py-16">
+    <main id="main-content" role="main" className="min-h-screen bg-background text-foreground py-16">
       <div className="container max-w-4xl space-y-8">
         <header className="space-y-4 text-center">
           <p className="text-sm uppercase tracking-wide text-muted-foreground">

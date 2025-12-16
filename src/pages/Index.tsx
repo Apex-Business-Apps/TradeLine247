@@ -47,15 +47,10 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen" style={wallpaperVariables}>
-      <div
-        id="app-home"
-        className="fixed inset-0 z-0 pointer-events-none bg-no-repeat bg-cover bg-center"
-        style={wallpaperStyle}
-        aria-hidden="true"
-      />
-      <main className="landing-shell min-h-screen flex flex-col relative">
-        {/* Content with translucency - Optimized for performance */}
-        <div className="relative z-10" style={{ minHeight: "100vh" }}>
+      <div className="landing-wallpaper fixed inset-0 bg-cover" style={{ backgroundImage: `url(${backgroundImage})` }} aria-hidden="true" />
+      <div className="landing-mask fixed inset-0 pointer-events-none" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255,107,53,0.55) 0%, rgba(104,182,233,0.55) 100%)` }} aria-hidden="true" />
+      <div className="landing-shell min-h-screen flex flex-col relative">
+        <div className="landing-content relative z-10">
           <AISEOHead
               title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
               description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
@@ -142,7 +137,7 @@ const Index = () => {
             <NoAIHypeFooter />
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
