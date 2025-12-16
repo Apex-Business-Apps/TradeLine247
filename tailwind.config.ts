@@ -22,6 +22,8 @@ export default {
         'brand': ['BrandFont', 'system-ui', 'sans-serif'],
       },
       colors: {
+        brand: "hsl(var(--brand))",
+        "brand-foreground": "hsl(var(--brand-foreground))",
         'brand-orange': {
           DEFAULT: "hsl(var(--brand-orange-primary))",
           light: "hsl(var(--brand-orange-light))",

@@ -87,6 +87,19 @@ const complianceStandards = [
   }
 ];
 
+const getComplianceBadgeVariant = (status: string) => {
+  switch (status) {
+    case "Aligned":
+      return "aligned" as const;
+    case "Enforced":
+      return "enforced" as const;
+    case "In Progress":
+      return "inProgress" as const;
+    default:
+      return "secondary" as const;
+  }
+};
+
 const privacyCommitments = [
   {
     title: "No Data Selling",
@@ -231,7 +244,7 @@ const Security = () => {
                           <div>
                             <CardTitle className="text-lg">{standard.name}</CardTitle>
                             <Badge
-                              variant={standard.status === "Aligned" || standard.status === "Enforced" ? "default" : "secondary"}
+                              variant={getComplianceBadgeVariant(standard.status)}
                               className="mt-1 text-xs"
                             >
                               {standard.status}

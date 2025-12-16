@@ -38,7 +38,8 @@ const webServer = shouldStartLocalServer
   : undefined;
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './',
+  testMatch: ['tests/**/*.{spec,test}.{ts,tsx,js}', 'scripts/**/*.spec.ts'],
 
   // CI-specific settings
   timeout: process.env.CI ? 120000 : 60000, // 2 minutes in CI, 1 minute local for accessibility tests

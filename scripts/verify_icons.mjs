@@ -3,6 +3,22 @@ import fs from "fs";
 import path from "path";
 import { execFileSync } from "child_process";
 
+// Skip iOS icon verification on Vercel (web deploy, not iOS build)
+if (process.env.VERCEL) {
+  console.log("[verify:icons] Skipping iOS icon checks on Vercel deploy.");
+  process.exit(0);
+}
+
+// Ensure the iOS marketing icon exists before verification runs
+try {
+  execFileSync("node", ["scripts/ensure-ios-1024-icon.mjs"], {
+    stdio: "inherit",
+  });
+} catch (err) {
+  console.error("Failed to ensure iOS 1024 icon:", err?.message || err);
+  process.exit(1);
+}
+
 // Strict mode: set STRICT_ICONS=true to fail build on missing/invalid icons
 // Default (non-strict): logs warnings but allows build to continue
 const STRICT = process.env.STRICT_ICONS === 'true';

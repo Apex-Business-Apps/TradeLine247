@@ -257,6 +257,10 @@ All colors MUST be HSL.
     --brand-orange-light: 29 100% 95%;
     --brand-orange-dark: var(--brand-orange-700);
 
+    /* Brand tokens for consistent foreground/background pairing */
+    --brand: var(--brand-orange-primary);
+    --brand-foreground: 0 0% 100%;
+
     /* Brand Blue Palette derived from TradeLine handset mark */
     --brand-blue-primary: 199 84% 58%;
     --brand-blue-500: 199 82% 64%;
