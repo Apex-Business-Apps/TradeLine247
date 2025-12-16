@@ -7,6 +7,7 @@ import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 // CRITICAL: Index route must be eager (not lazy) for immediate FCP on homepage
 import Index from "./pages/Index";
 import { initializeNativePlatform } from "./lib/native";
+import { useDeepLinks } from "./hooks/useDeepLinks";
 import { paths } from "./routes/paths";
 import { RequireAuth } from "./components/auth/RequireAuth";
 
@@ -108,6 +109,12 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Deep link handler component (must be inside BrowserRouter for useNavigate)
+function DeepLinkHandler({ children }: { children: React.ReactNode }) {
+  useDeepLinks();
+  return <>{children}</>;
+}
+
 export default function App() {
   // Initialize native platform (splash screen, status bar, keyboard) on mount
   useEffect(() => {
@@ -118,16 +125,19 @@ export default function App() {
     <SafeErrorBoundary>
       <div className="min-h-screen bg-background text-foreground antialiased">
         <BrowserRouter>
-          {/* Suspense prevents a white screen if any child is lazy elsewhere */}
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              <Route element={<LayoutShell />}>
-                {routeEntries.map(({ path, element }) => (
-                  <Route key={path} path={path} element={element} />
-                ))}
-              </Route>
-            </Routes>
-          </Suspense>
+          {/* Deep link handler for native app URL schemes */}
+          <DeepLinkHandler>
+            {/* Suspense prevents a white screen if any child is lazy elsewhere */}
+            <Suspense fallback={<LoadingFallback />}>
+              <Routes>
+                <Route element={<LayoutShell />}>
+                  {routeEntries.map(({ path, element }) => (
+                    <Route key={path} path={path} element={element} />
+                  ))}
+                </Route>
+              </Routes>
+            </Suspense>
+          </DeepLinkHandler>
         </BrowserRouter>
       </div>
     </SafeErrorBoundary>
