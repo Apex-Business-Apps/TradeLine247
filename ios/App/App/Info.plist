@@ -45,26 +45,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-
-	<!-- EXPORT COMPLIANCE: App uses only standard encryption (HTTPS/TLS) -->
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-
-	<!-- DEEP LINKS: tradeline247:// URL scheme -->
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>tradeline247</string>
-			</array>
-		</dict>
-	</array>
-
-	<!-- PUSH NOTIFICATIONS: Background mode required -->
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-	</array>
 </dict>
 </plist>
