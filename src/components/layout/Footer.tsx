@@ -26,7 +26,7 @@ export const Footer: React.FC = () => {
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
             {/* APEX Business Systems */}
             <a 
-              href="https://apexbusinesssystems.ca" 
+              href="https://apexbusiness-systems.com/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="opacity-70 hover:opacity-100 transition-opacity"

@@ -28,16 +28,18 @@ import "../styles/hero-roi.css";
 import { LeadCaptureCard } from "../components/sections/LeadCaptureCard";
 import RoiCalculator from "../components/RoiCalculator";
 import officialLogo from '@/assets/official-logo.png';
+import backgroundImage from '@/assets/BACKGROUND_IMAGE1.svg';
 export default function HeroRoiDuo() {
   return <section className="hero-section section-heavy overflow-hidden relative" style={{
     paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
     paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
     paddingLeft: 'env(safe-area-inset-left, 0)',
-    paddingRight: 'env(safe-area-inset-right, 0)'
+    paddingRight: 'env(safe-area-inset-right, 0)',
+    backgroundImage: `url(${backgroundImage})`
   }} data-lovable-lock="structure-only">
       {/* Background and overlay handled by #app-home in Index.tsx */}
       {/* hero-bg div kept for test compatibility */}
-      <div className="hero-bg" aria-hidden="true" data-testid="hero-bg"></div>
+      <div className="hero-bg" aria-hidden="true" data-testid="hero-bg" style={{ backgroundImage: `url(${backgroundImage})` }}></div>
       <div className="hero-gradient-overlay" aria-hidden="true"></div>
       <div className="hero-vignette" aria-hidden="true"></div>
       <div className="container relative z-10" data-lovable-lock="structure-only">
