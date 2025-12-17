@@ -26,7 +26,7 @@ workflows:
 
       xcode: 16.4
 
-      node: 20.11.1
+      node: 20.19.6
       npm: 10
 
       cocoapods: default
@@ -51,6 +51,8 @@ workflows:
 
           set -eo pipefail
 
+          node -v
+          npm -v
           npm ci
 
       - name: Quality gates
@@ -201,7 +203,7 @@ workflows:
         - android_signing
       vars:
         APP_VERSION: "1.1.0"
-      node: 20.11.1
+      node: 20.19.6
       npm: 10
       java: 17
     cache:
@@ -210,7 +212,10 @@ workflows:
         - ~/.gradle
     scripts:
       - name: Install dependencies
-        script: npm ci
+        script: |
+          node -v
+          npm -v
+          npm ci
       - name: Quality gates
         script: npm run lint && npm run typecheck && npm run test:unit
       - name: Verify visual assets
@@ -244,14 +249,17 @@ workflows:
     instance_type: linux
     max_build_duration: 45
     environment:
-      node: 20.11.1
+      node: 20.19.6
       npm: 10
     cache:
       cache_paths:
         - ~/.npm
     scripts:
       - name: Install dependencies
-        script: npm ci
+        script: |
+          node -v
+          npm -v
+          npm ci
       - name: Lint, typecheck, unit tests
         script: npm run lint && npm run typecheck && npm run test:unit
       - name: Build web bundle
