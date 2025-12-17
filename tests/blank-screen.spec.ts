@@ -16,8 +16,8 @@ test.describe('Blank Screen Prevention', () => {
     expect(rootContent).toBeTruthy();
     expect(rootContent.length).toBeGreaterThan(100);
     
-    // Main element should exist
-    await expect(page.locator('#main')).toBeVisible();
+    // Hero section should exist (landing page uses section.hero-section, not <main>)
+    await expect(page.locator('section.hero-section').first()).toBeVisible();
     
     // Hero section should be visible
     await expect(page.locator('h1').first()).toContainText('24/7');
@@ -27,7 +27,8 @@ test.describe('Blank Screen Prevention', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    const wallpaper = page.locator('#app-home');
+    // Landing page uses .landing-wallpaper for the fixed background layer
+    const wallpaper = page.locator('.landing-wallpaper');
     await expect(wallpaper).toHaveCount(1);
     await expect(wallpaper).toBeVisible();
 
@@ -37,19 +38,19 @@ test.describe('Blank Screen Prevention', () => {
     const opacity = await wallpaper.evaluate((el) => getComputedStyle(el).opacity);
     expect(parseFloat(opacity)).toBeGreaterThan(0);
 
-    // Check for gradient overlay in hero section (replaces separate mask element)
-    const heroSection = page.locator('section.hero-section').first();
-    if (await heroSection.count() > 0) {
-      const heroBg = await heroSection.evaluate((el) => getComputedStyle(el).backgroundImage);
-      expect(heroBg).not.toBe('none');
+    // Check for gradient overlay/mask layer (separate from wallpaper)
+    const landingMask = page.locator('.landing-mask');
+    if (await landingMask.count() > 0) {
+      const maskBg = await landingMask.evaluate((el) => getComputedStyle(el).backgroundImage);
+      expect(maskBg).not.toBe('none');
     }
   });
 
   test('startup splash does not block content', async ({ page }) => {
     await page.goto('/?nosplash=1'); // Disable splash for this test
-    
-    // Content should be immediately visible
-    await expect(page.locator('#main')).toBeVisible({ timeout: 2000 });
+
+    // Content should be immediately visible (landing page uses section.hero-section)
+    await expect(page.locator('section.hero-section').first()).toBeVisible({ timeout: 2000 });
   });
 
   test('safe mode unblanks screen', async ({ page }) => {
@@ -106,9 +107,9 @@ test.describe('Blank Screen Prevention', () => {
   test('all major sections render', async ({ page }) => {
     await page.goto('/');
 
-    // Check for key sections
+    // Check for key sections (landing page uses section.hero-section instead of <main>)
     await expect(page.locator('header').first()).toBeVisible();
-    await expect(page.locator('main').first()).toBeVisible();
+    await expect(page.locator('section.hero-section').first()).toBeVisible();
     await expect(page.locator('footer').first()).toBeVisible();
 
     // Hero content

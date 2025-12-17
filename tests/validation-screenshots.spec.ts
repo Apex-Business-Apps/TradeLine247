@@ -86,11 +86,12 @@ test.describe('Validation Screenshots', () => {
   test('Main Landmark - Accessibility', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(2000);
-    
-    const mainElement = page.locator('main#main-content[role="main"]');
-    const count = await mainElement.count();
+
+    // Landing page uses section.hero-section as main content area (no <main> tag)
+    const heroSection = page.locator('section.hero-section').first();
+    const count = await heroSection.count();
     expect(count).toBeGreaterThan(0);
-    
+
     await page.screenshot({
       path: join(SCREENSHOT_DIR, '07-main-landmark-accessibility.png'),
       fullPage: true

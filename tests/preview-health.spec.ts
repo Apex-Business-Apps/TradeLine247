@@ -80,7 +80,7 @@ test.describe('Preview Environment Health', () => {
 
   test('should load main navigation elements', async ({ page }) => {
     await page.goto('/');
-    
+
     // Wait for React to mount
     await page.waitForFunction(() => (window as any).__REACT_READY__ === true, { timeout: 10000 });
 
@@ -88,9 +88,9 @@ test.describe('Preview Environment Health', () => {
     const header = page.locator('header').first();
     await expect(header).toBeVisible();
 
-    // Check for main content area
-    const main = page.locator('main').first();
-    await expect(main).toBeVisible();
+    // Check for main content area (landing page uses section.hero-section, not <main>)
+    const heroSection = page.locator('section.hero-section').first();
+    await expect(heroSection).toBeVisible();
   });
 
   test.skip('should have working error boundary', async ({ page }) => {
