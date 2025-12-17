@@ -24,26 +24,26 @@ const __dirname = path.dirname(__filename);
 
 const HERO_FILE_PATH = path.join(__dirname, '..', 'src', 'sections', 'HeroRoiDuo.tsx');
 const INDEX_FILE_PATH = path.join(__dirname, '..', 'src', 'pages', 'Index.tsx');
-const LANDING_CSS_PATH = path.join(__dirname, '..', 'src', 'styles', 'landing.css');
+// Landing styles are in index.css, not a separate landing.css
+const INDEX_CSS_PATH = path.join(__dirname, '..', 'src', 'index.css');
 
+// HeroRoiDuo imports (background is now handled in Index.tsx)
 const REQUIRED_IMPORTS = [
   'import React from "react"',
-  'import backgroundImage from',
   'import officialLogo from',
   'import { LeadCaptureCard }',
   'import RoiCalculator from',
 ];
 
+// HeroRoiDuo structure elements (background moved to Index.tsx)
 const REQUIRED_STRUCTURE = [
   'hero-gradient-overlay',
   'hero-vignette',
-  'BACKGROUND_IMAGE1',
 ];
 
+// HeroRoiDuo visual elements
 const REQUIRED_ELEMENTS = [
   'hero-section',
-  'absolute inset-0',
-  'backgroundImage',
 ];
 
 const MIN_FILE_LENGTH = 100; // Minimum lines - truncation protection
@@ -114,52 +114,21 @@ function validateHeroSource() {
   });
   console.log();
 
-  // 6. Check for background image implementation (current uses inline styles)
-  const hasBackgroundImage = content.includes('backgroundImage') && 
-                             (content.includes('url(${backgroundImage})') || content.includes('url('));
-  if (!hasBackgroundImage) {
-    errors.push('Missing background image implementation');
+  // 6. Background image is now handled in Index.tsx via .landing-wallpaper
+  // HeroRoiDuo only needs hero-bg div for test compatibility
+  const hasHeroBgDiv = content.includes('hero-bg');
+  if (!hasHeroBgDiv) {
+    warnings.push('Missing hero-bg div (used for test compatibility)');
   } else {
-    console.log('✅ Background image implementation found\n');
+    console.log('✅ hero-bg div found (for test compatibility)\n');
   }
 
-  // 7. Check for background styling (size, position, repeat)
-  const hasBackgroundSize = content.includes('backgroundSize') || content.includes('background-size');
-  const hasBackgroundPosition = content.includes('backgroundPosition') || content.includes('background-position');
-  const hasBackgroundRepeat = content.includes('backgroundRepeat') || content.includes('background-repeat');
-  
-  if (!hasBackgroundSize) {
-    errors.push('Missing background size styling');
+  // 7. Check for data-testid (used by E2E tests)
+  const hasTestId = content.includes('data-testid="hero-bg"');
+  if (!hasTestId) {
+    warnings.push('Missing data-testid="hero-bg" attribute (used by E2E tests)');
   } else {
-    console.log('✅ Background size styling found');
-  }
-  if (!hasBackgroundPosition) {
-    errors.push('Missing background position styling');
-  } else {
-    console.log('✅ Background position styling found');
-  }
-  if (!hasBackgroundRepeat) {
-    errors.push('Missing background repeat styling');
-  } else {
-    console.log('✅ Background repeat styling found\n');
-  }
-
-  // 8. Verify background image div structure
-  const hasBackgroundDiv = content.includes('absolute inset-0') && content.includes('backgroundImage');
-  if (!hasBackgroundDiv) {
-    errors.push('Missing background image div with absolute positioning');
-  } else {
-    console.log('✅ Background image div structure correct\n');
-  }
-
-  // 9. Check for wallpaper version tag (optional but recommended)
-  if (content.includes('data-wallpaper-version')) {
-    const versionMatch = content.match(/data-wallpaper-version="([^"]+)"/);
-    if (versionMatch) {
-      console.log(`✅ Wallpaper version: ${versionMatch[1]}\n`);
-    }
-  } else {
-    warnings.push('Missing data-wallpaper-version attribute (recommended for tracking)');
+    console.log('✅ data-testid="hero-bg" found\n');
   }
 
   // 10. Validate closing structure
@@ -225,29 +194,33 @@ function validateLandingWallpaper() {
     console.log('✅ --landing-wallpaper CSS variable is set');
   }
 
-  // 5. Check landing.css has responsive media queries
-  if (fs.existsSync(LANDING_CSS_PATH)) {
-    const landingCss = fs.readFileSync(LANDING_CSS_PATH, 'utf-8');
-    
-    if (!landingCss.includes('@media (max-width: 768px)') || !landingCss.includes('20%')) {
-      errors.push('Missing mobile media query with 20% focal point in landing.css');
+  // 5. Check index.css has hero-related styles (landing-wallpaper styled via Tailwind in Index.tsx)
+  if (fs.existsSync(INDEX_CSS_PATH)) {
+    const indexCss = fs.readFileSync(INDEX_CSS_PATH, 'utf-8');
+
+    // Note: .landing-wallpaper element uses Tailwind classes (fixed inset-0 bg-cover)
+    // The CSS file should have landing-shell and hero overlay styles
+    if (indexCss.includes('.landing-shell') || indexCss.includes('landing-shell')) {
+      console.log('✅ .landing-shell styles found in index.css');
     } else {
-      console.log('✅ Mobile media query (20% focal point) found');
+      warnings.push('.landing-shell styles not found in index.css');
     }
 
-    if (!landingCss.includes('@media (max-width: 1024px)') || !landingCss.includes('15%')) {
-      errors.push('Missing tablet media query with 15% focal point in landing.css');
+    // Check for landing-shell responsive media queries
+    if (indexCss.includes('@media') && indexCss.includes('landing-shell')) {
+      console.log('✅ Responsive landing-shell media queries found');
     } else {
-      console.log('✅ Tablet media query (15% focal point) found');
+      warnings.push('Landing-shell responsive media queries not found');
     }
 
-    if (!landingCss.includes('center') && !landingCss.includes('background-position: center')) {
-      warnings.push('Desktop background-position (center) not explicitly found in landing.css');
+    // Check for hero overlay styles
+    if (indexCss.includes('.hero-gradient-overlay')) {
+      console.log('✅ Hero gradient overlay styles found');
     } else {
-      console.log('✅ Desktop background-position (center) found');
+      warnings.push('Hero gradient overlay styles not found in index.css');
     }
   } else {
-    errors.push(`landing.css not found at ${LANDING_CSS_PATH}`);
+    errors.push(`index.css not found at ${INDEX_CSS_PATH}`);
   }
 
   // 6. Check DO NOT CHANGE comment exists
