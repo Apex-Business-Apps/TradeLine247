@@ -10,9 +10,9 @@ export default function LayoutShell() {
       <HeaderErrorBoundary>
         <Header />
       </HeaderErrorBoundary>
-      <main id="content" className="min-h-[60vh]">
+      <div id="content" className="min-h-[60vh]">
         <Outlet />
-      </main>
+      </div>
     </>
   );
 }

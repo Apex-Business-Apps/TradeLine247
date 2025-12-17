@@ -146,6 +146,19 @@ html {
   }
 }
 
+/* ============================================================================
+   BACKGROUND LAYERS: pointer-events: none
+   Required by e2e tests - background layers must not block scroll/input
+   ============================================================================ */
+.landing-wallpaper,
+.landing-mask,
+.hero-bg,
+.hero-vignette,
+.hero-gradient-overlay,
+[data-bg-layer="true"] {
+  pointer-events: none !important;
+}
+
 
 /* Safe Area Support for Hero Sections */
 .hero-safe-area {
