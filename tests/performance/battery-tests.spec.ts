@@ -1,11 +1,17 @@
 /**
  * Battery Tests - Comprehensive Performance & Reliability Testing
- * 
+ *
  * These tests ensure the app is reliable, robust, and performs well
  * under various conditions and stress scenarios.
+ *
+ * @slow - These tests run in nightly builds only (full project)
+ * They are excluded from PR gates (critical project)
  */
 
 import { test, expect } from '@playwright/test';
+
+// Configure for parallel execution, no retries (performance tests should be deterministic)
+test.describe.configure({ mode: 'parallel', retries: 0 });
 
 test.describe('Battery Tests - Performance & Reliability', () => {
   test.beforeEach(async ({ page }) => {
