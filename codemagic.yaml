@@ -177,8 +177,6 @@ workflows:
 
           - Internal Testers
 
-        release_notes: "Internal build ${APP_VERSION} (${CM_BUILD_NUMBER})"
-
 
     triggering:
       events:
