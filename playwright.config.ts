@@ -64,8 +64,33 @@ export default defineConfig({
     },
   },
   projects: [
+    // CRITICAL: Fast, must-pass tests for PR gates
+    {
+      name: 'critical',
+      testMatch: [
+        '**/smoke.spec.ts',
+        '**/cta-smoke.spec.ts',
+        '**/blank-screen.spec.ts',
+        '**/preview-health.spec.ts',
+      ],
+      use: {
+        ...devices['Desktop Chrome'],
+        ...baseUse,
+      },
+    },
+    // FULL: Complete test suite for nightly/release builds
+    {
+      name: 'full',
+      testMatch: ['**/*.spec.ts'],
+      use: {
+        ...devices['Desktop Chrome'],
+        ...baseUse,
+      },
+    },
+    // Default chromium project (backwards compatible)
     {
       name: 'chromium',
+      testMatch: ['**/*.spec.ts'],
       use: {
         ...devices['Desktop Chrome'],
         ...baseUse,

@@ -1,10 +1,16 @@
 /**
  * Reliability Tests - System Robustness
- * 
+ *
  * Tests to ensure all systems, functions, and components are reliable
+ *
+ * @slow - These tests run in nightly builds only (full project)
+ * They are excluded from PR gates (critical project)
  */
 
 import { test, expect } from '@playwright/test';
+
+// Configure for parallel execution, no retries (performance tests should be deterministic)
+test.describe.configure({ mode: 'parallel', retries: 0 });
 
 test.describe('Reliability Tests - System Robustness', () => {
   test('Background Image System Reliability', async ({ page }) => {

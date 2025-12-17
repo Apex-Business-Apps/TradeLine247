@@ -1254,10 +1254,11 @@ textarea:focus-visible {
 }
 
 /* Hero section internal overlays - only used inside HeroRoiDuo component */
+/* Reduced from 20% to 10% to maximize background visibility while maintaining WCAG AA */
 .hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 107, 53, 0.20);
+  background: rgba(255, 107, 53, 0.10);
   pointer-events: none;
   z-index: 1;
 }

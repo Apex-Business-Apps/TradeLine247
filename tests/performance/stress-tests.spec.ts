@@ -1,10 +1,16 @@
 /**
  * Stress Tests - Heavy Load & Edge Cases
- * 
+ *
  * Tests to ensure the app remains stable under heavy load
+ *
+ * @slow - These tests run in nightly builds only (full project)
+ * They are excluded from PR gates (critical project)
  */
 
 import { test, expect } from '@playwright/test';
+
+// Configure for parallel execution, no retries (stress tests should be deterministic)
+test.describe.configure({ mode: 'parallel', retries: 0 });
 
 test.describe('Stress Tests - Heavy Load Scenarios', () => {
   test('Rapid Navigation Stress Test', async ({ page }) => {

@@ -95,14 +95,15 @@ const Index = () => {
               ]}
             />
 
-          {/* Hero section with 55% opacity gradient - Background image visible */}
+          {/* Hero section with 40% opacity gradient - Background image more visible */}
+          {/* WCAG AA: Large text needs 3:1 contrast; text-shadows enhance readability */}
           <div
             className="relative"
             style={{
               backgroundImage: `linear-gradient(
                 to bottom,
-                rgba(255, 107, 53, 0.55) 0%,
-                rgba(104, 182, 233, 0.55) 100%
+                rgba(255, 107, 53, 0.40) 0%,
+                rgba(104, 182, 233, 0.40) 100%
               )`,
             }}
           >

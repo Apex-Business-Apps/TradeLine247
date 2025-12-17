@@ -135,8 +135,8 @@ jobs:
         run: |
           lsof -ti:4173 | xargs kill -9 || true
           sleep 2
-      - name: Run smoke tests
-        run: npx playwright test tests/cta-smoke.spec.ts --reporter=line
+      - name: Run critical tests (PR gate)
+        run: npx playwright test --project=critical --reporter=line
         env:
           CI: true
 
@@ -159,8 +159,8 @@ jobs:
         run: |
           lsof -ti:4173 | xargs kill -9 || true
           sleep 2
-      - name: Run full E2E tests
-        run: npx playwright test --reporter=line
+      - name: Run full E2E tests (nightly/release)
+        run: npx playwright test --project=full --reporter=line
         env:
           CI: true
   
