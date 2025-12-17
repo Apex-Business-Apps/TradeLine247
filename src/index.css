@@ -1851,24 +1851,28 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 /* ================================================ */
 
 #app-home {
-  background-size: auto, auto, cover;
-  background-position: center, center, center;
-  background-attachment: scroll, scroll, scroll;
+  background-image: var(--hero-wallpaper-image, url(/assets/BACKGROUND_IMAGE1.svg));
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
 }
 
 @media (max-width: 600px) {
   #app-home {
-    background-size: auto, auto, contain;
-    background-position: center, center, center top;
-    background-attachment: scroll, scroll, scroll;
+    background-size: contain;
+    background-position: center 20%;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
   }
 }
 
 @media (min-width: 601px) and (max-width: 1024px) {
   #app-home {
-    background-size: auto, auto, cover;
-    background-position: center, center, center top;
-    background-attachment: scroll, scroll, scroll;
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
   }
 }
 
@@ -2041,12 +2045,14 @@ button[class*="orange"]:hover:not([class*="outline"]) {
   background-attachment: scroll;
   background-position: center top;
   background-size: cover;
+  background-repeat: no-repeat;
   min-height: var(--vh-safe);
 }
 @media (max-width: 768px) {
   #app-home, .hero-bg, [class*="hero-section"] {
     background-attachment: scroll !important;
     background-position: center 20%;
+    background-repeat: no-repeat !important;
   }
 }
 @supports (-webkit-touch-callout: none) {
