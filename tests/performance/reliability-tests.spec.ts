@@ -194,6 +194,9 @@ test.describe('Reliability Tests - System Robustness', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Ensure animations are enabled for accurate jank measurement
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+
     // Measure frame drops during animation
     const frameDrops = await page.evaluate(() => {
       let frameCount = 0;

@@ -72,6 +72,9 @@ test.describe('Battery Tests - Performance & Reliability', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
+    // Ensure animations are enabled for accurate FPS measurement
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+
     // Measure frame rate during animations
     const frameRates: number[] = [];
     let frameCount = 0;
