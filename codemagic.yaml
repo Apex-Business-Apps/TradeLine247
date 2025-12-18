@@ -20,7 +20,7 @@ workflows:
 
         BUNDLE_ID: com.apex.tradeline
 
-        APP_VERSION: "1.1.0"
+        APP_VERSION: "1.0.4"
 
         PROJECT_BUILD_NUMBER: $CM_BUILD_NUMBER
 
@@ -165,7 +165,21 @@ workflows:
             exit 2
           fi
 
-
+      - name: Ensure canonical IPA artifact path
+        script: |
+          set -eo pipefail
+          # Create canonical IPA path as guardrail against filename drift
+          mkdir -p ios/build/export
+          IPA_GLOB="build/ios/ipa/*.ipa"
+          if ls $IPA_GLOB 1> /dev/null 2>&1; then
+            IPA_FILE=$(ls $IPA_GLOB | head -n 1)
+            CANONICAL_PATH="ios/build/export/TradeLine247.ipa"
+            cp "$IPA_FILE" "$CANONICAL_PATH"
+            echo "✅ Created canonical IPA at $CANONICAL_PATH"
+            ls -lh "$CANONICAL_PATH" || true
+          else
+            echo "⚠️ IPA not found at $IPA_GLOB, will rely on glob in artifacts"
+          fi
 
     artifacts:
 
@@ -217,7 +231,7 @@ workflows:
       groups:
         - android_signing
       vars:
-        APP_VERSION: "1.1.0"
+        APP_VERSION: "1.0.0"
       node: 20.19.6
       npm: 10
       java: 17
@@ -246,6 +260,22 @@ workflows:
         script: |
           set -eo pipefail
           bash scripts/set-android-version.sh
+      - name: Force Android versionCode to 2
+        script: |
+          set -eo pipefail
+          BUILD_GRADLE="android/app/build.gradle"
+          if [ -f "$BUILD_GRADLE" ]; then
+            # Force versionCode to 2 (required for this release)
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+              sed -i '' "s/versionCode\s*=\?\s*[0-9]\+/versionCode 2/g" "$BUILD_GRADLE"
+            else
+              sed -i "s/versionCode\s*=\?\s*[0-9]\+/versionCode 2/g" "$BUILD_GRADLE"
+            fi
+            echo "✅ Forced versionCode to 2"
+            grep "versionCode" "$BUILD_GRADLE" || true
+          else
+            echo "⚠️ build.gradle not found, will be created by cap sync"
+          fi
       - name: Build Android App Bundle
         script: bash scripts/build-android.sh
       - name: Verify artifacts
@@ -255,6 +285,10 @@ workflows:
       - playwright-report/**/*
       - dist/**/*
       - build-artifacts-sha256.txt
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
 
   # ────────────────────────────────────────────────────────────────────────────
   # WEB TESTS
