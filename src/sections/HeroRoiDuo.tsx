@@ -34,14 +34,13 @@ export default function HeroRoiDuo() {
     paddingTop: 'max(env(safe-area-inset-top, 0), 3rem)',
     paddingBottom: 'max(env(safe-area-inset-bottom, 0), 3rem)',
     paddingLeft: 'env(safe-area-inset-left, 0)',
-    paddingRight: 'env(safe-area-inset-right, 0)',
-    backgroundImage: `url(${backgroundImage})`
+    paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
       {/* Background and overlay handled by #app-home in Index.tsx */}
       {/* hero-bg div kept for test compatibility */}
-      <div className="hero-bg" aria-hidden="true" data-testid="hero-bg" style={{ backgroundImage: `url(${backgroundImage})`, pointerEvents: 'none' }}></div>
-      <div className="hero-gradient-overlay" aria-hidden="true"></div>
-      <div className="hero-vignette" aria-hidden="true"></div>
+      <div className="hero-bg" aria-hidden="true" data-testid="hero-bg" data-bg-layer="true" style={{ backgroundImage: `url(${backgroundImage})`, pointerEvents: 'none' }}></div>
+      <div className="hero-gradient-overlay" aria-hidden="true" data-bg-layer="true"></div>
+      <div className="hero-vignette" aria-hidden="true" data-bg-layer="true"></div>
       <div className="container relative z-10" data-lovable-lock="structure-only">
         {/* Hero Content */}
         <div className="text-center mb-16" data-lovable-lock="structure-only">
