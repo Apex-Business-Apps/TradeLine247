@@ -157,32 +157,6 @@ html {
   pointer-events: none !important;
 }
 
-/* Background gradient overlays - moved from wrapper divs to ::before for proper layering */
-.landing-hero-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255, 107, 53, 0.40) 0%,
-    rgba(104, 182, 233, 0.40) 100%
-  );
-  pointer-events: none;
-  z-index: -1;
-}
-
-.landing-content-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255, 107, 53, 0.72) 0%,
-    rgba(104, 182, 233, 0.72) 100%
-  );
-  pointer-events: none;
-  z-index: -1;
-}
 
 
 /* Safe Area Support for Hero Sections */

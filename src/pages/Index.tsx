@@ -51,6 +51,10 @@ const Index = () => {
       <div className="landing-mask-wrapper fixed inset-0 pointer-events-none z-5" aria-hidden="true">
         <div className="landing-mask fixed inset-0 pointer-events-none z-5" data-bg-layer="true" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255,107,53,0.55) 0%, rgba(104,182,233,0.55) 100%)` }} aria-hidden="true" />
       </div>
+      {/* Hero gradient overlay */}
+      <div className="hero-gradient-overlay fixed inset-0 pointer-events-none z-1" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.40) 0%, rgba(104, 182, 233, 0.40) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
+      {/* Content gradient overlay */}
+      <div className="content-gradient-overlay fixed inset-0 pointer-events-none z-2" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.72) 0%, rgba(104, 182, 233, 0.72) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
       <div id="main" className="landing-shell min-h-screen flex flex-col relative">
         <div id="main-content" className="landing-content relative z-10">
           <AISEOHead
@@ -94,14 +98,14 @@ const Index = () => {
               ]}
             />
 
-          {/* Hero section with 40% opacity gradient - Background image more visible */}
+          {/* Hero section - gradient now applied via fixed overlay */}
           {/* WCAG AA: Large text needs 3:1 contrast; text-shadows enhance readability */}
-          <div className="relative landing-hero-section">
+          <div className="relative">
             <HeroRoiDuo />
           </div>
 
-          {/* Rest of page with 72% opacity gradient - Text readable, image visible */}
-          <div className="relative landing-content-section">
+          {/* Rest of page - gradient now applied via fixed overlay */}
+          <div className="relative">
             <BenefitsGrid />
             <ImpactStrip />
             <HowItWorks />

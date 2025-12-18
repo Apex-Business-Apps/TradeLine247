@@ -140,15 +140,28 @@ workflows:
 
           set -eo pipefail
 
-          xcode-project build-ipa \
+          # Detect Xcode workspace or project
+          WORKSPACE="$(find ios -maxdepth 4 -name '*.xcworkspace' | head -n 1 || true)"
+          PROJECT="$(find ios -maxdepth 4 -name '*.xcodeproj' | head -n 1 || true)"
 
-            --workspace "$XCODE_WORKSPACE" \
-
-            --scheme "$XCODE_SCHEME" \
-
-            --config Release \
-
-            --archive-flags="-destination 'generic/platform=iOS'"
+          if [[ -n "$WORKSPACE" ]]; then
+            echo "Using workspace: $WORKSPACE"
+            xcode-project build-ipa \
+              --workspace "$WORKSPACE" \
+              --scheme "${XCODE_SCHEME:-App}" \
+              --config Release \
+              --archive-flags="-destination 'generic/platform=iOS'"
+          elif [[ -n "$PROJECT" ]]; then
+            echo "Using project: $PROJECT"
+            xcode-project build-ipa \
+              --project "$PROJECT" \
+              --scheme "${XCODE_SCHEME:-App}" \
+              --config Release \
+              --archive-flags="-destination 'generic/platform=iOS'"
+          else
+            echo "ERROR: No Xcode workspace or project found under ios/"
+            exit 2
+          fi
 
 
 
