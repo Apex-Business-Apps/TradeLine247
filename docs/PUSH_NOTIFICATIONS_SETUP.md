@@ -95,11 +95,15 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 ### Step 3: Add Android App to Firebase
 
-1. In Firebase Console → Project Settings → Your apps
-2. Click "Add app" → Android
-3. Enter Package name: `com.apex.tradeline`
-4. Download `google-services.json`
-5. Place in `android/app/google-services.json` (commit to repo)
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Select project: **TradeLine 247** (`project-c86459e7-415b-4a36-a25`)
+3. In Firebase Console → Project Settings → Your apps
+4. Click "Add app" → Android
+5. Enter Package name: `com.apex.tradeline`
+6. Download `google-services.json`
+7. Place in `android/app/google-services.json` (commit to repo)
+
+> **Note:** See [Android Setup Guide](./android-setup.md) for complete Android configuration steps.
 
 ### Step 4: Generate Service Account Key
 
@@ -107,9 +111,11 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 2. Click "Generate new private key"
 3. Download JSON file
 4. Extract values for environment variables:
-   - `project_id` → `FCM_PROJECT_ID`
+   - `project_id` → `FCM_PROJECT_ID` = `project-c86459e7-415b-4a36-a25`
    - `client_email` → `FCM_CLIENT_EMAIL`
    - `private_key` → `FCM_PRIVATE_KEY` (keep newlines as `\n`)
+
+> **Google Cloud Project:** TradeLine 247 (`project-c86459e7-415b-4a36-a25`) - See [Android Setup Guide](./android-setup.md) for details.
 
 ---
 

@@ -1,0 +1,11 @@
+---
+description: Double-Green Upload runbook (Agent can request)
+alwaysApply: false
+---
+# Definition of Done (Double Green Upload)
+- Codemagic Android workflow uploads SIGNED .aab to Google Play track=internal.
+- Codemagic iOS workflow uploads .ipa to App Store Connect and submits to TestFlight INTERNAL only.
+- Artifact guardrail: canonical IPA path/name + glob fallback so filename drift can't break publishing.
+- Version rules:
+  - Android: versionCode MUST increase each upload (set to 2 now) and keep versionName 1.0.0.
+  - iOS: CFBundleVersion (build) MUST be higher/unique per upload (set to 219 now) and keep 1.0.4.
