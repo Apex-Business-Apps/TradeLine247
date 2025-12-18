@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.19.0
           cache: npm
       - run: npm ci --no-audit --fund=false
       - run: npm run -s typecheck --if-present
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.19.0
           cache: npm
       - run: npm ci --no-audit --fund=false
 
@@ -100,7 +100,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.19.0
           cache: npm
       - run: npm ci --no-audit --fund=false
       - run: npm run test:ci --if-present
@@ -126,7 +126,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.19.0
           cache: npm
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps
@@ -150,7 +150,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.19.0
           cache: npm
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps
@@ -173,7 +173,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.19.0
           cache: npm
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps
@@ -202,7 +202,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.19.0
           cache: npm
       - run: npm ci --no-audit --fund=false
       - run: npm run -s build

@@ -12,6 +12,7 @@ import { AISEOHead } from "@/components/seo/AISEOHead";
 import backgroundImage from "@/assets/BACKGROUND_IMAGE1.svg";
 import { QuickActionsCard } from "@/components/dashboard/QuickActionsCard";
 import { errorReporter } from "@/lib/errorReporter";
+import { LandingBackgroundLayers } from "@/components/landing/LandingBackgroundLayers";
 
 const Index = () => {
   const { trackPageView } = useAnalytics();
@@ -47,11 +48,10 @@ const Index = () => {
 
   return (
     <>
-      {/* Background stack - must be siblings, fixed, non-interactive */}
-      <div className="landing-wallpaper fixed inset-0 bg-cover" style={{ backgroundImage: `url(${backgroundImage})` }} aria-hidden="true" data-bg-layer="true"></div>
-      <div className="landing-mask fixed inset-0" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255,107,53,0.55) 0%, rgba(104,182,233,0.55) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
-      <div className="hero-gradient-overlay fixed inset-0" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.40) 0%, rgba(104, 182, 233, 0.40) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
-      <div className="content-gradient-overlay fixed inset-0" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.72) 0%, rgba(104, 182, 233, 0.72) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
+      {/* Background layers - fixed, non-interactive, proper z-index stacking */}
+      <LandingBackgroundLayers />
+      
+      {/* Main content container */}
       <div id="main" className="landing-shell min-h-screen flex flex-col relative">
         <div id="main-content" className="landing-content relative z-10">
           <AISEOHead

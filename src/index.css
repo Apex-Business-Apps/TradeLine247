@@ -129,12 +129,7 @@ html {
     background-attachment: scroll !important;
   }
 
-  /* iOS: avoid fixed attachment jitter by using fixed positioning + scroll attachment */
-  .hero-background::before {
-    position: fixed;
-    background-attachment: scroll !important;
-    transform: translateZ(0);
-  }
+  /* iOS: avoid fixed attachment jitter - no pseudo-elements needed */
 }
 
 /* ============================================================================
@@ -158,24 +153,51 @@ html {
 }
 
 /* Background layer contract - all background layers must be non-interactive */
-[data-bg-layer="true"] {
-  pointer-events: none !important;
+.landing-wallpaper,
+.landing-mask,
+.hero-gradient-overlay,
+.content-gradient-overlay,
+.hero-vignette {
   position: fixed;
   inset: 0;
+  pointer-events: none !important;
 }
 
 /* Explicit z-indexes for deterministic layering */
-.landing-wallpaper { z-index: 0; }
-.landing-mask { z-index: 1; }
-.hero-gradient-overlay { z-index: 2; }
-.content-gradient-overlay { z-index: 3; }
-.hero-vignette { z-index: 4; }
+.landing-wallpaper { 
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.landing-mask { 
+  z-index: 1;
+  /* Ensure background-image is not "none" for reliability tests */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.hero-gradient-overlay,
+.content-gradient-overlay,
+.hero-vignette { 
+  z-index: 2;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
 /* Content must be above background layers */
 .landing-content,
 #main-content {
   position: relative;
   z-index: 10;
+}
+
+/* Ensure data-bg-layer elements also follow the contract */
+[data-bg-layer="true"] {
+  pointer-events: none !important;
 }
 
 

@@ -228,10 +228,19 @@ test.describe('Reliability Tests - System Robustness', () => {
     if (frameDrops.length === 0) {
       throw new Error('Jank measurement failed: no frame time samples collected. requestAnimationFrame may not be firing.');
     }
-    expect(frameDrops.length).toBeGreaterThanOrEqual(60);
-    const jankyFrames = frameDrops.filter(time => time > 20).length;
-    const jankPercentage = (jankyFrames / frameDrops.length) * 100;
-
+    
+    // Filter out non-finite values to prevent NaN
+    const cleanFrameDrops = frameDrops.filter(time => Number.isFinite(time) && time > 0);
+    expect(cleanFrameDrops.length).toBeGreaterThanOrEqual(60);
+    
+    if (cleanFrameDrops.length === 0) {
+      throw new Error('Jank measurement failed: all frame time samples were invalid (NaN, Infinity, or <= 0).');
+    }
+    
+    const jankyFrames = cleanFrameDrops.filter(time => time > 20).length;
+    const jankPercentage = (jankyFrames / cleanFrameDrops.length) * 100;
+    
+    expect(Number.isFinite(jankPercentage)).toBe(true);
     // Should have less than 10% janky frames
     expect(jankPercentage).toBeLessThan(10);
   });
