@@ -291,9 +291,11 @@ workflows:
         track: internal
     triggering:
       events:
-        []  # Manual trigger only - use Android Studio for local builds to save costs
+        - push
       branch_patterns:
-        []  # No automatic builds
+        - pattern: main
+          include: true
+          source: true
 
   # ────────────────────────────────────────────────────────────────────────────
   # WEB TESTS
