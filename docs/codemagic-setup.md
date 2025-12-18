@@ -53,6 +53,13 @@ Create three environment groups in Codemagic and attach them to the workflows.
 | `ANDROID_KEY_ALIAS` | e.g. `tradeline247-release` |
 | `ANDROID_KEY_PASSWORD` | Alias password |
 
+#### `google_play_publishing` (for Android workflow)
+| Variable | Format |
+|----------|--------|
+| `GCLOUD_SERVICE_ACCOUNT_CREDENTIALS` | Complete JSON contents of Google Cloud service account key file (for Google Play uploads) |
+
+> **Setup Instructions:** See [Google Cloud Credentials Guide](./google-cloud-credentials.md) for detailed steps to create the service account and link it to Google Play Console.
+
 #### `ios_appstore`
 | Variable | Format |
 |----------|--------|
@@ -155,8 +162,9 @@ bash scripts/verify-codemagic.sh
 ## 8. Security notes
 
 - All secrets live in Codemagic env groups; rotate them quarterly or whenever a team member leaves.
-- Never commit keystores, `.p8` keys, or provisioning profiles into the repo.
+- Never commit keystores, `.p8` keys, provisioning profiles, or Google Cloud service account JSON files into the repo.
 - `scripts/decode-keystore.sh` ensures keystores are file-mode `600` inside the CI environment.
+- Google Play publishing requires `GCLOUD_SERVICE_ACCOUNT_CREDENTIALS` - see [Google Cloud Credentials Guide](./google-cloud-credentials.md) for setup.
 
 With these steps every Windows developer can confidently trigger Codemagic builds for Android and iOS, monitor their progress, and download signed artifacts. Use the helper scripts for local verification before running CI to reduce turnaround time.
 
