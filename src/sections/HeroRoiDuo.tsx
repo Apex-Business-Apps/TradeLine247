@@ -36,9 +36,9 @@ export default function HeroRoiDuo() {
     paddingLeft: 'env(safe-area-inset-left, 0)',
     paddingRight: 'env(safe-area-inset-right, 0)'
   }} data-lovable-lock="structure-only">
-      {/* Background and overlay handled by #app-home in Index.tsx */}
+      {/* Background and overlay handled by .landing-wallpaper in Index.tsx */}
       {/* hero-bg div kept for test compatibility */}
-      <div className="hero-bg" aria-hidden="true" data-testid="hero-bg" data-bg-layer="true" style={{ backgroundImage: `url(${backgroundImage})`, pointerEvents: 'none' }}></div>
+      <div className="hero-bg" aria-hidden="true" data-testid="hero-bg" data-bg-layer="true" style={{ pointerEvents: 'none' }}></div>
       <div className="hero-gradient-overlay" aria-hidden="true" data-bg-layer="true"></div>
       <div className="hero-vignette" aria-hidden="true" data-bg-layer="true"></div>
       <div className="container relative z-10" data-lovable-lock="structure-only">
