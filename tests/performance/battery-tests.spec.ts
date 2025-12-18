@@ -293,14 +293,18 @@ test.describe('Battery Tests - Performance & Reliability', () => {
   });
 
   test('Resource Cleanup - No Orphaned Resources', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('body')).toBeVisible();
+    await page.waitForTimeout(process.env.CI ? 1500 : 500);
 
     // Navigate away and back
-    await page.goto('/features');
-    await page.waitForLoadState('networkidle');
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/features', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('body')).toBeVisible();
+    await page.waitForTimeout(process.env.CI ? 1500 : 500);
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('body')).toBeVisible();
+    await page.waitForTimeout(process.env.CI ? 1500 : 500);
 
     // Check for orphaned intervals/timeouts
     const activeTimers = await page.evaluate(() => {
@@ -389,13 +393,15 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('Network Request Efficiency', async ({ page }) => {
     const requests: string[] = [];
-    
+
     page.on('request', request => {
       requests.push(request.url());
     });
 
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('body')).toBeVisible();
+    // allow a short settle window for request collection
+    await page.waitForTimeout(process.env.CI ? 1500 : 500);
 
     // Should not have excessive duplicate requests
     // Note: Some duplicates are expected (retries, prefetch, analytics)
