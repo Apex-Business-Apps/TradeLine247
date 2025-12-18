@@ -1,0 +1,14 @@
+---
+description: Sprint protocol + output format + safety rails (Always apply)
+alwaysApply: true
+---
+# Sprint Protocol (NO LOOP)
+- Make ONE pass through steps; only micro-fix if a step fails.
+- Minimal diffs; no refactors; no UI drift; no test changes.
+- Idempotent changes only.
+- Output format required:
+  1) Findings (file/line evidence)
+  2) Fix (unified diffs)
+  3) Verification commands
+  4) Commit messages (1 per step)
+- If credentials are missing: STOP and report exactly which env var/group is missing (do not guess).
