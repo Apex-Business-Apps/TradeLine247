@@ -38,13 +38,171 @@ const Index = () => {
     };
   }, []);
 
-  const wallpaperStyle = {
-    backgroundImage: `url(${backgroundImage})`,
-  } as CSSProperties;
+  // #region agent log
+  useEffect(() => {
+    // Write directly to file using Node.js fs (for browser, use a different approach)
+    // Since we're in browser, use console and also try to write to a data attribute
+    const logDebug = (hypothesisId: string, message: string, data: any) => {
+      const logEntry = {
+        location: 'Index.tsx:useEffect',
+        message,
+        data,
+        timestamp: Date.now(),
+        sessionId: 'debug-session',
+        runId: 'run1',
+        hypothesisId
+      };
+      // Try HTTP logging
+      fetch('http://127.0.0.1:7244/ingest/1a394b6c-8b02-4da6-944b-d1731ecd3598', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(logEntry)
+      }).catch(() => {});
+      // Console fallback
+      console.log(`[DEBUG ${hypothesisId}]`, message, data);
+      // Store in window for inspection
+      if (!(window as any).__debugLogs) {
+        (window as any).__debugLogs = [];
+      }
+      (window as any).__debugLogs.push(logEntry);
+    };
 
-  const wallpaperVariables = {
-    ["--hero-wallpaper-image" as const]: `url(${backgroundImage})`,
-  } as CSSProperties;
+    // H1: Check if fixed overlays are blocking scroll
+    const overlays = document.querySelectorAll('.landing-wallpaper, .landing-mask, .hero-gradient-overlay, .content-gradient-overlay');
+    overlays.forEach((el, i) => {
+      const style = window.getComputedStyle(el);
+      logDebug('H1', `Overlay ${i} scroll blocking check`, {
+        className: el.className,
+        position: style.position,
+        pointerEvents: style.pointerEvents,
+        zIndex: style.zIndex,
+        top: style.top,
+        bottom: style.bottom
+      });
+    });
+
+    // H2: Check page/document dimensions
+    logDebug('H2', 'Page dimensions check', {
+      documentHeight: document.documentElement.scrollHeight,
+      documentClientHeight: document.documentElement.clientHeight,
+      bodyHeight: document.body.scrollHeight,
+      bodyClientHeight: document.body.clientHeight,
+      windowInnerHeight: window.innerHeight,
+      scrollY: window.scrollY
+    });
+
+    // H3: Check footer position
+    const footer = document.querySelector('footer');
+    if (footer) {
+      const rect = footer.getBoundingClientRect();
+      logDebug('H3', 'Footer position check', {
+        top: rect.top,
+        bottom: rect.bottom,
+        left: rect.left,
+        right: rect.right,
+        height: rect.height,
+        isInViewport: rect.top >= 0 && rect.bottom <= window.innerHeight,
+        scrollHeight: document.documentElement.scrollHeight,
+        clientHeight: document.documentElement.clientHeight
+      });
+    }
+
+    // H4: Check z-index stacking
+    const mainContent = document.querySelector('#main-content');
+    const contentOverlay = document.querySelector('.content-gradient-overlay');
+    if (mainContent && contentOverlay) {
+      const mainStyle = window.getComputedStyle(mainContent);
+      const overlayStyle = window.getComputedStyle(contentOverlay);
+      logDebug('H4', 'Z-index stacking check', {
+        mainContentZIndex: mainStyle.zIndex,
+        overlayZIndex: overlayStyle.zIndex,
+        mainContentPosition: mainStyle.position,
+        overlayPosition: overlayStyle.position,
+        overlayPointerEvents: overlayStyle.pointerEvents
+      });
+    }
+
+    // H5: Check container overflow
+    const main = document.querySelector('#main');
+    if (main) {
+      const style = window.getComputedStyle(main);
+      const rect = main.getBoundingClientRect();
+      logDebug('H5', 'Main container overflow check', {
+        overflow: style.overflow,
+        overflowY: style.overflowY,
+        height: style.height,
+        minHeight: style.minHeight,
+        maxHeight: style.maxHeight,
+        scrollHeight: main.scrollHeight,
+        clientHeight: main.clientHeight,
+        rectHeight: rect.height,
+        canScroll: main.scrollHeight > main.clientHeight
+      });
+    }
+
+    // Additional: Check if page is actually scrollable
+    setTimeout(() => {
+      logDebug('H2', 'Delayed page dimensions after render', {
+        documentScrollHeight: document.documentElement.scrollHeight,
+        documentClientHeight: document.documentElement.clientHeight,
+        bodyScrollHeight: document.body.scrollHeight,
+        bodyClientHeight: document.body.clientHeight,
+        windowInnerHeight: window.innerHeight,
+        canScrollDocument: document.documentElement.scrollHeight > document.documentElement.clientHeight,
+        canScrollBody: document.body.scrollHeight > document.body.clientHeight,
+        scrollY: window.scrollY,
+        maxScrollY: document.documentElement.scrollHeight - window.innerHeight
+      });
+
+      // Check footer accessibility
+      const footer = document.querySelector('footer');
+      const privacyLink = Array.from(document.querySelectorAll('a')).find(a => 
+        a.textContent?.toLowerCase().includes('privacy')
+      );
+      if (footer && privacyLink) {
+        const footerRect = footer.getBoundingClientRect();
+        const linkRect = privacyLink.getBoundingClientRect();
+        logDebug('H3', 'Footer and privacy link position after render', {
+          footerTop: footerRect.top,
+          footerBottom: footerRect.bottom,
+          footerInViewport: footerRect.top < window.innerHeight && footerRect.bottom > 0,
+          linkTop: linkRect.top,
+          linkBottom: linkRect.bottom,
+          linkInViewport: linkRect.top < window.innerHeight && linkRect.bottom > 0,
+          linkVisible: linkRect.width > 0 && linkRect.height > 0,
+          linkDisplay: window.getComputedStyle(privacyLink).display,
+          linkVisibility: window.getComputedStyle(privacyLink).visibility,
+          linkPointerEvents: window.getComputedStyle(privacyLink).pointerEvents,
+          documentScrollHeight: document.documentElement.scrollHeight,
+          documentClientHeight: document.documentElement.clientHeight,
+          windowInnerHeight: window.innerHeight,
+          needsScroll: linkRect.bottom > window.innerHeight,
+          maxScrollY: document.documentElement.scrollHeight - window.innerHeight,
+          currentScrollY: window.scrollY
+        });
+
+        // Test if we can actually scroll to the footer
+        const originalScrollY = window.scrollY;
+        window.scrollTo(0, document.documentElement.scrollHeight);
+        setTimeout(() => {
+          const afterScrollY = window.scrollY;
+          const linkRectAfter = privacyLink.getBoundingClientRect();
+          logDebug('H2', 'Scroll test results', {
+            originalScrollY,
+            afterScrollY,
+            scrollWorked: afterScrollY > originalScrollY,
+            linkTopAfterScroll: linkRectAfter.top,
+            linkInViewportAfterScroll: linkRectAfter.top < window.innerHeight && linkRectAfter.bottom > 0,
+            scrollHeight: document.documentElement.scrollHeight,
+            clientHeight: document.documentElement.clientHeight
+          });
+          // Reset scroll
+          window.scrollTo(0, originalScrollY);
+        }, 100);
+      }
+    }, 1000);
+  }, []);
+  // #endregion
 
   return (
     <>

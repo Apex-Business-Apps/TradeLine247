@@ -32,10 +32,10 @@ export function LandingBackgroundLayers() {
         data-bg-layer="true"
       />
       
-      {/* Hero section gradient overlay */}
+      {/* Hero section gradient overlay - reduced opacity by 30% for better background visibility */}
       <div 
         className="hero-gradient-overlay" 
-        style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.40) 0%, rgba(104, 182, 233, 0.40) 100%)` }}
+        style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.28) 0%, rgba(104, 182, 233, 0.28) 100%)` }}
         aria-hidden="true"
         data-bg-layer="true"
       />

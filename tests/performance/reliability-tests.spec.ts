@@ -196,6 +196,9 @@ test.describe('Reliability Tests - System Robustness', () => {
 
     // Ensure animations are enabled for accurate jank measurement
     await page.emulateMedia({ reducedMotion: 'no-preference' });
+    
+    // Stabilization delay before sampling
+    await page.waitForTimeout(250);
 
     // Measure frame drops during animation
     const frameDrops = await page.evaluate(() => {
