@@ -39,7 +39,7 @@ export default function HeroRoiDuo() {
   }} data-lovable-lock="structure-only">
       {/* Background and overlay handled by #app-home in Index.tsx */}
       {/* hero-bg div kept for test compatibility */}
-      <div className="hero-bg" aria-hidden="true" data-testid="hero-bg" style={{ backgroundImage: `url(${backgroundImage})` }}></div>
+      <div className="hero-bg" aria-hidden="true" data-testid="hero-bg" style={{ backgroundImage: `url(${backgroundImage})`, pointerEvents: 'none' }}></div>
       <div className="hero-gradient-overlay" aria-hidden="true"></div>
       <div className="hero-vignette" aria-hidden="true"></div>
       <div className="container relative z-10" data-lovable-lock="structure-only">

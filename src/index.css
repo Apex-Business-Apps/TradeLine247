@@ -150,12 +150,19 @@ html {
    BACKGROUND LAYERS: pointer-events: none
    Required by e2e tests - background layers must not block scroll/input
    ============================================================================ */
+#app-home,
 .landing-wallpaper,
 .landing-mask,
 .hero-bg,
 .hero-vignette,
 .hero-gradient-overlay,
 [data-bg-layer="true"] {
+  pointer-events: none !important;
+}
+
+/* Force landing-wallpaper to have pointer-events none */
+.landing-wallpaper,
+#landing-wallpaper-bg {
   pointer-events: none !important;
 }
 

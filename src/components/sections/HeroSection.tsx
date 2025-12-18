@@ -15,7 +15,7 @@ export const HeroSection = () => {
         data-testid="hero-bg"
         className="hero-bg bg-scroll md:bg-fixed bg-center md:bg-top bg-cover"
         aria-hidden="true"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        style={{ backgroundImage: `url(${backgroundImage})`, pointerEvents: 'none' }}
       />
       <div className="hero-gradient-overlay" aria-hidden="true" />
       <div className="hero-vignette" aria-hidden="true" />

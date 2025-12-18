@@ -47,13 +47,13 @@ const Index = () => {
 
   return (
     <>
-      <div id="app-home" className="fixed inset-0" style={{ backgroundImage: `url(${backgroundImage})`, zIndex: -1 }} aria-hidden="true"></div>
-      <div className="landing-wallpaper fixed inset-0 bg-cover" style={{ backgroundImage: `url(${backgroundImage})` }} aria-hidden="true" />
+      <div id="app-home" className="fixed inset-0" style={{ backgroundImage: `url(${backgroundImage})`, zIndex: -1, pointerEvents: 'none' }} aria-hidden="true"></div>
+      <div id="landing-wallpaper-bg" className="landing-wallpaper fixed inset-0 bg-cover" data-bg-layer="true" style={{ backgroundImage: `url(${backgroundImage})`, pointerEvents: 'none' }} aria-hidden="true" />
       <div className="landing-mask-wrapper fixed inset-0 pointer-events-none" aria-hidden="true">
         <div className="landing-mask fixed inset-0 pointer-events-none" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255,107,53,0.55) 0%, rgba(104,182,233,0.55) 100%)` }} aria-hidden="true" />
       </div>
       <div id="main" className="landing-shell min-h-screen flex flex-col relative">
-        <main id="main-content" role="main" className="landing-content relative z-10">
+        <div id="main-content" className="landing-content relative z-10">
           <AISEOHead
               title="TradeLine 24/7 - Your 24/7 AI Receptionist!"
               description="Get fast and reliable customer service that never sleeps. Handle calls, messages, and inquiries 24/7 with human-like responses. Start growing now!"
@@ -105,6 +105,7 @@ const Index = () => {
                 rgba(255, 107, 53, 0.40) 0%,
                 rgba(104, 182, 233, 0.40) 100%
               )`,
+              pointerEvents: 'none',
             }}
           >
             <HeroRoiDuo />
@@ -119,6 +120,7 @@ const Index = () => {
                 rgba(255, 107, 53, 0.72) 0%,
                 rgba(104, 182, 233, 0.72) 100%
               )`,
+              pointerEvents: 'none',
             }}
           >
             <BenefitsGrid />
@@ -140,7 +142,7 @@ const Index = () => {
             <Footer />
             <NoAIHypeFooter />
           </div>
-        </main>
+        </div>
       </div>
     </>
   );
