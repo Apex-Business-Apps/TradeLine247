@@ -20,8 +20,8 @@ dist-ssr/
 # Allow only templates like .env.example
 !*.example
 
-# Native Android project is regenerated in CI
-android/
+# Native Android project (committed for Codemagic builds)
+# android/
 
 # Credentials (never commit)
 .git-credentials
