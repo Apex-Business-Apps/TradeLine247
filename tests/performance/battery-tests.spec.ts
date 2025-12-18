@@ -117,6 +117,10 @@ test.describe('Battery Tests - Performance & Reliability', () => {
     await page.waitForTimeout(2000);
 
     // Check that animations are smooth (target: 50+ fps average)
+    if (frameRates.length === 0) {
+      throw new Error('FPS measurement failed: no frame rate samples collected. requestAnimationFrame may not be firing.');
+    }
+    expect(frameRates.length).toBeGreaterThanOrEqual(3);
     const avgFps = frameRates.reduce((a, b) => a + b, 0) / frameRates.length;
     expect(avgFps).toBeGreaterThan(50);
   });

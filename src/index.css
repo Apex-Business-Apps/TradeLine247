@@ -157,6 +157,27 @@ html {
   pointer-events: none !important;
 }
 
+/* Background layer contract - all background layers must be non-interactive */
+[data-bg-layer="true"] {
+  pointer-events: none !important;
+  position: fixed;
+  inset: 0;
+}
+
+/* Explicit z-indexes for deterministic layering */
+.landing-wallpaper { z-index: 0; }
+.landing-mask { z-index: 1; }
+.hero-gradient-overlay { z-index: 2; }
+.content-gradient-overlay { z-index: 3; }
+.hero-vignette { z-index: 4; }
+
+/* Content must be above background layers */
+.landing-content,
+#main-content {
+  position: relative;
+  z-index: 10;
+}
+
 
 
 /* Safe Area Support for Hero Sections */
@@ -1689,18 +1710,11 @@ code[class*="bg-primary"],
   position: relative;
 }
 
+/* DISABLED: ::after pseudo-elements on content wrappers can intercept clicks */
 .hero-gradient::after,
 [data-testid="hero-bg"]::after,
 .page-hero::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg,
-    #e55a2b 0%,
-    rgba(229, 90, 43, 0.5) 100%);
+  content: none;
   opacity: 0.8;
   pointer-events: none;
 }
@@ -2041,12 +2055,7 @@ button[class*="orange"]:hover:not([class*="outline"]) {
 }
 
 .hero-bg::after {
-  content: '';
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
+  content: none;
   --regression-marker: "bg-v1.0.0-2025-12-03";
 }
 

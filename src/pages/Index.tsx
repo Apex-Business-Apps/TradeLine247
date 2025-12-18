@@ -47,14 +47,11 @@ const Index = () => {
 
   return (
     <>
-      <div className="landing-wallpaper fixed inset-0 bg-cover z-0" style={{ backgroundImage: `url(${backgroundImage})`, pointerEvents: 'none' }} aria-hidden="true" data-bg-layer="true"></div>
-      <div className="landing-mask-wrapper fixed inset-0 pointer-events-none z-5" aria-hidden="true">
-        <div className="landing-mask fixed inset-0 pointer-events-none z-5" data-bg-layer="true" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255,107,53,0.55) 0%, rgba(104,182,233,0.55) 100%)` }} aria-hidden="true" />
-      </div>
-      {/* Hero gradient overlay */}
-      <div className="hero-gradient-overlay fixed inset-0 pointer-events-none z-1" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.40) 0%, rgba(104, 182, 233, 0.40) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
-      {/* Content gradient overlay */}
-      <div className="content-gradient-overlay fixed inset-0 pointer-events-none z-2" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.72) 0%, rgba(104, 182, 233, 0.72) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
+      {/* Background stack - must be siblings, fixed, non-interactive */}
+      <div className="landing-wallpaper fixed inset-0 bg-cover" style={{ backgroundImage: `url(${backgroundImage})` }} aria-hidden="true" data-bg-layer="true"></div>
+      <div className="landing-mask fixed inset-0" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255,107,53,0.55) 0%, rgba(104,182,233,0.55) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
+      <div className="hero-gradient-overlay fixed inset-0" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.40) 0%, rgba(104, 182, 233, 0.40) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
+      <div className="content-gradient-overlay fixed inset-0" style={{ backgroundImage: `linear-gradient(to bottom, rgba(255, 107, 53, 0.72) 0%, rgba(104, 182, 233, 0.72) 100%)` }} aria-hidden="true" data-bg-layer="true"></div>
       <div id="main" className="landing-shell min-h-screen flex flex-col relative">
         <div id="main-content" className="landing-content relative z-10">
           <AISEOHead

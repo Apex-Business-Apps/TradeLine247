@@ -225,9 +225,13 @@ test.describe('Reliability Tests - System Robustness', () => {
     });
 
     // Check for excessive frame drops (> 20ms indicates jank)
+    if (frameDrops.length === 0) {
+      throw new Error('Jank measurement failed: no frame time samples collected. requestAnimationFrame may not be firing.');
+    }
+    expect(frameDrops.length).toBeGreaterThanOrEqual(60);
     const jankyFrames = frameDrops.filter(time => time > 20).length;
     const jankPercentage = (jankyFrames / frameDrops.length) * 100;
-    
+
     // Should have less than 10% janky frames
     expect(jankPercentage).toBeLessThan(10);
   });
