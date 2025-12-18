@@ -261,27 +261,33 @@ test.describe('Reliability Tests - System Robustness', () => {
 
   test('Error Handling Reliability', async ({ page }) => {
     const errors: string[] = [];
-    
+
     page.on('console', msg => {
       if (msg.type() === 'error') {
         errors.push(msg.text());
       }
     });
-    
+
     page.on('pageerror', error => {
       errors.push(error.message);
     });
 
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#main-content')).toBeVisible();
+    await page.waitForTimeout(process.env.CI ? 1500 : 500);
 
     // Navigate through pages
-    await page.goto('/features');
-    await page.waitForLoadState('networkidle');
-    await page.goto('/pricing');
-    await page.waitForLoadState('networkidle');
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/features', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#main-content')).toBeVisible();
+    await page.waitForTimeout(process.env.CI ? 1500 : 500);
+
+    await page.goto('/pricing', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#main-content')).toBeVisible();
+    await page.waitForTimeout(process.env.CI ? 1500 : 500);
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('#main-content')).toBeVisible();
+    await page.waitForTimeout(process.env.CI ? 1500 : 500);
 
     // Filter out known non-critical errors
     const criticalErrors = errors.filter(error => {
