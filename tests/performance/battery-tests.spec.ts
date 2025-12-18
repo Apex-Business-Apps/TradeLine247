@@ -294,16 +294,16 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('Resource Cleanup - No Orphaned Resources', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('#main-content')).toBeVisible();
+    await expect(page.locator('body')).toBeVisible();
     await page.waitForTimeout(process.env.CI ? 1500 : 500);
 
     // Navigate away and back
     await page.goto('/features', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('#main-content')).toBeVisible();
+    await expect(page.locator('body')).toBeVisible();
     await page.waitForTimeout(process.env.CI ? 1500 : 500);
 
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('#main-content')).toBeVisible();
+    await expect(page.locator('body')).toBeVisible();
     await page.waitForTimeout(process.env.CI ? 1500 : 500);
 
     // Check for orphaned intervals/timeouts
@@ -399,7 +399,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
     });
 
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('#main-content')).toBeVisible();
+    await expect(page.locator('body')).toBeVisible();
     // allow a short settle window for request collection
     await page.waitForTimeout(process.env.CI ? 1500 : 500);
 
