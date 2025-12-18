@@ -140,9 +140,8 @@ workflows:
 
           set -eo pipefail
 
-          # Detect Xcode workspace or project
-          WORKSPACE="$(find ios -maxdepth 4 -name '*.xcworkspace' | head -n 1 || true)"
-          PROJECT="$(find ios -maxdepth 4 -name '*.xcodeproj' | head -n 1 || true)"
+          # Find workspace but EXCLUDE the one inside .xcodeproj
+          WORKSPACE="$(find ios -maxdepth 3 -name '*.xcworkspace' -not -path '*.xcodeproj/*' | head -n 1 || true)"
 
           if [[ -n "$WORKSPACE" ]]; then
             echo "Using workspace: $WORKSPACE"
@@ -151,18 +150,10 @@ workflows:
               --scheme "${XCODE_SCHEME:-App}" \
               --config Release \
               --archive-flags="-destination 'generic/platform=iOS'"
-          elif [[ -n "$PROJECT" ]]; then
-            echo "Using project: $PROJECT"
-            xcode-project build-ipa \
-              --project "$PROJECT" \
-              --scheme "${XCODE_SCHEME:-App}" \
-              --config Release \
-              --archive-flags="-destination 'generic/platform=iOS'"
           else
-            echo "ERROR: No Xcode workspace or project found under ios/"
-            echo "Directory listing:"
-            ls -R ios || true
-            exit 2
+            echo "ERROR: No Xcode workspace found"
+            find ios -name '*.xcworkspace'
+            exit 1
           fi
 
       - name: Ensure canonical IPA artifact path
