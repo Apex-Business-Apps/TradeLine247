@@ -74,6 +74,9 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
     // Ensure animations are enabled for accurate FPS measurement
     await page.emulateMedia({ reducedMotion: 'no-preference' });
+    
+    // Stabilization delay before sampling
+    await page.waitForTimeout(250);
 
     // Measure frame rate during animations
     const frameRates: number[] = [];
