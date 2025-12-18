@@ -120,8 +120,17 @@ test.describe('Battery Tests - Performance & Reliability', () => {
     if (frameRates.length === 0) {
       throw new Error('FPS measurement failed: no frame rate samples collected. requestAnimationFrame may not be firing.');
     }
-    expect(frameRates.length).toBeGreaterThanOrEqual(3);
-    const avgFps = frameRates.reduce((a, b) => a + b, 0) / frameRates.length;
+    
+    // Filter out non-finite values to prevent NaN
+    const cleanFrameRates = frameRates.filter(n => Number.isFinite(n) && n > 0);
+    expect(cleanFrameRates.length).toBeGreaterThanOrEqual(3);
+    
+    if (cleanFrameRates.length === 0) {
+      throw new Error('FPS measurement failed: all frame rate samples were invalid (NaN, Infinity, or <= 0).');
+    }
+    
+    const avgFps = cleanFrameRates.reduce((a, b) => a + b, 0) / cleanFrameRates.length;
+    expect(Number.isFinite(avgFps)).toBe(true);
     expect(avgFps).toBeGreaterThan(50);
   });
 
