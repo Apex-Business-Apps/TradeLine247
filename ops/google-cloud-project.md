@@ -27,10 +27,22 @@
 - **Environment Variables:** `FCM_PROJECT_ID`, `FCM_CREDENTIALS_JSON` (or `FCM_CLIENT_EMAIL` + `FCM_PRIVATE_KEY`)
 - **Setup:** See [Push Notifications Setup](../docs/PUSH_NOTIFICATIONS_SETUP.md)
 
+## Google Play Console Account
+
+**Developer Account Details:**
+- **Developer Account ID:** `6211678816738378373`
+- **Developer Name:** `Apex Business Systems Ltd`
+- **Legal Name:** `Michael Jr Mendoza`
+- **Account Type:** Personal
+- **App Name:** TradeLine 24/7
+
+**Console:** [Google Play Console](https://play.google.com/console/)
+
 ## Current Status
 
 ✅ Project created and active  
 ✅ Billing enabled (CAD $0.00 current charges)  
+✅ Google Play Console account configured  
 ⚠️ Service accounts need to be created and configured (see docs)
 
 ---

@@ -30,6 +30,15 @@ This guide covers setting up the Android development environment, configuring Fi
 - [Firebase Console](https://console.firebase.google.com/project/project-c86459e7-415b-4a36-a25)
 - [Google Play Console](https://play.google.com/console/)
 
+## Google Play Console Account Information
+
+**Developer Account Details:**
+- **Developer Account ID:** `6211678816738378373`
+- **Developer Name:** `Apex Business Systems Ltd` (25/50 characters)
+- **Legal Name:** `Michael Jr Mendoza`
+- **Account Type:** Personal
+- **App Name:** TradeLine 24/7
+
 ---
 
 ## Initial Setup
@@ -215,6 +224,10 @@ Or use entire JSON as `FCM_CREDENTIALS_JSON`.
    - ✅ **View app information and download bulk reports**
 8. Click **INVITE USER**
 
+**Account Information:**
+- Developer Account ID: `6211678816738378373`
+- Developer Name: `Apex Business Systems Ltd`
+
 ### Step 4: Configure in CI/CD (Codemagic)
 
 For automated publishing, add to Codemagic environment variables:
@@ -385,7 +398,9 @@ defaultConfig {
 **Project ID:** `project-c86459e7-415b-4a36-a25`  
 **Package Name:** `com.apex.tradeline`  
 **Firebase Project:** TradeLine 247  
-**Google Play Console:** [Link](https://play.google.com/console/)
+**Google Play Console:** [Link](https://play.google.com/console/)  
+**Developer Account ID:** `6211678816738378373`  
+**Developer Name:** `Apex Business Systems Ltd`
 
 **Key Files:**
 - `android/app/build.gradle` - App configuration
