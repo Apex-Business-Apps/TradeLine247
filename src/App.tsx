@@ -10,6 +10,7 @@ import { initializeNativePlatform } from "./lib/native";
 import { useDeepLinks } from "./hooks/useDeepLinks";
 import { paths } from "./routes/paths";
 import { RequireAuth } from "./components/auth/RequireAuth";
+import { SplashGate } from "./components/splash/SplashGate";
 
 // PERFORMANCE: Route-based code splitting - lazy load all routes except Index (critical)
 const Pricing = lazy(() => import("./pages/Pricing"));
@@ -121,23 +122,26 @@ export default function App() {
 
   return (
     <SafeErrorBoundary>
-      <div className="min-h-screen bg-background text-foreground antialiased">
-        <BrowserRouter>
-          {/* Deep link handler for native app URL schemes */}
-          <DeepLinkHandler>
-            {/* Suspense prevents a white screen if any child is lazy elsewhere */}
-            <Suspense fallback={<LoadingFallback />}>
-              <Routes>
-                <Route element={<LayoutShell />}>
-                  {routeEntries.map(({ path, element }) => (
-                    <Route key={path} path={path} element={element} />
-                  ))}
-                </Route>
-              </Routes>
-            </Suspense>
-          </DeepLinkHandler>
-        </BrowserRouter>
-      </div>
+      {/* SplashGate: Single source of truth for splash/boot flow */}
+      <SplashGate>
+        <div className="min-h-screen bg-background text-foreground antialiased">
+          <BrowserRouter>
+            {/* Deep link handler for native app URL schemes */}
+            <DeepLinkHandler>
+              {/* Suspense prevents a white screen if any child is lazy elsewhere */}
+              <Suspense fallback={<LoadingFallback />}>
+                <Routes>
+                  <Route element={<LayoutShell />}>
+                    {routeEntries.map(({ path, element }) => (
+                      <Route key={path} path={path} element={element} />
+                    ))}
+                  </Route>
+                </Routes>
+              </Suspense>
+            </DeepLinkHandler>
+          </BrowserRouter>
+        </div>
+      </SplashGate>
     </SafeErrorBoundary>
   );
 }

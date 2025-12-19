@@ -82,7 +82,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         <MotionPreferenceSync />
         <Header />
         {/* WCAG 2.1 SC 2.4.1: Bypass Blocks - main landmark for skip link */}
-        <main id="main-content" role="main" tabIndex={-1} className="flex min-h-screen flex-col flex-1">
+        <main id="main-content" role="main" tabIndex={-1} className="flex min-h-screen flex-col flex-1" data-testid="app-content">
           {children ?? <Outlet />}
         </main>
         {/* Lazy-loaded Global Chat Widget - uses startup splash robot icon */}
