@@ -1,2 +1,11 @@
 # Normalize key config files to avoid binary diffs in reviews
 *.gitignore text eol=lf diff
+
+# Protect iOS assets from accidental modification
+ios/App/App/Assets.xcassets/** binary
+ios/App/App/Assets.xcassets/AppIcon.appiconset/*.png binary -diff
+ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json linguist-generated=true
+
+# Protect Android assets
+android/app/src/main/res/mipmap-*/*.png binary -diff
+android/app/src/main/res/drawable/*.png binary -diff

@@ -17,3 +17,11 @@
 /ops/ @apex-business-systems
 SECURITY.md @apex-business-systems
 SUPPORT.md @apex-business-systems
+
+# Protect app icons - require owner approval
+ios/App/App/Assets.xcassets/ @sinyorlang
+android/app/src/main/res/mipmap-*/ @sinyorlang
+
+# Protect CI/CD configs
+codemagic.yaml @sinyorlang
+.github/workflows/ @sinyorlang
