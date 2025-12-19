@@ -202,11 +202,10 @@ workflows:
 
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
 
-        submit_to_testflight: true
-
-        beta_groups:
-
-          - Internal Testers
+        submit_to_testflight: false  # Internal-only: avoids external beta review submission
+        # TODO: Re-enable beta_groups after creating "Internal Testers" group in App Store Connect
+        # beta_groups:
+        #   - Internal Testers
 
 
     triggering:
