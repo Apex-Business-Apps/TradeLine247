@@ -20,7 +20,7 @@ workflows:
 
         BUNDLE_ID: com.apex.tradeline
 
-        APP_VERSION: "1.0.4"
+        APP_VERSION: "1.0.5"
 
         PROJECT_BUILD_NUMBER: $CM_BUILD_NUMBER
 
@@ -140,9 +140,9 @@ workflows:
 
           cd ios/App
           agvtool new-version -all $FINAL_BUILD_NUMBER
-          agvtool new-marketing-version "${APP_VERSION:-1.0.4}"
+          agvtool new-marketing-version "${APP_VERSION:-1.0.5}"
 
-          echo "Version set: ${APP_VERSION:-1.0.4} ($FINAL_BUILD_NUMBER)"
+          echo "Version set: ${APP_VERSION:-1.0.5} ($FINAL_BUILD_NUMBER)"
 
       - name: Configure code signing
 
