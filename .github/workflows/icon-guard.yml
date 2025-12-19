@@ -1,0 +1,41 @@
+name: Icon Guard
+
+on:
+  pull_request:
+    paths:
+      - 'ios/App/App/Assets.xcassets/**'
+      - 'android/app/src/main/res/**'
+
+jobs:
+  icon-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check iOS icons
+        run: |
+          ICON_DIR="ios/App/App/Assets.xcassets/AppIcon.appiconset"
+
+          if [[ ! -d "$ICON_DIR" ]]; then
+            echo "❌ AppIcon.appiconset directory was deleted!"
+            exit 1
+          fi
+
+          ICON_COUNT=$(find "$ICON_DIR" -name "*.png" | wc -l)
+
+          if [[ $ICON_COUNT -lt 1 ]]; then
+            echo "❌ All iOS icons were deleted!"
+            exit 1
+          fi
+
+          echo "✅ iOS icons intact: $ICON_COUNT file(s)"
+
+      - name: Check Android icons
+        run: |
+          MIPMAP_COUNT=$(find android/app/src/main/res -name "ic_launcher*.png" | wc -l)
+
+          if [[ $MIPMAP_COUNT -lt 1 ]]; then
+            echo "⚠️ Warning: Android launcher icons may be missing"
+          else
+            echo "✅ Android icons intact: $MIPMAP_COUNT file(s)"
+          fi
