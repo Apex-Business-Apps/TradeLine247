@@ -128,6 +128,8 @@ export default function App() {
             {/* Suspense prevents a white screen if any child is lazy elsewhere */}
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
+                {/* Legacy /splash route redirect - must be outside LayoutShell */}
+                <Route path="/splash" element={<Navigate to="/" replace />} />
                 <Route element={<LayoutShell />}>
                   {routeEntries.map(({ path, element }) => (
                     <Route key={path} path={path} element={element} />
