@@ -1,3 +1,5 @@
+// DENO-ONLY, not executed in Node/Vitest CI due to https imports.
+
 /**
  * Enterprise Security Middleware
  *
