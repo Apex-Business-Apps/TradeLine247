@@ -1,6 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { performSafetyCheck, sanitizeForLogging, type SafetyConfig } from "../_shared/voiceSafety.ts";
+import {
+  redactSensitive,
+  categorizeCall,
+  calculateSentiment,
+  shouldEscalate,
+  buildNoRecordMetadata,
+  generateTL247Meta,
+  formatTL247MetaBlock,
+  createComplianceService,
+  type SessionContext,
+  type TL247Meta
+} from "../_shared/compliance.ts";
 
 // Helper: Substitute variables in prompt template
 function substitutePromptTemplate(template: string, variables: Record<string, string>): string {
@@ -192,7 +204,10 @@ Deno.serve(async (req) => {
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  
+
+  // Initialize compliance service
+  const complianceService = createComplianceService(supabase);
+
   // Get voice config and enhanced preset
   const { data: config } = await supabase
     .from('voice_config')
@@ -200,7 +215,7 @@ Deno.serve(async (req) => {
     .single();
 
   const preset = await getEnhancedPreset(supabase, config?.active_preset_id || null, config);
-  
+
   if (!preset) {
     socket.close(1011, 'Invalid preset configuration');
     return response;
@@ -219,6 +234,21 @@ Deno.serve(async (req) => {
   let userTranscript = ''; // Track user speech separately for safety checks
   const safetyConfig = preset.safety_guardrails;
   let silenceCheckInterval: ReturnType<typeof setInterval> | undefined;
+
+  // Compliance tracking state
+  let recordingMode: 'full' | 'no_record' = 'full'; // Default to full, switch to no_record if consent denied
+  let consentRecording: boolean | null = null; // null = not yet asked
+  let consentSmsOptIn: boolean | null = null;
+  let callCategory: 'customer_service' | 'lead_capture' | 'prospect_call' = 'lead_capture';
+  let lastTL247Meta: TL247Meta | null = null;
+
+  // Session context for compliance decisions
+  const sessionContext: SessionContext = {
+    call_id: callSid,
+    call_sid: callSid,
+    consent_flags: {},
+    call_category: 'lead_capture'
+  };
 
   // Connect to OpenAI Realtime API
   try {
@@ -492,39 +522,100 @@ Deno.serve(async (req) => {
       
     } else if (data.event === 'stop') {
       console.log('📞 Call ended');
-      
+
       // Calculate conversation metrics
       const conversationDuration = Math.floor((Date.now() - conversationStartTime) / 1000);
       const avgSentiment = sentimentHistory.length > 0
         ? sentimentHistory.reduce((a, b) => a + b, 0) / sentimentHistory.length
         : null;
-      
-      // Save transcript and captured fields with compressed metadata
-      await supabase.from('call_logs')
-        .update({
-          transcript: transcript,
-          captured_fields: {
-            ...capturedFields,
-            dur_s: conversationDuration,
-            turns: turnCount,
-            sent: avgSentiment,
-            safe: preset.safety_guardrails ? 1 : 0
+
+      // Determine call category from conversation
+      const detectedCategory = categorizeCall({ text: userTranscript });
+      callCategory = detectedCategory;
+      sessionContext.call_category = detectedCategory;
+
+      // Generate final TL247 meta
+      lastTL247Meta = generateTL247Meta(
+        sessionContext,
+        avgSentiment || 0,
+        null, // BANT summary (extracted from capturedFields if available)
+        null, // followup recommendation
+        false // vision anchor flag
+      );
+
+      // Compliance: NO-RECORD MODE handling
+      if (recordingMode === 'no_record') {
+        // NO-RECORD MODE: Store only allowed metadata, NO transcript/audio
+        console.log('🔒 NO-RECORD MODE: Storing metadata only, no transcript');
+
+        const noRecordMetadata = buildNoRecordMetadata(
+          sessionContext,
+          `Call duration: ${conversationDuration}s, turns: ${turnCount}`
+        );
+
+        await supabase.from('call_logs')
+          .update({
+            transcript: null, // DO NOT store transcript
+            recording_mode: 'no_record',
+            consent_recording: false,
+            consent_sms_opt_in: consentSmsOptIn,
+            call_category: callCategory,
+            needs_review: true,
+            captured_fields: {
+              ...noRecordMetadata,
+              dur_s: conversationDuration,
+              turns: turnCount,
+              tl247_meta: lastTL247Meta
+            },
+            ended_at: new Date().toISOString(),
+            status: 'completed'
+          })
+          .eq('call_sid', callSid);
+
+        // Log compliance event
+        await complianceService.logComplianceEvent({
+          call_id: callSid,
+          event_type: 'no_record_mode_applied',
+          reason: consentRecording === false ? 'consent_denied' : 'consent_unknown',
+          details: { duration_s: conversationDuration, turns: turnCount },
+          created_by: 'voice_stream'
+        });
+
+      } else {
+        // FULL MODE: Save transcript and captured fields with compressed metadata
+        await supabase.from('call_logs')
+          .update({
+            transcript: transcript,
+            recording_mode: 'full',
+            consent_recording: consentRecording,
+            consent_sms_opt_in: consentSmsOptIn,
+            call_category: callCategory,
+            sentiment_avg: avgSentiment,
+            needs_review: shouldEscalate(userTranscript, avgSentiment || 0),
+            captured_fields: {
+              ...capturedFields,
+              dur_s: conversationDuration,
+              turns: turnCount,
+              sent: avgSentiment,
+              safe: preset.safety_guardrails ? 1 : 0,
+              tl247_meta: lastTL247Meta
+            },
+            ended_at: new Date().toISOString(),
+            status: 'completed'
+          })
+          .eq('call_sid', callSid);
+
+        // Send transcript email asynchronously (only in FULL mode)
+        fetch(`${supabaseUrl}/functions/v1/send-transcript`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseServiceKey}`
           },
-          ended_at: new Date().toISOString(),
-          status: 'completed'
-        })
-        .eq('call_sid', callSid);
-      
-      // Send transcript email asynchronously
-      fetch(`${supabaseUrl}/functions/v1/send-transcript`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseServiceKey}`
-        },
-        body: JSON.stringify({ callSid })
-      }).catch(err => console.error('Failed to trigger transcript email:', err));
-      
+          body: JSON.stringify({ callSid })
+        }).catch(err => console.error('Failed to trigger transcript email:', err));
+      }
+
       openaiWs.close();
       if (silenceCheckInterval) clearInterval(silenceCheckInterval);
     }
