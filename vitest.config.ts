@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react-swc';
 import { fileURLToPath } from 'node:url';
 
@@ -22,7 +22,12 @@ export default defineConfig({
       'src/**/*.{test,spec}.{ts,tsx}',
       'supabase/functions/_shared/**/*.test.ts',
     ],
-    exclude: ['tests/**', 'node_modules/**'],
+    exclude: [
+      ...configDefaults.exclude,
+      'tests/**',
+      '**/*.deno.ts',
+      '**/*.deno.test.ts',
+    ],
     // Ensure Node.js built-ins and modules are available for tests
     server: {
       deps: {
