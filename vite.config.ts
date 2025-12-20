@@ -2,8 +2,13 @@ import { defineConfig, type ConfigEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { componentTagger } from "lovable-tagger";
+import pkg from "./package.json";
 
 export default defineConfig(({ mode }: ConfigEnv) => ({
+  // Inject app version for splash v2 persistence
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(pkg.version),
+  },
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
