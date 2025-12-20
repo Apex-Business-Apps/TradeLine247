@@ -22,7 +22,7 @@ export default defineConfig({
       'src/**/*.{test,spec}.{ts,tsx}',
       'supabase/functions/_shared/**/*.test.ts',
     ],
-    exclude: ['tests/**', 'node_modules/**'],
+    exclude: ['tests/**', 'node_modules/**'], // tests/** contains Playwright e2e tests only
     // Ensure Node.js built-ins and modules are available for tests
     server: {
       deps: {
