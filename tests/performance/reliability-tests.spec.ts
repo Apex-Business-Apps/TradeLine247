@@ -14,8 +14,8 @@ test.describe.configure({ mode: 'parallel', retries: 0 });
 
 test.describe('Reliability Tests - System Robustness', () => {
   test('Background Image System Reliability', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Verify all background images are properly configured
     const backgroundConfig = await page.evaluate(() => {
@@ -43,8 +43,8 @@ test.describe('Reliability Tests - System Robustness', () => {
   });
 
   test('Overlay System Reliability', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByTestId('hero-overlay')).toBeVisible();
 
     // Check hero overlay opacity
     const heroOverlay = await page.evaluate(() => {
@@ -88,8 +88,8 @@ test.describe('Reliability Tests - System Robustness', () => {
   });
 
   test('Hero Text Shadow Reliability', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Check hero headline shadow
     const headlineShadow = await page.evaluate(() => {
@@ -121,8 +121,8 @@ test.describe('Reliability Tests - System Robustness', () => {
   });
 
   test('Platform-Specific Styles Reliability', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Check that platform-specific styles are loaded
     const platformStyles = await page.evaluate(() => {
@@ -141,8 +141,8 @@ test.describe('Reliability Tests - System Robustness', () => {
   });
 
   test('Safe Area Support Reliability', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Check for safe area usage
     const safeAreaUsage = await page.evaluate(() => {
@@ -178,9 +178,9 @@ test.describe('Reliability Tests - System Robustness', () => {
     if (isMobile) {
       await page.setViewportSize({ width: 375, height: 667 });
     }
-    
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Check touch interaction support
     const touchSupport = await page.evaluate(() => {
@@ -202,8 +202,8 @@ test.describe('Reliability Tests - System Robustness', () => {
       return;
     }
 
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Ensure animations are enabled for accurate jank measurement
     await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -320,8 +320,8 @@ test.describe('Reliability Tests - System Robustness', () => {
       }
     });
 
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Filter out expected non-critical failures
     const criticalFailures = failedResources.filter(url => {

@@ -7,9 +7,10 @@ import AxeBuilder from './vendor/axe-core-playwright/src/index.js';
 test('a11y on home', async ({ page }) => {
   // Navigate with explicit wait - increased timeout for Windows CI
   await page.goto('/', {
-    waitUntil: 'networkidle',
+    waitUntil: 'domcontentloaded',
     timeout: process.env.CI ? 30000 : 20000
   });
+  await expect(page.locator('main')).toBeVisible();
 
   // Wait for React to mount completely
   await page.waitForFunction(() => (window as any).__REACT_READY__ === true, { timeout: 15000 });

@@ -78,8 +78,8 @@ test.describe('Blank Screen Prevention', () => {
     const errors: string[] = [];
     page.on('pageerror', err => errors.push(err.message));
     
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
     
     // No CSS-related errors
     const cssErrors = errors.filter(e => 

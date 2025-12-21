@@ -49,8 +49,6 @@ export async function gotoAndWait(page: Page, url: string): Promise<void> {
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await disableAnimations(page);
   await waitForReactHydration(page);
-  // Wait for network to be idle after React hydration
-  await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {
-    // Ignore networkidle timeout - page may have long-polling connections
-  });
+  // Wait for main content to be visible after React hydration
+  await expect(page.locator('main')).toBeVisible({ timeout: 10000 });
 }

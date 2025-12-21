@@ -49,8 +49,8 @@ test.describe('Preview Environment Health', () => {
       }
     });
     
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
     
     // Filter out known non-critical errors (including network errors for external resources)
     const criticalErrors = errors.filter(err =>
