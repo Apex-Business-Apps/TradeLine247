@@ -14,8 +14,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.20.3
       - name: Analyze drift (read-only)
         env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: supabase db push --db-url "$SUPABASE_DB_URL" --dry-run --debug || true
+          SUPABASE_DB_URL_SECRET: ${{ secrets.SUPABASE_DB_URL_SECRET }}
+        run: supabase db push --db-url "$SUPABASE_DB_URL_SECRET" --dry-run --debug || true
