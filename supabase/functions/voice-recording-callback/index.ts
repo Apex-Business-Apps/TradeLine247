@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,65 +12,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    if (!TWILIO_AUTH_TOKEN) {
-      throw new Error('Missing TWILIO_AUTH_TOKEN');
-    }
-
-    // Validate Twilio signature for security
-    const twilioSignature = req.headers.get('x-twilio-signature');
-    if (!twilioSignature) {
-      console.warn('Missing Twilio signature - rejecting request');
-      return new Response(JSON.stringify({ error: 'Forbidden' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Parse form data first (needed for signature validation)
+    // PHASE 2: Validate Twilio signature using shared validator (handles proxy URL reconstruction)
     const url = new URL(req.url);
-
-    const formData = await req.formData();
-    const params: Record<string, string> = {};
-
-    for (const [key, value] of formData.entries()) {
-      params[key] = value.toString();
-    }
-
-    // Build signature validation string
-    let signatureString = url.origin + url.pathname;
-    const sortedKeys = Object.keys(params).sort();
-    for (const key of sortedKeys) {
-      signatureString += key + params[key];
-    }
-
-    // Compute expected signature
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(TWILIO_AUTH_TOKEN);
-    const messageData = encoder.encode(signatureString);
-
-    const cryptoKey = await crypto.subtle.importKey(
-      'raw',
-      keyData,
-      { name: 'HMAC', hash: 'SHA-1' },
-      false,
-      ['sign']
-    );
-
-    const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
-    const expectedSignature = btoa(String.fromCharCode(...new Uint8Array(signatureBuffer)));
-
-    // Compare signatures (constant-time comparison)
-    if (expectedSignature !== twilioSignature) {
-      console.error('Invalid Twilio signature - potential spoofing attempt');
-      return new Response(JSON.stringify({ error: 'Forbidden - Invalid Signature' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    const params = await validateTwilioRequest(req, url.toString());
 
     console.log('✅ Twilio signature validated successfully');
 
@@ -91,12 +39,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Validate recording status
-    const validStatuses = ['in-progress', 'completed', 'absent', 'failed'];
+    // PHASE 1C: Only accept recordingStatusCallbackEvent values: in-progress, completed, absent (default completed)
+    // DO NOT implement "failed" as a recording event per Twilio requirements
+    const validStatuses = ['in-progress', 'completed', 'absent'];
     if (!validStatuses.includes(RecordingStatus)) {
-      console.error('Invalid recording status:', RecordingStatus);
-      return new Response(JSON.stringify({ error: 'Invalid recording status' }), {
-        status: 400,
+      console.warn(`Ignoring recording callback with RecordingStatus=${RecordingStatus} (not in configured events)`);
+      // Return 200 OK to prevent Twilio retries, but don't process
+      return new Response(JSON.stringify({ success: true, ignored: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
@@ -110,11 +59,12 @@ Deno.serve(async (req) => {
     });
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const now = new Date().toISOString();
 
-    // Create idempotency key for recording updates
+    // PHASE 1C: Create idempotency key for recording updates (by CallSid + RecordingSid + RecordingStatus)
     const idempotencyKey = `${CallSid}-${RecordingSid}-${RecordingStatus}`;
 
-    // Store recording status in call_lifecycle table (idempotent)
+    // PHASE 1C: Store recording status in call_lifecycle table (idempotent by call_sid)
     const { error: upsertError } = await supabase
       .from('call_lifecycle')
       .upsert({
@@ -127,9 +77,9 @@ Deno.serve(async (req) => {
           recording_channels: RecordingChannels,
           recording_source: RecordingSource,
           idempotency_key: idempotencyKey,
-          updated_at: new Date().toISOString()
+          updated_at: now
         },
-        updated_at: new Date().toISOString()
+        updated_at: now
       }, {
         onConflict: 'call_sid'
       });
@@ -138,20 +88,42 @@ Deno.serve(async (req) => {
       console.error('Error upserting recording lifecycle:', upsertError);
     }
 
+    // PHASE 3: Log recording status timeline events (idempotent by unique constraint)
+    await supabase.from('call_timeline').insert({
+      call_sid: CallSid,
+      event: 'recording_' + RecordingStatus,
+      timestamp: now,
+      metadata: {
+        recording_sid: RecordingSid,
+        recording_url: RecordingUrl ? '[REDACTED_URL]' : null,
+        recording_duration: RecordingDuration,
+        idempotency_key: idempotencyKey
+      }
+    }).catch(err => {
+      // Ignore duplicate key errors (idempotency)
+      if (!err.message?.includes('duplicate key')) {
+        console.error('Failed to log recording timeline:', err);
+      }
+    });
+
     // If recording is completed, trigger transcription pipeline
     if (RecordingStatus === 'completed' && RecordingUrl) {
       console.log('🎯 Recording completed, triggering transcription pipeline for CallSid:', CallSid);
 
-      // Log recording_completed timeline event
+      // PHASE 3: Add recording_completed timeline marker
       await supabase.from('call_timeline').insert({
         call_sid: CallSid,
         event: 'recording_completed',
-        timestamp: new Date().toISOString(),
+        timestamp: now,
         metadata: {
           recording_sid: RecordingSid,
           recording_url: RecordingUrl,
           recording_duration: RecordingDuration,
           idempotency_key: idempotencyKey
+        }
+      }).catch(err => {
+        if (!err.message?.includes('duplicate key')) {
+          console.error('Failed to log recording_completed timeline:', err);
         }
       });
 
@@ -171,6 +143,7 @@ Deno.serve(async (req) => {
             console.error('Error updating call_logs with recording:', updateError);
           } else {
             // Enqueue transcription task
+            // PHASE 1C: Enqueue transcription task (idempotent by call_sid + operation)
             await supabase.from('call_processing_queue').insert({
               call_sid: CallSid,
               operation: 'transcribe_recording',
@@ -182,7 +155,12 @@ Deno.serve(async (req) => {
                 duration: RecordingDuration,
                 idempotency_key: idempotencyKey
               },
-              created_at: new Date().toISOString()
+              created_at: now
+            }).catch(err => {
+              // Ignore duplicate key errors (idempotency)
+              if (!err.message?.includes('duplicate key')) {
+                console.error('Failed to enqueue transcription task:', err);
+              }
             });
 
             console.log('✅ Recording queued for transcription processing');

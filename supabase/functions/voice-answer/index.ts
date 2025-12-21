@@ -1,5 +1,6 @@
  
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,12 +13,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
     const FORWARD_TARGET_E164 = Deno.env.get('BUSINESS_TARGET_E164');
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    if (!TWILIO_AUTH_TOKEN || !FORWARD_TARGET_E164) {
+    if (!FORWARD_TARGET_E164) {
       throw new Error('Missing required environment variables');
     }
 
@@ -28,50 +28,9 @@ Deno.serve(async (req) => {
       throw new Error('Invalid bridge target configuration - must be E.164 format');
     }
 
-    // Validate Twilio signature for security
-    const twilioSignature = req.headers.get('x-twilio-signature');
-    if (!twilioSignature) {
-      console.warn('Missing Twilio signature - rejecting request');
-      return new Response('Forbidden', { status: 403 });
-    }
-
-    // CRITICAL: Validate HMAC signature from Twilio
+    // Validate Twilio signature using shared validator (handles proxy URL reconstruction)
     const url = new URL(req.url);
-    const formData = await req.formData();
-    const params: Record<string, string> = {};
-    
-    for (const [key, value] of formData.entries()) {
-      params[key] = value.toString();
-    }
-
-    // Build signature validation string
-    let signatureString = url.origin + url.pathname;
-    const sortedKeys = Object.keys(params).sort();
-    for (const key of sortedKeys) {
-      signatureString += key + params[key];
-    }
-
-    // Compute expected signature
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(TWILIO_AUTH_TOKEN);
-    const messageData = encoder.encode(signatureString);
-    
-    const cryptoKey = await crypto.subtle.importKey(
-      'raw',
-      keyData,
-      { name: 'HMAC', hash: 'SHA-1' },
-      false,
-      ['sign']
-    );
-    
-    const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
-    const expectedSignature = btoa(String.fromCharCode(...new Uint8Array(signatureBuffer)));
-
-    // Compare signatures
-    if (expectedSignature !== twilioSignature) {
-      console.error('Invalid Twilio signature - potential spoofing attempt');
-      return new Response('Forbidden - Invalid Signature', { status: 403 });
-    }
+    const params = await validateTwilioRequest(req, url.toString());
 
     console.log('✅ Twilio signature validated successfully');
 
@@ -95,21 +54,40 @@ Deno.serve(async (req) => {
 
     console.log('Incoming call:', { CallSid, From, To, AnsweredBy });
 
-    // Get voice config
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // PHASE 3: Add timeline marker - inbound_received
+    const now = new Date().toISOString();
+    await supabase.from('call_timeline').insert({
+      call_sid: CallSid,
+      event: 'inbound_received',
+      timestamp: now,
+      metadata: {
+        from: From,
+        to: To,
+        answered_by: AnsweredBy
+      }
+    }).catch(err => console.error('Failed to log inbound_received timeline:', err));
+
+    // Get voice config
     const { data: config } = await supabase
       .from('voice_config')
       .select('*')
       .single();
 
-    // Create call log
+    // Create call log (idempotent by call_sid unique constraint)
     await supabase.from('call_logs').insert({
       call_sid: CallSid,
       from_e164: From,
       to_e164: To,
-      started_at: new Date().toISOString(),
+      started_at: now,
       status: 'initiated',
       amd_detected: AnsweredBy === 'machine_start' || AnsweredBy === 'machine_end_beep',
+    }).catch(err => {
+      // Ignore duplicate key errors (idempotency)
+      if (!err.message?.includes('duplicate key')) {
+        console.error('Failed to create call log:', err);
+      }
     });
 
     // AMD Detection: If voicemail detected, use LLM path
@@ -133,8 +111,13 @@ Deno.serve(async (req) => {
     const realtimeEnabled = config?.stream_enabled !== false;
     const withinConcurrencyLimit = (activeStreams || 0) < 10;
 
+    // Build recording callback URL (PHASE 1A: Fix callback URL to voice-recording-callback)
+    const recordingCallbackUrl = `${supabaseUrl}/functions/v1/voice-recording-callback`;
+    const statusCallbackUrl = `${supabaseUrl}/functions/v1/voice-status-callback`;
+
     if ((useLLM || pickupMode === 'immediate') && realtimeEnabled && withinConcurrencyLimit) {
       // Greeting + realtime stream with 3s watchdog fallback
+      // PHASE 1A: Ensure recording doesn't loop - use record="record-from-answer" on Dial only (not on Connect/Stream)
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Gather action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-action" numDigits="1" timeout="1">
@@ -146,7 +129,7 @@ Deno.serve(async (req) => {
     <Stream url="wss://${supabaseUrl.replace('https://', '')}/functions/v1/voice-stream?callSid=${CallSid}" />
   </Connect>
   <Say voice="Polly.Joanna">Connecting you to an agent now.</Say>
-  <Dial callerId="${To}" record="record-from-answer" recordingStatusCallback="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-status">
+  <Dial callerId="${To}" record="record-from-answer" recordingStatusCallback="${recordingCallbackUrl}" statusCallback="${statusCallbackUrl}" statusCallbackEvent="initiated ringing answered completed">
     <Number>${FORWARD_TARGET_E164}</Number>
   </Dial>
 </Response>`;
@@ -157,11 +140,22 @@ Deno.serve(async (req) => {
   <Say voice="Polly.Joanna">
     Hi, you've reached TradeLine 24/7 — Your 24/7 AI Receptionist! Connecting you now.
   </Say>
-  <Dial callerId="${To}" record="record-from-answer" recordingStatusCallback="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-status">
+  <Dial callerId="${To}" record="record-from-answer" recordingStatusCallback="${recordingCallbackUrl}" statusCallback="${statusCallbackUrl}" statusCallbackEvent="initiated ringing answered completed">
     <Number>${FORWARD_TARGET_E164}</Number>
   </Dial>
 </Response>`;
     }
+
+    // PHASE 3: Add timeline marker - twiml_sent
+    await supabase.from('call_timeline').insert({
+      call_sid: CallSid,
+      event: 'twiml_sent',
+      timestamp: new Date().toISOString(),
+      metadata: {
+        mode: (useLLM || pickupMode === 'immediate') && realtimeEnabled && withinConcurrencyLimit ? 'llm' : 'bridge',
+        pickup_mode: pickupMode
+      }
+    }).catch(err => console.error('Failed to log twiml_sent timeline:', err));
 
     // Update call log with mode
     await supabase.from('call_logs')

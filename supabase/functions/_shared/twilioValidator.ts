@@ -54,6 +54,33 @@ export async function validateTwilioSignature(
 }
 
 /**
+ * PHASE 2: Reconstructs URL for signature validation behind proxies
+ * Handles X-Forwarded-Proto, X-Forwarded-Host, and query string preservation
+ */
+function reconstructUrl(req: Request, providedUrl: string): string {
+  const url = new URL(providedUrl);
+  
+  // Check for proxy headers (Supabase Edge Functions behind load balancer)
+  const forwardedProto = req.headers.get('x-forwarded-proto');
+  const forwardedHost = req.headers.get('x-forwarded-host');
+  const forwardedPort = req.headers.get('x-forwarded-port');
+  
+  if (forwardedProto && forwardedHost) {
+    // Reconstruct URL using proxy headers (matches what Twilio sees)
+    const protocol = forwardedProto === 'https' ? 'https' : 'http';
+    const host = forwardedHost;
+    const port = forwardedPort && forwardedPort !== '80' && forwardedPort !== '443' ? `:${forwardedPort}` : '';
+    const pathname = url.pathname;
+    const search = url.search;
+    
+    return `${protocol}://${host}${port}${pathname}${search}`;
+  }
+  
+  // Fallback to provided URL (direct access or no proxy)
+  return providedUrl;
+}
+
+/**
  * Validates Twilio request or rejects with 401
  * @param req Request object
  * @param url Full webhook URL
@@ -71,8 +98,8 @@ export async function validateTwilioRequest(
     throw new Response('Security configuration error', { status: 500 });
   }
   
-  // Get signature
-  const twilioSignature = req.headers.get('X-Twilio-Signature');
+  // PHASE 2: Get signature - handle lowercase x-twilio-signature (WebSocket header)
+  const twilioSignature = req.headers.get('X-Twilio-Signature') || req.headers.get('x-twilio-signature');
   
   // Parse form data
   const formData = await req.formData();
@@ -117,9 +144,12 @@ export async function validateTwilioRequest(
     throw new Response('Unauthorized: Missing signature', { status: 401 });
   }
   
-  // Validate signature
+  // PHASE 2: Reconstruct URL for signature validation (handles proxies)
+  const reconstructedUrl = reconstructUrl(req, url);
+  
+  // Validate signature with reconstructed URL
   const isValid = await validateTwilioSignature(
-    url,
+    reconstructedUrl,
     params,
     twilioSignature,
     authToken
@@ -127,6 +157,7 @@ export async function validateTwilioRequest(
   
   if (!isValid) {
     console.error('Invalid Twilio signature - possible spoofing attempt');
+    console.error('Reconstructed URL:', reconstructedUrl);
     throw new Response('Unauthorized: Invalid signature', { status: 401 });
   }
   
