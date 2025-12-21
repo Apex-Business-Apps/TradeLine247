@@ -87,6 +87,7 @@ const routeEntries: Array<{ path: string; element: React.ReactNode }> = [
   { path: paths.twilioEvidence, element: <TwilioEvidence /> },
   { path: paths.previewHealth, element: <PreviewHealth /> },
   { path: paths.notFound, element: <NotFound /> },
+  { path: "/splash", element: <Navigate replace to="/" /> },
 ];
 
 export const appRoutePaths = new Set(routeEntries.map(({ path }) => path));

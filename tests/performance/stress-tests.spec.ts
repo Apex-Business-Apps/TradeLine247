@@ -30,15 +30,15 @@ test.describe('Stress Tests - Heavy Load Scenarios', () => {
 
     // Final page should still work
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    
+    await expect(page.locator('h1')).toBeVisible();
+
     const title = await page.title();
     expect(title).toContain('TradeLine');
   });
 
   test('Rapid Scroll Stress Test', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Rapid scrolling up and down
     for (let i = 0; i < 100; i++) {
@@ -61,7 +61,7 @@ test.describe('Stress Tests - Heavy Load Scenarios', () => {
     
     for (const route of pages) {
       await page.goto(route);
-      await page.waitForLoadState('networkidle');
+      await expect(page.locator('main')).toBeVisible();
       
       // Verify background image is loaded and has correct properties
       const bgProps = await page.evaluate(() => {
@@ -86,7 +86,7 @@ test.describe('Stress Tests - Heavy Load Scenarios', () => {
 
   test('Concurrent User Interaction Simulation', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Simulate multiple concurrent interactions
     await Promise.all([
@@ -106,7 +106,7 @@ test.describe('Stress Tests - Heavy Load Scenarios', () => {
 
   test('Large DOM Manipulation Test', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Measure initial DOM size
     const initialSize = await page.evaluate(() => {
@@ -117,12 +117,12 @@ test.describe('Stress Tests - Heavy Load Scenarios', () => {
     const routes = ['/features', '/pricing', '/contact', '/faq', '/demo', '/security'];
     for (const route of routes) {
       await page.goto(route);
-      await page.waitForLoadState('networkidle');
+      await expect(page.locator('main')).toBeVisible();
     }
 
     // Return to home
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // DOM should not be excessively large
     const finalSize = await page.evaluate(() => {
@@ -134,7 +134,7 @@ test.describe('Stress Tests - Heavy Load Scenarios', () => {
 
   test('Network Failure Recovery', async ({ page, context }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Simulate network offline
     await context.setOffline(true);
@@ -151,8 +151,8 @@ test.describe('Stress Tests - Heavy Load Scenarios', () => {
 
     // Should recover
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    
+    await expect(page.locator('main')).toBeVisible();
+
     const title = await page.title();
     expect(title).toContain('TradeLine');
   });
@@ -164,7 +164,7 @@ test.describe('Stress Tests - Heavy Load Scenarios', () => {
     });
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Should still render core content
     const heroText = await page.locator('h1').first();
