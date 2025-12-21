@@ -112,10 +112,10 @@ test.describe('Service Worker Freshness', () => {
   });
 
   test('should cache assets immutably', async ({ page, request }) => {
-    await page.goto('/');
-    
-    // Wait for assets to load
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    // Wait for main content to be visible instead of networkidle
+    await expect(page.locator('main')).toBeVisible();
     
     // Get all loaded resources
     const resources = await page.evaluate(() => {

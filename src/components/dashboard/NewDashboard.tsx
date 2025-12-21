@@ -23,6 +23,7 @@ import { useUserPreferencesStore } from '@/stores/userPreferencesStore';
 import { useDashboardStore } from '@/stores/dashboardStore';
 import { PersonalizedWelcomeDialog } from './PersonalizedWelcomeDialog';
 import { PersonalizedTips } from './PersonalizedTips';
+import RoiDashboard from './RoiDashboard';
 
 export const NewDashboard = () => {
   const { kpis, nextItems, transcripts, isLoading, hasData } = useDashboardData();
@@ -141,6 +142,9 @@ export const NewDashboard = () => {
           })
         )}
         </div>
+
+        {/* ROI Dashboard */}
+        <RoiDashboard />
 
         <div className={`grid grid-cols-1 lg:grid-cols-3 ${gridGapClass}`}>
           <div className={`lg:col-span-2 ${spacingClass}`}>
