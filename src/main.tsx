@@ -7,7 +7,9 @@ console.info('🚀 TradeLine 24/7 - Starting main.tsx...');
 import React from "react";
 import { createRoot } from "react-dom/client";
 import "./safe-mode";
-import App from "./App.tsx";
+// SPLASH V2: AppWithSplash handles splash screen decision via BootCoordinator
+// The boot coordinator is the single source of truth for splash decisions
+import AppWithSplash from "./components/AppWithSplash";
 import SafeErrorBoundary from "./components/errors/SafeErrorBoundary";
 import "./index.css";
 import { initBootSentinel } from "./lib/bootSentinel";
@@ -118,17 +120,18 @@ window.addEventListener('error', (e) => { if (isPreview) diag('App error', e.err
 window.addEventListener('unhandledrejection', (e) => { if (isPreview) diag('Unhandled rejection', e.reason); });
 
 // CRITICAL: Synchronous render path for immediate FCP
-// Use App already imported at top for fastest possible mount
+// AppWithSplash handles splash v2 gating via BootCoordinator (single source of truth)
 function boot() {
   try {
     // Create root immediately for faster initial render
     const reactRoot = createRoot(root!);
-    
-    // CRITICAL: Render immediately using already-imported App - no async delay
-    // Wrap with Error Boundary to catch mount failures
+
+    // CRITICAL: Render immediately using AppWithSplash
+    // Splash v2 decision is made synchronously by BootCoordinator
+    // When SPLASH_V2_ENABLED=false (default), splash is skipped entirely
     reactRoot.render(
       React.createElement(SafeErrorBoundary, null,
-        React.createElement(App)
+        React.createElement(AppWithSplash)
       )
     );
 
