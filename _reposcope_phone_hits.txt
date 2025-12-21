@@ -1,0 +1,169 @@
+supabase/migrations/20251008123111_f953f882-38c2-4481-bfea-3bb95c02ca84.sql
+
+ops/policy-kit/apple_privacy.md
+
+src/sections/HeroRoiDuo.tsx
+
+docs/archive/other/BILLING_MAP_VERIFICATION.md
+
+docs/archive/telephony/HOTLINE_REPORT.md
+
+PUSH_NOTIFICATIONS_IMPLEMENTATION_SUMMARY.md
+75:1. `supabase/migrations/20250106120000_add_device_push_tokens.sql`
+
+VERIFICATION_EVIDENCE.md
+144:✅ supabase/migrations/20250106120000_add_device_push_tokens.sql
+
+scripts/twilio_negative_test.sh
+
+docs/archive/other/SEO_TASKS_COMPLETE.md
+
+src/hooks/useTwilioCallData.ts
+
+src/components/seo/LocalBusinessSchema.tsx
+
+scripts/test_sms_fallback.sh
+
+docs/archive/other/NUMBER_HYGIENE_GUIDE.md
+
+README.md
+198:- **Phone**: 587-742-8885
+
+src/pages/ops/ClientNumberOnboarding.tsx
+
+docs/archive/ci-cd/DEVOPS_DIAGNOSTIC_COMPLETE.md
+
+docs/archive/telephony/SMS_DELIVERY_OBSERVABILITY.md
+
+docs/archive/telephony/REALTIME_VOICE_IMPLEMENTATION.md
+
+docs/archive/telephony/TWILIO_PREFLIGHT_CHECKLIST.md
+
+docs/archive/other/DELTA_FIX_VERIFICATION.md
+
+docs/archive/telephony/SMS_SENDER_INTELLIGENCE.md
+
+src/components/dashboard/LiveCallSummary.tsx
+
+src/pages/ops/VoiceSettings.tsx
+
+docs/archive/production/INVESTOR_SNAPSHOT.md
+
+src/pages/ops/VoiceHealth.tsx
+
+SUPPORT.md
+9:- **Phone:** +1-587-742-8885
+
+index.html
+115:        "telephone":"+1-587-742-8885",
+125:      "telephone":"+1-587-742-8885",
+
+scripts/test_sms_security.sh
+
+src/config/public.ts
+
+scripts/test_sender_intelligence.sh
+
+docs/archive/security/SECURITY_FIXES_NON_DESTRUCTIVE.md
+
+docs/archive/telephony/HOTLINE_CONSENT.md
+
+docs/archive/production/PRODUCTION_SNAPSHOT_2025-10-08.md
+
+docs/archive/telephony/HOTLINE_DTMF.md
+
+src/components/seo/AISEOHead.tsx
+
+SECURITY.md
+56:**Phone:** +1-587-742-8885
+
+docs/archive/production/TECHNICAL_PRODUCTION_STATUS.md
+
+docs/archive/other/CASL_COMPLIANCE_GUIDE.md
+
+docs/archive/telephony/HOTLINE_FLOW.md
+
+src/pages/ops/MessagingHealth.tsx
+
+docs/archive/telephony/SMS_TASK_04_COMPLETE.md
+
+supabase/functions/ops-twilio-test-webhook/index.ts
+
+scripts/verify-push-implementation.mjs
+
+ops/policy-kit/play_data_safety.md
+
+supabase/functions/_shared/e164.ts
+
+dist\index.html
+
+docs/archive/telephony/TWILIO_VOICE_README.md
+
+src/pages/PhoneApps.tsx
+
+docs/archive/features/HERO_GUARDRAILS.md
+
+docs/archive/telephony/HOTLINE_RATELIMIT.md
+
+docs/archive/telephony/VOICE_FRONTDOOR_IMPLEMENTATION.md
+
+docs/IOS_ROLLOUT.md
+416:- **Phone:** +1-587-742-8885
+
+supabase/migrations/20251008092425_09222aee-ab00-4c21-b845-25e9a9df7aa1.sql
+
+docs/archive/other/VALIDATION_REPORT.md
+
+docs/archive/production/ENTERPRISE_UPGRADE_SUMMARY.md
+
+supabase/functions/voice-menu-handler/index.ts
+
+docs/archive/security/SECURITY_REVIEW_2025-10-14.md
+
+docs/archive/other/PHASE_1_2_IMPLEMENTATION.md
+
+docs/archive/telephony/TWILIO_INTEGRATION_COMPLETE.md
+
+docs/archive/other/COMPREHENSIVE_TEST_REPORT.md
+
+src/pages/CallCenter.tsx
+
+docs/archive/mobile/MOBILE_STORE_SUBMISSION.md
+
+docs/archive/telephony/TELEPHONY_CRITICAL_FIXES.md
+
+src/components/seo/OrganizationSchema.tsx
+
+scripts/test_number_hygiene.sh
+14:  "+15877428885"           # Already E.164
+15:  "5877428885"             # 10-digit NANP
+16:  "(587) 742-8885"         # Formatted NANP
+17:  "587-742-8885"           # Dashed NANP
+18:  "1-587-742-8885"         # With country code
+19:  "+1 (587) 742-8885"      # Formatted E.164
+46:VALID_NUMBER="+15877428885"
+64:   ✅ +15877428885        (Canada - Alberta)
+65:   ✅ +16471234567        (Canada - Ontario)
+
+supabase/functions/voice-stream/index.ts
+
+docs/telephony.md
+39:OPS_NUMBER=+14319900222  # Human fallback number (E.164 format)
+40:BUSINESS_TARGET_E164=+14319900222  # Alternative env var
+180:  --data "CallSid=CAtest&From=%2B15551234567&To=%2B14319900222"
+
+tests/telephony/test-voice-flow.ts
+
+docs/archive/features/HERO_GUARDIAN_ACTIVE.md
+
+docs/archive/ci-cd/PRODUCTION_DEPLOYMENT_GUIDE.md
+
+supabase/functions/contact-submit/index.ts
+
+src/components/seo/EnhancedSEOHead.tsx
+
+docs/PUSH_NOTIFICATIONS_SETUP.md
+
+docs/archive/telephony/SMS_TWILIO_MANAGED_FALLBACK.md
+
+docs/archive/security/SECURITY_HARDENING_20251014.md
