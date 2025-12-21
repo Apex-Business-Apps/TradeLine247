@@ -67,7 +67,7 @@ async function testVoiceWebhook(callSid = null) {
   console.log('Payload:', payload);
 
   try {
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/telephony-voice`, {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/voice-incoming`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -104,7 +104,7 @@ async function testStatusCallback(callSid) {
     return;
   }
 
-  const url = `${SUPABASE_URL}/functions/v1/voice-status`;
+  const url = `${SUPABASE_URL}/functions/v1/voice-status-callback`;
   const signature = generateTwilioSignature(url, payload, TWILIO_AUTH_TOKEN);
 
   try {
@@ -144,7 +144,7 @@ async function testRecordingCallback(callSid) {
     return;
   }
 
-  const url = `${SUPABASE_URL}/functions/v1/voice-recording-status`;
+  const url = `${SUPABASE_URL}/functions/v1/voice-recording-callback`;
   const signature = generateTwilioSignature(url, payload, TWILIO_AUTH_TOKEN);
 
   try {
