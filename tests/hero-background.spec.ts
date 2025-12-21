@@ -26,7 +26,7 @@ test.describe('Hero Background Responsiveness', () => {
   test('mobile: background focal point shows face', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     const wallpaper = page.locator('.landing-wallpaper');
 
@@ -49,7 +49,7 @@ test.describe('Hero Background Responsiveness', () => {
   test('tablet: background focal point adjusted', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     const wallpaper = page.locator('.landing-wallpaper');
 
@@ -71,7 +71,7 @@ test.describe('Hero Background Responsiveness', () => {
   test('desktop: background uses cover (Dec 4 standard)', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     const wallpaper = page.locator('.landing-wallpaper');
 
@@ -103,7 +103,7 @@ test.describe('Hero Background Responsiveness', () => {
 
   test('background does not leak into next sections', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Scroll past hero section
     await page.evaluate(() => {
@@ -182,7 +182,7 @@ test.describe('Hero Background Responsiveness', () => {
     });
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     const imageErrors = errors.filter(e => e.includes('BACKGROUND_IMAGE1') || e.includes('background'));
     expect(imageErrors).toHaveLength(0);

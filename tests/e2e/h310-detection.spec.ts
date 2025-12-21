@@ -36,7 +36,8 @@ test.describe('React Error #310 Detection', () => {
       });
       
       // Navigate to route
-      await page.goto(route, { waitUntil: 'networkidle' });
+      await page.goto(route, { waitUntil: 'domcontentloaded' });
+      await expect(page.locator('main')).toBeVisible();
       
       // Wait for potential errors to surface
       await page.waitForTimeout(2000);
@@ -70,7 +71,8 @@ test.describe('React Error #310 Detection', () => {
   }
   
   test('should render app root on homepage', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
     
     // Wait for React to mount
     await page.waitForTimeout(3000);

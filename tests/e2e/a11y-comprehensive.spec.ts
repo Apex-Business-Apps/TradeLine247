@@ -21,9 +21,9 @@ import { waitForReactHydration } from './helpers';
 // ==========================================
 
 async function gotoAndWaitForHydration(page: any, url: string) {
-  await page.goto(url);
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
   await waitForReactHydration(page);
-  await page.waitForLoadState('networkidle');
+  await expect(page.locator('main')).toBeVisible();
 }
 
 async function analyzeAccessibility(page: any, routeName: string) {

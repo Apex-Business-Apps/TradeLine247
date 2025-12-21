@@ -25,8 +25,8 @@ test.describe('Nav & refresh', () => {
       await expect(page.getByRole('heading', { level: 1 }).first()).toHaveText(action.h1, { timeout: 30000 });
 
       // Reload and verify persistence
-      await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForLoadState('domcontentloaded');
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await expect(page.locator('main')).toBeVisible();
       await expect(page.getByRole('heading', { level: 1 }).first()).toHaveText(action.h1, { timeout: 30000 });
     });
   }
