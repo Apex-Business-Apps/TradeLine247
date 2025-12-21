@@ -48,6 +48,7 @@
     "test:ci:full": "npm run test:install-browsers && npx playwright test --reporter=html",
     "test:a11y": "playwright test scripts/a11y-contrast.spec.ts",
     "test:security": "playwright test tests/e2e/security-validation.spec.ts",
+    "test:twilio-webhooks": "node scripts/test-twilio-webhooks.mjs",
     "omnlink:health": "node scripts/omnlink-health.mjs",
     "start": "node server.mjs",
     "// supabase function (secret-encrypt)": "───────────────",

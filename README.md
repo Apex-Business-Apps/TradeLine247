@@ -116,6 +116,61 @@ TradeLine247/
 - Android native app (Capacitor)
 - PWA capabilities
 
+## 📞 Twilio Voice Integration
+
+### Environment Variables Required
+```bash
+# Twilio Configuration
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_ACCOUNT_SID=your_account_sid
+
+# Voice Testing (Optional - enables receptionist mode for test numbers)
+VOICE_TEST_ALLOWLIST=+15551234567,+15559876543
+```
+
+### Twilio Console Configuration
+
+#### 1. Voice Webhook (Inbound Calls)
+- **URL**: `https://your-project.supabase.co/functions/v1/telephony-voice`
+- **Method**: `POST`
+- **Voice Settings**: Accept incoming calls
+
+#### 2. Status Callbacks
+- **URL**: `https://your-project.supabase.co/functions/v1/voice-status`
+- **Method**: `POST`
+- **Events**: `initiated`, `ringing`, `answered`, `completed`
+
+#### 3. Recording Status Callbacks
+- **URL**: `https://your-project.supabase.co/functions/v1/voice-recording-status`
+- **Method**: `POST`
+- **Events**: `in-progress`, `completed`, `failed`
+
+### Testing & Monitoring
+
+#### Local Testing
+```bash
+# Test webhook payloads without calling Twilio
+npm run test:twilio-webhooks
+
+# Test specific webhook types
+node scripts/test-twilio-webhooks.mjs voice          # Test inbound call
+node scripts/test-twilio-webhooks.mjs status CA123   # Test status callback
+node scripts/test-twilio-webhooks.mjs recording CA123 # Test recording callback
+node scripts/test-twilio-webhooks.mjs qa-view        # View call monitoring
+node scripts/test-twilio-webhooks.mjs full-flow      # Complete call flow test
+```
+
+#### QA Monitoring
+- **Endpoint**: `https://your-project.supabase.co/functions/v1/voice-qa-view`
+- **Method**: `GET` (requires service key auth)
+- **Returns**: Recent calls with status timelines and analytics
+
+### Security Features
+- ✅ Twilio signature validation on all webhooks
+- ✅ Test number allowlist for receptionist mode
+- ✅ Idempotent status/recording callbacks
+- ✅ Comprehensive audit logging
+
 ## 🧪 Testing
 
 ### Unit Tests
