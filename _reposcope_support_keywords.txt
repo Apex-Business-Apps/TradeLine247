@@ -1,0 +1,423 @@
+PUSH_NOTIFICATIONS_IMPLEMENTATION_SUMMARY.md
+56:- Integrated into Dashboard Settings Dialog
+89:4. `src/components/dashboard/DashboardSettingsDialog.tsx` - Added toggle component
+
+README.md
+18:- **Telephony**: Twilio API integration
+
+docs/archive/security/SECURITY_GATES_QA.md
+
+supabase/functions/webcomms-sms-status/index.ts
+
+src/pages/ops/ClientNumberOnboarding.tsx
+
+docs/archive/other/BRAND_COLORS.md
+
+supabase/functions/production-audit/index.ts
+
+supabase/functions/ops-generate-forwarding-kit/index.ts
+
+scripts/test_billing_map.sh
+
+supabase/migrations/20251101T1400_ultra_humanized_voice_ai.sql
+
+docs/archive/other/TESTING_ANALYSIS.md
+
+docs/AI_CONCIERGE_FAQ.md
+16:- Summarize calls or SMS interactions by referencing the underlying Twilio logs.
+
+docs/archive/audit/AUDIT_COMPLETE_SUMMARY.md
+
+docs/archive/security/SMS_SECURITY_VERIFICATION.md
+
+docs/archive/security/SECURITY_HARDENING_COMPLETE.md
+
+docs/archive/audit/PRODUCTION_AUDIT_2025-10-07.md
+
+docs/archive/other/SYSTEM_STATUS_VERIFICATION_2025-10-15.md
+
+docs/archive/security/SECURITY_REVIEW_2025-10-14.md
+
+src/components/TwilioLinkGuard.tsx
+
+supabase/migrations/2025-11-03_twilio_job_queue.sql
+
+src/components/ui/MiniChat.tsx
+
+docs/archive/audit/PRODUCTION_AUDIT_2025-10-06.md
+
+supabase/migrations/20251002212623_c9903c6d-135f-4004-b16e-cf0fedc6b4bb.sql
+
+src/components/dashboard/LiveCallSummary.tsx
+
+src/integrations/supabase/types.ts
+
+supabase/functions/dsar-export/index.ts
+
+supabase/functions/ops-twilio-buy-number/index.ts
+
+supabase/functions/voice-stream/index.ts
+
+supabase/functions/_shared/twilioValidator.ts
+
+supabase/functions/voice-voicemail/index.ts
+
+supabase/functions/telephony-mms-ingest/index.ts
+
+src/pages/FAQ.tsx
+
+supabase/functions/voice-menu-handler/index.ts
+
+docs/archive/mobile/MOBILE_STORE_SUBMISSION.md
+
+docs/archive/supabase/RAG_E2E_VERIFICATION.md
+
+src/hooks/useSecurityMonitoring.ts
+
+docs/archive/other/NUMBER_HYGIENE_GUIDE.md
+
+docs/archive/telephony/HOTLINE_DTMF.md
+
+docs/archive/telephony/SMS_DELIVERY_OBSERVABILITY.md
+
+scripts/predeploy-security.sh
+3:# Blocks deployment if insecure Twilio bypass is enabled in production
+9:# Check 1: Twilio webhook bypass must not be enabled in production
+16:echo "✅ Twilio webhook security: PASS"
+
+docs/archive/telephony/SMS_TASK_04_COMPLETE.md
+
+supabase/functions/ops-twilio-quickstart-forward/index.ts
+
+supabase/functions/dashboard-summary/index.ts
+
+supabase/functions/ops-twilio-test-webhook/index.ts
+
+docs/archive/other/MULTILINGUAL_GUIDELINES.md
+
+src/pages/CallCenter.tsx
+
+scripts/test_sender_intelligence.sh
+
+docs/archive/production/PRODUCTION_SNAPSHOT_2025-10-08.md
+
+docs/archive/features/DASHBOARD_ENHANCEMENTS.md
+
+supabase/functions/_shared/twilio.ts
+
+docs/archive/telephony/TELEPHONY_CRITICAL_FIXES.md
+
+scripts/test-enterprise-features.mjs
+29:  'src/components/booking/CreditCardDialog.tsx',
+
+scripts/twilio_negative_test.sh
+
+supabase/functions/ops-twilio-hosted-sms/index.ts
+
+docs/archive/CLEANUP_SUMMARY_2025.md
+
+docs/archive/production/PRODUCTION_CHECKLIST_P7_P12.md
+
+supabase/migrations/20251012115149_e7302e41-6fb4-4a45-b5e6-7b83aa5e049e.sql
+
+docs/archive/other/P0_SERVER_AUTH_IMPLEMENTATION_GUIDE.md
+
+src/components/dashboard/TwilioStats.tsx
+
+docs/archive/telephony/HOTLINE_SECURITY.md
+
+src/pages/Index.tsx
+
+scripts/verify-production-readiness.mjs
+
+docs/archive/telephony/HOTLINE_FLOW.md
+
+ops/policy-kit/play_data_safety.md
+
+scripts/verify-push-implementation.mjs
+
+docs/archive/telephony/SMS_TWILIO_MANAGED_FALLBACK.md
+
+docs/archive/other/COMPREHENSIVE_TEST_REPORT.md
+
+docs/archive/telephony/REALTIME_VOICE_IMPLEMENTATION.md
+
+docs/archive/other/DEPS_RISK_REPORT.md
+
+supabase/functions/lookup-number/index.ts
+
+src/components/admin/EscalationManagement.tsx
+
+src/pages/PhoneApps.tsx
+
+docs/archive/other/BILLING_MAP_VERIFICATION.md
+
+docs/archive/other/INCIDENT_RESPONSE_PLAN.md
+
+docs/archive/other/OPTIMIZATION_COMPLETE.md
+
+docs/archive/production/ENTERPRISE_UPGRADE_SUMMARY.md
+
+src/channels/rcs/rcs.ts
+
+src/components/dashboard/InviteStaffDialog.tsx
+
+docs/archive/features/DASHBOARD_DARK_MODE_PERSONALIZATION_FIXES.md
+
+supabase/functions/ops-twilio-queue-worker/index.ts
+
+supabase/functions/voice-route-action/index.ts
+
+src/hooks/useTwilioCallData.ts
+
+docs/archive/security/SECURITY_ARCHITECTURE.md
+
+supabase/functions/voice-route/index.ts
+
+supabase/migrations/20251008230547_5169f1d1-3dce-46bf-a172-5e234860082a.sql
+
+supabase/migrations/20250925101824_ccfec7cb-d624-45a1-89e9-f8723ab018ea.sql
+
+supabase/functions/ops-twilio-a2p/index.ts
+
+docs/archive/telephony/SMS_US_EXPANSION_CHECKLIST.md
+
+src/pages/SecurityMonitoring.tsx
+
+src/stores/dashboardStore.ts
+
+PRODUCTION_AUDIT_2025-12-04.md
+20:1. **Client-side Twilio credentials** - Architectural blocker requiring server-side refactor
+52:#### 1.2 Client-side Twilio Credentials - DOCUMENTED ⚠️
+65:- Even if available, exposing Twilio credentials client-side = security vulnerability
+74:2. Move ALL Twilio SDK usage server-side
+76:4. Edge function handles Twilio authentication securely
+124:**Location:** `src/components/dashboard/InviteStaffDialog.tsx:47`
+360:- Architectural issues (client-side Twilio) not flagged early
+457:**The most critical remaining issue is the RCS module's client-side Twilio credential usage, which requires architectural refactoring to move credentials server-side.**
+
+supabase/functions/_shared/twilio_client.ts
+
+supabase/functions/ops-twilio-configure-webhooks/index.ts
+
+supabase/functions/voice-consent/index.ts
+
+supabase/functions/ops-voice-health/index.ts
+
+src/components/dashboard/__tests__/NewDashboard.test.tsx
+
+docs/archive/other/CASL_COMPLIANCE_GUIDE.md
+
+supabase/functions/_shared/__tests__/http-security.test.ts
+
+supabase/functions/ops-twilio-debugger-intake/index.ts
+
+supabase/migrations/20251101T1510_twilio_queue_cron.sql
+
+docs/archive/audit/SUPABASE_FUNCTIONS_AUDIT_2025-11-01.md
+
+VERIFICATION_EVIDENCE.md
+163:✅ src/components/dashboard/DashboardSettingsDialog.tsx (UI component added)
+223:✅ Component integrated in DashboardSettingsDialog
+
+docs/archive/security/SECURITY_HARDENING_20251014.md
+
+SUPPORT.md
+33:2. **Check Twilio Console:** [Debugger](https://console.twilio.com/us1/monitor/debugger)
+54:- Check Twilio Debugger for webhook errors
+64:- Check Twilio account status
+
+audit/report-AUDIT.md
+583:   - **Twilio**: Webhook testing, call flow validation
+
+scripts/test_sms_optout.sh
+
+src/components/dashboard/DashboardSettingsDialog.tsx
+
+supabase/functions/voice-frontdoor/index.ts
+
+docs/IOS_ROLLOUT.md
+395:TradeLine 24/7 is hosted in Canada (Edmonton, AB). All telephony uses standard HTTPS/TLS encryption via Twilio. No custom cryptography or non-exempt encryption is used.
+408:- Real production requires Twilio phone number provisioning (not in demo)
+
+docs/archive/supabase/SUPABASE_CLEANUP_COMPLETE.md
+
+src/pages/ops/MessagingHealth.tsx
+
+REPOSITORY_SCOPE.md
+12:**TradeLine247** is a production-grade, enterprise-level AI-powered 24/7 receptionist platform built with modern web technologies. The application provides telephony services (voice calls, SMS) via Twilio integration, with comprehensive dashboard, analytics, and multi-channel communication capabilities.
+15:- **Tech Stack:** React 18 + TypeScript + Vite + Supabase + Twilio
+70:- Twilio integration (twilio_client, twilioValidator, twilio_sig)
+119:│   ├── useTwilioCallData.ts
+203:- Connect: Supabase, OpenAI, Twilio APIs
+381:- (Twilio SDK used in edge functions)
+416:   - 24/7 call handling via Twilio
+422:   - Voice calls (Twilio)
+423:   - SMS messaging (Twilio)
+
+scripts/test_sms_fallback.sh
+
+supabase/functions/webcomms-sms-reply/index.ts
+
+supabase/functions/ops-twilio-ensure-messaging-service/index.ts
+
+src/components/ui/dialog.tsx
+
+supabase/functions/voice-answer/index.ts
+
+supabase/functions/voice-action/index.ts
+
+supabase/functions/voice-status/index.ts
+
+docs/archive/other/PR_CANONICAL_COLOR_SYSTEM.md
+
+supabase/functions/voice-consent-speech/index.ts
+
+src/pages/ops/TwilioWire.tsx
+
+docs/archive/accessibility/LONG_TERM_ACCESSIBILITY_STRATEGY.md
+
+src/pages/ops/VoiceHealth.tsx
+
+docs/archive/production/INVESTOR_SNAPSHOT.md
+
+docs/archive/telephony/TWILIO_INTEGRATION_COMPLETE.md
+
+src/components/dashboard/NewDashboard.tsx
+
+docs/archive/audit/COMPREHENSIVE_AUDIT_REPORT.md
+
+supabase/functions/health-check/index.ts
+
+scripts/test-booking-integration.mjs
+94:const creditCardPath = 'src/components/booking/CreditCardDialog.tsx';
+
+supabase/functions/ops-messaging-health-check/index.ts
+
+docs/archive/ci-cd/DEVOPS_SECURITY_HARDENING_2025-10-13.md
+
+docs/archive/telephony/TWILIO_PREFLIGHT_CHECKLIST.md
+
+supabase/functions/recording-purge/index.ts
+
+docs/archive/telephony/SMS_SENDER_INTELLIGENCE.md
+
+src/pages/integrations/PhoneIntegration.tsx
+
+src/routes/ForwardingWizard.tsx
+
+supabase/functions/rcs-inbound/index.ts
+
+src/components/dashboard/ServiceHealth.tsx
+
+supabase/functions/send-booking-confirmation/index.ts
+
+src/components/dashboard/new/WelcomeHeader.tsx
+
+docs/archive/other/VALIDATION_REPORT.md
+
+supabase/functions/ops-test-call/index.ts
+
+scripts/test_sms_security.sh
+
+docs/archive/ci-cd/DEVOPS_DIAGNOSTIC_COMPLETE.md
+
+supabase/migrations/20251005102608_2bfc73e6-ce9c-42b1-be13-6612517f5808.sql
+
+src/components/dashboard/PersonalizedWelcomeDialog.tsx
+
+tests/e2e/a11y-comprehensive.spec.ts
+
+docs/archive/other/ACCEPTANCE_TESTS.md
+
+supabase/functions/_shared/__tests__/http-security.test.ts
+
+docs/archive/supabase/SUPABASE_SECRETS_COMPLETE_GUIDE.md
+
+docs/archive/other/DELTA_FIX_VERIFICATION.md
+
+ops/policy-kit/apple_privacy.md
+
+src/pages/ops/TwilioEvidence.tsx
+
+src/pages/TeamInvite.tsx
+
+docs/archive/telephony/HOTLINE_REPORT.md
+
+docs/archive/other/PHASE6_UX_IMPROVEMENTS.md
+
+docs/archive/telephony/SMS_FALLBACK_TTL.md
+
+scripts/test_number_hygiene.sh
+
+supabase/functions/ops-twilio-create-port/index.ts
+
+docs/archive/ci-cd/DEVOPS_SKILL_DEPLOYMENT.md
+
+SECURITY.md
+34:- Twilio webhook signature bypass
+50:- **Webhook signature verification:** All Twilio webhooks
+
+src/components/booking/CreditCardDialog.tsx
+
+docs/archive/ci-cd/GITHUB_PREFLIGHT_COMPLETE.md
+
+twilio-fallback-twiml.xml
+4:  <!-- Twilio accepts the message silently without sending a reply -->
+
+src/config/api.ts
+
+src/components/ui/alert-dialog.tsx
+
+src/App.tsx
+
+docs/archive/ci-cd/PRODUCTION_DEPLOYMENT_GUIDE.md
+
+docs/archive/production/PRODUCTION_EVIDENCE.md
+
+src/components/ui/command.tsx
+
+src/stores/__tests__/dashboardStore.test.ts
+
+supabase/functions/ops-twilio-trust-setup/index.ts
+
+docs/archive/other/EMAIL_UNSUBSCRIBE_IMPLEMENTATION.md
+
+supabase/functions/telephony-onboard/index.ts
+
+docs/PUSH_NOTIFICATIONS_SETUP.md
+
+docs/archive/production/TECHNICAL_PRODUCTION_STATUS.md
+
+docs/archive/telephony/HOTLINE_RATELIMIT.md
+
+docs/archive/telephony/TWILIO_VOICE_README.md
+
+docs/archive/telephony/VOICE_FRONTDOOR_IMPLEMENTATION.md
+
+supabase/migrations/20251101T1500_twilio_job_queue.sql
+
+supabase/functions/ops-twilio-ensure-subaccount/index.ts
+
+supabase/functions/_shared/twilio_sig.ts
+
+docs/archive/telephony/HOTLINE_CONSENT.md
+
+docs/archive/features/LIGHTHOUSE_PLAYWRIGHT_ROOT_CAUSE_ANALYSIS.md
+
+docs/telephony.md
+4:TradeLine 24/7 uses Twilio for voice calls with Canadian-compliant consent management and AI-first routing with human fallback.
+35:# Twilio Authentication
+51:## Twilio Console Configuration
+55:1. Log into [Twilio Console](https://console.twilio.com/)
+96:All Twilio webhooks validate `X-Twilio-Signature` using HMAC-SHA1:
+117:- call_sid: Twilio unique identifier
+158:### Direct Dial (No AI)
+168:1. **Call the number**: Dial your configured Twilio number
+183:# Test with valid signature (requires Twilio auth token)
+184:# Use Twilio's request validator tool or make a real call
+193:  -H "X-Twilio-Signature: valid_signature_here" \
+245:- **Check**: Twilio console voice URL is set correctly
+252:- **Check**: Using POST method in Twilio console
+
+docs/archive/other/ENVIRONMENT_VARIABLES.md
