@@ -8,8 +8,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Memory Leak Detection', () => {
   test('Component Unmount Cleanup', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Get baseline memory
     const baseline = await page.evaluate(() => {
@@ -21,8 +21,8 @@ test.describe('Memory Leak Detection', () => {
     
     for (let cycle = 0; cycle < 3; cycle++) {
       for (const route of routes) {
-        await page.goto(route);
-        await page.waitForLoadState('networkidle');
+        await page.goto(route, { waitUntil: 'domcontentloaded' });
+        await expect(page.locator('main')).toBeVisible();
         await page.waitForTimeout(500);
       }
     }
@@ -49,8 +49,8 @@ test.describe('Memory Leak Detection', () => {
   });
 
   test('Event Listener Cleanup', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Count event listeners before
     const beforeCount = await page.evaluate(() => {
@@ -67,10 +67,10 @@ test.describe('Memory Leak Detection', () => {
     }
 
     // Navigate away and back
-    await page.goto('/features');
-    await page.waitForLoadState('networkidle');
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/features', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     const afterCount = await page.evaluate(() => {
       const elements = document.querySelectorAll('*');
@@ -82,20 +82,20 @@ test.describe('Memory Leak Detection', () => {
   });
 
   test('Image Resource Cleanup', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     const initialImages = await page.evaluate(() => {
       return document.images.length;
     });
 
     // Navigate through pages with images
-    await page.goto('/features');
-    await page.waitForLoadState('networkidle');
-    await page.goto('/pricing');
-    await page.waitForLoadState('networkidle');
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/features', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
+    await page.goto('/pricing', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     const finalImages = await page.evaluate(() => {
       return document.images.length;
@@ -106,8 +106,8 @@ test.describe('Memory Leak Detection', () => {
   });
 
   test('Animation Frame Cleanup', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Start animations
     await page.evaluate(() => {
@@ -116,8 +116,8 @@ test.describe('Memory Leak Detection', () => {
     await page.waitForTimeout(1000);
 
     // Navigate away
-    await page.goto('/features');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/features', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
     await page.waitForTimeout(1000);
 
     // Check for errors (orphaned animation frames cause errors)
