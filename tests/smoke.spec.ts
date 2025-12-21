@@ -17,14 +17,11 @@ const PAGES = [
 for (const page of PAGES) {
   test(`renders ${page.path} with correct heading`, async ({ page: browserPage }) => {
     await browserPage.goto(BASE_URL + page.path, {
-      waitUntil: "networkidle",
+      waitUntil: "domcontentloaded",
       timeout: process.env.CI ? 15000 : 10000
     });
 
-    // Wait for page to fully load
-    await browserPage.waitForLoadState('domcontentloaded');
-
-    // Check for h1 heading
+    // Check for h1 heading - use element assertion instead of networkidle
     const h1 = browserPage.locator("h1").first();
     await expect(h1).toBeVisible({ timeout: process.env.CI ? 10000 : 5000 });
     await expect(h1).toHaveText(page.h1);
@@ -40,7 +37,7 @@ for (const page of PAGES) {
     });
 
     await browserPage.goto(BASE_URL + page.path, {
-      waitUntil: "networkidle",
+      waitUntil: "domcontentloaded",
       timeout: process.env.CI ? 15000 : 10000
     });
 

@@ -445,4 +445,5 @@ INSERT INTO feature_flags (org_id, feature_name, enabled) VALUES
   (NULL, 'RAG_FEATURE_ENABLED', false),
   (NULL, 'EMAIL_AI_ENABLED', false),
   (NULL, 'CALL_AI_ENABLED', false),
-  (NULL, 'REMINDERS_ENABLED', false);
+  (NULL, 'REMINDERS_ENABLED', false),
+  (NULL, 'ROI_DASHBOARD_ENABLED', true);
