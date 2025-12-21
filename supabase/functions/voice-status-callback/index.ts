@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,65 +12,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    if (!TWILIO_AUTH_TOKEN) {
-      throw new Error('Missing TWILIO_AUTH_TOKEN');
-    }
-
-    // Validate Twilio signature for security
-    const twilioSignature = req.headers.get('x-twilio-signature');
-    if (!twilioSignature) {
-      console.warn('Missing Twilio signature - rejecting request');
-      return new Response(JSON.stringify({ error: 'Forbidden' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Parse form data first (needed for signature validation)
+    // PHASE 2: Validate Twilio signature using shared validator (handles proxy URL reconstruction)
     const url = new URL(req.url);
-
-    const formData = await req.formData();
-    const params: Record<string, string> = {};
-
-    for (const [key, value] of formData.entries()) {
-      params[key] = value.toString();
-    }
-
-    // Build signature validation string
-    let signatureString = url.origin + url.pathname;
-    const sortedKeys = Object.keys(params).sort();
-    for (const key of sortedKeys) {
-      signatureString += key + params[key];
-    }
-
-    // Compute expected signature
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(TWILIO_AUTH_TOKEN);
-    const messageData = encoder.encode(signatureString);
-
-    const cryptoKey = await crypto.subtle.importKey(
-      'raw',
-      keyData,
-      { name: 'HMAC', hash: 'SHA-1' },
-      false,
-      ['sign']
-    );
-
-    const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
-    const expectedSignature = btoa(String.fromCharCode(...new Uint8Array(signatureBuffer)));
-
-    // Compare signatures (constant-time comparison)
-    if (expectedSignature !== twilioSignature) {
-      console.error('Invalid Twilio signature - potential spoofing attempt');
-      return new Response(JSON.stringify({ error: 'Forbidden - Invalid Signature' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    const params = await validateTwilioRequest(req, url.toString());
 
     console.log('✅ Twilio signature validated successfully');
 
@@ -80,6 +28,8 @@ Deno.serve(async (req) => {
     const From = params['From'];
     const To = params['To'];
     const RecordingUrl = params['RecordingUrl'];
+    // PHASE 1B: Extract statusCallbackEvent (Twilio sends this to indicate which event triggered the callback)
+    const StatusCallbackEvent = params['StatusCallbackEvent'];
 
     // Input validation
     if (!CallSid || !CallStatus) {
@@ -90,12 +40,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Validate call status is a known value
-    const validStatuses = ['queued', 'ringing', 'in-progress', 'completed', 'busy', 'no-answer', 'canceled', 'failed'];
+    // PHASE 1B: Only accept statusCallbackEvent values: initiated, ringing, answered, completed
+    // Twilio maps these to CallStatus as: queued (initiated), ringing, in-progress (answered), completed
+    // We accept the CallStatus values that correspond to our configured events
+    const validStatuses = ['queued', 'ringing', 'in-progress', 'completed'];
     if (!validStatuses.includes(CallStatus)) {
-      console.error('Invalid call status:', CallStatus);
-      return new Response(JSON.stringify({ error: 'Invalid status' }), {
-        status: 400,
+      console.warn(`Ignoring status callback with CallStatus=${CallStatus} (not in configured events)`);
+      // Return 200 OK to prevent Twilio retries, but don't process
+      return new Response(JSON.stringify({ success: true, ignored: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
@@ -110,26 +62,60 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log('Call status update:', { CallSid, CallStatus, CallDuration });
+    console.log('Call status update:', { CallSid, CallStatus, CallDuration, StatusCallbackEvent });
 
-    // Create idempotency key for status updates
-    const idempotencyKey = `${CallSid}-${CallStatus}-${new Date().toISOString().slice(0, 19)}`;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const now = new Date().toISOString();
 
-    // Log status_events timeline
+    // PHASE 1B: Create idempotency key for status updates (by CallSid + CallStatus + timestamp to second)
+    const idempotencyKey = `${CallSid}-${CallStatus}-${now.slice(0, 19)}`;
+
+    // PHASE 3: Log status_event timeline (idempotent by unique constraint)
     await supabase.from('call_timeline').insert({
       call_sid: CallSid,
       event: 'status_event',
-      timestamp: new Date().toISOString(),
+      timestamp: now,
       metadata: {
         status: CallStatus,
+        status_callback_event: StatusCallbackEvent,
         duration: CallDuration,
         idempotency_key: idempotencyKey
       }
+    }).catch(err => {
+      // Ignore duplicate key errors (idempotency)
+      if (!err.message?.includes('duplicate key')) {
+        console.error('Failed to log status_event timeline:', err);
+      }
     });
 
-    // Store in call_lifecycle table for tracking
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // PHASE 3: Add status_completed marker when call completes
+    if (CallStatus === 'completed') {
+      await supabase.from('call_timeline').insert({
+        call_sid: CallSid,
+        event: 'status_completed',
+        timestamp: now,
+        metadata: {
+          duration: CallDuration,
+          idempotency_key: idempotencyKey
+        }
+      }).catch(err => {
+        if (!err.message?.includes('duplicate key')) {
+          console.error('Failed to log status_completed timeline:', err);
+        }
+      });
+    }
 
+    // Sanitize duration (must be a valid number)
+    const duration = parseInt(CallDuration || '0');
+    if (isNaN(duration) || duration < 0) {
+      console.error('Invalid call duration');
+      return new Response(JSON.stringify({ error: 'Invalid duration' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // PHASE 1B: Store in call_lifecycle table for tracking (idempotent by call_sid)
     const { error: upsertError } = await supabase
       .from('call_lifecycle')
       .upsert({
@@ -140,9 +126,10 @@ Deno.serve(async (req) => {
         meta: {
           recording_url: RecordingUrl,
           idempotency_key: idempotencyKey,
-          updated_at: new Date().toISOString()
+          status_callback_event: StatusCallbackEvent,
+          updated_at: now
         },
-        updated_at: new Date().toISOString()
+        updated_at: now
       }, {
         onConflict: 'call_sid'
       });
