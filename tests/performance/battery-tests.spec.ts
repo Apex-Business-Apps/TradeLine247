@@ -32,8 +32,8 @@ test.describe('Battery Tests - Performance & Reliability', () => {
   });
 
   test('Memory Leak Test - Extended Scroll Session', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Get initial memory usage
     const initialMemory = await page.evaluate(() => {
@@ -69,8 +69,8 @@ test.describe('Battery Tests - Performance & Reliability', () => {
   });
 
   test('Animation Performance - 60fps Target', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
 
     // Ensure animations are enabled for accurate FPS measurement
     await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -137,7 +137,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('Scroll Performance - Smooth Scrolling Test', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Measure scroll performance
     const scrollMetrics = await page.evaluate(() => {
@@ -179,7 +179,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('Background Image Rendering Performance', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Measure background image rendering performance
     const renderTime = await page.evaluate(() => {
@@ -216,7 +216,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('Component Rendering Stress Test', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Navigate through multiple pages rapidly
     const pages = ['/features', '/pricing', '/contact', '/faq', '/'];
@@ -235,7 +235,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('Event Handler Efficiency - No Memory Leaks', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Count initial event listeners
     const initialListeners = await page.evaluate(() => {
@@ -263,7 +263,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('Background Image Pointer Events - No Scroll Interference', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Verify background images have pointer-events: none
     const backgroundElements = await page.evaluate(() => {
@@ -318,7 +318,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('Large Content Rendering - Performance Test', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Measure time to render all content
     const renderTime = await page.evaluate(() => {
@@ -347,7 +347,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Test touch interactions
     const touchPerformance = await page.evaluate(() => {
@@ -369,7 +369,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('CSS Animation Performance', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     // Check that CSS animations use GPU acceleration
     const animationProperties = await page.evaluate(() => {
@@ -411,7 +411,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
   test('Z-Index Layering - Correct Stacking Order', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await expect(page.locator('main')).toBeVisible();
 
     const zIndexValues = await page.evaluate(() => {
       const elements = document.querySelectorAll('.landing-wallpaper, .landing-mask, .landing-content, .hero-bg');
