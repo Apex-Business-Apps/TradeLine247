@@ -52,16 +52,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Sanitize duration (must be a valid number)
-    const duration = parseInt(CallDuration || '0');
-    if (isNaN(duration) || duration < 0) {
-      console.error('Invalid call duration');
-      return new Response(JSON.stringify({ error: 'Invalid duration' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
     console.log('Call status update:', { CallSid, CallStatus, CallDuration, StatusCallbackEvent });
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -106,14 +96,8 @@ Deno.serve(async (req) => {
     }
 
     // Sanitize duration (must be a valid number)
-    const duration = parseInt(CallDuration || '0');
-    if (isNaN(duration) || duration < 0) {
-      console.error('Invalid call duration');
-      return new Response(JSON.stringify({ error: 'Invalid duration' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    const durationRaw = Number.parseInt(CallDuration ?? "0", 10);
+    const duration = Number.isFinite(durationRaw) && durationRaw >= 0 ? durationRaw : 0;
 
     // PHASE 1B: Store in call_lifecycle table for tracking (idempotent by call_sid)
     const { error: upsertError } = await supabase
