@@ -1,0 +1,262 @@
+/**
+ * Splash V2 Styles - "Magic Heart" Experience
+ *
+ * All animation timings are synchronized with TIMING constants
+ * from BootCoordinator.ts:
+ * - t=0.00-0.60: Pixie dust draws heart
+ * - t=0.60-0.90: APEX logo materializes
+ * - t=0.80: Text appears
+ * - t<=1.00: Alberta Innovates visible
+ * - t=2.00: Transition out
+ */
+
+/* ============================================================
+   ROOT CONTAINER
+   ============================================================ */
+
+.splash-v2-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+  overflow: hidden;
+  /* Smooth exit transition */
+  transition: opacity 250ms ease-out;
+}
+
+.splash-v2-root.exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-v2-root.quick-fade {
+  animation: quickFadeOut 250ms ease-out forwards;
+}
+
+@keyframes quickFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ============================================================
+   PIXIE DUST HEART ANIMATION
+   ============================================================ */
+
+.splash-v2-heart-container {
+  position: relative;
+  width: 200px;
+  height: 180px;
+  margin-bottom: 24px;
+}
+
+.splash-v2-heart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* The heart path that gets drawn */
+.splash-v2-heart-path {
+  fill: none;
+  stroke: url(#heartGradient);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Path animation: draw from 0 to 100% over 600ms */
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: drawHeart 600ms ease-out forwards;
+  filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.6));
+}
+
+@keyframes drawHeart {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Pixie dust particles */
+.splash-v2-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #ff6b35 50%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+  animation: sparkle 600ms ease-out forwards;
+}
+
+@keyframes sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* ============================================================
+   APEX LOGO MATERIALIZATION
+   ============================================================ */
+
+.splash-v2-apex-logo {
+  width: 180px;
+  height: auto;
+  opacity: 0;
+  transform: scale(0.8);
+  /* Materialize from t=600ms to t=900ms (300ms duration) */
+  animation: materializeLogo 300ms ease-out 600ms forwards;
+  filter: drop-shadow(0 4px 12px rgba(255, 107, 53, 0.3));
+}
+
+@keyframes materializeLogo {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* ============================================================
+   TEXT CONTENT
+   ============================================================ */
+
+.splash-v2-text {
+  margin-top: 20px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.05em;
+  text-align: center;
+  opacity: 0;
+  /* Appear at t=800ms */
+  animation: fadeInText 400ms ease-out 800ms forwards;
+}
+
+@keyframes fadeInText {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   SPONSOR SECTION (ALBERTA INNOVATES)
+   ============================================================ */
+
+.splash-v2-sponsor {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  /* Must be visible by t=1000ms */
+  animation: fadeInSponsor 400ms ease-out 600ms forwards;
+}
+
+@keyframes fadeInSponsor {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.splash-v2-sponsor-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.splash-v2-sponsor-logo {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(1.1);
+}
+
+/* ============================================================
+   FALLBACK STATIC SCREEN
+   ============================================================ */
+
+.splash-v2-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.splash-v2-fallback-logo {
+  width: 160px;
+  height: auto;
+}
+
+.splash-v2-fallback-text {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ============================================================
+   ACCESSIBILITY: REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-v2-heart-path,
+  .splash-v2-apex-logo,
+  .splash-v2-text,
+  .splash-v2-sponsor,
+  .splash-v2-particle {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    opacity: 1 !important;
+    transform: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  .splash-v2-root,
+  .splash-v2-root.exiting,
+  .splash-v2-root.quick-fade {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}
+
+/* ============================================================
+   PERFORMANCE: GPU ACCELERATION
+   ============================================================ */
+
+.splash-v2-heart-container,
+.splash-v2-apex-logo,
+.splash-v2-text,
+.splash-v2-sponsor {
+  will-change: opacity, transform;
+}

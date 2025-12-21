@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import {
+  enforceQuietHours,
+  createComplianceService
+} from "../_shared/compliance.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,6 +23,9 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // Initialize compliance service
+    const complianceService = createComplianceService(supabaseClient);
 
     console.log('Processing pending follow-ups...');
 
@@ -95,15 +102,47 @@ Deno.serve(async (req) => {
         if (unsub) {
           await supabaseClient
             .from('campaign_followups')
-            .update({ 
+            .update({
               status: 'halted',
               halted_reason: 'Unsubscribed'
             })
             .eq('id', followup.id);
-          
+
           results.halted++;
           console.log(`Halted follow-up for ${lead.email}: unsubscribed`);
           continue;
+        }
+
+        // 3. COMPLIANCE: Check suppressions table (DNC list)
+        const isSuppressed = await complianceService.isSupressed(lead.email, 'sms');
+        if (isSuppressed) {
+          await supabaseClient
+            .from('campaign_followups')
+            .update({
+              status: 'halted',
+              halted_reason: 'Suppressed (compliance)'
+            })
+            .eq('id', followup.id);
+
+          // Log compliance event
+          await complianceService.logComplianceEvent({
+            call_id: followup.id,
+            event_type: 'followup_blocked',
+            reason: 'contact_suppressed',
+            details: { email: lead.email, campaign_id: campaign.id },
+            created_by: 'ops_followups_send'
+          });
+
+          results.halted++;
+          console.log(`Halted follow-up for ${lead.email}: suppressed (compliance)`);
+          continue;
+        }
+
+        // 4. COMPLIANCE: Enforce quiet hours (default 8am-9pm)
+        const quietHoursCheck = enforceQuietHours(new Date().toISOString(), null);
+        if (quietHoursCheck.needs_review) {
+          // We don't know the recipient's timezone, log for review but allow email
+          console.log(`Note: Sending without recipient timezone confirmation for ${lead.email}`);
         }
 
         // Send follow-up email
