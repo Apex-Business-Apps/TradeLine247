@@ -71,8 +71,6 @@ export default tseslint.config(
     ignores: [
       "dist",
       "coverage",
-      // Supabase edge functions linting is handled separately
-      "supabase/functions",
       // Playwright and other end-to-end helpers rely on permissive types
       "tests",
     ],
