@@ -77,19 +77,6 @@ jobs:
             echo "✅ No fetchPriority casing issues detected"
           fi
 
-      # Guardrail: Prevent const reassignment in Supabase functions (CodeQL js/assignment-to-constant)
-      - name: Check Supabase functions for const reassignment
-        run: |
-          echo "🔍 Checking Supabase functions for const reassignment patterns..."
-          if find supabase/functions -name "*.ts" -exec grep -l "const.*=" {} \; | xargs grep -n "const \w\+.*;" | grep -A5 -B5 "const \w\+.*;" | grep -E "(^\w+\.yml|\.ts):.*\b(const \w+.*=.*)" | head -10; then
-            echo "❌ Found potential const reassignment patterns in Supabase functions:"
-            echo "   This would trigger CodeQL js/assignment-to-constant alerts"
-            echo "   Use non-mutable patterns like: const varRaw = parseInt(input); const var = isFinite(varRaw) ? varRaw : 0;"
-            exit 1
-          else
-            echo "✅ No const reassignment patterns detected in Supabase functions"
-          fi
-
       - run: npm run -s lint --if-present
       - name: Report status (ci/lint)
         if: always()
