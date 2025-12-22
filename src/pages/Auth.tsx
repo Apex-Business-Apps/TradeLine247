@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CheckCircle } from 'lucide-react';
 import { Session, User } from '@supabase/supabase-js';
 import { Footer } from '@/components/layout/Footer';
 import { usePasswordSecurity } from '@/hooks/usePasswordSecurity';
@@ -326,11 +326,38 @@ const Auth = () => {
                 </Alert>
               )}
               
-              {message && (
-                <Alert>
-                  <AlertDescription>{message}</AlertDescription>
-                </Alert>
-              )}
+              {message && (() => {
+                const isVerifyEmailNotice =
+                  message.toLowerCase().includes("check your email") ||
+                  message.toLowerCase().includes("verify your account");
+                
+                if (isVerifyEmailNotice) {
+                  return (
+                    <div
+                      role="status"
+                      className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800"
+                    >
+                      <div className="flex items-start gap-2">
+                        <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5 text-emerald-700" aria-hidden="true" />
+                        <div>
+                          <p className="font-semibold text-emerald-900 mb-1">
+                            Account created — check your email to verify.
+                          </p>
+                          <p className="text-sm text-emerald-800">
+                            We've sent a verification link to your email address. Please click the link to activate your account.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <Alert>
+                    <AlertDescription>{message}</AlertDescription>
+                  </Alert>
+                );
+              })()}
               
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4">
