@@ -1,78 +1,113 @@
 workflows:
   ios-capacitor-testflight:
-    name: 🍏 GOODBUILD iOS TestFlight (Upload-only)
+    name: 🍏 GOODBUILD iOS TestFlight (Upload-safe)
     instance_type: mac_mini_m2
     max_build_duration: 60
+
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: "GOODBUILD-*"
+          include: true
+      cancel_previous_builds: true
+
     environment:
-      xcode: 16.4
-      node: 20.19.6
       groups:
         - ios_config
-        - app_store_credentials
-      vars:
-        # 📌 SINGLE SOURCE OF TRUTH
-        APP_VERSION: "1.0.1" 
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-        BUNDLE_ID: "com.apex.tradeline"
+        - appstore_credentials
 
-    cache:
-      cache_paths:
-        - $HOME/.npm
-        - node_modules
-        - $HOME/Library/Caches/CocoaPods
-        - ios/App/Pods
+      vars:
+        APP_VERSION: "1.0.6"
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
+        XCODE_SCHEME: App
+        BUNDLE_ID: com.apex.tradeline
+
+      xcode: 16.4
+      node: 20.19.0
+      npm: 10
+      cocoapods: default
+
+      # ✅ IMPORTANT: ios_signing MUST live under environment
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.apex.tradeline
 
     scripts:
-      - name: 🔎 Runtime versions (fail fast)
+      - name: Runtime versions (fail fast)
         script: |
-          node --version
-          npm --version
+          set -euo pipefail
+          node -v
+          npm -v
+          xcodebuild -version
 
-      - name: 📦 Install dependencies
+      - name: Install dependencies
         script: |
+          set -euo pipefail
           npm ci --no-audit --prefer-offline
 
-      - name: ✅ GOODBUILD quality + verify gates
+      - name: Ensure iOS marketing icon exists (pre-sync)
         script: |
+          set -euo pipefail
+          node scripts/ensure-ios-marketing-icon.mjs
+
+      - name: GOODBUILD quality + verify gates
+        script: |
+          set -euo pipefail
           npm run lint
           npm run typecheck
           npm run test:unit
           npm run test:e2e:smoke
+          npm run build
           npm run verify:app
           npm run verify:icons
           npm run verify:console
 
-      - name: 🧱 Build web assets + sync Capacitor (iOS only)
+      - name: Sync Capacitor iOS
         script: |
-          npm run build
-          npx cap sync
+          set -euo pipefail
+          npx cap sync ios
 
-      - name: 🧩 Assert iOS AppIcon exists (hard fail if missing)
+      - name: Ensure iOS marketing icon exists (post-sync)
         script: |
-          # Inject Version directly into archive command
+          set -euo pipefail
+          node scripts/ensure-ios-marketing-icon.mjs
+
+      - name: Install CocoaPods
+        script: |
+          set -euo pipefail
+          cd ios/App
+          pod install --repo-update
+          cd ../..
+
+      - name: Set iOS version & build number
+        script: |
+          set -euo pipefail
           cd ios/App
           xcrun agvtool new-marketing-version "$APP_VERSION"
           xcrun agvtool new-version -all "$BUILD_NUMBER"
           cd ../..
 
-      - name: 🔐 Use provisioning profiles (GOODBUILD)
+      - name: Use provisioning profiles (GOODBUILD)
         script: |
-          xcode-project use-profiles \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
+          set -euo pipefail
+          xcode-project use-profiles --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
 
-      - name: 📦 Build IPA (GOODBUILD)
+      - name: Build IPA (GOODBUILD)
         script: |
-          cd android
-          # Use standard AGP properties to override version without file editing
-          ./gradlew bundleRelease \
-            -Pandroid.injected.version.code=$BUILD_NUMBER \
-            -Pandroid.injected.version.name=$APP_VERSION \
-            -Pandroid.injected.signing.store.file=$(echo $CM_KEYSTORE_PATH) \
-            -Pandroid.injected.signing.store.password=$CM_KEYSTORE_PASSWORD \
-            -Pandroid.injected.signing.key.alias=$CM_KEY_ALIAS \
-            -Pandroid.injected.signing.key.password=$CM_KEY_PASSWORD
+          set -euo pipefail
+          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+
     artifacts:
-      - build/ios/export/*.ipa
-      - android/app/build/outputs/bundle/release/*.aab
+      - build/ios/ipa/*.ipa
+
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+        submit_to_app_store: false
+        # ✅ DO NOT set beta_groups until the group definitely exists in ASC.
+        # beta_groups:
+        #   - Internal Testers
