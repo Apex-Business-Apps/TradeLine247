@@ -11,7 +11,7 @@ workflows:
         - keystore_credentials
       vars:
         # 📌 SINGLE SOURCE OF TRUTH
-        APP_VERSION: "1.0.5" 
+        APP_VERSION: "1.0.6" 
         ANDROID_APP_VERSION: "1.0.1"
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
@@ -31,9 +31,16 @@ workflows:
         script: |
           npm run build
           npx cap sync
+          node $CM_BUILD_DIR/scripts/ensure-ios-marketing-icon.mjs
 
       - name: 🍏 Build iOS (Injected Version)
         script: |
+          # Ensure ios-marketing icon remains present before iOS build
+          node $CM_BUILD_DIR/scripts/ensure-ios-marketing-icon.mjs
+
+          # Synchronize Info.plist versions from CI inputs
+          bash $CM_BUILD_DIR/scripts/set-ios-version-from-ci.sh
+
           # Inject Version directly into archive command
           cd ios/App
           
