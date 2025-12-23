@@ -3,7 +3,6 @@ workflows:
     name: 🚀 Double Green Release (iOS & Android)
     instance_type: mac_mini_m2
     max_build_duration: 60
-    # Upload-only / internal distribution; no external TestFlight/Play Store submission here.
     environment:
       groups:
         - app_store_credentials
@@ -11,8 +10,7 @@ workflows:
         - keystore_credentials
       vars:
         # 📌 SINGLE SOURCE OF TRUTH
-        APP_VERSION: "1.0.6" 
-        ANDROID_APP_VERSION: "1.0.1"
+        APP_VERSION: "1.0.1" 
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
         BUNDLE_ID: "com.tradeline247.app"
@@ -31,16 +29,9 @@ workflows:
         script: |
           npm run build
           npx cap sync
-          node $CM_BUILD_DIR/scripts/ensure-ios-marketing-icon.mjs
 
       - name: 🍏 Build iOS (Injected Version)
         script: |
-          # Ensure ios-marketing icon remains present before iOS build
-          node $CM_BUILD_DIR/scripts/ensure-ios-marketing-icon.mjs
-
-          # Synchronize Info.plist versions from CI inputs
-          bash $CM_BUILD_DIR/scripts/set-ios-version-from-ci.sh
-
           # Inject Version directly into archive command
           cd ios/App
           
@@ -67,12 +58,11 @@ workflows:
 
       - name: 🤖 Build Android (Injected Version)
         script: |
-          ANDROID_VERSION=${ANDROID_APP_VERSION:-$APP_VERSION}
           cd android
           # Use standard AGP properties to override version without file editing
           ./gradlew bundleRelease \
             -Pandroid.injected.version.code=$BUILD_NUMBER \
-            -Pandroid.injected.version.name=$ANDROID_VERSION \
+            -Pandroid.injected.version.name=$APP_VERSION \
             -Pandroid.injected.signing.store.file=$(echo $CM_KEYSTORE_PATH) \
             -Pandroid.injected.signing.store.password=$CM_KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$CM_KEY_ALIAS \
@@ -80,4 +70,3 @@ workflows:
     artifacts:
       - build/ios/export/*.ipa
       - android/app/build/outputs/bundle/release/*.aab
-
