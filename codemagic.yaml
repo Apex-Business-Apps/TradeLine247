@@ -1,116 +1,101 @@
 workflows:
   ios-capacitor-testflight:
-    name: TradeLine 24/7 iOS TestFlight
-    max_build_duration: 60
+    name: 🍏 GOODBUILD iOS TestFlight (Upload-only)
     instance_type: mac_mini_m2
+    max_build_duration: 60
 
     environment:
+      xcode: 16.4
+      node: 20.19.6
       groups:
         - ios_config
-        - appstore_credentials
+        - app_store_credentials
       vars:
-        XCODE_WORKSPACE: ios/App/App.xcworkspace
-        XCODE_SCHEME: App
-        BUNDLE_ID: com.apex.tradeline
-      xcode: 16.4
-      node: 20.11.1
-      npm: 10
-      cocoapods: default
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.apex.tradeline
+        # ✅ SINGLE SOURCE OF TRUTH
+        APP_VERSION: "1.0.6"
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+        BUNDLE_ID: "com.apex.tradeline"
 
     cache:
       cache_paths:
-        - ~/.npm
-        - ~/.cocoapods
-        - ios/Pods
+        - $HOME/.npm
+        - node_modules
+        - $HOME/Library/Caches/CocoaPods
+        - ios/App/Pods
 
     scripts:
-      - name: Install dependencies
+      - name: 🔎 Runtime versions (fail fast)
         script: |
-          set -eo pipefail
-          npm ci
+          node --version
+          npm --version
 
-      - name: Build web assets
+      - name: 📦 Install dependencies
         script: |
-          set -eo pipefail
+          npm ci --no-audit --prefer-offline
+
+      - name: ✅ GOODBUILD quality + verify gates
+        script: |
+          npm run lint
+          npm run typecheck
+          npm run test:unit
+          npm run test:e2e:smoke
+          npm run verify:app
+          npm run verify:icons
+          npm run verify:console
+
+      - name: 🧱 Build web assets + sync Capacitor (iOS only)
+        script: |
           npm run build
-
-      - name: Sync Capacitor
-        script: |
-          set -eo pipefail
           npx cap sync ios
 
-      - name: Install CocoaPods
+      - name: 🧩 Assert iOS AppIcon exists (hard fail if missing)
         script: |
-          set -eo pipefail
-          cd ios/App && pod install --repo-update
+          test -f "ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json"
+          echo "✅ AppIcon.appiconset present"
 
-      - name: Set iOS version & build number
+      - name: 🍏 Install CocoaPods
         script: |
-          set -eo pipefail
-          APP_VERSION="${APP_VERSION:-1.0.4}"
-          BUILD_NUM=$((RANDOM % 900 + 100))
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $APP_VERSION" ios/App/App/Info.plist
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUM" ios/App/App/Info.plist
-          echo "Set version to $APP_VERSION ($BUILD_NUM)"
+          cd ios/App
+          pod install
+          cd ../..
 
-      - name: Fetch and configure code signing
+      - name: 🔢 Set iOS version & build number
         script: |
-          set -eo pipefail
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
-          keychain add-certificates
+          cd ios/App
+          xcrun agvtool new-marketing-version "$APP_VERSION"
+          xcrun agvtool new-version -all "$BUILD_NUMBER"
+          cd ../..
+
+      - name: 🔐 Use provisioning profiles (GOODBUILD)
+        script: |
           xcode-project use-profiles \
-            --custom-export-options='{"testFlightInternalTestingOnly": true}'
-          echo "═══════════════════════════════════════════════════════════"
-          echo "✅ CODE SIGNING CONFIGURED"
-          echo "═══════════════════════════════════════════════════════════"
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
 
-      - name: Build archive & IPA
+      - name: 📦 Build IPA (GOODBUILD)
         script: |
-          set -eo pipefail
           xcode-project build-ipa \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME" \
-            --config Release \
-            --archive-flags="-destination 'generic/platform=iOS'"
-          echo "═══════════════════════════════════════════════════════════"
-          echo "✅ iOS ARCHIVE & IPA SUCCESSFULLY BUILT"
-          echo "═══════════════════════════════════════════════════════════"
-          ls -la build/ios/ipa/
-
-      - name: Upload to App Store Connect (Internal Testing Only)
-        script: |
-          set -eo pipefail
-          echo "[publish] Finding IPA..."
-          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
-          echo "[publish] Uploading $IPA_PATH to App Store Connect..."
-          echo "Build marked as 'Internal Testing Only' - no beta review required"
-          app-store-connect publish \
-            --path "$IPA_PATH" \
-            --testflight \
-            --beta-group "Internal Testers" || true
-          echo "✅ Successfully uploaded to App Store Connect"
-          echo "✅ Build is ready for INTERNAL TESTING ONLY"
+            --export-options-plist "ios/App/App/ExportOptions.plist" \
+            --verbose
 
     artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - build/ios/**/*.ipa
+      - build/ios/**/*.xcarchive
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult
+
+    ios_signing:
+      distribution_type: app_store
+      bundle_identifier: com.apex.tradeline
 
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
+        submit_to_testflight: true
+        submit_to_app_store: false
+        # IMPORTANT: Do NOT set beta_groups until the group exists in ASC.
+        # This keeps the lane “upload-only” and prevents post-processing failures.
