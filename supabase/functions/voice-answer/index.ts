@@ -1,6 +1,7 @@
  
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
+import { buildInternalNumberSet, isInternalCaller, safeDialTarget } from "../_shared/antiLoop.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,6 +33,10 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const params = await validateTwilioRequest(req, url.toString());
 
+    const recordingParam = url.searchParams.get('recording_enabled');
+    const hasRecordingParam = recordingParam !== null;
+    const recordingEnabled = recordingParam === 'true';
+
     console.log('✅ Twilio signature validated successfully');
 
     // Extract parameters
@@ -51,6 +56,28 @@ Deno.serve(async (req) => {
       console.error('Invalid phone number format');
       return new Response('Bad Request', { status: 400 });
     }
+
+    // Early consent prompt (strict opt-in: default is no-record)
+    if (!hasRecordingParam) {
+      const consentUrl = `${supabaseUrl}/functions/v1/voice-consent`;
+      const twimlConsent = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Gather action="${consentUrl}" method="POST" input="dtmf" numDigits="1" timeout="4">
+    <Say voice="Polly.Joanna">Press 1 to consent to recording. Otherwise, we will continue without recording.</Say>
+  </Gather>
+  <Redirect method="POST">${consentUrl}</Redirect>
+</Response>`;
+
+      return new Response(twimlConsent, {
+        headers: { ...corsHeaders, 'Content-Type': 'text/xml' },
+      });
+    }
+
+    // Anti-loop protections
+    const internalNumbers = buildInternalNumberSet(Deno.env as Record<string, string | undefined>);
+    const internalCaller = isInternalCaller(From, internalNumbers);
+    const dialTarget = safeDialTarget(FORWARD_TARGET_E164, From, To, internalNumbers);
+    const canDial = !!dialTarget;
 
     console.log('Incoming call:', { CallSid, From, To, AnsweredBy });
 
@@ -114,13 +141,25 @@ Deno.serve(async (req) => {
     // Build recording callback URL (PHASE 1A: Fix callback URL to voice-recording-callback)
     const recordingCallbackUrl = `${supabaseUrl}/functions/v1/voice-recording-callback`;
     const statusCallbackUrl = `${supabaseUrl}/functions/v1/voice-status-callback`;
+    const dialRecordAttr = recordingEnabled ? "record-from-answer" : "do-not-record";
 
-    if ((useLLM || pickupMode === 'immediate') && realtimeEnabled && withinConcurrencyLimit) {
+    if (internalCaller || !canDial) {
+      // Safe path: never dial humans for internal callers or blocked targets
+      const streamUrl = `wss://${supabaseUrl.replace('https://', '')}/functions/v1/voice-stream?callSid=${CallSid}`;
+      twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna">Admin line active. Connecting you to the AI assistant.</Say>
+  <Connect action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-answer?fallback=true">
+    <Stream url="${streamUrl}" />
+  </Connect>
+  <Say voice="Polly.Joanna">Goodbye.</Say>
+</Response>`;
+    } else if ((useLLM || pickupMode === 'immediate') && realtimeEnabled && withinConcurrencyLimit) {
       // Greeting + realtime stream with 3s watchdog fallback
       // PHASE 1A: Ensure recording doesn't loop - use record="record-from-answer" on Dial only (not on Connect/Stream)
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Gather action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-action" numDigits="1" timeout="1">
+  <Gather action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-action?recording_enabled=${recordingEnabled}" numDigits="1" timeout="1">
     <Say voice="Polly.Joanna">
       Hi, you've reached TradeLine 24/7 — Your 24/7 AI Receptionist! How can I help? Press 0 to speak with someone directly.
     </Say>
@@ -129,8 +168,8 @@ Deno.serve(async (req) => {
     <Stream url="wss://${supabaseUrl.replace('https://', '')}/functions/v1/voice-stream?callSid=${CallSid}" />
   </Connect>
   <Say voice="Polly.Joanna">Connecting you to an agent now.</Say>
-  <Dial callerId="${To}" record="record-from-answer" recordingStatusCallback="${recordingCallbackUrl}" statusCallback="${statusCallbackUrl}" statusCallbackEvent="initiated ringing answered completed">
-    <Number>${FORWARD_TARGET_E164}</Number>
+  <Dial callerId="${To}" record="${dialRecordAttr}" recordingStatusCallback="${recordingCallbackUrl}" statusCallback="${statusCallbackUrl}" statusCallbackEvent="initiated ringing answered completed">
+    <Number>${dialTarget}</Number>
   </Dial>
 </Response>`;
     } else {
@@ -140,8 +179,8 @@ Deno.serve(async (req) => {
   <Say voice="Polly.Joanna">
     Hi, you've reached TradeLine 24/7 — Your 24/7 AI Receptionist! Connecting you now.
   </Say>
-  <Dial callerId="${To}" record="record-from-answer" recordingStatusCallback="${recordingCallbackUrl}" statusCallback="${statusCallbackUrl}" statusCallbackEvent="initiated ringing answered completed">
-    <Number>${FORWARD_TARGET_E164}</Number>
+  <Dial callerId="${To}" record="${dialRecordAttr}" recordingStatusCallback="${recordingCallbackUrl}" statusCallback="${statusCallbackUrl}" statusCallbackEvent="initiated ringing answered completed">
+    <Number>${dialTarget}</Number>
   </Dial>
 </Response>`;
     }
