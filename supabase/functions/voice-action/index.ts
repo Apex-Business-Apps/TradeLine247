@@ -29,6 +29,7 @@ Deno.serve(async (req) => {
     const CallSid = params['CallSid'];
     const Digits = params['Digits'];
     const To = params['To'];
+    const recordingEnabled = url.searchParams.get('recording_enabled') === 'true';
 
     console.log('DTMF action received (signature validated):', { CallSid, Digits });
 
@@ -49,10 +50,11 @@ Deno.serve(async (req) => {
         })
         .eq('call_sid', CallSid);
 
+      const dialRecordAttr = recordingEnabled ? "record-from-answer" : "do-not-record";
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="Polly.Joanna">Connecting you now.</Say>
-  <Dial callerId="${To}" record="record-from-answer" recordingStatusCallback="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-status">
+  <Dial callerId="${To}" record="${dialRecordAttr}" recordingStatusCallback="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-status">
     <Number>${FORWARD_TARGET_E164}</Number>
   </Dial>
 </Response>`;
