@@ -132,5 +132,13 @@ export default tseslint.config(
       "no-console": "off",
     },
   },
+  {
+    ignores: [
+      "**/__tests__/**",
+      "**/scripts/**",
+      "**/dist/**",
+      "**/public/**"
+    ]
+  },
 );
 

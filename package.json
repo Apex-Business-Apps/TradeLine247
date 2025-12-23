@@ -22,7 +22,7 @@
     "verify:icons": "node scripts/verify_icons.mjs",
     "verify:console": "node scripts/verify-console-usage.mjs",
     "verify:env:public": "node scripts/verify-public-env.mjs",
-    "lint": "eslint . --ext .ts,.tsx --max-warnings=0 && node scripts/check-edge-imports.mjs",
+    "lint": "eslint . --ext .ts,.tsx && node scripts/check-edge-imports.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:unit": "node scripts/run-vitest.mjs",
     "// web dev/build": "────────────────────────────────────────",

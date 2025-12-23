@@ -21,14 +21,13 @@ interface LogMetadata {
 }
 
 class Logger {
-  private isDevelopment: boolean;
-  private isProduction: boolean;
-  private minLevel: LogLevel;
+  // Made public and mutable so tests can simulate production by setting false
+  public isDevelopment = import.meta.env.DEV;
+  private isProduction = import.meta.env.MODE === 'production';
+  private minLevel: LogLevel = this.isDevelopment ? 'debug' : 'info';
 
-  constructor() {
-    this.isDevelopment = import.meta.env.MODE === 'development';
-    this.isProduction = import.meta.env.MODE === 'production';
-    this.minLevel = this.isDevelopment ? 'debug' : 'info';
+  public setLogLevel(level: LogLevel): void {
+    this.minLevel = level;
   }
 
   /**
