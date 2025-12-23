@@ -5,7 +5,7 @@
  * Centralized test utilities for consistent testing across the codebase.
  */
 
-import { render, RenderOptions } from '@testing-library/react';
+import { render as rtlRender, RenderOptions } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { ReactElement } from 'react';
 import { vi } from 'vitest';
@@ -13,22 +13,29 @@ import { vi } from 'vitest';
 /**
  * Custom render function with common providers
  */
+interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
+  route?: string;
+}
+
 export function renderWithProviders(
   ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'> & { initialEntries?: string[] }
+  options: CustomRenderOptions = {}
 ) {
-  const { initialEntries = ['/'], ...renderOptions } = options || {};
+  const { route = '/', ...renderOptions } = options;
 
   function Wrapper({ children }: { children: React.ReactNode }) {
     return (
-      <MemoryRouter initialEntries={initialEntries}>
+      <MemoryRouter initialEntries={[route]}>
         {children}
       </MemoryRouter>
     );
   }
 
-  return render(ui, { wrapper: Wrapper, ...renderOptions });
+  return rtlRender(ui, { wrapper: Wrapper, ...renderOptions });
 }
+
+// Re-export render alias for convenience
+export const render = renderWithProviders;
 
 /**
  * Mock Supabase client factory
@@ -160,5 +167,5 @@ export function createMockSession(user?: any) {
 
 export * from '@testing-library/react';
 export { vi } from 'vitest';
-
-
+export { renderWithProviders };
+export { renderWithProviders as render };
