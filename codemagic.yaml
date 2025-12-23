@@ -4,7 +4,6 @@ workflows:
     instance_type: mac_mini_m2
     max_build_duration: 60
 
-    # Prevent “loop builds”: tag-triggered only (manual starts still allowed in UI)
     triggering:
       events:
         - tag
@@ -14,26 +13,25 @@ workflows:
       cancel_previous_builds: true
 
     environment:
-      xcode: 16.4
-      node: 20.19.0
-      npm: 10
-
       groups:
         - ios_config
-        - appstore_credentials  # ✅ CANONICAL GOODBUILD group name (no underscore)
+        - appstore_credentials
 
       vars:
         APP_VERSION: "1.0.6"
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-        BUNDLE_ID: "com.apex.tradeline"
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
+        XCODE_SCHEME: App
+        BUNDLE_ID: com.apex.tradeline
 
-        # Optional override if your 1024 source icon ever moves:
-        # IOS_MARKETING_ICON_SRC: "public/assets/brand/App_Icons/ios/AppStore1024.png"
+      xcode: 16.4
+      node: 20.19.0
+      npm: 10
+      cocoapods: default
 
-    ios_signing:
-      distribution_type: app_store
-      bundle_identifier: com.apex.tradeline
+      # ✅ IMPORTANT: ios_signing MUST live under environment
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.apex.tradeline
 
     scripts:
       - name: Runtime versions (fail fast)
@@ -42,10 +40,6 @@ workflows:
           node -v
           npm -v
           xcodebuild -version
-
-          # Hard guard for EBADENGINE (must be >= 20.19.0)
-          node -e "const [M,m]=process.versions.node.split('.').map(Number); process.exit((M>20||(M===20&&m>=19))?0:1)" \
-            || (echo "❌ Node must be >=20.19.0. Check codemagic.yaml environment.node." && exit 1)
 
       - name: Install dependencies
         script: |
@@ -106,7 +100,6 @@ workflows:
 
     artifacts:
       - build/ios/ipa/*.ipa
-      - build/ios/logs/**/*.log
 
     publishing:
       app_store_connect:
@@ -115,6 +108,6 @@ workflows:
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
         submit_to_app_store: false
-        # ✅ SAFE DEFAULT: do NOT set beta_groups until you confirm the group exists in ASC.
+        # ✅ DO NOT set beta_groups until the group definitely exists in ASC.
         # beta_groups:
         #   - Internal Testers
