@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { performSafetyCheck, sanitizeForLogging, type SafetyConfig } from "../_shared/voiceSafety.ts";
+import { classifyObjection, getObjectionContext } from "../_shared/objectionClassifier.ts";
 import {
   redactSensitive,
   categorizeCall,
@@ -210,6 +211,7 @@ Deno.serve(async (req) => {
   const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const enforcementMode = (Deno.env.get('SAFETY_ENFORCEMENT_MODE') || 'log').toLowerCase();
   
   if (!OPENAI_API_KEY) {
     socket.close(1011, 'OpenAI API key not configured');
@@ -321,7 +323,7 @@ Deno.serve(async (req) => {
           const userText = data.item.transcript;
           userTranscript += userText + ' ';
           
-          // Perform safety check on user input (non-blocking - logs only)
+          // Perform safety check on user input (enforcement-aware)
           try {
             const safetyResult = performSafetyCheck(
               userText,
@@ -341,25 +343,28 @@ Deno.serve(async (req) => {
               }
             }
 
-            // Handle safety actions (non-blocking for backward compatibility)
-            if (!safetyResult.safe && safetyResult.action === 'escalate') {
-              console.log(`⚠️ Safety escalation triggered: ${safetyResult.reason}`);
-              
-              // Log safety event (non-blocking)
-              supabase.from('voice_safety_logs').insert({
+            // Handle safety actions with fail-closed option
+            if (!safetyResult.safe) {
+              const incidentPayload = {
                 call_sid: callSid,
-                event_type: 'safety_escalation',
-                reason: safetyResult.reason,
-                confidence: safetyResult.confidence || 0.8,
-                sanitized_text: sanitizeForLogging(userText),
-                sentiment_score: safetyResult.sentiment_score
-              }).then(({ error }) => {
-                if (error) console.error('Safety log error:', error);
-              });
-              
-              // Flag for escalation
+                severity: 'high',
+                details: {
+                  reason: safetyResult.reason,
+                  action: safetyResult.action,
+                  confidence: safetyResult.confidence || 0.8,
+                  sanitized_text: sanitizeForLogging(userText)
+                }
+              };
+
+              supabase.from('security_incidents')
+                .insert(incidentPayload)
+                .then(({ error }) => {
+                  if (error) console.error('security_incidents insert error:', error);
+                });
+
               supabase.from('call_logs')
                 .update({ 
+                  status: 'terminated_safety',
                   captured_fields: { 
                     ...capturedFields,
                     safety_flag: true,
@@ -371,6 +376,45 @@ Deno.serve(async (req) => {
                 .eq('call_sid', callSid)
                 .then(({ error }) => {
                   if (error) console.error('Safety flag error:', error);
+                });
+
+              if (enforcementMode === 'block') {
+                try {
+                  socket.close(1000, 'safety_block');
+                  openaiWs?.close(1000, 'safety_block');
+                } catch (err) {
+                  console.error('Failed to close sockets on safety block:', err);
+                }
+                return;
+              } else {
+                console.log(`⚠️ Safety escalation (log mode): ${safetyResult.reason}`);
+              }
+            }
+
+            // Objection handling (low-latency)
+            const objectionType = classifyObjection(userText);
+            if (objectionType !== 'none') {
+              const context = getObjectionContext(objectionType);
+              try {
+                openaiWs.send(JSON.stringify({
+                  type: 'conversation.item.create',
+                  item: {
+                    type: 'message',
+                    role: 'system',
+                    content: [{ type: 'input_text', text: context }]
+                  }
+                }));
+              } catch (err) {
+                console.error('Objection injection error:', err);
+              }
+
+              supabase.from('call_logs')
+                .update({
+                  captured_fields: { ...capturedFields, objection_type: objectionType }
+                })
+                .eq('call_sid', callSid)
+                .then(({ error }) => {
+                  if (error) console.error('Objection log error:', error);
                 });
             }
           } catch (error) {

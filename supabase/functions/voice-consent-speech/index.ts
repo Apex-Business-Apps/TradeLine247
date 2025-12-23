@@ -1,5 +1,6 @@
  
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,6 +15,8 @@ Deno.serve(async (req) => {
   try {
     const url = new URL(req.url);
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     // Validate Twilio signature and get params
     const params = await validateTwilioRequest(req, url.toString());
@@ -25,15 +28,24 @@ Deno.serve(async (req) => {
     console.log('Consent speech: CallSid=%s Speech="%s" Confidence=%s', 
       callSid, speechResult, confidence);
     
-    // Check if caller said "opt out" or similar phrases
-    const optOutPhrases = ['opt out', 'no recording', 'don\'t record', 'no record'];
-    const userOptedOut = optOutPhrases.some(phrase => speechResult.includes(phrase));
+    // Strict opt-in: only explicit opt-in enables recording
+    const optInPhrases = ['consent', 'record', 'yes record', 'you can record', 'i agree to recording'];
+    const userOptedIn = optInPhrases.some(phrase => speechResult.includes(phrase));
+    const recordParam = userOptedIn ? 'true' : 'false';
     
-    const recordParam = userOptedOut ? 'false' : 'true';
+    console.log('Consent decision: CallSid=%s OptIn=%s Record=%s', 
+      callSid, userOptedIn, recordParam);
     
-    console.log('Consent decision: CallSid=%s OptOut=%s Record=%s', 
-      callSid, userOptedOut, recordParam);
-    
+    // Persist consent decision
+    await supabase
+      .from('call_logs')
+      .upsert({
+        call_sid: callSid,
+        consent_recording: userOptedIn,
+        recording_mode: userOptedIn ? 'full' : 'no_record',
+        status: 'in-progress'
+      }, { onConflict: 'call_sid' });
+
     // Redirect to routing logic
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>

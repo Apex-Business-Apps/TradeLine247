@@ -1,6 +1,7 @@
  
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
+import { buildInternalNumberSet, isInternalCaller, safeDialTarget } from "../_shared/antiLoop.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -36,6 +37,12 @@ Deno.serve(async (req) => {
     console.log('Voice route: CallSid=%s Record=%s From=%s To=%s', 
       callSid, shouldRecord, from, to);
     
+    // Anti-loop protections
+    const internalNumbers = buildInternalNumberSet(Deno.env as Record<string, string | undefined>);
+    const internalCaller = isInternalCaller(from, internalNumbers);
+    const dialTarget = safeDialTarget(opsNumber, from, to, internalNumbers);
+    const canDial = !!dialTarget;
+
     // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
@@ -59,7 +66,32 @@ Deno.serve(async (req) => {
     // Build TwiML with AI-first approach (if configured) or direct dial
     let twiml: string;
     
-    if (twilioStreamUrl) {
+    if (internalCaller || !canDial) {
+      const safeMsg = internalCaller
+        ? 'Admin line active. No forwarding. You are connected to the AI assistant.'
+        : 'We could not forward this call right now. Connecting you to the AI assistant.';
+
+      if (twilioStreamUrl) {
+        const redirectUrl = `${supabaseUrl}/functions/v1/voice-route-action?record=${recordParam}`;
+        twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna">${safeMsg}</Say>
+  <Connect action="${redirectUrl}">
+    <Stream url="${twilioStreamUrl}">
+      <Parameter name="callSid" value="${callSid}"/>
+      <Parameter name="record" value="${shouldRecord}"/>
+    </Stream>
+  </Connect>
+  <Hangup/>
+</Response>`;
+      } else {
+        twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna">${safeMsg}</Say>
+  <Hangup/>
+</Response>`;
+      }
+    } else if (twilioStreamUrl) {
       // Use Twilio Media Streams for real-time AI
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -78,7 +110,7 @@ Deno.serve(async (req) => {
   <Dial action="${supabaseUrl}/functions/v1/voice-route-action?record=${recordParam}" 
         timeout="6" 
         record="${recordAttr}">
-    <Number url="${aiWebhook}">${opsNumber}</Number>
+    <Number url="${aiWebhook}">${dialTarget}</Number>
   </Dial>
 </Response>`;
     } else {
@@ -91,7 +123,7 @@ Deno.serve(async (req) => {
         record="${recordAttr}"
         callerId="${to}">
     <Number statusCallback="${supabaseUrl}/functions/v1/voice-status" 
-            statusCallbackEvent="initiated ringing answered completed">${opsNumber}</Number>
+            statusCallbackEvent="initiated ringing answered completed">${dialTarget}</Number>
   </Dial>
   <Say voice="Polly.Joanna">We're sorry, but no one is available to take your call. Please try again later.</Say>
   <Hangup/>
