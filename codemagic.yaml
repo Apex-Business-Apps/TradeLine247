@@ -1,78 +1,127 @@
 workflows:
-  ios-capacitor-testflight:
+  ios-goodbuild-testflight-upload-only:
     name: 🍏 GOODBUILD iOS TestFlight (Upload-only)
     instance_type: mac_mini_m2
     max_build_duration: 60
+
+    # Avoid “loop” behavior: run manually or via GOODBUILD tags only.
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: "GOODBUILD-*"
+          include: true
+      cancel_previous_builds: true
+
     environment:
-      xcode: 16.4
-      node: 20.19.6
       groups:
         - ios_config
-        - app_store_credentials
+        - appstore_credentials  # ✅ GOODBUILD canonical name (no underscore)
       vars:
-        # 📌 SINGLE SOURCE OF TRUTH
-        APP_VERSION: "1.0.1" 
+        APP_VERSION: "1.0.6"
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
         BUNDLE_ID: "com.apex.tradeline"
 
-    cache:
-      cache_paths:
-        - $HOME/.npm
-        - node_modules
-        - $HOME/Library/Caches/CocoaPods
-        - ios/App/Pods
+      # ✅ Fix EBADENGINE: project requires node >=20.19.0
+      node: 20.19.0
+      npm: 10
+      xcode: 16.4
+      cocoapods: default
+
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.apex.tradeline
 
     scripts:
-      - name: 🔎 Runtime versions (fail fast)
+      - name: Runtime versions (fail fast)
         script: |
-          node --version
-          npm --version
+          set -euo pipefail
+          node -v
+          npm -v
+          xcodebuild -version
 
-      - name: 📦 Install dependencies
+      - name: Install dependencies
         script: |
+          set -euo pipefail
           npm ci --no-audit --prefer-offline
 
-      - name: ✅ GOODBUILD quality + verify gates
+      - name: GOODBUILD quality + verify gates
         script: |
+          set -euo pipefail
           npm run lint
           npm run typecheck
           npm run test:unit
           npm run test:e2e:smoke
+          npm run build
           npm run verify:app
           npm run verify:icons
           npm run verify:console
 
-      - name: 🧱 Build web assets + sync Capacitor (iOS only)
+      - name: Build web assets + sync Capacitor (iOS only)
         script: |
-          npm run build
-          npx cap sync
+          set -euo pipefail
+          npx cap sync ios
 
-      - name: 🧩 Assert iOS AppIcon exists (hard fail if missing)
+      - name: Install CocoaPods
         script: |
-          # Inject Version directly into archive command
+          set -euo pipefail
+          cd ios/App
+          pod install --repo-update
+          cd ../..
+
+      - name: Assert iOS AppIcon asset exists (hard fail)
+        script: |
+          set -euo pipefail
+          test -f "ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json"
+          echo "✅ AppIcon asset catalog present"
+
+      - name: Set iOS version & build number
+        script: |
+          set -euo pipefail
           cd ios/App
           xcrun agvtool new-marketing-version "$APP_VERSION"
           xcrun agvtool new-version -all "$BUILD_NUMBER"
           cd ../..
 
-      - name: 🔐 Use provisioning profiles (GOODBUILD)
+      - name: Use provisioning profiles (GOODBUILD)
         script: |
-          xcode-project use-profiles \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
+          set -euo pipefail
+          # Internal/upload-only export behavior is handled by our export options
+          xcode-project use-profiles --custom-export-options '{"testFlightInternalTestingOnly": true}'
 
-      - name: 📦 Build IPA (GOODBUILD)
+      - name: Build IPA (GOODBUILD)
         script: |
-          cd android
-          # Use standard AGP properties to override version without file editing
-          ./gradlew bundleRelease \
-            -Pandroid.injected.version.code=$BUILD_NUMBER \
-            -Pandroid.injected.version.name=$APP_VERSION \
-            -Pandroid.injected.signing.store.file=$(echo $CM_KEYSTORE_PATH) \
-            -Pandroid.injected.signing.store.password=$CM_KEYSTORE_PASSWORD \
-            -Pandroid.injected.signing.key.alias=$CM_KEY_ALIAS \
-            -Pandroid.injected.signing.key.password=$CM_KEY_PASSWORD
+          set -euo pipefail
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME" \
+            --config Release \
+            --archive-flags="-destination 'generic/platform=iOS' ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon"
+
+      - name: Assert IPA contains AppIcon (hard fail)
+        script: |
+          set -euo pipefail
+          IPA_PATH="$(ls build/ios/ipa/*.ipa | head -n 1)"
+          rm -rf /tmp/tl247_ipa && mkdir -p /tmp/tl247_ipa
+          unzip -q "$IPA_PATH" -d /tmp/tl247_ipa
+          APP_DIR="$(find /tmp/tl247_ipa/Payload -maxdepth 1 -name '*.app' -print -quit)"
+
+          echo "App payload: $APP_DIR"
+          # Look for compiled icon artifacts commonly present in .app bundles
+          if ! (find "$APP_DIR" -maxdepth 1 -type f \( -iname '*AppIcon*' -o -iname '*60x60*' -o -iname '*76x76*' -o -iname '*83.5x83.5*' \) | grep -q .); then
+            echo "❌ App icon not found inside IPA payload. Stop: this would show blank in App Store Connect."
+            exit 1
+          fi
+          echo "✅ IPA contains icon assets"
+
     artifacts:
-      - build/ios/export/*.ipa
-      - android/app/build/outputs/bundle/release/*.aab
+      - build/ios/ipa/*.ipa
+      - /tmp/tl247_ipa/**
+
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        # ✅ Upload-only: DO NOT include submit_to_testflight or beta_groups (avoids post-processing failures)
