@@ -56,6 +56,7 @@
     "deploy:fn:secret-encrypt": "node ./scripts/deploy-secret-encrypt.cjs",
     "deploy:fn:secret-encrypt:manual": "SUPABASE_DEPLOY=1 node ./scripts/deploy-secret-encrypt.cjs",
     "// capacitor helpers & hooks": "──────────────────────────────",
+    "generate:icons": "node resize-icons.js",
     "cap:sync": "npx cap sync",
     "ios:open": "npx cap open ios",
     "// npm lifecycle hooks": "────────────────────────────────────",
