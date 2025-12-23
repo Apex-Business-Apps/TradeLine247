@@ -1,9 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-import fs from "fs";
-import path from "path";
-
 const SRC =
   process.env.IOS_MARKETING_ICON_SRC ||
   "public/assets/brand/App_Icons/ios/AppStore1024.png";
