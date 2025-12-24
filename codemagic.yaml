@@ -13,7 +13,7 @@ workflows:
         XCODE_SCHEME: App
         BUNDLE_ID: com.apex.tradeline
       xcode: 16.4
-      node: 20.11.1
+      node: 20.19.0
       npm: 10
       cocoapods: default
       ios_signing:
