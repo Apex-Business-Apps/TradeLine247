@@ -40,6 +40,7 @@ workflows:
           node -v
           npm -v
           xcodebuild -version
+          node -e "const v=process.versions.node.split('.').map(Number); if(v[0]!==20||v[1]<19){console.error('Node must be >=20.19.0'); process.exit(1)}"
 
       - name: Install dependencies
         script: |
@@ -73,6 +74,18 @@ workflows:
           set -euo pipefail
           node scripts/ensure-ios-marketing-icon.mjs
 
+      - name: Verify App Store Connect secrets (fail fast)
+        script: |
+          set -euo pipefail
+          missing=()
+          [[ -z "${APP_STORE_CONNECT_PRIVATE_KEY:-}" ]] && missing+=("APP_STORE_CONNECT_PRIVATE_KEY")
+          [[ -z "${APP_STORE_CONNECT_KEY_IDENTIFIER:-}" ]] && missing+=("APP_STORE_CONNECT_KEY_IDENTIFIER")
+          [[ -z "${APP_STORE_CONNECT_ISSUER_ID:-}" ]] && missing+=("APP_STORE_CONNECT_ISSUER_ID")
+          if (( ${#missing[@]} > 0 )); then
+            echo "Missing required App Store Connect secrets: ${missing[*]}"
+            exit 1
+          fi
+
       - name: Install CocoaPods
         script: |
           set -euo pipefail
@@ -91,7 +104,7 @@ workflows:
       - name: Use provisioning profiles (GOODBUILD)
         script: |
           set -euo pipefail
-          xcode-project use-profiles --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+          xcode-project use-profiles --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME" --custom-export-options='{"testFlightInternalTestingOnly": true}'
 
       - name: Build IPA (GOODBUILD)
         script: |
@@ -106,7 +119,7 @@ workflows:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
+        submit_to_testflight: false
         submit_to_app_store: false
         # ✅ DO NOT set beta_groups until the group definitely exists in ASC.
         # beta_groups:
