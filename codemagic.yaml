@@ -84,7 +84,7 @@ workflows:
       - name: Configure code signing
         script: |
           set -euo pipefail
-          xcode-project use-profiles --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME" --custom-export-options='{"testFlightInternalTestingOnly": true}'
+          xcode-project use-profiles --custom-export-options='{"testFlightInternalTestingOnly": true}'
 
       # Step 8: Build archive & IPA
       - name: Build archive & IPA
