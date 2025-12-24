@@ -13,7 +13,7 @@ workflows:
       cancel_previous_builds: true
 
     cache:
-      paths:
+      cache_paths:
         - node_modules
         - ios/App/Pods
 
