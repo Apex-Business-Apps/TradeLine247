@@ -20,11 +20,14 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.apex.tradeline
 
-    cache:
-      cache_paths:
-        - ~/.npm
-        - ~/.cocoapods
-        - ios/Pods
+    scripts:
+      - name: Runtime versions (fail fast)
+        script: |
+          set -euo pipefail
+          node -v
+          npm -v
+          xcodebuild -version
+          node -e "const v=process.versions.node.split('.').map(Number); if(v[0]!==20||v[1]<19){console.error('Node must be >=20.19.0'); process.exit(1)}"
 
     scripts:
       # Step 1: Install dependencies
@@ -54,8 +57,19 @@ workflows:
           set -eo pipefail
           npm run build
 
-      # Step 5: Sync Capacitor for iOS
-      - name: Sync Capacitor for iOS
+      - name: Verify App Store Connect secrets (fail fast)
+        script: |
+          set -euo pipefail
+          missing=()
+          [[ -z "${APP_STORE_CONNECT_PRIVATE_KEY:-}" ]] && missing+=("APP_STORE_CONNECT_PRIVATE_KEY")
+          [[ -z "${APP_STORE_CONNECT_KEY_IDENTIFIER:-}" ]] && missing+=("APP_STORE_CONNECT_KEY_IDENTIFIER")
+          [[ -z "${APP_STORE_CONNECT_ISSUER_ID:-}" ]] && missing+=("APP_STORE_CONNECT_ISSUER_ID")
+          if (( ${#missing[@]} > 0 )); then
+            echo "Missing required App Store Connect secrets: ${missing[*]}"
+            exit 1
+          fi
+
+      - name: Install CocoaPods
         script: |
           set -eo pipefail
           npx cap sync ios
@@ -69,9 +83,8 @@ workflows:
       # Step 7: Configure code signing (NO manual fetch-signing-files per spec)
       - name: Configure code signing
         script: |
-          set -eo pipefail
-          xcode-project use-profiles \
-            --custom-export-options='{"testFlightInternalTestingOnly": true}'
+          set -euo pipefail
+          xcode-project use-profiles --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME" --custom-export-options='{"testFlightInternalTestingOnly": true}'
 
       # Step 8: Build archive & IPA
       - name: Build archive & IPA
@@ -92,14 +105,8 @@ workflows:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
-        beta_groups:
-          - Internal Testers
-
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
+        submit_to_testflight: false
+        submit_to_app_store: false
+        # ✅ DO NOT set beta_groups until the group definitely exists in ASC.
+        # beta_groups:
+        #   - Internal Testers
