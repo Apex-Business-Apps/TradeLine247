@@ -12,6 +12,11 @@ workflows:
           include: true
       cancel_previous_builds: true
 
+    cache:
+      cache_paths:
+        - node_modules
+        - ios/App/Pods
+
     environment:
       groups:
         - ios_config
@@ -68,9 +73,10 @@ workflows:
           set -euo pipefail
           npx cap sync ios
 
-      - name: Ensure iOS marketing icon exists (post-sync)
+      - name: Generate iOS Icons (post-sync)
         script: |
           set -euo pipefail
+          npm run generate:icons
           node scripts/ensure-ios-marketing-icon.mjs
 
       - name: Install CocoaPods

@@ -438,6 +438,8 @@ export const Header: React.FC = () => {
         <nav
           id="mobile-menu"
           aria-label="Mobile navigation"
+          role="dialog"
+          aria-modal="true"
           className="border-t bg-background/95 backdrop-blur transition-all duration-300 overflow-hidden"
         >
           <div className="container py-4 space-y-1">
