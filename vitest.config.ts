@@ -20,9 +20,13 @@ export default defineConfig({
     css: true,
     include: [
       'src/**/*.{test,spec}.{ts,tsx}',
-      'supabase/functions/_shared/**/*.test.ts',
+      // NOTE: Deno-based Supabase function tests excluded (use 'deno test' instead)
     ],
-    exclude: ['tests/**', 'node_modules/**'], // tests/** contains Playwright e2e tests only
+    exclude: [
+      'tests/**', // Playwright e2e tests
+      'node_modules/**',
+      'supabase/functions/**', // Deno runtime tests (https:// imports incompatible with Node)
+    ]
     // Ensure Node.js built-ins and modules are available for tests
     server: {
       deps: {
