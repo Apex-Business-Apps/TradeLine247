@@ -476,10 +476,30 @@ export default function VoiceSettings() {
                   <Label>Enable AMD (Answering Machine Detection)</Label>
                   <p className="text-xs text-muted-foreground">Detect voicemail and skip</p>
                 </div>
-                <Switch
-                  checked={config?.amd_enable}
-                  onCheckedChange={(checked) => saveConfig({ amd_enable: checked })}
-                />
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={config?.amd_enable}
+                  onClick={() => saveConfig({ amd_enable: !config?.amd_enable })}
+                  className={`
+                    relative inline-flex h-6 w-11 shrink-0 cursor-pointer
+                    rounded-full border-2 border-transparent
+                    transition-all duration-300 ease-in-out
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500
+                    ${config?.amd_enable
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 shadow-lg shadow-amber-500/30'
+                      : 'bg-slate-200 dark:bg-slate-600'
+                    }
+                  `}
+                >
+                  <span
+                    className={`
+                      pointer-events-none inline-block h-5 w-5 rounded-full
+                      bg-white shadow-lg transform transition-all duration-300 ease-in-out
+                      ${config?.amd_enable ? 'translate-x-5' : 'translate-x-0.5'}
+                    `}
+                  />
+                </button>
               </div>
             </CardContent>
           </Card>
