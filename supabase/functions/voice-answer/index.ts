@@ -1,7 +1,8 @@
- 
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
 import { buildInternalNumberSet, isInternalCaller, safeDialTarget } from "../_shared/antiLoop.ts";
+import { TWIML_TEMPLATES, TEMPLATE_CONFIG } from "../_shared/responseTemplates.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -60,13 +61,7 @@ Deno.serve(async (req) => {
     // Early consent prompt (strict opt-in: default is no-record)
     if (!hasRecordingParam) {
       const consentUrl = `${supabaseUrl}/functions/v1/voice-consent`;
-      const twimlConsent = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Gather action="${consentUrl}" method="POST" input="dtmf" numDigits="1" timeout="4">
-    <Say voice="Polly.Joanna">Press 1 to consent to recording. Otherwise, we will continue without recording.</Say>
-  </Gather>
-  <Redirect method="POST">${consentUrl}</Redirect>
-</Response>`;
+      const twimlConsent = TWIML_TEMPLATES.CONSENT_GATHER(consentUrl, TEMPLATE_CONFIG.default_voice);
 
       return new Response(twimlConsent, {
         headers: { ...corsHeaders, 'Content-Type': 'text/xml' },
@@ -138,51 +133,34 @@ Deno.serve(async (req) => {
     const realtimeEnabled = config?.stream_enabled !== false;
     const withinConcurrencyLimit = (activeStreams || 0) < 10;
 
-    // Build recording callback URL (PHASE 1A: Fix callback URL to voice-recording-callback)
-    const recordingCallbackUrl = `${supabaseUrl}/functions/v1/voice-recording-callback`;
-    const statusCallbackUrl = `${supabaseUrl}/functions/v1/voice-status-callback`;
-    const dialRecordAttr = recordingEnabled ? "record-from-answer" : "do-not-record";
+    // Get business name from config (with safe fallback)
+    const businessName = config?.business_name || TEMPLATE_CONFIG.default_business_name;
 
     if (internalCaller || !canDial) {
       // Safe path: never dial humans for internal callers or blocked targets
-      const streamUrl = `wss://${supabaseUrl.replace('https://', '')}/functions/v1/voice-stream?callSid=${CallSid}`;
-      twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">Admin line active. Connecting you to the AI assistant.</Say>
-  <Connect action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-answer?fallback=true">
-    <Stream url="${streamUrl}" />
-  </Connect>
-  <Say voice="Polly.Joanna">Goodbye.</Say>
-</Response>`;
+      twiml = TWIML_TEMPLATES.ADMIN_STREAM(supabaseUrl, CallSid, TEMPLATE_CONFIG.default_voice);
     } else if ((useLLM || pickupMode === 'immediate') && realtimeEnabled && withinConcurrencyLimit) {
       // Greeting + realtime stream with 3s watchdog fallback
       // PHASE 1A: Ensure recording doesn't loop - use record="record-from-answer" on Dial only (not on Connect/Stream)
-      twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Gather action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-action?recording_enabled=${recordingEnabled}" numDigits="1" timeout="1">
-    <Say voice="Polly.Joanna">
-      Hi, you've reached TradeLine 24/7 — Your 24/7 AI Receptionist! How can I help? Press 0 to speak with someone directly.
-    </Say>
-  </Gather>
-  <Connect action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-answer?fallback=true">
-    <Stream url="wss://${supabaseUrl.replace('https://', '')}/functions/v1/voice-stream?callSid=${CallSid}" />
-  </Connect>
-  <Say voice="Polly.Joanna">Connecting you to an agent now.</Say>
-  <Dial callerId="${To}" record="${dialRecordAttr}" recordingStatusCallback="${recordingCallbackUrl}" statusCallback="${statusCallbackUrl}" statusCallbackEvent="initiated ringing answered completed">
-    <Number>${dialTarget}</Number>
-  </Dial>
-</Response>`;
+      twiml = TWIML_TEMPLATES.GREETING_WITH_STREAM(
+        supabaseUrl,
+        CallSid,
+        recordingEnabled,
+        businessName,
+        dialTarget,
+        To,
+        TEMPLATE_CONFIG.default_voice
+      );
     } else {
       // Bridge directly to human
-      twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">
-    Hi, you've reached TradeLine 24/7 — Your 24/7 AI Receptionist! Connecting you now.
-  </Say>
-  <Dial callerId="${To}" record="${dialRecordAttr}" recordingStatusCallback="${recordingCallbackUrl}" statusCallback="${statusCallbackUrl}" statusCallbackEvent="initiated ringing answered completed">
-    <Number>${dialTarget}</Number>
-  </Dial>
-</Response>`;
+      twiml = TWIML_TEMPLATES.BRIDGE_TO_HUMAN(
+        businessName,
+        dialTarget,
+        To,
+        recordingEnabled,
+        supabaseUrl,
+        TEMPLATE_CONFIG.default_voice
+      );
     }
 
     // PHASE 3: Add timeline marker - twiml_sent
@@ -212,13 +190,9 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('Error handling call:', error);
-    
-    // Return error TwiML
-    const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">We're sorry, but we're experiencing technical difficulties. Please try again later.</Say>
-  <Hangup/>
-</Response>`;
+
+    // Return error TwiML using centralized template
+    const errorTwiml = TWIML_TEMPLATES.ERROR_RESPONSE(TEMPLATE_CONFIG.default_voice);
 
     return new Response(errorTwiml, {
       headers: {
