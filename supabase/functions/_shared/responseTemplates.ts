@@ -84,6 +84,11 @@ export const TEMPLATES = {
 
   // === NO-RECORD MODE ===
   NO_RECORD_CONFIRMATION: "Understood. This call will not be recorded. How can I assist you?",
+
+  // === FRONT DOOR / CONSENT ===
+  FRONTDOOR_GREETING: "Thank you for calling {business_name}. This call may be recorded for quality and training purposes. By staying on the line, you consent to being recorded.",
+  FRONTDOOR_MENU: "Press 1 for Sales. Press 2 for Support. Press 9 to leave a voicemail. Press star to repeat this menu.",
+  FRONTDOOR_RATE_LIMIT: "We're experiencing high call volume. Please try again later.",
 } as const;
 
 // ============================================================================
@@ -177,7 +182,7 @@ export const TWIML_TEMPLATES = {
   <Hangup/>
 </Response>`,
 
-  VOICEMAIL_ERROR: (voice: string = TEMPLATE_CONFIG.default_voice) => `<?xml version="1.0" encoding="UTF-8"?>
+  VOICEMAIL_ERROR_RESPONSE: (voice: string = TEMPLATE_CONFIG.default_voice) => `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="${voice}">${TEMPLATES.VOICEMAIL_ERROR}</Say>
   <Hangup/>
@@ -215,6 +220,12 @@ export const TWIML_TEMPLATES = {
   <Redirect method="POST">${new URL(Deno.env.get('SUPABASE_URL') || '').origin}/functions/v1/voice-voicemail?reason=menu_timeout</Redirect>
 </Response>`,
 
+  MENU_ERROR_RESPONSE: (supabaseUrl: string, voice: string = TEMPLATE_CONFIG.default_voice) => `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="${voice}">${TEMPLATES.ERROR_GENERIC}</Say>
+  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=error</Redirect>
+</Response>`,
+
   FORWARDING_ACTIVE_TWIML: (businessName: string, voice: string = TEMPLATE_CONFIG.default_voice) => {
     const message = renderTemplate(TEMPLATES.FORWARDING_ACTIVE, { business_name: businessName });
     return `<?xml version="1.0" encoding="UTF-8"?>
@@ -222,6 +233,32 @@ export const TWIML_TEMPLATES = {
   <Say voice="${voice}">${message}</Say>
 </Response>`;
   },
+
+  FRONTDOOR_CONSENT_MENU: (businessName: string, supabaseUrl: string, voice: string = TEMPLATE_CONFIG.default_voice) => {
+    const greeting = renderTemplate(TEMPLATES.FRONTDOOR_GREETING, { business_name: businessName });
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="${voice}" language="en-CA">${greeting}</Say>
+  <Gather action="${supabaseUrl}/functions/v1/voice-menu-handler" method="POST" numDigits="1" timeout="5">
+    <Say voice="${voice}">${TEMPLATES.FRONTDOOR_MENU}</Say>
+  </Gather>
+  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=menu_timeout</Redirect>
+</Response>`;
+  },
+
+  FRONTDOOR_MENU_ONLY: (supabaseUrl: string, voice: string = TEMPLATE_CONFIG.default_voice) => `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Gather action="${supabaseUrl}/functions/v1/voice-menu-handler" method="POST" numDigits="1" timeout="5">
+    <Say voice="${voice}">${TEMPLATES.FRONTDOOR_MENU}</Say>
+  </Gather>
+  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=menu_timeout</Redirect>
+</Response>`,
+
+  FRONTDOOR_RATE_LIMIT_RESPONSE: (voice: string = TEMPLATE_CONFIG.default_voice) => `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="${voice}">${TEMPLATES.FRONTDOOR_RATE_LIMIT}</Say>
+  <Hangup/>
+</Response>`,
 } as const;
 
 // ============================================================================
