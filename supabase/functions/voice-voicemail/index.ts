@@ -1,7 +1,8 @@
- 
+
 // Voicemail Handler - Records messages and notifies staff
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
+import { TWIML_TEMPLATES, TEMPLATE_CONFIG } from "../_shared/responseTemplates.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -59,17 +60,7 @@ Deno.serve(async (req) => {
     }
 
     // Otherwise, prompt for voicemail
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">Please leave a message after the tone. Press pound when finished.</Say>
-  <Record action="${supabaseUrl}/functions/v1/voice-voicemail"
-          maxLength="180"
-          finishOnKey="#"
-          transcribe="true"
-          transcribeCallback="${supabaseUrl}/functions/v1/voice-voicemail"/>
-  <Say voice="Polly.Joanna">Thank you. Your message has been recorded. Goodbye.</Say>
-  <Hangup/>
-</Response>`;
+    const twiml = TWIML_TEMPLATES.VOICEMAIL_RECORD(supabaseUrl, TEMPLATE_CONFIG.default_voice);
 
     return new Response(twiml, {
       headers: { ...corsHeaders, 'Content-Type': 'text/xml' },
@@ -78,11 +69,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Voicemail error:', error);
 
-    const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">We're sorry, but we couldn't record your message. Please call back later.</Say>
-  <Hangup/>
-</Response>`;
+    const errorTwiml = TWIML_TEMPLATES.VOICEMAIL_ERROR_RESPONSE(TEMPLATE_CONFIG.default_voice);
 
     return new Response(errorTwiml, {
       headers: { ...corsHeaders, 'Content-Type': 'text/xml' },
