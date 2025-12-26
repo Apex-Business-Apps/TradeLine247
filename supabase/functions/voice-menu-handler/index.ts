@@ -1,8 +1,9 @@
- 
+
 // DTMF Menu Handler - Routes calls based on user selection
 // Press 1: Sales, Press 2: Support, Press 9: Voicemail
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
+import { TWIML_TEMPLATES, TEMPLATE_CONFIG } from "../_shared/responseTemplates.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,14 +53,7 @@ Deno.serve(async (req) => {
       console.error('Log error:', logError);
     }
 
-      twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">Connecting you to our sales team.</Say>
-  <Dial timeout="20" action="${supabaseUrl}/functions/v1/voice-status" record="record-from-answer-dual">
-    <Number statusCallback="${supabaseUrl}/functions/v1/voice-status">${SALES_NUMBER}</Number>
-  </Dial>
-  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=no_answer</Redirect>
-</Response>`;
+      twiml = TWIML_TEMPLATES.MENU_ROUTE_SALES(SALES_NUMBER, supabaseUrl, TEMPLATE_CONFIG.default_voice);
 
     } else if (Digits === '2') {
       // Support
@@ -76,14 +70,7 @@ Deno.serve(async (req) => {
         console.error('Log error:', supportLogError);
       }
 
-      twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">Connecting you to technical support.</Say>
-  <Dial timeout="20" action="${supabaseUrl}/functions/v1/voice-status" record="record-from-answer-dual">
-    <Number statusCallback="${supabaseUrl}/functions/v1/voice-status">${SUPPORT_NUMBER}</Number>
-  </Dial>
-  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=no_answer</Redirect>
-</Response>`;
+      twiml = TWIML_TEMPLATES.MENU_ROUTE_SUPPORT(SUPPORT_NUMBER, supabaseUrl, TEMPLATE_CONFIG.default_voice);
 
     } else if (Digits === '9') {
       // Voicemail
@@ -103,23 +90,10 @@ Deno.serve(async (req) => {
       // Invalid input or timeout
       if (retryCount >= 1) {
         // Second failure - go to voicemail
-        twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">We didn't receive your selection. Transferring you to voicemail.</Say>
-  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=menu_timeout</Redirect>
-</Response>`;
+        twiml = TWIML_TEMPLATES.MENU_TIMEOUT_VOICEMAIL(TEMPLATE_CONFIG.default_voice);
       } else {
         // First failure - retry
-        twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Gather action="${supabaseUrl}/functions/v1/voice-menu-handler?retry=1" method="POST" numDigits="1" timeout="5">
-    <Say voice="Polly.Joanna">
-      Invalid selection. Please try again.
-      Press 1 for Sales. Press 2 for Support. Press 9 to leave a voicemail.
-    </Say>
-  </Gather>
-  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=menu_timeout</Redirect>
-</Response>`;
+        twiml = TWIML_TEMPLATES.MENU_INVALID_RETRY(supabaseUrl, 1, TEMPLATE_CONFIG.default_voice);
       }
     }
 
@@ -131,11 +105,7 @@ Deno.serve(async (req) => {
     console.error('Menu handler error:', error);
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">We're sorry, but we're experiencing technical difficulties.</Say>
-  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=error</Redirect>
-</Response>`;
+    const errorTwiml = TWIML_TEMPLATES.MENU_ERROR_RESPONSE(supabaseUrl, TEMPLATE_CONFIG.default_voice);
 
     return new Response(errorTwiml, {
       headers: { ...corsHeaders, 'Content-Type': 'text/xml' },
