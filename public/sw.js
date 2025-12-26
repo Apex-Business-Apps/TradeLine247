@@ -1,145 +1,69 @@
-// Service Worker v6 - Force cache bust for hero button fix
-const SW_VERSION = '6';
-const CACHE_NAME = `app-v${SW_VERSION}`;
-const STATIC_CACHE = `tradeline247-static-v${SW_VERSION}`;
-const API_CACHE = `tradeline247-api-v${SW_VERSION}`;
-
-// Cache configuration for production
-const CACHE_CONFIG = {
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for static assets
-  maxEntries: 100, // Limit cache size
-  networkTimeout: 5000 // 5 seconds network timeout
-};
+// Service Worker v7 - SELF-DESTROYING mode to clear stale caches and recover from blank page
+// This version immediately unregisters itself and clears ALL caches
+// This is a ONE-TIME recovery deployment to fix the React createContext error
+// After users get this version, revert to normal SW in next deployment
+const SW_VERSION = '7-SELF-DESTRUCT';
+const SELF_DESTRUCT_MODE = true; // Set to false in next deployment to restore normal PWA
 
 self.addEventListener("install", (event) => {
-  console.log(`[SW ${SW_VERSION}] Installing...`);
+  console.warn(`[SW ${SW_VERSION}] 🧨 SELF-DESTRUCT MODE - Installing to clear all caches...`);
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => 
-      cache.addAll(['/', '/index.html'])
-    ).then(() => {
-      console.log(`[SW ${SW_VERSION}] Pre-cached core assets`);
-      self.skipWaiting();
+    // Delete ALL caches immediately
+    caches.keys().then((cacheNames) => {
+      console.warn(`[SW ${SW_VERSION}] 🧨 Destroying ${cacheNames.length} caches...`);
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          console.warn(`[SW ${SW_VERSION}] 🧨 Deleting cache: ${cacheName}`);
+          return caches.delete(cacheName);
+        })
+      );
+    }).then(() => {
+      console.warn(`[SW ${SW_VERSION}] 🧨 All caches destroyed. Skipping waiting...`);
+      return self.skipWaiting();
     })
   );
 });
 
 self.addEventListener("activate", (event) => {
-  console.log(`[SW ${SW_VERSION}] Activating...`);
+  console.warn(`[SW ${SW_VERSION}] 🧨 Activating SELF-DESTRUCT sequence...`);
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      const oldCaches = cacheNames.filter((cacheName) => 
-        !cacheName.includes(`v${SW_VERSION}`) &&
-        (cacheName.startsWith('tradeline247') || cacheName.startsWith('app-'))
-      );
-      console.log(`[SW ${SW_VERSION}] Deleting ${oldCaches.length} old caches`);
-      return Promise.all(
-        oldCaches.map((cacheName) => {
-          console.log(`[SW ${SW_VERSION}] Deleting: ${cacheName}`);
-          return caches.delete(cacheName);
-        })
-      );
-    }).then(() => {
-      console.log(`[SW ${SW_VERSION}] Cache cleanup complete, claiming clients`);
-      return self.clients.claim();
-    }).then(() => {
-      console.log(`[SW ${SW_VERSION}] CACHE_VERSION=${SW_VERSION}, clients claimed`);
-      // Notify clients that update is available
-      return self.clients.matchAll().then(clients => {
-        clients.forEach(client => {
-          client.postMessage({ type: 'SW_UPDATED', version: SW_VERSION });
+    // Claim all clients immediately
+    self.clients.claim().then(() => {
+      console.warn(`[SW ${SW_VERSION}] 🧨 Claimed clients. Initiating unregister...`);
+      // Notify all clients that caches are cleared
+      return self.clients.matchAll();
+    }).then(clients => {
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SW_SELF_DESTRUCT',
+          version: SW_VERSION,
+          message: 'All caches cleared. Service worker unregistering. Please reload page.'
         });
       });
+      console.warn(`[SW ${SW_VERSION}] 🧨 Notified ${clients.length} clients`);
+
+      // Unregister this service worker
+      return self.registration.unregister();
+    }).then((unregistered) => {
+      if (unregistered) {
+        console.warn(`[SW ${SW_VERSION}] 🧨 SELF-DESTRUCT COMPLETE - Service worker unregistered successfully`);
+      } else {
+        console.error(`[SW ${SW_VERSION}] ⚠️  Failed to unregister service worker`);
+      }
+    }).catch((error) => {
+      console.error(`[SW ${SW_VERSION}] ⚠️  Self-destruct error:`, error);
     })
   );
 });
 
 self.addEventListener("fetch", (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-
-  // Skip non-GET requests, chrome extensions, and auth callbacks
-  if (
-    request.method !== 'GET' || 
-    url.protocol === 'chrome-extension:' ||
-    url.pathname.includes('/auth/callback')
-  ) {
+  // SELF-DESTRUCT MODE: Pass all requests directly to network, no caching
+  // This ensures users get fresh content immediately after cache wipe
+  if (SELF_DESTRUCT_MODE) {
+    console.warn(`[SW ${SW_VERSION}] 🧨 SELF-DESTRUCT: Bypassing cache for ${event.request.url}`);
+    event.respondWith(fetch(event.request));
     return;
   }
 
-  // Static assets strategy: Cache-first with fallback
-  if (
-    url.pathname.match(/\.(js|css|woff2|png|jpg|jpeg|svg|ico|webp)$/) &&
-    !url.pathname.includes('/functions/')
-  ) {
-    event.respondWith(
-      caches.match(request).then(cached => {
-        if (cached) {
-          // Validate cache age
-          const cacheTime = cached.headers.get('sw-cache-time');
-          if (cacheTime && Date.now() - parseInt(cacheTime) < CACHE_CONFIG.maxAge) {
-            return cached;
-          }
-        }
-
-        // Fetch with timeout
-        return Promise.race([
-          fetch(request).then(response => {
-            if (response.ok && response.status === 200) {
-              const responseToCache = response.clone();
-              const headers = new Headers(responseToCache.headers);
-              headers.set('sw-cache-time', Date.now().toString());
-              
-              const blob = responseToCache.blob();
-              blob.then(b => {
-                const cachedResponse = new Response(b, {
-                  status: responseToCache.status,
-                  statusText: responseToCache.statusText,
-                  headers: headers
-                });
-                
-                caches.open(STATIC_CACHE).then(cache => {
-                  cache.put(request, cachedResponse);
-                });
-              });
-            }
-            return response;
-          }),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Network timeout')), CACHE_CONFIG.networkTimeout)
-          )
-        ]).catch(() => cached || new Response('Offline', { status: 503 }));
-      })
-    );
-    return;
-  }
-
-  // API requests strategy: Network-first with short cache fallback
-  if (url.pathname.includes('/functions/') || url.pathname.includes('/rest/')) {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response.ok && response.status === 200) {
-            const responseToCache = response.clone();
-            caches.open(API_CACHE).then(cache => {
-              cache.put(request, responseToCache);
-              // Limit API cache size
-              cache.keys().then(keys => {
-                if (keys.length > 20) {
-                  cache.delete(keys[0]);
-                }
-              });
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          return caches.match(request).then(cached => 
-            cached || new Response('Offline', { status: 503 })
-          );
-        })
-    );
-    return;
-  }
-
-  // Default: network-only for HTML and other resources
+  // Normal SW behavior would go here (but we're in self-destruct mode)
 });
