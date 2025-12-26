@@ -52,6 +52,9 @@ export default defineConfig(({ mode }: ConfigEnv) => ({
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
+    // CRITICAL: Dedupe React/React-DOM to prevent "Cannot read properties of undefined (reading 'createContext')"
+    // This ensures only ONE instance of React exists in the bundle, even if multiple packages depend on it
+    dedupe: ['react', 'react-dom'],
   },
   build: {
     sourcemap: false, // Disable sourcemaps in production for better performance
