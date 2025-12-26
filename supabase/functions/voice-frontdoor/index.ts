@@ -1,5 +1,7 @@
- 
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
+import { TWIML_TEMPLATES, TEMPLATE_CONFIG } from "../_shared/responseTemplates.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -58,13 +60,9 @@ Deno.serve(async (req) => {
     
     if (!checkRateLimit(from) || !checkRateLimit(clientIp)) {
       console.warn(`Rate limit exceeded: From=${from}, IP=${clientIp}`);
-      
-      const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">We're experiencing high call volume. Please try again later.</Say>
-  <Hangup/>
-</Response>`;
-      
+
+      const twiml = TWIML_TEMPLATES.FRONTDOOR_RATE_LIMIT_RESPONSE(TEMPLATE_CONFIG.default_voice);
+
       return new Response(twiml, {
         headers: { ...corsHeaders, 'Content-Type': 'text/xml' },
         status: 429,
@@ -75,35 +73,22 @@ Deno.serve(async (req) => {
 
     const skipConsent = url.searchParams.get('skip_consent') === 'true';
 
+    // Get business name from voice config (with fallback)
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+    const { data: config } = await supabase.from('voice_config').select('business_name').single();
+    const businessName = config?.business_name || TEMPLATE_CONFIG.default_business_name;
+
     let twiml: string;
 
     if (skipConsent) {
       // Skip to menu directly (for menu repeat)
-      twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Gather action="${supabaseUrl}/functions/v1/voice-menu-handler" method="POST" numDigits="1" timeout="5">
-    <Say voice="Polly.Joanna">
-      Press 1 for Sales. Press 2 for Support. Press 9 to leave a voicemail. Press star to repeat this menu.
-    </Say>
-  </Gather>
-  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=menu_timeout</Redirect>
-</Response>`;
+      twiml = TWIML_TEMPLATES.FRONTDOOR_MENU_ONLY(supabaseUrl, TEMPLATE_CONFIG.default_voice);
     } else {
-      // Canadian consent disclosure + menu
-      twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna" language="en-CA">
-    Thank you for calling TradeLine 24/7.
-    This call may be recorded for quality and training purposes.
-    By staying on the line, you consent to being recorded.
-  </Say>
-  <Gather action="${supabaseUrl}/functions/v1/voice-menu-handler" method="POST" numDigits="1" timeout="5">
-    <Say voice="Polly.Joanna">
-      Press 1 for Sales. Press 2 for Support. Press 9 to leave a voicemail. Press star to repeat this menu.
-    </Say>
-  </Gather>
-  <Redirect method="POST">${supabaseUrl}/functions/v1/voice-voicemail?reason=menu_timeout</Redirect>
-</Response>`;
+      // Canadian consent disclosure + menu with configurable business name
+      twiml = TWIML_TEMPLATES.FRONTDOOR_CONSENT_MENU(businessName, supabaseUrl, TEMPLATE_CONFIG.default_voice);
     }
 
     return new Response(twiml, {
@@ -111,14 +96,10 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('Front door error:', error);
-    
+
     // Generic error TwiML
-    const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">We're sorry, but we're experiencing technical difficulties. Please try again later.</Say>
-  <Hangup/>
-</Response>`;
-    
+    const errorTwiml = TWIML_TEMPLATES.ERROR_RESPONSE(TEMPLATE_CONFIG.default_voice);
+
     return new Response(errorTwiml, {
       headers: { ...corsHeaders, 'Content-Type': 'text/xml' },
       status: 500,
