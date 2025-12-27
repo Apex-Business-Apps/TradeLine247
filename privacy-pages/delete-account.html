@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delete Account - TradeLine 24/7</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Delete your TradeLine 24/7 account and personal data. We respect your privacy and make account deletion simple and transparent.">
+  <meta name="keywords" content="delete account, privacy, data deletion, GDPR, CCPA, TradeLine 24/7">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Delete Account - TradeLine 24/7">
+  <meta property="og:description" content="Request permanent deletion of your TradeLine 24/7 account and all associated data.">
+  <meta property="og:type" content="website">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Critical CSS -->
+  <style>
+    :root {
+      --orange-primary: #E85D2A;
+      --neutral-bg: #F8F9FA;
+      --text-primary: #1A1A1A;
+      --font-display: 'DM Sans', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      background: var(--neutral-bg);
+      color: var(--text-primary);
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--neutral-bg) 0%, #FAFBFC 100%);
+      padding: 3rem 0;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .hero-title { font-size: 3rem; }
+    }
+
+    .hero-subtitle {
+      font-size: 1.125rem;
+      color: #4A4A4A;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="site-header" role="banner">
+    <div class="container">
+      <nav class="header-content">
+        <a href="/" class="logo" aria-label="TradeLine 24/7 Home">
+          <span class="logo-accent">TradeLine</span> 24/7
+        </a>
+
+        <ul class="nav-links" role="navigation" aria-label="Main navigation">
+          <li><a href="/">Home</a></li>
+          <li><a href="/privacy-policy">Privacy Policy</a></li>
+          <li><a href="/delete-account" aria-current="page">Delete Account</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+
+        <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">Account Deletion</h1>
+      <p class="hero-subtitle">Your data. Your choice. Always.</p>
+      <div class="breadcrumb">
+        <a href="/">Home</a> / <a href="/privacy-policy">Privacy Policy</a> / Delete Account
+      </div>
+    </div>
+  </section>
+
+  <!-- Warning Card -->
+  <section class="warning-section">
+    <div class="container">
+      <div class="warning-card">
+        <div class="warning-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <div class="warning-content">
+          <h3>This Action is Permanent</h3>
+          <p>Once you delete your account, the following data will be permanently removed:</p>
+          <ul>
+            <li>Your account credentials and login information</li>
+            <li>All personal details (name, email, phone, company)</li>
+            <li>Call history and conversation transcripts</li>
+            <li>AI training data derived from your interactions</li>
+            <li>Account preferences and settings</li>
+          </ul>
+          <p><strong>This cannot be undone.</strong> However, you have a 30-day grace period to reactivate your account.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content" id="main-content">
+    <div class="container">
+      <div class="content-layout">
+        <!-- Deletion Form -->
+        <div class="form-section">
+          <h2>Request Account Deletion</h2>
+          <p>Fill out this form to initiate the permanent deletion of your TradeLine 24/7 account. We'll send a confirmation email to verify your request.</p>
+
+          <form id="delete-account-form" action="/api/delete-account" method="POST">
+            <div class="form-group">
+              <label for="email" class="form-label">Email Address *</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder="your.email@example.com"
+                required
+                aria-describedby="email-help"
+              >
+              <small id="email-help" class="form-help">We'll send a verification link to this email address</small>
+            </div>
+
+            <div class="form-group">
+              <label for="reason" class="form-label">Reason for Deletion (Optional)</label>
+              <select id="reason" name="reason" class="form-input">
+                <option value="">Please select...</option>
+                <option value="no-longer-needed">No longer needed</option>
+                <option value="switching-service">Switching to another service</option>
+                <option value="privacy-concerns">Privacy concerns</option>
+                <option value="cost">Cost related</option>
+                <option value="technical-issues">Technical issues</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="additional-comments" class="form-label">Additional Comments (Optional)</label>
+              <textarea
+                id="additional-comments"
+                name="comments"
+                class="form-input form-textarea"
+                placeholder="Any feedback or additional information..."
+                rows="4"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <fieldset>
+                <legend class="form-label">Confirm Deletion *</legend>
+
+                <div class="checkbox-group">
+                  <input
+                    type="checkbox"
+                    id="understand-permanent"
+                    name="understand-permanent"
+                    class="checkbox-input"
+                    required
+                  >
+                  <label for="understand-permanent" class="checkbox-label">
+                    I understand that this deletion is <strong>permanent</strong> and cannot be undone after 30 days.
+                  </label>
+                </div>
+
+                <div class="checkbox-group">
+                  <input
+                    type="checkbox"
+                    id="reviewed-alternatives"
+                    name="reviewed-alternatives"
+                    class="checkbox-input"
+                    required
+                  >
+                  <label for="reviewed-alternatives" class="checkbox-label">
+                    I have reviewed the <a href="#alternatives" class="highlight-link">alternative options</a> below.
+                  </label>
+                </div>
+
+                <div class="checkbox-group">
+                  <input
+                    type="checkbox"
+                    id="ready-to-delete"
+                    name="ready-to-delete"
+                    class="checkbox-input"
+                    required
+                  >
+                  <label for="ready-to-delete" class="checkbox-label">
+                    I am ready to proceed with account deletion.
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+              <button type="submit" class="btn btn-danger" disabled>
+                Delete My Account
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Process Timeline -->
+        <section class="process-section">
+          <h2>What Happens Next</h2>
+          <p>Here's what to expect after you submit your deletion request:</p>
+
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot">📧</div>
+              <div class="timeline-content">
+                <h4>Step 1: Email Verification</h4>
+                <p><strong>Timeframe:</strong> Within 5 minutes</p>
+                <p>We'll send a verification link to your email address. Click the link to confirm your deletion request.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot">⏳</div>
+              <div class="timeline-content">
+                <h4>Step 2: 30-Day Grace Period</h4>
+                <p><strong>Timeframe:</strong> 30 days from verification</p>
+                <p>Your account will be marked for deletion but you can reactivate it anytime by logging in.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot">🗑️</div>
+              <div class="timeline-content">
+                <h4>Step 3: Permanent Deletion</h4>
+                <p><strong>Timeframe:</strong> After 30 days</p>
+                <p>All your personal data is permanently deleted from our systems.</p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-dot">✅</div>
+              <div class="timeline-content">
+                <h4>Step 4: Confirmation</h4>
+                <p><strong>Timeframe:</strong> Within 48 hours of permanent deletion</p>
+                <p>You'll receive a final confirmation email that your account has been deleted.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Alternative Options -->
+        <section id="alternatives" class="alternatives-section">
+          <h2>Alternative Options</h2>
+          <p>Before deleting your account permanently, consider these less drastic alternatives:</p>
+
+          <div class="alternatives-grid">
+            <div class="alternative-card">
+              <div class="alternative-icon">⏸️</div>
+              <h4>Pause Account</h4>
+              <p>Temporarily disable your account while retaining all data. Perfect if you're taking a break.</p>
+              <ul>
+                <li>Data stays safe and accessible</li>
+                <li>No billing during pause</li>
+                <li>Reactivate anytime</li>
+              </ul>
+              <a href="/account/settings" class="btn btn-secondary">Pause Account</a>
+            </div>
+
+            <div class="alternative-card">
+              <div class="alternative-icon">📤</div>
+              <h4>Export Your Data</h4>
+              <p>Download a complete copy of your data before making any decisions.</p>
+              <ul>
+                <li>All personal information</li>
+                <li>Call history and transcripts</li>
+                <li>Account settings and preferences</li>
+              </ul>
+              <a href="/data-export" class="btn btn-secondary">Export Data</a>
+            </div>
+
+            <div class="alternative-card">
+              <div class="alternative-icon">🔕</div>
+              <h4>Disable Notifications</h4>
+              <p>Keep your account active but stop receiving emails and alerts.</p>
+              <ul>
+                <li>Account remains functional</li>
+                <li>No email notifications</li>
+                <li>Easy to re-enable</li>
+              </ul>
+              <a href="/account/notifications" class="btn btn-secondary">Manage Notifications</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="faq-section">
+          <h2>Frequently Asked Questions</h2>
+
+          <div class="accordion-item">
+            <button class="accordion-header" aria-expanded="false">
+              <span>Can I reactivate my account after requesting deletion?</span>
+              <span class="accordion-toggle" aria-hidden="true">▼</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <p>Yes! You have a 30-day grace period after verification. Simply log in to your account during this time to reactivate it. After 30 days, the deletion becomes permanent and cannot be reversed.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" aria-expanded="false">
+              <span>How long does the deletion process take?</span>
+              <span class="accordion-toggle" aria-hidden="true">▼</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <p>The process takes up to 30 days from the time you verify your request:</p>
+                <ul>
+                  <li>Email verification: Within 5 minutes</li>
+                  <li>Grace period: 30 days</li>
+                  <li>Permanent deletion: Within 48 hours after grace period</li>
+                  <li>Confirmation email: Within 48 hours of deletion</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" aria-expanded="false">
+              <span>What happens to my call data and transcripts?</span>
+              <span class="accordion-toggle" aria-hidden="true">▼</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <p>All call transcripts and conversation data associated with your account will be permanently deleted. However:</p>
+                <ul>
+                  <li>Anonymous usage statistics may be retained for service improvement</li>
+                  <li>Data used to train our AI models is permanently anonymized</li>
+                  <li>No personal identifiers are kept in analytics data</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" aria-expanded="false">
+              <span>Will I lose access to my billing history?</span>
+              <span class="accordion-toggle" aria-hidden="true">▼</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <p>Transaction records required for tax compliance will be retained for 7 years as required by law. This includes:</p>
+                <ul>
+                  <li>Invoice dates and amounts</li>
+                  <li>Tax identification information</li>
+                  <li>Basic transaction details</li>
+                </ul>
+                <p>However, payment methods, full billing addresses, and personal account details are deleted immediately.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-header" aria-expanded="false">
+              <span>Can I use the same email address for a new account?</span>
+              <span class="accordion-toggle" aria-hidden="true">▼</span>
+            </button>
+            <div class="accordion-content">
+              <div class="accordion-body">
+                <p>Yes, after your account is permanently deleted, the email address becomes available for new account registration. However, we recommend waiting until you receive the final confirmation email to ensure all data has been completely removed from our systems.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>TradeLine 24/7</h4>
+          <p>Your privacy matters to us. We're committed to transparency and control over your data.</p>
+        </div>
+
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms of Service</a></li>
+            <li><a href="/contact">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Need Help?</h4>
+          <ul class="footer-links">
+            <li><a href="mailto:privacy@tradeline247ai.com">Privacy Questions</a></li>
+            <li><a href="mailto:support@tradeline247ai.com">Technical Support</a></li>
+            <li><a href="/faq">Frequently Asked Questions</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2024 APEX Business Systems (2755419 Alberta Ltd.). All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Load styles and scripts -->
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</body>
+</html>
