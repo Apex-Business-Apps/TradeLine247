@@ -1,6 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import Twilio from 'npm:twilio';
 
 const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
 const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
@@ -62,32 +61,63 @@ serve(async (req) => {
     const tenantId = `client-${userId.substring(0, 8)}`;
 
     // 5. Create Twilio subaccount
-    const twilioClient = new Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-
-    const subaccount = await twilioClient.api.accounts.create({
-      friendlyName: `TradeLine-${tenantId}`
-    });
+    const subaccountResponse = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          FriendlyName: `TradeLine-${tenantId}`
+        })
+      }
+    );
+    const subaccount = await subaccountResponse.json();
 
     // 6. Purchase phone number (local to user's location)
-    const availableNumbers = await twilioClient
-      .availablePhoneNumbers(userLocation || 'US')
-      .local
-      .list({ limit: 1 });
+    const availableNumbersResponse = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/AvailablePhoneNumbers/${userLocation || 'US'}/Local.json?Limit=1`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`
+        }
+      }
+    );
+    const { available_phone_numbers } = await availableNumbersResponse.json();
 
-    if (availableNumbers.length === 0) {
+    if (available_phone_numbers.length === 0) {
       // Rollback: Delete subaccount
-      await twilioClient.api.accounts(subaccount.sid).remove();
+      await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${subaccount.sid}.json`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`
+          }
+        }
+      );
       throw new Error('No available phone numbers in your area');
     }
 
-    const purchasedNumber = await twilioClient
-      .incomingPhoneNumbers
-      .create({
-        phoneNumber: availableNumbers[0].phoneNumber,
-        voiceUrl: `${Deno.env.get('API_BASE_URL')}/webhooks/voice/${tenantId}`,
-        smsUrl: `${Deno.env.get('API_BASE_URL')}/webhooks/sms/${tenantId}`,
-        accountSid: subaccount.sid
-      });
+    const purchaseResponse = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${subaccount.sid}/IncomingPhoneNumbers.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${btoa(`${subaccount.sid}:${subaccount.auth_token}`)}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          PhoneNumber: available_phone_numbers[0].phone_number,
+          VoiceUrl: `${Deno.env.get('API_BASE_URL')}/webhooks/voice/${tenantId}`,
+          SmsUrl: `${Deno.env.get('API_BASE_URL')}/webhooks/sms/${tenantId}`
+        })
+      }
+    );
+    const purchasedNumber = await purchaseResponse.json();
 
     // 7. Store in database
     const { data: newClient, error: dbError } = await supabase
@@ -98,23 +128,39 @@ serve(async (req) => {
         business_name: `Client ${userId.substring(0, 8)}`, // Auto-generated, can update later
         contact_email: userEmail,
         twilio_account_sid: subaccount.sid,
-        twilio_auth_token: subaccount.authToken, // Will be encrypted by Supabase
-        phone_number: purchasedNumber.phoneNumber
+        twilio_auth_token: subaccount.auth_token, // Will be encrypted by Supabase
+        phone_number: purchasedNumber.phone_number
       })
       .select()
       .single();
 
     if (dbError) {
       // Rollback: Delete Twilio resources
-      await twilioClient.incomingPhoneNumbers(purchasedNumber.sid).remove();
-      await twilioClient.api.accounts(subaccount.sid).remove();
+      await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${subaccount.sid}/IncomingPhoneNumbers/${purchasedNumber.sid}.json`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Basic ${btoa(`${subaccount.sid}:${subaccount.auth_token}`)}`
+          }
+        }
+      );
+      await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${subaccount.sid}.json`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`
+          }
+        }
+      );
       throw dbError;
     }
 
     // 8. Return success
     return new Response(
       JSON.stringify({
-        phoneNumber: purchasedNumber.phoneNumber,
+        phoneNumber: purchasedNumber.phone_number,
         twilioAccountSid: subaccount.sid,
         tenantId
       }),
