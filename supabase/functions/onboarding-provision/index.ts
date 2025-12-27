@@ -3,19 +3,44 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
 const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
-const TWILIO_MASTER_SUBACCOUNT_SID = Deno.env.get('TWILIO_MASTER_SUBACCOUNT_SID');
+
+// Twilio REST API helper
+const callTwilioAPI = async (
+  endpoint: string,
+  method: string,
+  accountSid: string,
+  authToken: string,
+  body?: Record<string, string>
+) => {
+  const url = `https://api.twilio.com/2010-04-01${endpoint}`;
+  const auth = btoa(`${accountSid}:${authToken}`);
+
+  const options: RequestInit = {
+    method,
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  };
+
+  if (body && method === 'POST') {
+    options.body = new URLSearchParams(body).toString();
+  }
+
+  const response = await fetch(url, options);
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Twilio API error: ${error}`);
+  }
+
+  return response.json();
+};
 
 serve(async (req) => {
   try {
-    // 1. Verify user authentication
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
+    // 1. Verify authentication
+    const authHeader = req.headers.get('Authorization')!;
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_ANON_KEY')!,
@@ -24,23 +49,13 @@ serve(async (req) => {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    // 2. Parse request body
+    // 2. Parse request
     const { userId, userEmail, userLocation } = await req.json();
 
-    if (!userId || !userEmail) {
-      return new Response(JSON.stringify({ error: 'Missing required fields: userId, userEmail' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // 3. Check if user already has a client record
+    // 3. Check existing client
     const { data: existingClient } = await supabase
       .from('clients')
       .select('*')
@@ -53,7 +68,7 @@ serve(async (req) => {
           error: 'Client already exists',
           phoneNumber: existingClient.phone_number
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400 }
       );
     }
 
@@ -61,126 +76,92 @@ serve(async (req) => {
     const tenantId = `client-${userId.substring(0, 8)}`;
 
     // 5. Create Twilio subaccount
-    const subaccountResponse = await fetch(
-      `https://api.twilio.com/2010-04-01/Accounts.json`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          FriendlyName: `TradeLine-${tenantId}`
-        })
-      }
+    const subaccount = await callTwilioAPI(
+      '/Accounts.json',
+      'POST',
+      TWILIO_ACCOUNT_SID!,
+      TWILIO_AUTH_TOKEN!,
+      { FriendlyName: `TradeLine-${tenantId}` }
     );
-    const subaccount = await subaccountResponse.json();
 
-    // 6. Purchase phone number (local to user's location)
-    const availableNumbersResponse = await fetch(
-      `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/AvailablePhoneNumbers/${userLocation || 'US'}/Local.json?Limit=1`,
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`
-        }
-      }
+    // 6. Find available numbers
+    const availableNumbersResponse = await callTwilioAPI(
+      `/Accounts/${TWILIO_ACCOUNT_SID}/AvailablePhoneNumbers/${userLocation || 'US'}/Local.json?Limit=1`,
+      'GET',
+      TWILIO_ACCOUNT_SID!,
+      TWILIO_AUTH_TOKEN!
     );
-    const { available_phone_numbers } = await availableNumbersResponse.json();
 
-    if (available_phone_numbers.length === 0) {
-      // Rollback: Delete subaccount
-      await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${subaccount.sid}.json`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`
-          }
-        }
-      );
+    if (!availableNumbersResponse.available_phone_numbers || availableNumbersResponse.available_phone_numbers.length === 0) {
       throw new Error('No available phone numbers in your area');
     }
 
-    const purchaseResponse = await fetch(
-      `https://api.twilio.com/2010-04-01/Accounts/${subaccount.sid}/IncomingPhoneNumbers.json`,
+    const availableNumber = availableNumbersResponse.available_phone_numbers[0];
+
+    // 7. Purchase number
+    const purchasedNumber = await callTwilioAPI(
+      `/Accounts/${subaccount.sid}/IncomingPhoneNumbers.json`,
+      'POST',
+      subaccount.sid,
+      subaccount.auth_token,
       {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${btoa(`${subaccount.sid}:${subaccount.auth_token}`)}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          PhoneNumber: available_phone_numbers[0].phone_number,
-          VoiceUrl: `${Deno.env.get('API_BASE_URL')}/webhooks/voice/${tenantId}`,
-          SmsUrl: `${Deno.env.get('API_BASE_URL')}/webhooks/sms/${tenantId}`
-        })
+        PhoneNumber: availableNumber.phone_number,
+        VoiceUrl: `${Deno.env.get('API_BASE_URL')}/webhooks/voice/${tenantId}`,
+        SmsUrl: `${Deno.env.get('API_BASE_URL')}/webhooks/sms/${tenantId}`
       }
     );
-    const purchasedNumber = await purchaseResponse.json();
 
-    // 7. Store in database
+    // 8. Store in database
     const { data: newClient, error: dbError } = await supabase
       .from('clients')
       .insert({
         user_id: userId,
         tenant_id: tenantId,
-        business_name: `Client ${userId.substring(0, 8)}`, // Auto-generated, can update later
+        business_name: `Client ${userId.substring(0, 8)}`,
         contact_email: userEmail,
         twilio_account_sid: subaccount.sid,
-        twilio_auth_token: subaccount.auth_token, // Will be encrypted by Supabase
+        twilio_auth_token: subaccount.auth_token,
         phone_number: purchasedNumber.phone_number
       })
       .select()
       .single();
 
     if (dbError) {
-      // Rollback: Delete Twilio resources
-      await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${subaccount.sid}/IncomingPhoneNumbers/${purchasedNumber.sid}.json`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Basic ${btoa(`${subaccount.sid}:${subaccount.auth_token}`)}`
-          }
-        }
-      );
-      await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${subaccount.sid}.json`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`
-          }
-        }
-      );
+      // Rollback Twilio resources
+      try {
+        await callTwilioAPI(
+          `/Accounts/${subaccount.sid}/IncomingPhoneNumbers/${purchasedNumber.sid}.json`,
+          'DELETE',
+          subaccount.sid,
+          subaccount.auth_token
+        );
+        await callTwilioAPI(
+          `/Accounts/${subaccount.sid}.json`,
+          'DELETE',
+          TWILIO_ACCOUNT_SID!,
+          TWILIO_AUTH_TOKEN!
+        );
+      } catch (rollbackError) {
+        console.error('Rollback failed:', rollbackError);
+      }
       throw dbError;
     }
 
-    // 8. Return success
+    // 9. Return success
     return new Response(
       JSON.stringify({
         phoneNumber: purchasedNumber.phone_number,
         twilioAccountSid: subaccount.sid,
         tenantId
       }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      }
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Provisioning error:', error);
     return new Response(
-      JSON.stringify({
-        error: error.message || 'Provisioning failed',
-        details: error.stack
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ error: error.message || 'Provisioning failed' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
 });
