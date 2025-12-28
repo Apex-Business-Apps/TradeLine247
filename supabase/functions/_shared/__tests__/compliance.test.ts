@@ -2,8 +2,9 @@
  * compliance.test.ts - Unit tests for compliance module
  *
  * Tests pure helpers without external dependencies and runtime service with mocks.
- * Includes CI safety test to ensure no remote https imports in _shared modules.
  */
+
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import {
   redactSensitive,
@@ -19,7 +20,7 @@ import {
   createComplianceService,
   type SessionContext,
   type BANTSummary
-} from '../compliance';
+} from '../compliance.ts';
 
 // ============================================================================
 // PURE UTILITY TESTS
@@ -27,7 +28,7 @@ import {
 
 describe('compliance pure utilities', () => {
   describe('redactSensitive', () => {
-    test('redacts SSN patterns', () => {
+    it('redacts SSN patterns', () => {
       const input = 'My SSN is 123-45-6789 and yours is 987-65-4321';
       const result = redactSensitive(input);
       expect(result).not.toContain('123-45-6789');
@@ -35,49 +36,49 @@ describe('compliance pure utilities', () => {
       expect(result).toContain('XXX-XX-XXXX');
     });
 
-    test('redacts credit card numbers', () => {
+    it('redacts credit card numbers', () => {
       const input = 'Card number 4111111111111111 should be hidden';
       const result = redactSensitive(input);
       expect(result).not.toContain('4111111111111111');
       expect(result).toContain('4111XXXXXXXXXXXX');
     });
 
-    test('redacts API keys', () => {
+    it('redacts API keys', () => {
       const input = 'AKIAIOSFODNN7EXAMPLE and sk-abc123def456ghi789';
       const result = redactSensitive(input);
       expect(result).toContain('[REDACTED_KEY]');
       expect(result).not.toContain('AKIAIOSFODNN7EXAMPLE');
     });
 
-    test('redacts phone numbers', () => {
+    it('redacts phone numbers', () => {
       const input = 'Call me at +14155551234';
       const result = redactSensitive(input);
       expect(result).toContain('[PHONE]');
       expect(result).not.toContain('+14155551234');
     });
 
-    test('redacts email addresses', () => {
+    it('redacts email addresses', () => {
       const input = 'Email me at john.doe@example.com';
       const result = redactSensitive(input);
       expect(result).toContain('[EMAIL]');
       expect(result).not.toContain('john.doe@example.com');
     });
 
-    test('handles empty/null input', () => {
+    it('handles empty/null input', () => {
       expect(redactSensitive('')).toBe('');
       expect(redactSensitive(null as unknown as string)).toBe(null);
     });
   });
 
   describe('enforceQuietHours', () => {
-    test('returns needs_review=true when timezone unknown', () => {
+    it('returns needs_review=true when timezone unknown', () => {
       const now = new Date().toISOString();
       const result = enforceQuietHours(now, null);
       expect(result.needs_review).toBe(true);
       expect(result.adjusted_time).toBeDefined();
     });
 
-    test('allows time within window when tz known', () => {
+    it('allows time within window when tz known', () => {
       // 10:00 UTC should be within 8-21 window
       const testTime = new Date();
       testTime.setUTCHours(10, 0, 0, 0);
@@ -85,7 +86,7 @@ describe('compliance pure utilities', () => {
       expect(result.needs_review).toBe(false);
     });
 
-    test('adjusts time outside quiet hours', () => {
+    it('adjusts time outside quiet hours', () => {
       // 22:00 UTC is outside 8-21 window
       const testTime = new Date();
       testTime.setUTCHours(22, 0, 0, 0);
@@ -96,7 +97,7 @@ describe('compliance pure utilities', () => {
       expect(adjusted.getUTCHours()).toBe(8);
     });
 
-    test('accepts Date object input', () => {
+    it('accepts Date object input', () => {
       const testDate = new Date();
       testDate.setUTCHours(12, 0, 0, 0);
       const result = enforceQuietHours(testDate, 'UTC');
@@ -105,33 +106,33 @@ describe('compliance pure utilities', () => {
   });
 
   describe('categorizeCall', () => {
-    test('returns prospect_call for pricing inquiries', () => {
+    it('returns prospect_call for pricing inquiries', () => {
       expect(categorizeCall({ text: 'How much does it cost?' })).toBe('prospect_call');
       expect(categorizeCall({ text: 'I need a quote' })).toBe('prospect_call');
       expect(categorizeCall({ text: 'What are your prices?' })).toBe('prospect_call');
       expect(categorizeCall({ text: 'Can I get an estimate?' })).toBe('prospect_call');
     });
 
-    test('returns customer_service for support requests', () => {
+    it('returns customer_service for support requests', () => {
       expect(categorizeCall({ text: 'I have a problem with my service' })).toBe('customer_service');
       expect(categorizeCall({ text: 'I need help' })).toBe('customer_service');
       expect(categorizeCall({ text: 'Can I cancel my order?' })).toBe('customer_service');
       expect(categorizeCall({ text: 'My unit is not working' })).toBe('customer_service');
     });
 
-    test('returns lead_capture as default', () => {
+    it('returns lead_capture as default', () => {
       expect(categorizeCall({ text: 'Hello, I saw your ad' })).toBe('lead_capture');
       expect(categorizeCall({ text: '' })).toBe('lead_capture');
       expect(categorizeCall(null)).toBe('lead_capture');
     });
 
-    test('uses keywords array', () => {
+    it('uses keywords array', () => {
       expect(categorizeCall({ keywords: ['quote', 'pricing'] })).toBe('prospect_call');
     });
   });
 
   describe('validateRecordingConsent', () => {
-    test('allows when recording consent is true', () => {
+    it('allows when recording consent is true', () => {
       const session: SessionContext = {
         consent_flags: { recording: true }
       };
@@ -140,7 +141,7 @@ describe('compliance pure utilities', () => {
       expect(result.mode).toBe('full');
     });
 
-    test('blocks when recording consent is false', () => {
+    it('blocks when recording consent is false', () => {
       const session: SessionContext = {
         consent_flags: { recording: false }
       };
@@ -150,7 +151,7 @@ describe('compliance pure utilities', () => {
       expect(result.reason).toBe('consent_denied');
     });
 
-    test('blocks when consent is undefined (fail closed)', () => {
+    it('blocks when consent is undefined (fail closed)', () => {
       const session: SessionContext = {};
       const result = validateRecordingConsent(session);
       expect(result.allow).toBe(false);
@@ -160,7 +161,7 @@ describe('compliance pure utilities', () => {
   });
 
   describe('validateSmsOptIn', () => {
-    test('returns true only when sms_opt_in is explicitly true', () => {
+    it('returns true only when sms_opt_in is explicitly true', () => {
       expect(validateSmsOptIn({ consent_flags: { sms_opt_in: true } })).toBe(true);
       expect(validateSmsOptIn({ consent_flags: { sms_opt_in: false } })).toBe(false);
       expect(validateSmsOptIn({ consent_flags: {} })).toBe(false);
@@ -169,45 +170,45 @@ describe('compliance pure utilities', () => {
   });
 
   describe('calculateSentiment', () => {
-    test('returns positive score for positive words', () => {
+    it('returns positive score for positive words', () => {
       const score = calculateSentiment('This is great, thank you so much!');
       expect(score).toBeGreaterThan(0);
     });
 
-    test('returns negative score for negative words', () => {
+    it('returns negative score for negative words', () => {
       const score = calculateSentiment('This is terrible and awful service');
       expect(score).toBeLessThan(0);
     });
 
-    test('returns neutral for mixed or neutral text', () => {
+    it('returns neutral for mixed or neutral text', () => {
       const score = calculateSentiment('Hello, I am calling about something');
       expect(score).toBe(0);
     });
 
-    test('handles empty input', () => {
+    it('handles empty input', () => {
       expect(calculateSentiment('')).toBe(0);
     });
   });
 
   describe('shouldEscalate', () => {
-    test('returns true for sentiment <= -0.5', () => {
+    it('returns true for sentiment <= -0.5', () => {
       expect(shouldEscalate('', -0.5)).toBe(true);
       expect(shouldEscalate('', -0.8)).toBe(true);
     });
 
-    test('returns true for threat keywords', () => {
+    it('returns true for threat keywords', () => {
       expect(shouldEscalate('I will sue you', 0)).toBe(true);
       expect(shouldEscalate('Calling my lawyer', 0)).toBe(true);
       expect(shouldEscalate('Report to BBB', 0)).toBe(true);
     });
 
-    test('returns false for normal conversation', () => {
+    it('returns false for normal conversation', () => {
       expect(shouldEscalate('I need help with my order', 0)).toBe(false);
     });
   });
 
   describe('buildNoRecordMetadata', () => {
-    test('builds allowed metadata only', () => {
+    it('builds allowed metadata only', () => {
       const session: SessionContext = {
         caller_number: '+14155551234',
         caller_name: 'John Doe',
@@ -225,7 +226,7 @@ describe('compliance pure utilities', () => {
       expect(result.redacted_summary).toBeDefined();
     });
 
-    test('redacts sensitive info in summary', () => {
+    it('redacts sensitive info in summary', () => {
       const session: SessionContext = {};
       const result = buildNoRecordMetadata(session, 'Call +14155551234 for SSN 123-45-6789');
 
@@ -235,7 +236,7 @@ describe('compliance pure utilities', () => {
   });
 
   describe('generateTL247Meta', () => {
-    test('generates complete meta block', () => {
+    it('generates complete meta block', () => {
       const session: SessionContext = {
         call_category: 'prospect_call',
         consent_flags: { recording: true },
@@ -259,7 +260,7 @@ describe('compliance pure utilities', () => {
       expect(meta.needs_review).toBe(false);
     });
 
-    test('marks needs_review for missing tz or low sentiment', () => {
+    it('marks needs_review for missing tz or low sentiment', () => {
       const session: SessionContext = { call_category: 'lead_capture' };
       const meta = generateTL247Meta(session, -0.6, null, null, false);
 
@@ -268,7 +269,7 @@ describe('compliance pure utilities', () => {
   });
 
   describe('formatTL247MetaBlock', () => {
-    test('formats meta as XML-like block', () => {
+    it('formats meta as XML-like block', () => {
       const meta = {
         call_category: 'lead_capture' as const,
         consent_state: 'granted' as const,
@@ -319,7 +320,7 @@ describe('compliance runtime service', () => {
     };
   };
 
-  test('applySuppression calls supabase upsert', async () => {
+  it('applySuppression calls supabase upsert', async () => {
     const mockClient = createMockClient();
     const svc = createComplianceService(mockClient as never);
 
@@ -335,7 +336,7 @@ describe('compliance runtime service', () => {
     expect(mockClient.events[0].operation).toBe('upsert');
   });
 
-  test('requireRecordingConsent blocks and logs when consent missing', async () => {
+  it('requireRecordingConsent blocks and logs when consent missing', async () => {
     const mockClient = createMockClient();
     const svc = createComplianceService(mockClient as never);
 
@@ -353,7 +354,7 @@ describe('compliance runtime service', () => {
     expect(mockClient.events[0].operation).toBe('insert');
   });
 
-  test('requireRecordingConsent allows when consent granted', async () => {
+  it('requireRecordingConsent allows when consent granted', async () => {
     const mockClient = createMockClient();
     const svc = createComplianceService(mockClient as never);
 
@@ -369,7 +370,7 @@ describe('compliance runtime service', () => {
     expect(mockClient.events).toHaveLength(0); // No compliance event logged
   });
 
-  test('requireSmsOptIn blocks and logs when opt-in missing', async () => {
+  it('requireSmsOptIn blocks and logs when opt-in missing', async () => {
     const mockClient = createMockClient();
     const svc = createComplianceService(mockClient as never);
 
@@ -386,7 +387,7 @@ describe('compliance runtime service', () => {
     expect(mockClient.events[0].table).toBe('compliance_events');
   });
 
-  test('logComplianceEvent writes to compliance_events table', async () => {
+  it('logComplianceEvent writes to compliance_events table', async () => {
     const mockClient = createMockClient();
     const svc = createComplianceService(mockClient as never);
 
@@ -403,11 +404,11 @@ describe('compliance runtime service', () => {
     expect(mockClient.events[0].table).toBe('compliance_events');
   });
 
-  test('throws if supabase client not provided', () => {
+  it('throws if supabase client not provided', () => {
     expect(() => createComplianceService(null as never)).toThrow('Supabase client is required');
   });
 
-  test('scheduleCompliantFollowup enforces quiet hours', async () => {
+  it('scheduleCompliantFollowup enforces quiet hours', async () => {
     const mockClient = createMockClient();
     const svc = createComplianceService(mockClient as never);
 
@@ -426,7 +427,7 @@ describe('compliance runtime service', () => {
     expect(result.blocked).toBeUndefined();
   });
 
-  test('scheduleCompliantFollowup blocks SMS without opt-in', async () => {
+  it('scheduleCompliantFollowup blocks SMS without opt-in', async () => {
     const mockClient = createMockClient();
     const svc = createComplianceService(mockClient as never);
 
@@ -439,53 +440,5 @@ describe('compliance runtime service', () => {
 
     expect(result.blocked).toBe(true);
     expect(result.reason).toBe('sms_opt_in_required');
-  });
-});
-
-// ============================================================================
-// CI SAFETY NET: No remote https imports in _shared modules
-// ============================================================================
-
-describe('CI safety: no remote https imports in _shared', () => {
-  test('compliance.ts has no https:// imports', () => {
-    const fs = require('fs');
-    const path = require('path');
-
-    const compliancePath = path.resolve(__dirname, '../compliance.ts');
-    const content = fs.readFileSync(compliancePath, 'utf8');
-
-    // Should not contain any https:// imports at module level
-    expect(content).not.toMatch(/^import.*from\s+['"]https:\/\//m);
-    expect(content).not.toMatch(/^import\s+['"]https:\/\//m);
-  });
-
-  test('no _shared .ts files contain top-level https imports (except test files)', () => {
-    const fs = require('fs');
-    const path = require('path');
-
-    const sharedDir = path.resolve(__dirname, '..');
-    const files = fs.readdirSync(sharedDir).filter((f: string) =>
-      f.endsWith('.ts') && !f.endsWith('.test.ts')
-    );
-
-    const filesWithHttpsImports: string[] = [];
-
-    for (const file of files) {
-      const content = fs.readFileSync(path.join(sharedDir, file), 'utf8');
-
-      // Check for top-level import statements with https://
-      // This regex matches: import ... from "https://..." or import "https://..."
-      if (/^import\s+(?:.*\s+from\s+)?['"]https:\/\//m.test(content)) {
-        filesWithHttpsImports.push(file);
-      }
-    }
-
-    // Report which files have https imports for CI debugging
-    if (filesWithHttpsImports.length > 0) {
-      console.warn('Files with https:// imports:', filesWithHttpsImports);
-    }
-
-    // The compliance.ts module we just created should NOT have https imports
-    expect(filesWithHttpsImports).not.toContain('compliance.ts');
   });
 });

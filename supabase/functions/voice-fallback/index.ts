@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
     const from = params['From'] || 'unknown';
     const to = params['To'] || 'unknown';
 
-    const internalNumbers = buildInternalNumberSet(Deno.env as Record<string, string | undefined>);
+    const internalNumbers = buildInternalNumberSet(Deno.env.toObject() as Record<string, string | undefined>);
     const internalCaller = isInternalCaller(from, internalNumbers);
 
     let twiml: string;

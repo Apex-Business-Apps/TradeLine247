@@ -125,8 +125,9 @@ Deno.serve(async (req) => {
         .select('organization:organizations(name)')
         .eq('call_sid', payload.callSid)
         .single();
-      if (callLog?.organization?.name) {
-        orgName = callLog.organization.name;
+      const org = callLog?.organization as { name?: string } | null;
+      if (org?.name) {
+        orgName = org.name;
       }
     }
 

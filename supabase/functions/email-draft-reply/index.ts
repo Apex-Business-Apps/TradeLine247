@@ -75,6 +75,7 @@ Deno.serve(async (req) => {
     const draftReply = await generateDraftReply(email, threadEmails || [], relevantChunks || [], user_intent);
 
     // Store the draft
+    interface ChunkResult { id?: string; email_id?: string; chunk_index?: number; similarity?: number; }
     const { data: aiOutput, error: outputError } = await supabase
       .from('email_ai_outputs')
       .insert({
@@ -83,7 +84,7 @@ Deno.serve(async (req) => {
         email_id: email.id,
         type: 'draft_reply',
         content: draftReply,
-        sources: relevantChunks?.map(c => ({ chunk_id: c.id, similarity: c.similarity })) || [],
+        sources: relevantChunks?.map((c: ChunkResult) => ({ chunk_id: c.id, similarity: c.similarity })) || [],
         model_info: { model: 'gpt-4', provider: 'openai', intent: user_intent }
       })
       .select()
@@ -104,7 +105,7 @@ Deno.serve(async (req) => {
         draft_length: draftReply.length,
         chunks_used: relevantChunks?.length || 0
       },
-      sources_used: relevantChunks?.map(c => ({ email_id: c.email_id, chunk_index: c.chunk_index })) || []
+      sources_used: relevantChunks?.map((c: ChunkResult) => ({ email_id: c.email_id, chunk_index: c.chunk_index })) || []
     });
 
     return new Response(
@@ -120,7 +121,8 @@ Deno.serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     console.error('Email draft reply failed:', error);
 
     return new Response(

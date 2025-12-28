@@ -251,7 +251,7 @@ Deno.serve(async (req) => {
   let silenceCheckInterval: ReturnType<typeof setInterval> | undefined;
 
   // Compliance tracking state
-  let recordingMode: 'full' | 'no_record' = 'full'; // Default to full, switch to no_record if consent denied
+  let recordingMode: 'full' | 'no_record' = 'full' as 'full' | 'no_record'; // Default to full, switch to no_record if consent denied
   let consentRecording: boolean | null = null; // null = not yet asked
   let consentSmsOptIn: boolean | null = null;
   let callCategory: 'customer_service' | 'lead_capture' | 'prospect_call' = 'lead_capture';

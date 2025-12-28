@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
     }
 
     // Anti-loop protections
-    const internalNumbers = buildInternalNumberSet(Deno.env as Record<string, string | undefined>);
+    const internalNumbers = buildInternalNumberSet(Deno.env.toObject() as Record<string, string | undefined>);
     const internalCaller = isInternalCaller(From, internalNumbers);
     const dialTarget = safeDialTarget(FORWARD_TARGET_E164, From, To, internalNumbers);
     const canDial = !!dialTarget;
@@ -94,8 +94,8 @@ Deno.serve(async (req) => {
         to: To,
         answered_by: AnsweredBy
       }
-    }).catch(err => console.error('Failed to log inbound_received timeline:', err));
-
+    });
+    
     // Get voice config
     const { data: config } = await supabase
       .from('voice_config')
@@ -103,19 +103,18 @@ Deno.serve(async (req) => {
       .single();
 
     // Create call log (idempotent by call_sid unique constraint)
-    await supabase.from('call_logs').insert({
+    const { error: insertError } = await supabase.from('call_logs').insert({
       call_sid: CallSid,
       from_e164: From,
       to_e164: To,
       started_at: now,
       status: 'initiated',
       amd_detected: AnsweredBy === 'machine_start' || AnsweredBy === 'machine_end_beep',
-    }).catch(err => {
-      // Ignore duplicate key errors (idempotency)
-      if (!err.message?.includes('duplicate key')) {
-        console.error('Failed to create call log:', err);
-      }
     });
+    // Ignore duplicate key errors (idempotency)
+    if (insertError && !String(insertError.message || insertError).includes('duplicate key')) {
+      console.error('Failed to create call log:', insertError);
+    }
 
     // AMD Detection: If voicemail detected, use LLM path
     const isVoicemail = AnsweredBy === 'machine_start' || AnsweredBy === 'machine_end_beep';
@@ -186,7 +185,7 @@ Deno.serve(async (req) => {
     }
 
     // PHASE 3: Add timeline marker - twiml_sent
-    await supabase.from('call_timeline').insert({
+    const { error: timelineError } = await supabase.from('call_timeline').insert({
       call_sid: CallSid,
       event: 'twiml_sent',
       timestamp: new Date().toISOString(),
@@ -194,7 +193,8 @@ Deno.serve(async (req) => {
         mode: (useLLM || pickupMode === 'immediate') && realtimeEnabled && withinConcurrencyLimit ? 'llm' : 'bridge',
         pickup_mode: pickupMode
       }
-    }).catch(err => console.error('Failed to log twiml_sent timeline:', err));
+    });
+    if (timelineError) console.error('Failed to log twiml_sent timeline:', timelineError);
 
     // Update call log with mode
     await supabase.from('call_logs')

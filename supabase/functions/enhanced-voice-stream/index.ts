@@ -9,7 +9,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { enterpriseMonitor } from "../_shared/enterprise-monitoring.ts";
-import { withSecurity, SecurityContext, successResponse, errorResponse } from "../_shared/security-middleware.ts";
+import { withSecurity, ExtendedSecurityContext, successResponse, errorResponse } from "../_shared/security-middleware.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -241,7 +241,7 @@ and offer to help resolve their concerns.`;
   }
 }
 
-async function handleVoiceStream(req: Request, ctx: SecurityContext): Promise<Response> {
+async function handleVoiceStream(req: Request, ctx: ExtendedSecurityContext): Promise<Response> {
   const requestData: VoiceStreamRequest = await req.json();
 
   if (!requestData.callSid || !requestData.organizationId) {
