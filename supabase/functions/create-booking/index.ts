@@ -86,9 +86,10 @@ async function createBookingCore(requestData: CreateBookingRequest, req: Request
   }
 
   // IP reputation check
-  const ipReputation = await supabase.rpc('check_ip_reputation', {
+  const ipReputationResult = await supabase.rpc('check_ip_reputation', {
     p_ip_address: clientIP
   });
+  const ipReputation = (ipReputationResult.data as number) ?? 50;
 
   if (ipReputation < 20) {
     await enterpriseMonitor.logSecurityEvent('suspicious_activity', {
@@ -144,7 +145,7 @@ async function createBookingCore(requestData: CreateBookingRequest, req: Request
   const organizationId = "00000000-0000-0000-0000-000000000000"; // Replace with actual org resolution
 
   // Fraud detection
-  const fraudIndicators = [];
+  const fraudIndicators: string[] = [];
   if (ipReputation < 50) fraudIndicators.push('low_ip_reputation');
   if (sanitizedData.callerEmail?.includes('@tempmail.')) fraudIndicators.push('temporary_email');
 
@@ -252,7 +253,8 @@ async function createBookingCore(requestData: CreateBookingRequest, req: Request
         channel: 'both',
       },
     });
-  } catch (emailError) {
+  } catch (err: unknown) {
+    const emailError = err instanceof Error ? err : new Error(String(err));
     console.error("Email scheduling error:", emailError);
     await enterpriseMonitor.logEvent({
       event_type: 'warning',
@@ -260,7 +262,7 @@ async function createBookingCore(requestData: CreateBookingRequest, req: Request
       component: 'booking-service',
       operation: 'schedule_confirmation',
       message: `Email scheduling failed: ${emailError.message}`,
-      metadata: { error: emailError, booking_id: booking, request_id: requestId },
+      metadata: { error: emailError.message, booking_id: booking, request_id: requestId },
       request_id: requestId
     });
     // Don't fail booking for email issues

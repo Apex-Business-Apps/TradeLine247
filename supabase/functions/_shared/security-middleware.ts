@@ -551,30 +551,196 @@ export class EnterpriseSecurity {
 // Singleton instance
 export const enterpriseSecurity = new EnterpriseSecurity();
 
-// Security middleware wrapper
+// CORS headers export
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Extended security context with requestId
+export interface ExtendedSecurityContext extends SecurityContext {
+  requestId: string;
+}
+
+// Success response helper
+export function successResponse(
+  data: unknown,
+  status = 200,
+  requestId?: string
+): Response {
+  return new Response(
+    JSON.stringify({ success: true, data, request_id: requestId }),
+    {
+      status,
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders,
+        ...(requestId ? { 'X-Request-ID': requestId } : {}),
+      },
+    }
+  );
+}
+
+// Error response helper
+export function errorResponse(
+  message: string,
+  status = 500,
+  requestId?: string
+): Response {
+  return new Response(
+    JSON.stringify({ success: false, error: message, request_id: requestId }),
+    {
+      status,
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders,
+        ...(requestId ? { 'X-Request-ID': requestId } : {}),
+      },
+    }
+  );
+}
+
+// Validation schema type
+interface ValidationRule {
+  type: 'string' | 'uuid' | 'email' | 'number' | 'boolean' | 'enum';
+  required?: boolean;
+  maxLength?: number;
+  minLength?: number;
+  allowedValues?: string[];
+}
+
+// Validate request helper
+export function validateRequest<T>(
+  body: unknown,
+  schema: Record<string, ValidationRule>
+): { isValid: boolean; errors: string[]; sanitizedData: Partial<T> } {
+  const errors: string[] = [];
+  const sanitizedData: Record<string, unknown> = {};
+
+  if (!body || typeof body !== 'object') {
+    return { isValid: false, errors: ['Invalid request body'], sanitizedData: {} };
+  }
+
+  const data = body as Record<string, unknown>;
+
+  for (const [field, rule] of Object.entries(schema)) {
+    const value = data[field];
+
+    if (rule.required && (value === undefined || value === null || value === '')) {
+      errors.push(`${field} is required`);
+      continue;
+    }
+
+    if (value === undefined || value === null) continue;
+
+    if (rule.type === 'string' && typeof value !== 'string') {
+      errors.push(`${field} must be a string`);
+    } else if (rule.type === 'string') {
+      let strVal = String(value).trim();
+      if (rule.maxLength && strVal.length > rule.maxLength) {
+        strVal = strVal.substring(0, rule.maxLength);
+      }
+      if (rule.minLength && strVal.length < rule.minLength) {
+        errors.push(`${field} must be at least ${rule.minLength} characters`);
+      }
+      sanitizedData[field] = strVal;
+    }
+
+    if (rule.type === 'uuid') {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(String(value))) {
+        errors.push(`${field} must be a valid UUID`);
+      } else {
+        sanitizedData[field] = value;
+      }
+    }
+
+    if (rule.type === 'number') {
+      const num = Number(value);
+      if (isNaN(num)) {
+        errors.push(`${field} must be a number`);
+      } else {
+        sanitizedData[field] = num;
+      }
+    }
+
+    if (rule.type === 'boolean') {
+      sanitizedData[field] = Boolean(value);
+    }
+
+    if (rule.type === 'enum' && rule.allowedValues) {
+      if (!rule.allowedValues.includes(String(value))) {
+        errors.push(`${field} must be one of: ${rule.allowedValues.join(', ')}`);
+      } else {
+        sanitizedData[field] = value;
+      }
+    }
+  }
+
+  return { isValid: errors.length === 0, errors, sanitizedData: sanitizedData as Partial<T> };
+}
+
+// Security middleware wrapper (legacy name)
 export function withSecurityCheck<T extends any[], R>(
   operation: string,
   securityOptions: Parameters<EnterpriseSecurity['performSecurityCheck']>[1],
   fn: (securityContext: SecurityContext, ...args: T) => Promise<R>
 ) {
   return async (...args: T): Promise<R> => {
-    const req = args[0] as Request; // Assume first argument is request
-
-    // Perform security check
+    const req = args[0] as Request;
     const securityContext = await enterpriseSecurity.performSecurityCheck(req, securityOptions);
-
-    // Add security headers to response
     const result = await fn(securityContext, ...args);
 
-    // If result is a Response object, add security headers
     if (result && typeof result === 'object' && 'headers' in result) {
       const securityHeaders = enterpriseSecurity.getSecurityHeaders();
       for (const [key, value] of Object.entries(securityHeaders)) {
-        (result.headers as any).set(key, value);
+        (result.headers as Headers).set(key, value);
       }
     }
 
     return result;
+  };
+}
+
+// Modern withSecurity wrapper
+export function withSecurity<T>(
+  handler: (req: Request, ctx: ExtendedSecurityContext) => Promise<Response>,
+  options: {
+    endpoint?: string;
+    requireAuth?: boolean;
+    rateLimit?: number | RateLimitConfig;
+  } = {}
+): (req: Request) => Promise<Response> {
+  return async (req: Request): Promise<Response> => {
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
+    }
+
+    const requestId = crypto.randomUUID();
+
+    try {
+      const rateLimitConfig: RateLimitConfig | undefined = 
+        typeof options.rateLimit === 'number'
+          ? { windowSeconds: 60, maxRequests: options.rateLimit, blockDurationMinutes: 5 }
+          : options.rateLimit;
+
+      const securityContext = await enterpriseSecurity.performSecurityCheck(req, {
+        requireAuth: options.requireAuth,
+        rateLimit: rateLimitConfig,
+      });
+
+      const extendedContext: ExtendedSecurityContext = {
+        ...securityContext,
+        requestId,
+      };
+
+      return await handler(req, extendedContext);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Security check failed';
+      console.error(`Security error (${requestId}):`, message);
+      return errorResponse(message, 403, requestId);
+    }
   };
 }
 
