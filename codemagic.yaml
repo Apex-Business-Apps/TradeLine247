@@ -104,11 +104,5 @@ workflows:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
-        submit_to_app_store: false
-        export_compliance_uses_encryption: true
-        export_compliance_is_exempt: true
-        # ✅ DO NOT set beta_groups until the group definitely exists in ASC.
-        # beta_groups:
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID        # beta_groups:
         #   - Internal Testers
