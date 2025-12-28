@@ -23,6 +23,7 @@
     "verify:console": "node scripts/verify-console-usage.mjs",
     "verify:env:public": "node scripts/verify-public-env.mjs",
     "lint": "eslint . --ext .ts,.tsx && node scripts/check-edge-imports.mjs",
+    "type-check": "tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:unit": "node scripts/run-vitest.mjs",
     "// web dev/build": "────────────────────────────────────────",
