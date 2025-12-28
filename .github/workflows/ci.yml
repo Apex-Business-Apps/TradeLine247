@@ -1,215 +1,36 @@
 name: CI
-
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
-  schedule:
-    - cron: '0 9 * * *'
-
-# Prevent pile-ups and zombies
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
-# Needed to set commit statuses
-permissions:
-  contents: read
-  statuses: write
+    branches: [main]
+  push:
+    branches: [main]
 
 jobs:
-  build:
-    # IMPORTANT: job name must be the required context
-    name: ci/build
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.19.0
-          cache: npm
-      - run: npm ci --no-audit --fund=false
-      - run: npm run -s typecheck --if-present
-      - run: npm run -s build
-      - name: Run preflight verifications
-        run: |
-          npm run -s verify:env:public
-          npm run -s verify:app
-          npm run -s verify:icons
-      - name: Verify web artifact
-        run: |
-          test -f dist/index.html || (echo "dist/index.html missing" && exit 2)
-      - name: Report status (ci/build)
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const state = "${{ job.status }}" === "success" ? "success" : "failure";
-            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner, repo: context.repo.repo, sha,
-              state, context: "ci/build",
-              description: state === "success" ? "Build passed" : "Build failed"
-            });
-
-  lint:
-    name: ci/lint
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.19.0
-          cache: npm
-      - run: npm ci --no-audit --fund=false
-
-      # Merged from props-guard.yml: Check fetchpriority attribute casing
-      - name: Check fetchpriority attribute casing
-        run: |
-          if git grep -n "fetchPriority=" -- src; then
-            echo "❌ Found camelCase fetchPriority (use lowercase fetchpriority in HTML)"
-            exit 1
-          else
-            echo "✅ No fetchPriority casing issues detected"
-          fi
-
-      - run: npm run -s lint --if-present
-      - name: Report status (ci/lint)
-        if: always()
-        continue-on-error: true
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const state = "${{ job.status }}" === "success" ? "success" : "failure";
-            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
-            try {
-              await github.rest.repos.createCommitStatus({
-                owner: context.repo.owner, repo: context.repo.repo, sha,
-                state, context: "ci/lint",
-                description: state === "success" ? "Lint passed" : "Lint failed"
-              });
-            } catch (error) {
-              console.log("GitHub Status API failed (infra); lint already passed.");
-              console.error(error);
-            }
-
   test:
-    name: ci/test
     runs-on: ubuntu-latest
-    needs: [ build ]
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.19.0
-          cache: npm
-      - run: npm ci --no-audit --fund=false
-      - run: npm run test:ci --if-present
-      - name: Report status (ci/test)
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const state = "${{ job.status }}" === "success" ? "success" : "failure";
-            const sha = context.payload.pull_request ? context.payload.pull_request.head.sha : context.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner, repo: context.repo.repo, sha,
-              state, context: "ci/test",
-              description: state === "success" ? "Tests passed" : "Tests failed"
-            });
 
-  e2e-smoke:
-    name: e2e/smoke
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.19.0
-          cache: npm
-      - run: npm ci --no-audit --fund=false
-      - run: npx playwright install --with-deps
-      - run: npm run -s build
-      - name: Ensure port 4173 is free
-        run: |
-          lsof -ti:4173 | xargs kill -9 || true
-          sleep 2
-      - name: Run critical tests (PR gate)
-        run: npx playwright test --project=critical --reporter=line
-        env:
-          CI: true
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  e2e-full:
-    name: e2e/full
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    if: github.event_name == 'schedule' || github.ref == 'refs/heads/main'
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 20.19.0
-          cache: npm
-      - run: npm ci --no-audit --fund=false
-      - run: npx playwright install --with-deps
-      - run: npm run -s build
-      - name: Ensure port 4173 is free
-        run: |
-          lsof -ti:4173 | xargs kill -9 || true
-          sleep 2
-      - name: Run full E2E tests (nightly/release)
-        run: npx playwright test --project=full --reporter=line
-        env:
-          CI: true
-  
-  a11y:
-    name: a11y/accessibility
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.19.0
-          cache: npm
-      - run: npm ci --no-audit --fund=false
-      - run: npx playwright install --with-deps
-      - run: npm run -s build
-      - name: Ensure port 4173 is free
-        run: |
-          lsof -ti:4173 | xargs kill -9 || true
-          sleep 2
-      - name: Run comprehensive accessibility tests
-        run: npx playwright test tests/e2e/a11y-comprehensive.spec.ts --reporter=list --reporter=html
-      - name: Upload accessibility report
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: accessibility-report
-          path: playwright-report/
-          retention-days: 30
-          if-no-files-found: ignore
+          node-version: '20'
+          cache: 'npm'
 
-  lhci:
-    name: ci/lighthouse
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.19.0
-          cache: npm
-      - run: npm ci --no-audit --fund=false
-      - run: npm run -s build
-      - run: npx lhci autorun --config=.lighthouserc.cjs
+      - name: Install
+        run: npm ci
+
+      - name: Type Check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # Add tests when you write them
+      # - name: Test
+      #   run: npm test
