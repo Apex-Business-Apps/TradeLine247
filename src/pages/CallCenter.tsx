@@ -6,6 +6,7 @@ import { Phone, RefreshCw, Download, ExternalLink, PhoneCall } from 'lucide-reac
 import { useTwilioCallData } from '@/hooks/useTwilioCallData';
 import { TwilioStats } from '@/components/dashboard/TwilioStats';
 import { SEOHead } from '@/components/seo/SEOHead';
+import { useAuth } from '@/hooks/useAuth';
 import backgroundImage from '@/assets/BACKGROUND_IMAGE1.svg';
 import { createBrandGradientStyle } from '@/styles/brandGradients';
 
@@ -28,6 +29,7 @@ const getStatusColor = (status: string) => {
 
 export default function CallCenter() {
   const { calls, loading, error, refresh, formatDuration, formatTimeAgo } = useTwilioCallData();
+  const { isAdmin } = useAuth();
   const gradientBackgroundStyle = createBrandGradientStyle(backgroundImage);
 
   const handleExportCalls = () => {
@@ -160,16 +162,26 @@ export default function CallCenter() {
                   <Phone className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-foreground mb-2">No calls yet</h3>
                   <p className="text-muted-foreground mb-4">
-                    Your Twilio integration is ready! Test it by calling:
+                    Your AI receptionist will log incoming calls here
                   </p>
-                  <div className="inline-block p-3 bg-primary/10 rounded-lg border border-primary/20">
-                    <span className="text-lg font-mono font-semibold" style={{ color: 'hsl(15, 100%, 35%)', textShadow: 'none' }}>+1-587-742-8885</span>
-                  </div>
-                  <div className="mt-4 space-y-2 text-sm text-muted-foreground">
-                    <p>✓ Voice webhooks configured</p>
-                    <p>✓ Call forwarding to +1-431-990-0222</p>
-                    <p>✓ Real-time call monitoring active</p>
-                  </div>
+
+                  {/* ADMIN-ONLY TEST PANEL */}
+                  {isAdmin && (
+                    <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-muted">
+                      <h4 className="text-sm font-medium text-muted-foreground mb-2">🔧 Admin Test Panel</h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Your Twilio integration is ready! Test it by calling:
+                      </p>
+                      <div className="inline-block p-2 bg-primary/10 rounded border border-primary/20">
+                        <span className="text-sm font-mono font-semibold" style={{ color: 'hsl(15, 100%, 35%)', textShadow: 'none' }}>+1-587-742-8885</span>
+                      </div>
+                      <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                        <p>✓ Voice webhooks configured</p>
+                        <p>✓ Call forwarding to +1-431-990-0222</p>
+                        <p>✓ Real-time call monitoring active</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
