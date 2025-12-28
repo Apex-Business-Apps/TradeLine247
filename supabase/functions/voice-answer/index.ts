@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
     }
 
     // Anti-loop protections
-    const internalNumbers = buildInternalNumberSet(Deno.env as Record<string, string | undefined>);
+    const internalNumbers = buildInternalNumberSet(Deno.env.toObject() as Record<string, string | undefined>);
     const internalCaller = isInternalCaller(From, internalNumbers);
     const dialTarget = safeDialTarget(FORWARD_TARGET_E164, From, To, internalNumbers);
     const canDial = !!dialTarget;
@@ -94,8 +94,8 @@ Deno.serve(async (req) => {
         to: To,
         answered_by: AnsweredBy
       }
-    }).catch(err => console.error('Failed to log inbound_received timeline:', err));
-
+    });
+    
     // Get voice config
     const { data: config } = await supabase
       .from('voice_config')

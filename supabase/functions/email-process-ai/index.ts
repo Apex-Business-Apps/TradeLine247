@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
         summary_length: summary.length,
         tags_count: tags.length
       },
-      sources_used: chunkInserts.map(c => ({ chunk_id: c.id, chunk_index: c.chunk_index }))
+      sources_used: chunkInserts.map((c, index) => ({ chunk_id: `chunk_${index}`, chunk_index: c.chunk_index }))
     });
 
     return new Response(
@@ -117,7 +117,8 @@ Deno.serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     console.error('Email AI processing failed:', error);
 
     const supabase = createClient(

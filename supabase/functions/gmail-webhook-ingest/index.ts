@@ -109,7 +109,8 @@ Deno.serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     console.error('Gmail webhook processing failed:', error);
 
     const supabase = createClient(
@@ -225,7 +226,7 @@ async function processAndStoreEmail(messageData: GmailHistoryMessage, supabase: 
       thread_id: messageData.threadId,
       message_id: messageData.id,
       from_email: fromEmail,
-      to_emails: to_emails,
+      to_emails: toEmails,
       subject: subject,
       body_text: bodyText,
       received_at: new Date(date || Date.now()).toISOString(),
