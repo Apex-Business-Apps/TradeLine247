@@ -361,10 +361,10 @@ export function createVisionAnchorService(supabaseClient: {
             )
           : { status: 'unknown' as const };
 
-        const hasWarrantyRisk =
+        const hasWarrantyRisk: boolean =
           warrantyCheck.status === 'expired' ||
           riskKeywords.length > 0 ||
-          (analysisResult.est_age_years && analysisResult.est_age_years > 5);
+          Boolean(analysisResult.est_age_years && analysisResult.est_age_years > 5);
 
         // Update analysis log with results
         await supabaseClient.from('visual_analysis_logs')

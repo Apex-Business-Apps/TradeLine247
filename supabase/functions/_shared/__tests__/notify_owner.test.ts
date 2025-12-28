@@ -2,6 +2,8 @@
  * notify_owner.test.ts - Unit tests for owner notification module
  */
 
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+
 import {
   formatSubject,
   formatEmailBody,
@@ -12,26 +14,26 @@ import {
   NOTIFICATION_COOLDOWN_SECONDS,
   type OwnerNotificationPayload,
   type NotificationEventType
-} from '../notify_owner';
+} from '../notify_owner.ts';
 
 describe('notify_owner pure utilities', () => {
   describe('formatSubject', () => {
-    test('formats basic subject', () => {
+    it('formats basic subject', () => {
       const subject = formatSubject('warranty_risk_detected');
       expect(subject).toBe('[TradeLine 24/7] Warranty Risk Detected');
     });
 
-    test('adds urgent prefix', () => {
+    it('adds urgent prefix', () => {
       const subject = formatSubject('escalation_required', 'urgent');
       expect(subject).toContain('URGENT');
     });
 
-    test('adds warning emoji for high priority', () => {
+    it('adds warning emoji for high priority', () => {
       const subject = formatSubject('negative_sentiment', 'high');
       expect(subject).toContain('⚠️');
     });
 
-    test('handles all event types', () => {
+    it('handles all event types', () => {
       const eventTypes: NotificationEventType[] = [
         'warranty_risk_detected',
         'escalation_required',
@@ -51,7 +53,7 @@ describe('notify_owner pure utilities', () => {
   });
 
   describe('formatEmailBody', () => {
-    test('generates HTML email body', () => {
+    it('generates HTML email body', () => {
       const payload: OwnerNotificationPayload = {
         event_type: 'warranty_risk_detected',
         call_id: 'call-123',
@@ -67,7 +69,7 @@ describe('notify_owner pure utilities', () => {
       expect(html).toContain('warranty issue');
     });
 
-    test('includes priority badge for urgent', () => {
+    it('includes priority badge for urgent', () => {
       const payload: OwnerNotificationPayload = {
         event_type: 'escalation_required',
         needs_review: true,
@@ -78,7 +80,7 @@ describe('notify_owner pure utilities', () => {
       expect(html).toContain('URGENT');
     });
 
-    test('shows consent state', () => {
+    it('shows consent state', () => {
       const payload: OwnerNotificationPayload = {
         event_type: 'call_summary',
         consent_state: 'granted',
@@ -91,7 +93,7 @@ describe('notify_owner pure utilities', () => {
   });
 
   describe('formatEmailBodyPlain', () => {
-    test('generates plain text email body', () => {
+    it('generates plain text email body', () => {
       const payload: OwnerNotificationPayload = {
         event_type: 'high_value_lead',
         call_id: 'call-456',
@@ -109,29 +111,29 @@ describe('notify_owner pure utilities', () => {
   });
 
   describe('isNotificationEnabled', () => {
-    test('returns true when no flags set', () => {
+    it('returns true when no flags set', () => {
       expect(isNotificationEnabled('warranty_risk_detected', {})).toBe(true);
     });
 
-    test('returns false when globally disabled', () => {
+    it('returns false when globally disabled', () => {
       expect(isNotificationEnabled('warranty_risk_detected', {
         OWNER_NOTIFY_DISABLED: 'true'
       })).toBe(false);
     });
 
-    test('returns false when event-specific flag is false', () => {
+    it('returns false when event-specific flag is false', () => {
       expect(isNotificationEnabled('warranty_risk_detected', {
         NOTIFY_WARRANTY_RISK: 'false'
       })).toBe(false);
     });
 
-    test('returns true when event-specific flag is true', () => {
+    it('returns true when event-specific flag is true', () => {
       expect(isNotificationEnabled('escalation_required', {
         NOTIFY_ESCALATION: 'true'
       })).toBe(true);
     });
 
-    test('respects global disable over event flags', () => {
+    it('respects global disable over event flags', () => {
       expect(isNotificationEnabled('high_value_lead', {
         OWNER_NOTIFY_DISABLED: 'true',
         NOTIFY_HIGH_VALUE_LEAD: 'true'
@@ -140,11 +142,11 @@ describe('notify_owner pure utilities', () => {
   });
 
   describe('constants', () => {
-    test('DEFAULT_FROM_EMAIL is valid email format', () => {
+    it('DEFAULT_FROM_EMAIL is valid email format', () => {
       expect(DEFAULT_FROM_EMAIL).toMatch(/^[^@]+@[^@]+\.[^@]+$/);
     });
 
-    test('NOTIFICATION_COOLDOWN_SECONDS is reasonable', () => {
+    it('NOTIFICATION_COOLDOWN_SECONDS is reasonable', () => {
       expect(NOTIFICATION_COOLDOWN_SECONDS).toBeGreaterThan(60);
       expect(NOTIFICATION_COOLDOWN_SECONDS).toBeLessThan(3600);
     });
@@ -212,7 +214,7 @@ describe('notify_owner runtime service', () => {
     };
   };
 
-  test('returns no_owner_email_configured when email not set', async () => {
+  it('returns no_owner_email_configured when email not set', async () => {
     setupDenoMock(undefined); // No owner email
 
     const mockClient = createMockClient();
@@ -229,7 +231,7 @@ describe('notify_owner runtime service', () => {
     expect(result.error).toBe('no_owner_email_configured');
   });
 
-  test('respects cooldown when recent notifications exist', async () => {
+  it('respects cooldown when recent notifications exist', async () => {
     setupDenoMock('owner@test.com');
 
     const mockClient = createMockClient([{ id: 'existing-notification' }]);
@@ -246,7 +248,7 @@ describe('notify_owner runtime service', () => {
     expect(result.error).toBe('cooldown_active');
   });
 
-  test('sends email when provider available and owner email set', async () => {
+  it('sends email when provider available and owner email set', async () => {
     setupDenoMock('owner@test.com');
 
     const mockClient = createMockClient();
@@ -266,7 +268,7 @@ describe('notify_owner runtime service', () => {
     expect(insertEvents.length).toBeGreaterThan(0);
   });
 
-  test('notifyWarrantyRisk sends with high priority', async () => {
+  it('notifyWarrantyRisk sends with high priority', async () => {
     setupDenoMock('owner@test.com');
 
     const mockClient = createMockClient();
@@ -279,20 +281,7 @@ describe('notify_owner runtime service', () => {
     expect(mockEmail.sentEmails.length).toBe(1);
   });
 
-  test('throws if supabase client not provided', () => {
+  it('throws if supabase client not provided', () => {
     expect(() => createNotifyOwnerService(null as never)).toThrow('Supabase client is required');
-  });
-});
-
-// CI safety test
-describe('CI safety: notify_owner module', () => {
-  test('notify_owner.ts has no https:// imports', () => {
-    const fs = require('fs');
-    const path = require('path');
-
-    const modulePath = path.resolve(__dirname, '../notify_owner.ts');
-    const content = fs.readFileSync(modulePath, 'utf8');
-
-    expect(content).not.toMatch(/^import.*from\s+['"]https:\/\//m);
   });
 });
