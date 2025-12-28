@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
     const idempotencyKey = `${CallSid}-${CallStatus}-${now.slice(0, 19)}`;
 
     // PHASE 3: Log status_event timeline (idempotent by unique constraint)
-    await supabase.from('call_timeline').insert({
+    const { error: statusError } = await supabase.from('call_timeline').insert({
       call_sid: CallSid,
       event: 'status_event',
       timestamp: now,
@@ -71,16 +71,15 @@ Deno.serve(async (req) => {
         duration: CallDuration,
         idempotency_key: idempotencyKey
       }
-    }).catch(err => {
-      // Ignore duplicate key errors (idempotency)
-      if (!err.message?.includes('duplicate key')) {
-        console.error('Failed to log status_event timeline:', err);
-      }
     });
+    // Ignore duplicate key errors (idempotency)
+    if (statusError && !String(statusError.message || statusError).includes('duplicate key')) {
+      console.error('Failed to log status_event timeline:', statusError);
+    }
 
     // PHASE 3: Add status_completed marker when call completes
     if (CallStatus === 'completed') {
-      await supabase.from('call_timeline').insert({
+      const { error: completedError } = await supabase.from('call_timeline').insert({
         call_sid: CallSid,
         event: 'status_completed',
         timestamp: now,
@@ -88,11 +87,10 @@ Deno.serve(async (req) => {
           duration: CallDuration,
           idempotency_key: idempotencyKey
         }
-      }).catch(err => {
-        if (!err.message?.includes('duplicate key')) {
-          console.error('Failed to log status_completed timeline:', err);
-        }
       });
+      if (completedError && !String(completedError.message || completedError).includes('duplicate key')) {
+        console.error('Failed to log status_completed timeline:', completedError);
+      }
     }
 
     // Sanitize duration (must be a valid number)
