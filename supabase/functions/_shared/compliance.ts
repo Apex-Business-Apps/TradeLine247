@@ -305,20 +305,14 @@ export function formatTL247MetaBlock(meta: TL247Meta): string {
 // RUNTIME SERVICE FACTORY (Requires supabase client injection)
 // ============================================================================
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseClientLike = any;
+
 /**
  * Create compliance service with runtime supabase client
  * This factory pattern ensures no https:// imports at module load time
  */
-export function createComplianceService(supabaseClient: {
-  from: (table: string) => {
-    upsert: (data: Record<string, unknown>, options?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
-    insert: (data: Record<string, unknown> | Record<string, unknown>[]) => Promise<{ data: unknown; error: unknown }>;
-    select: (columns?: string) => {
-      eq: (column: string, value: unknown) => Promise<{ data: unknown[]; error: unknown }>;
-      single: () => Promise<{ data: unknown; error: unknown }>;
-    };
-  };
-}) {
+export function createComplianceService(supabaseClient: SupabaseClientLike) {
   if (!supabaseClient) {
     throw new Error('Supabase client is required for compliance service');
   }
