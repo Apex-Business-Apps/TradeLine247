@@ -157,7 +157,8 @@ serve(async (req) => {
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     console.error('Provisioning error:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Provisioning failed' }),

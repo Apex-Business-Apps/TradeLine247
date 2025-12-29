@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
     }
 
     // PHASE 3: Log recording status timeline events (idempotent by unique constraint)
-    await supabase.from('call_timeline').insert({
+    const { error: timelineError } = await supabase.from('call_timeline').insert({
       call_sid: CallSid,
       event: 'recording_' + RecordingStatus,
       timestamp: now,
@@ -99,19 +99,18 @@ Deno.serve(async (req) => {
         recording_duration: RecordingDuration,
         idempotency_key: idempotencyKey
       }
-    }).catch(err => {
-      // Ignore duplicate key errors (idempotency)
-      if (!err.message?.includes('duplicate key')) {
-        console.error('Failed to log recording timeline:', err);
-      }
     });
+    // Ignore duplicate key errors (idempotency)
+    if (timelineError && !String(timelineError.message || timelineError).includes('duplicate key')) {
+      console.error('Failed to log recording timeline:', timelineError);
+    }
 
     // If recording is completed, trigger transcription pipeline
     if (RecordingStatus === 'completed' && RecordingUrl) {
       console.log('🎯 Recording completed, triggering transcription pipeline for CallSid:', CallSid);
 
       // PHASE 3: Add recording_completed timeline marker
-      await supabase.from('call_timeline').insert({
+      const { error: completedError } = await supabase.from('call_timeline').insert({
         call_sid: CallSid,
         event: 'recording_completed',
         timestamp: now,
@@ -121,11 +120,10 @@ Deno.serve(async (req) => {
           recording_duration: RecordingDuration,
           idempotency_key: idempotencyKey
         }
-      }).catch(err => {
-        if (!err.message?.includes('duplicate key')) {
-          console.error('Failed to log recording_completed timeline:', err);
-        }
       });
+      if (completedError && !String(completedError.message || completedError).includes('duplicate key')) {
+        console.error('Failed to log recording_completed timeline:', completedError);
+      }
 
       try {
         // Update call_logs with recording data
@@ -144,7 +142,7 @@ Deno.serve(async (req) => {
           } else {
             // Enqueue transcription task
             // PHASE 1C: Enqueue transcription task (idempotent by call_sid + operation)
-            await supabase.from('call_processing_queue').insert({
+            const { error: queueError } = await supabase.from('call_processing_queue').insert({
               call_sid: CallSid,
               operation: 'transcribe_recording',
               status: 'pending',
@@ -156,12 +154,11 @@ Deno.serve(async (req) => {
                 idempotency_key: idempotencyKey
               },
               created_at: now
-            }).catch(err => {
-              // Ignore duplicate key errors (idempotency)
-              if (!err.message?.includes('duplicate key')) {
-                console.error('Failed to enqueue transcription task:', err);
-              }
             });
+            // Ignore duplicate key errors (idempotency)
+            if (queueError && !String(queueError.message || queueError).includes('duplicate key')) {
+              console.error('Failed to enqueue transcription task:', queueError);
+            }
 
             console.log('✅ Recording queued for transcription processing');
           }

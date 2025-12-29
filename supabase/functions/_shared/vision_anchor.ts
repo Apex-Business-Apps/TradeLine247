@@ -189,9 +189,7 @@ export function createVisionAnchorService(supabaseClient: {
   from: (table: string) => {
     insert: (data: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
     update: (data: Record<string, unknown>) => { eq: (col: string, val: unknown) => Promise<{ data: unknown; error: unknown }> };
-    select: (columns?: string) => {
-      eq: (col: string, val: unknown) => Promise<{ data: unknown[]; error: unknown }>;
-    };
+    select: (columns?: string) => Promise<{ data: unknown[]; error: unknown }>;
   };
 }) {
   if (!supabaseClient) {
@@ -339,9 +337,9 @@ export function createVisionAnchorService(supabaseClient: {
     ): Promise<{ processed: boolean; warranty_risk: boolean; error?: string }> {
       try {
         // Get warranty rules from database
-        const { data: rules } = await supabaseClient.from('warranty_rules')
+        const rulesResult = await supabaseClient.from('warranty_rules')
           .select('*');
-
+        const rules = rulesResult.data;
         const warrantyRules = (rules || []) as WarrantyRule[];
 
         // Check for warranty risk keywords in visible_risks
@@ -361,10 +359,10 @@ export function createVisionAnchorService(supabaseClient: {
             )
           : { status: 'unknown' as const };
 
-        const hasWarrantyRisk =
+        const hasWarrantyRisk: boolean =
           warrantyCheck.status === 'expired' ||
           riskKeywords.length > 0 ||
-          (analysisResult.est_age_years && analysisResult.est_age_years > 5);
+          Boolean(analysisResult.est_age_years && analysisResult.est_age_years > 5);
 
         // Update analysis log with results
         await supabaseClient.from('visual_analysis_logs')

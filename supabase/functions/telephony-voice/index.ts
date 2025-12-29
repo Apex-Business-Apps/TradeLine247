@@ -74,7 +74,14 @@ function isTestNumber(fromNumber: string): boolean {
 export default async (req: Request) => {
   const body = await req.text();
   const p = new URLSearchParams(body);
-  const callData = {
+  const callData: {
+    CallSid: string;
+    From: string;
+    To: string;
+    CallerName: string | null;
+    ForwardedFrom: string | null;
+    receptionistMode?: boolean;
+  } = {
     CallSid: p.get("CallSid") || "",
     From: p.get("From") || "",
     To: p.get("To") || "",
@@ -90,7 +97,7 @@ export default async (req: Request) => {
   callData.receptionistMode = receptionistMode;
 
   // Log inbound webhook (async, don't block response)
-  logInboundCall(callData).catch(err => console.error('Failed to log inbound call:', err));
+  logInboundCall(callData).catch((err: unknown) => console.error('Failed to log inbound call:', err));
 
   let xml: string;
 

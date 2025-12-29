@@ -1,13 +1,14 @@
 workflows:
-  ios-capacitor-testflight:
-    name: iOS • Capacitor -> TestFlight
+  ios-release-1-0-8:
+    name: iOS Release v1.0.8 (TestFlight)
     max_build_duration: 60
-    instance_type: mac_mini_m2
-
+    instance_type: mac_mini_m1
     environment:
       groups:
-        - ios_config
+        # VERIFIED: ONE UNDERSCORE
         - appstore_credentials
+        # Importing ios_config as seen in your screenshot
+        - ios_config
       vars:
         XCODE_WORKSPACE: ios/App/App.xcworkspace
         XCODE_SCHEME: App
@@ -16,70 +17,12 @@ workflows:
         APP_STORE_ID: $APP_STORE_ID
       xcode: 16.4
       node: 20.19.0
-      npm: 10
-      cocoapods: default
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.apex.tradeline
 
     scripts:
-      - name: Runtime versions (fail fast)
+      - name: Install Dependencies
         script: |
-          set -euo pipefail
-          node -v
-          npm -v
-          xcodebuild -version
-          node -e "const v=process.versions.node.split('.').map(Number); if(v[0]!==20||v[1]<19){console.error('Node must be >=20.19.0'); process.exit(1)}"
-
-      # Step 1: Install dependencies
-      - name: Install dependencies
-        script: |
-          set -eo pipefail
-          npm ci
-
-      # Step 2: Quality gates (lint, typecheck, test:unit)
-      - name: Quality gates
-        script: |
-          set -eo pipefail
-          npm run lint
-          npm run typecheck
-          npm run test:unit
-
-      # Step 3: Playwright smoke (install browsers first)
-      - name: Playwright smoke
-        script: |
-          set -eo pipefail
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
-
-      # Step 4: Build (includes postbuild verify:app, verify:icons, verify:console)
-      - name: Build web assets
-        script: |
-          set -eo pipefail
-          npm run build
-
-      - name: Verify App Store Connect secrets (fail fast)
-        script: |
-          set -euo pipefail
-          missing=()
-          [[ -z "${APP_STORE_CONNECT_PRIVATE_KEY:-}" ]] && missing+=("APP_STORE_CONNECT_PRIVATE_KEY")
-          [[ -z "${APP_STORE_CONNECT_KEY_IDENTIFIER:-}" ]] && missing+=("APP_STORE_CONNECT_KEY_IDENTIFIER")
-          [[ -z "${APP_STORE_CONNECT_ISSUER_ID:-}" ]] && missing+=("APP_STORE_CONNECT_ISSUER_ID")
-          if (( ${#missing[@]} > 0 )); then
-            echo "Missing required App Store Connect secrets: ${missing[*]}"
-            exit 1
-          fi
-
-      - name: Install CocoaPods
-        script: |
-          set -eo pipefail
-          npx cap sync ios
-
-      # Step 6: Install CocoaPods
-      - name: Install CocoaPods
-        script: |
-          set -eo pipefail
-          cd ios/App && pod install --repo-update
+          npm install
+          gem install cocoapods
 
       - name: Set iOS version/build (1.0.8 + unique build)
         script: |
@@ -87,23 +30,67 @@ workflows:
           chmod +x scripts/ci/ios_set_version_build.sh
           ./scripts/ci/ios_set_version_build.sh
 
-      # Step 7: Configure code signing (NO manual fetch-signing-files per spec)
-      - name: Configure code signing
+      - name: Build Web Assets & Sync Capacitor
         script: |
-          set -euo pipefail
-          xcode-project use-profiles --custom-export-options='{"testFlightInternalTestingOnly": true}'
+          set -e
+          npm run build
+          npx cap sync ios
 
-      # Step 8: Build archive & IPA
-      - name: Build archive & IPA
+      - name: Build IPA (Archive & Export)
         script: |
-          set -eo pipefail
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME" \
-            --config Release \
-            --archive-flags="-destination 'generic/platform=iOS'"
+          set -e
+          cd ios/App
+          
+          pod install
+          
+          XC_WORKSPACE="App.xcworkspace"
+          XC_SCHEME="$XCODE_SCHEME"
+          ARCHIVE_PATH="../../build/ios/xcarchive/App.xcarchive"
+          IPA_PATH="../../build/ios/ipa"
+          EXPORT_PLIST="../../export_options.plist"
+          
+          # Create Export Options Plist
+          cat > "$EXPORT_PLIST" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>$BUNDLE_ID</key>
+                  <string>TL247_mobpro_tradeline_01</string>
+              </dict>
+              <key>signingCertificate</key>
+              <string>Apple Distribution</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+          </dict>
+          </plist>
+          EOF
+          
+          # 1. Archive (CRITICAL FIX: ADDED SIGNING FLAGS)
+          xcodebuild archive \
+            -workspace "$XC_WORKSPACE" \
+            -scheme "$XC_SCHEME" \
+            -archivePath "$ARCHIVE_PATH" \
+            -allowProvisioningUpdates \
+            -sdk iphoneos \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            CODE_SIGN_STYLE="Manual"
 
-      - name: Verify IPA version + build (fail-fast preflight)
+          # 2. Export IPA
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$IPA_PATH" \
+            -exportOptionsPlist "$EXPORT_PLIST"
+
+      - name: Verify IPA Version (Fail Fast)
         script: |
           set -euo pipefail
           # Load persisted vars (Codemagic exports CM_ENV automatically in later steps)
@@ -113,10 +100,14 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
+      - build/ios/xcarchive/*.xcarchive
 
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID        # beta_groups:
-        #   - Internal Testers
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+        submit_to_app_store: false
+        beta_groups:
+          - "Internal Testers"

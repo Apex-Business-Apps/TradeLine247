@@ -186,8 +186,8 @@ Return ONLY valid JSON with this exact structure:
           event: 'vision_analysis_complete',
           payload: {
             call_id,
-            warranty_status,
-            warranty_warning,
+            warranty_status: warrantyStatus,
+            warranty_warning: warrantyWarning,
             brand: analysisResult.brand,
             est_age_years: analysisResult.est_age_years
           }
@@ -200,13 +200,14 @@ Return ONLY valid JSON with this exact structure:
       success: true,
       analysis_log_id,
       analysis_result: analysisResult,
-      warranty_status,
-      warranty_warning
+      warranty_status: warrantyStatus,
+      warranty_warning: warrantyWarning
     }), {
       headers: { 'Content-Type': 'application/json' }
     });
 
-  } catch (error) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     console.error('[Vision Analyzer] Error:', error);
 
     return new Response(JSON.stringify({

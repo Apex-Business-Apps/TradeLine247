@@ -9,7 +9,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { enterpriseMonitor } from "../_shared/enterprise-monitoring.ts";
-import { withSecurity, SecurityContext, successResponse, errorResponse, validateRequest } from "../_shared/security-middleware.ts";
+import { withSecurity, ExtendedSecurityContext, successResponse, errorResponse, validateRequest } from "../_shared/security-middleware.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -23,7 +23,7 @@ interface ResolveEscalationRequest {
   followUpDate?: string;
 }
 
-async function handleResolveEscalation(req: Request, ctx: SecurityContext): Promise<Response> {
+async function handleResolveEscalation(req: Request, ctx: ExtendedSecurityContext): Promise<Response> {
   const body = await req.json();
 
   const validation = validateRequest<ResolveEscalationRequest>(body, {
@@ -31,7 +31,7 @@ async function handleResolveEscalation(req: Request, ctx: SecurityContext): Prom
     resolution: { type: 'enum', required: true, allowedValues: ['resolved', 'escalated'] },
     resolutionNotes: { type: 'string', required: true, maxLength: 2000 },
     followUpRequired: { type: 'boolean' },
-    followUpDate: { type: 'date' },
+    followUpDate: { type: 'string' },
   });
 
   if (!validation.isValid) {

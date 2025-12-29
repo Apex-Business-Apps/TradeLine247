@@ -4785,16 +4785,16 @@ export type Database = {
       }
       batch_encrypt_appointments:
         | {
-            Args: { p_batch_size?: number; p_encryption_key?: string }
-            Returns: Json
-          }
-        | {
             Args: { batch_size?: number }
             Returns: {
               batch_duration_seconds: number
               encrypted_count: number
               failed_count: number
             }[]
+          }
+        | {
+            Args: { p_batch_size?: number; p_encryption_key?: string }
+            Returns: Json
           }
       can_access_customer_pii: { Args: { _user_id: string }; Returns: boolean }
       can_view_appointment_summary: {
