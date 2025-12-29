@@ -78,7 +78,7 @@
     "@capacitor/haptics": "7.0.3",
     "@capacitor/ios": "7.4.4",
     "@capacitor/local-notifications": "7.0.4",
-    "@capacitor/network": "7.0.3",
+    "@capacitor/network": "8.0.0",
     "@capacitor/preferences": "7.0.3",
     "@capacitor/push-notifications": "7.0.4",
     "@radix-ui/react-accordion": "^1.2.12",
