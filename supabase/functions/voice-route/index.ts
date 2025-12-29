@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
       callSid, shouldRecord, from, to);
     
     // Anti-loop protections
-    const internalNumbers = buildInternalNumberSet(Deno.env as Record<string, string | undefined>);
+    const internalNumbers = buildInternalNumberSet(Deno.env.toObject() as Record<string, string | undefined>);
     const internalCaller = isInternalCaller(from, internalNumbers);
     const dialTarget = safeDialTarget(opsNumber, from, to, internalNumbers);
     const canDial = !!dialTarget;

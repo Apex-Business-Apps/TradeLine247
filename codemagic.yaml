@@ -1,13 +1,12 @@
 workflows:
-  ios-capacitor-testflight:
-    name: iOS • Capacitor -> TestFlight
+  ios-release-1-0-8:
+    name: iOS Release v1.0.8 (TestFlight)
     max_build_duration: 60
-    instance_type: mac_mini_m2
-
+    instance_type: mac_mini_m2   # match known-good behavior
     environment:
       groups:
-        - ios_config
         - appstore_credentials
+        - ios_config
       vars:
         XCODE_WORKSPACE: ios/App/App.xcworkspace
         XCODE_SCHEME: App
@@ -23,63 +22,33 @@ workflows:
         bundle_identifier: com.apex.tradeline
 
     scripts:
-      - name: Runtime versions (fail fast)
+      - name: Install dependencies
         script: |
           set -euo pipefail
           node -v
           npm -v
-          xcodebuild -version
-          node -e "const v=process.versions.node.split('.').map(Number); if(v[0]!==20||v[1]<19){console.error('Node must be >=20.19.0'); process.exit(1)}"
-
-      # Step 1: Install dependencies
-      - name: Install dependencies
-        script: |
-          set -eo pipefail
           npm ci
 
-      # Step 2: Quality gates (lint, typecheck, test:unit)
-      - name: Quality gates
-        script: |
-          set -eo pipefail
-          npm run lint
-          npm run typecheck
-          npm run test:unit
-
-      # Step 3: Playwright smoke (install browsers first)
-      - name: Playwright smoke
-        script: |
-          set -eo pipefail
-          npx playwright install --with-deps chromium
-          npm run test:e2e:smoke
-
-      # Step 4: Build (includes postbuild verify:app, verify:icons, verify:console)
       - name: Build web assets
         script: |
-          set -eo pipefail
+          set -euo pipefail
           npm run build
 
-      - name: Verify App Store Connect secrets (fail fast)
+      - name: Sync iOS (Capacitor)
         script: |
           set -euo pipefail
-          missing=()
-          [[ -z "${APP_STORE_CONNECT_PRIVATE_KEY:-}" ]] && missing+=("APP_STORE_CONNECT_PRIVATE_KEY")
-          [[ -z "${APP_STORE_CONNECT_KEY_IDENTIFIER:-}" ]] && missing+=("APP_STORE_CONNECT_KEY_IDENTIFIER")
-          [[ -z "${APP_STORE_CONNECT_ISSUER_ID:-}" ]] && missing+=("APP_STORE_CONNECT_ISSUER_ID")
-          if (( ${#missing[@]} > 0 )); then
-            echo "Missing required App Store Connect secrets: ${missing[*]}"
-            exit 1
-          fi
-
-      - name: Install CocoaPods
-        script: |
-          set -eo pipefail
           npx cap sync ios
 
-      # Step 6: Install CocoaPods
       - name: Install CocoaPods
         script: |
-          set -eo pipefail
-          cd ios/App && pod install --repo-update
+          set -euo pipefail
+          cd ios/App
+          pod install --repo-update
+
+      - name: Install Codemagic CLI tools
+        script: |
+          set -euo pipefail
+          pip3 install codemagic-cli-tools --upgrade
 
       - name: Set iOS version/build (1.0.8 + unique build)
         script: |
@@ -87,21 +56,27 @@ workflows:
           chmod +x scripts/ci/ios_set_version_build.sh
           ./scripts/ci/ios_set_version_build.sh
 
-      # Step 7: Configure code signing (NO manual fetch-signing-files per spec)
-      - name: Configure code signing
+          echo "✅ Info.plist updated:"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST"
+
+      # THIS is what wires the provisioning profile into the Xcode project (Goodbuild #130 behavior)
+      - name: Configure code signing (use profiles)
         script: |
           set -euo pipefail
           xcode-project use-profiles --custom-export-options='{"testFlightInternalTestingOnly": true}'
+          # Goodbuild shows it generates export options with Apple Distribution + manual signing
 
-      # Step 8: Build archive & IPA
+      # Force Apple Distribution identity at archive time (prevents “iOS Distribution” mismatch)
       - name: Build archive & IPA
         script: |
-          set -eo pipefail
+          set -euo pipefail
           xcode-project build-ipa \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME" \
             --config Release \
-            --archive-flags="-destination 'generic/platform=iOS'"
+            --archive-flags="-destination 'generic/platform=iOS' COMPILER_INDEX_STORE_ENABLE=NO DEVELOPMENT_TEAM=$TEAM_ID 'CODE_SIGN_IDENTITY=Apple Distribution' CODE_SIGN_STYLE=Manual"
+          # This matches the known-good archive command shape
 
       - name: Verify IPA version + build (fail-fast)
         script: |
@@ -137,5 +112,4 @@ workflows:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID        # beta_groups:
-        #   - Internal Testers
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID

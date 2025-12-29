@@ -291,7 +291,9 @@ export function createNotifyOwnerService(
       insert: (data: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
       select: (columns?: string) => {
         eq: (col: string, val: unknown) => {
-          gte: (col: string, val: unknown) => Promise<{ data: unknown[]; error: unknown }>;
+          eq: (col: string, val: unknown) => {
+            gte: (col: string, val: unknown) => Promise<{ data: unknown[]; error: unknown }>;
+          };
         };
       };
     };

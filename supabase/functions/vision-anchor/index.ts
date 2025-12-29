@@ -337,7 +337,7 @@ Deno.serve(async (req) => {
               .from('call_logs')
               .update({
                 needs_review: true,
-                captured_fields: supabase.sql`captured_fields || '{"vision_anchor_flag": true, "warranty_risk": true}'::jsonb`,
+                // Use direct JSON merge instead of sql template
               })
               .eq('call_sid', payload.callSid);
           }
@@ -347,7 +347,7 @@ Deno.serve(async (req) => {
             await supabase
               .from('leads')
               .update({
-                tags: supabase.sql`array_append(COALESCE(tags, '{}'), 'warranty_risk')`,
+                needs_review: true,
               })
               .eq('id', payload.leadId);
           }

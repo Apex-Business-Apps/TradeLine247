@@ -353,10 +353,11 @@ serve(async (req) => {
     }
 
     // Send SMS if requested
+    let smsMessageContent = '';
     if (requestData.channel === 'sms' || requestData.channel === 'both') {
-      const smsMessage = `Hi ${booking.caller_name.split(' ')[0]}! Your booking (${booking.booking_reference}) with ${organization.name} is confirmed. ${booking.preferred_date ? `Scheduled for ${new Date(booking.preferred_date).toLocaleDateString()}` : 'We\'ll contact you to schedule.'} Reply to this message or call ${organization.phone_number} with questions.`;
+      smsMessageContent = `Hi ${booking.caller_name.split(' ')[0]}! Your booking (${booking.booking_reference}) with ${organization.name} is confirmed. ${booking.preferred_date ? `Scheduled for ${new Date(booking.preferred_date).toLocaleDateString()}` : 'We\'ll contact you to schedule.'} Reply to this message or call ${organization.phone_number} with questions.`;
 
-      smsSent = await sendSMS(booking.caller_phone, smsMessage);
+      smsSent = await sendSMS(booking.caller_phone, smsMessageContent);
     }
 
     // Record the confirmation attempt
@@ -373,10 +374,11 @@ serve(async (req) => {
         sms_sent_at: smsSent ? new Date().toISOString() : null,
         sms_delivery_status: smsSent ? 'sent' : 'failed',
         subject_line: subject,
-        message_content: requestData.channel === 'email' ? html : smsMessage,
+        message_content: requestData.channel === 'email' ? html : smsMessageContent,
         scheduled_for: requestData.scheduledFor || new Date().toISOString(),
         sent_at: new Date().toISOString(),
       });
+
 
     if (confirmationError) {
       console.error("Confirmation logging error:", confirmationError);

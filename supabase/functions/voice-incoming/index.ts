@@ -84,7 +84,14 @@ function isTestNumber(fromNumber: string): boolean {
 export default async (req: Request) => {
   const body = await req.text();
   const p = new URLSearchParams(body);
-  const callData = {
+  const callData: {
+    CallSid: string;
+    From: string;
+    To: string;
+    CallerName: string | null;
+    ForwardedFrom: string | null;
+    receptionistMode?: boolean;
+  } = {
     CallSid: p.get("CallSid") || "",
     From: p.get("From") || "",
     To: p.get("To") || "",
@@ -100,7 +107,7 @@ export default async (req: Request) => {
   callData.receptionistMode = receptionistMode;
 
   // Log inbound webhook events (async, don't block response)
-  logInboundCall(callData).catch(err => console.error('Failed to log inbound call:', err));
+  logInboundCall(callData).catch((err: unknown) => console.error('Failed to log inbound call:', err));
 
   // Log timeline events
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -108,7 +115,7 @@ export default async (req: Request) => {
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   // Log inbound_received
-  supabase.from('call_timeline').insert({
+  const { error: timelineError } = await supabase.from('call_timeline').insert({
     call_sid: callData.CallSid,
     event: 'inbound_received',
     timestamp: new Date().toISOString(),
@@ -117,7 +124,8 @@ export default async (req: Request) => {
       to_number: callData.To,
       receptionist_mode: callData.receptionistMode
     }
-  }).catch(err => console.error('Failed to log inbound_received:', err));
+  });
+  if (timelineError) console.error('Failed to log inbound_received:', timelineError);
 
   let xml: string;
 
@@ -139,8 +147,8 @@ export default async (req: Request) => {
 </Response>`;
   }
 
-  // Log twiml_sent event (async)
-  supabase.from('call_timeline').insert({
+  // Log twiml_sent event
+  const { error: twimlError } = await supabase.from('call_timeline').insert({
     call_sid: callData.CallSid,
     event: 'twiml_sent',
     timestamp: new Date().toISOString(),
@@ -148,7 +156,8 @@ export default async (req: Request) => {
       receptionist_mode: callData.receptionistMode,
       xml_length: xml.length
     }
-  }).catch(err => console.error('Failed to log twiml_sent:', err));
+  });
+  if (twimlError) console.error('Failed to log twiml_sent:', twimlError);
 
   return new Response(xml, { headers: { "Content-Type": "text/xml" } });
 };
