@@ -7,14 +7,13 @@ workflows:
       groups:
         - app_store_credentials
       vars:
-        # CORRECTED IDs FROM YOUR GOOD BUILD LOG
         XCODE_SCHEME: "App"
         BUNDLE_ID: "com.apex.tradeline"
-        APP_STORE_ID: "6754187965" 
+        APP_STORE_ID: "6754187965"
         TEAM_ID: "NWGUYF42KW"
       xcode: 16.4
       node: 20.19.0
-    
+
     scripts:
       - name: Install Dependencies
         script: |
@@ -25,16 +24,113 @@ workflows:
         script: |
           set -e
           
-          # --- NO COMPROMISE: FORCE VERSION 1.0.8 ---
+          # NO COMPROMISE: FORCE VERSION 1.0.8
           TARGET_VERSION="1.0.8"
           
-          # Fetch latest build number from TestFlight (default to 0 if fails)
+          # Fetch latest build number
           LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_ID" || echo "0")
           NEW_BUILD=$(($LATEST_BUILD + 1))
           
           echo "🚀 Enforcing Target Version: $TARGET_VERSION"
           echo "🆙 Calculated Build Number: $NEW_BUILD"
           
+          # PERSIST TO GLOBAL ENV
+          echo "APP_VERSION=$TARGET_VERSION" >> $CM_ENV
+          echo "APP_BUILD_NUMBER=$NEW_BUILD" >> $CM_ENV
+          
+          # Apply to Xcode
+          cd ios/App
+          xcrun agvtool new-marketing-version "$TARGET_VERSION"
+          xcrun agvtool new-version -all "$NEW_BUILD"
+
+      - name: Build Web Assets & Sync Capacitor
+        script: |
+          set -e
+          npm run build
+          npx cap sync ios
+
+      - name: Build IPA (Archive & Export)
+        script: |
+          set -e
+          cd ios/App
+          
+          pod install
+          
+          XC_WORKSPACE="App.xcworkspace"
+          XC_SCHEME="$XCODE_SCHEME"
+          ARCHIVE_PATH="../../build/ios/xcarchive/App.xcarchive"
+          IPA_PATH="../../build/ios/ipa"
+          EXPORT_PLIST="../../export_options.plist"
+          
+          # Create Export Options
+          cat > "$EXPORT_PLIST" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>$BUNDLE_ID</key>
+                  <string>TL247_mobpro_tradeline_01</string>
+              </dict>
+              <key>signingCertificate</key>
+              <string>Apple Distribution</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+          </dict>
+          </plist>
+          EOF
+          
+          # Archive
+          xcodebuild archive \
+            -workspace "$XC_WORKSPACE" \
+            -scheme "$XC_SCHEME" \
+            -archivePath "$ARCHIVE_PATH" \
+            -allowProvisioningUpdates \
+            -sdk iphoneos \
+            COMPILER_INDEX_STORE_ENABLE=NO
+
+          # Export
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$IPA_PATH" \
+            -exportOptionsPlist "$EXPORT_PLIST"
+
+      - name: Verify IPA Version (Fail Fast)
+        script: |
+          set -e
+          echo "🔍 Verifying Build Version: $APP_VERSION"
+          
+          if [ -z "$APP_VERSION" ]; then
+            echo "❌ CRITICAL: APP_VERSION is empty."
+            exit 1
+          fi
+          
+          if [ "$APP_VERSION" != "1.0.8" ]; then
+             echo "❌ VERSION MISMATCH: Expected 1.0.8, got $APP_VERSION"
+             exit 1
+          fi
+          
+          echo "✅ Verification Passed"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - build/ios/xcarchive/*.xcarchive
+
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+        submit_to_app_store: false
+        beta_groups:
+          - "Internal Testers"          
           # --- CRITICAL FIX: PERSIST TO GLOBAL ENV ---
           echo "APP_VERSION=$TARGET_VERSION" >> $CM_ENV
           echo "APP_BUILD_NUMBER=$NEW_BUILD" >> $CM_ENV
