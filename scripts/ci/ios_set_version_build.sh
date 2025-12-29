@@ -1,52 +1,70 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+set -e
 
-EXPECTED_IOS_VERSION="${EXPECTED_IOS_VERSION:-1.0.8}"
+# ==========================================
+# CONFIGURATION
+# ==========================================
+# Standard Capacitor iOS Info.plist path
+PLIST_PATH="ios/App/App/Info.plist"
 
-# Prefer TestFlight latest build + 1; fallback to Codemagic build counter.
-APP_STORE_APPLE_ID="${APP_STORE_APPLE_ID:-${APP_STORE_ID:-}}"
+echo "🚀 Starting iOS Versioning & Build Number Update..."
+echo "📍 Target Plist: $PLIST_PATH"
 
-LATEST_TF=0
-if [[ -n "${APP_STORE_APPLE_ID}" ]]; then
-  # This command must exist in your build image already (Codemagic CLI tools).
-  # If it fails, we fallback cleanly.
-  LATEST_TF="$(app-store-connect get-latest-testflight-build-number "${APP_STORE_APPLE_ID}" 2>/dev/null || true)"
-  [[ "${LATEST_TF}" =~ ^[0-9]+$ ]] || LATEST_TF=0
+# ==========================================
+# PRE-FLIGHT CHECKS
+# ==========================================
+if [ ! -f "$PLIST_PATH" ]; then
+    echo "❌ CRITICAL ERROR: Info.plist not found at $PLIST_PATH"
+    echo "📂 Current Directory Layout (ios/):"
+    ls -R ios/ | head -n 20
+    exit 1
 fi
 
-FALLBACK_BUILD="${CM_BUILD_NUMBER:-${BUILD_NUMBER:-0}}"
-[[ "${FALLBACK_BUILD}" =~ ^[0-9]+$ ]] || FALLBACK_BUILD=0
+# ==========================================
+# CALCULATE BUILD NUMBER
+# ==========================================
+# Attempt to fetch latest build from TestFlight.
+# We use '|| echo 0' to prevent the script from crashing if the API call fails/times out.
+echo "🔍 Fetching latest build number from App Store Connect..."
+LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" || echo "0")
 
-NEXT_BUILD_NUMBER=$(( LATEST_TF + 1 ))
-# If TF lookup failed (LATEST_TF=0) and fallback is higher, use fallback.
-if (( FALLBACK_BUILD > NEXT_BUILD_NUMBER )); then
-  NEXT_BUILD_NUMBER="${FALLBACK_BUILD}"
-fi
-# Ensure > 1 always
-if (( NEXT_BUILD_NUMBER < 2 )); then
-  NEXT_BUILD_NUMBER=2
-fi
-
-echo "✅ Setting iOS version=${EXPECTED_IOS_VERSION} build=${NEXT_BUILD_NUMBER} (latest_tf=${LATEST_TF}, fallback=${FALLBACK_BUILD})"
-
-# Write directly to Info.plist (most reliable for Capacitor setups)
-PLIST="ios/App/App/Info.plist"
-if [[ ! -f "$PLIST" ]]; then
-  echo "❌ Missing Info.plist at $PLIST"
-  exit 1
+if [ "$LATEST_BUILD" == "0" ]; then
+    echo "⚠️  WARNING: Could not fetch latest build number (or it returned 0)."
+    echo "⚙️  Defaulting to safe fallback: 10"
+    NEW_BUILD_NUMBER=10
+else
+    NEW_BUILD_NUMBER=$(($LATEST_BUILD + 1))
+    echo "✅ Fetched latest build: $LATEST_BUILD. Incrementing to: $NEW_BUILD_NUMBER"
 fi
 
-/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${EXPECTED_IOS_VERSION}" "$PLIST" \
-  || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string ${EXPECTED_IOS_VERSION}" "$PLIST"
+# ==========================================
+# EXECUTE UPDATES (PlistBuddy)
+# ==========================================
+# We use PlistBuddy as it is the native, safe way to edit Plists on macOS.
+# 'Set' assumes the key exists. If keys are missing, we might need 'Add', 
+# but standard Capacitor projects have these keys.
 
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${NEXT_BUILD_NUMBER}" "$PLIST" \
-  || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string ${NEXT_BUILD_NUMBER}" "$PLIST"
+echo "📝 Updating CFBundleShortVersionString to $EXPECTED_IOS_VERSION..."
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $EXPECTED_IOS_VERSION" "$PLIST_PATH"
 
-# Persist across steps
-echo "EXPECTED_IOS_VERSION=${EXPECTED_IOS_VERSION}" >> "${CM_ENV}"
-echo "NEXT_BUILD_NUMBER=${NEXT_BUILD_NUMBER}" >> "${CM_ENV}"
+echo "📝 Updating CFBundleVersion to $NEW_BUILD_NUMBER..."
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $NEW_BUILD_NUMBER" "$PLIST_PATH"
 
-# Print proof (safe)
-V=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST")
-B=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST")
-echo "✅ Info.plist now Version=$V Build=$B"
+# ==========================================
+# VERIFICATION & EXPORT
+# ==========================================
+# Read values back to verify success
+FINAL_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_PATH")
+FINAL_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH")
+
+echo "✅ SUCCESS: Info.plist updated."
+echo "   Version: $FINAL_VERSION"
+echo "   Build:   $FINAL_BUILD"
+
+# Export variable for subsequent Codemagic steps
+if [ -n "$CM_ENV" ]; then
+    echo "BUILD_NUMBER=$NEW_BUILD_NUMBER" >> $CM_ENV
+    echo "📤 Exported BUILD_NUMBER to Codemagic environment."
+fi
+
+exit 0

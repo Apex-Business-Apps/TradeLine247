@@ -54,7 +54,7 @@ workflows:
         script: |
           set -euo pipefail
           chmod +x scripts/ci/ios_set_version_build.sh
-          ./scripts/ci/ios_set_version_build.sh
+          bash scripts/ci/ios_set_version_build.sh
 
           echo "✅ Info.plist updated:"
           /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST"
