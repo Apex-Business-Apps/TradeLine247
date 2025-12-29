@@ -113,33 +113,97 @@ workflows:
 
       - name: Verify IPA version + build (fail-fast)
         script: |
+          #!/bin/bash
           set -euo pipefail
           source "$CM_ENV"
 
-          IPA="$(ls -1 build/ios/ipa/*.ipa | head -n 1)"
-          echo "📦 IPA: $IPA"
+          # === Configuration ===
+          IPA_PATH="$(ls -1 build/ios/ipa/*.ipa 2>/dev/null | head -n 1)"
+          EXPECTED_VERSION="${APP_VERSION:-${TARGET_VERSION:-1.0.8}}"
+          EXPECTED_BUILD="${APP_BUILD_NUMBER:-}"
 
-          TMP="$(mktemp -d)"
-          unzip -q "$IPA" -d "$TMP"
+          echo "══════════════════════════════════════════════"
+          echo "🎯 IPA VERIFICATION"
+          echo "══════════════════════════════════════════════"
+          echo "📦 IPA Path: $IPA_PATH"
+          echo "🎯 Expected Version: $EXPECTED_VERSION"
+          echo "🔢 Expected Build: $EXPECTED_BUILD"
+          echo ""
 
-          PLIST_IN_IPA="$(find "$TMP/Payload" -maxdepth 4 -name Info.plist | head -n 1)"
-          if [[ -z "$PLIST_IN_IPA" ]]; then
-            echo "❌ Could not find Info.plist in IPA"
-            find "$TMP/Payload" -maxdepth 3 -print || true
+          # === Validate IPA exists ===
+          if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
+            echo "❌ FATAL: IPA not found in build/ios/ipa/"
+            echo "   Ensure 'Build archive & IPA' step completed successfully."
+            ls -la build/ios/ipa/ 2>/dev/null || echo "   Directory does not exist"
             exit 1
           fi
 
-          V=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_IN_IPA")
-          B=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_IN_IPA")
+          echo "✅ IPA file exists ($(du -h "$IPA_PATH" | cut -f1))"
 
-          echo "✅ IPA Version: $V"
-          echo "✅ IPA Build:   $B"
+          # === Extract IPA to temp directory ===
+          TEMP_DIR=$(mktemp -d)
+          trap "rm -rf $TEMP_DIR" EXIT
 
-          [[ "$V" == "$APP_VERSION" ]] || (echo "❌ Version mismatch (expected $APP_VERSION)"; exit 1)
-          [[ "$B" == "$APP_BUILD_NUMBER" ]] || (echo "❌ Build mismatch (expected $APP_BUILD_NUMBER)"; exit 1)
+          echo "📂 Extracting IPA..."
+          unzip -q "$IPA_PATH" -d "$TEMP_DIR"
 
-          rm -rf "$TMP"
-          echo "✅ IPA verified. Safe to publish."
+          # === Locate Info.plist (use explicit path, not find) ===
+          PLIST_PATH="$TEMP_DIR/Payload/App.app/Info.plist"
+
+          if [ ! -f "$PLIST_PATH" ]; then
+            echo "❌ FATAL: Info.plist not found at expected path"
+            echo "   Expected: Payload/App.app/Info.plist"
+            echo ""
+            echo "   IPA contents:"
+            ls -la "$TEMP_DIR/" 2>/dev/null || true
+            ls -la "$TEMP_DIR/Payload/" 2>/dev/null || true
+            find "$TEMP_DIR/Payload" -name "*.app" -type d 2>/dev/null || true
+            exit 1
+          fi
+
+          echo "✅ IPA Info.plist: Payload/App.app/Info.plist"
+
+          # === Read version and build ===
+          IPA_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_PATH")
+          IPA_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH")
+          BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$PLIST_PATH" 2>/dev/null || echo "unknown")
+
+          echo "✅ IPA Version: $IPA_VERSION"
+          echo "✅ IPA Build:   $IPA_BUILD"
+          echo "📋 Bundle ID:  $BUNDLE_ID"
+          echo ""
+
+          # === Verify version matches ===
+          if [ "$IPA_VERSION" != "$EXPECTED_VERSION" ]; then
+            echo "══════════════════════════════════════════════"
+            echo "❌ VERSION MISMATCH!"
+            echo "══════════════════════════════════════════════"
+            echo "   Expected: $EXPECTED_VERSION"
+            echo "   Found:    $IPA_VERSION"
+            echo ""
+            echo "   Possible causes:"
+            echo "   1. APP_VERSION env var not set correctly"
+            echo "   2. Info.plist update step failed silently"
+            echo "   3. Capacitor sync overwrote version"
+            exit 1
+          fi
+
+          # === Verify build matches (if expected build is set) ===
+          if [ -n "$EXPECTED_BUILD" ] && [ "$IPA_BUILD" != "$EXPECTED_BUILD" ]; then
+            echo "══════════════════════════════════════════════"
+            echo "❌ BUILD MISMATCH!"
+            echo "══════════════════════════════════════════════"
+            echo "   Expected: $EXPECTED_BUILD"
+            echo "   Found:    $IPA_BUILD"
+            exit 1
+          fi
+
+          # === Success ===
+          echo "══════════════════════════════════════════════"
+          echo "✅ IPA VERIFICATION PASSED"
+          echo "══════════════════════════════════════════════"
+          echo "   Version $IPA_VERSION (build $IPA_BUILD) ready for TestFlight"
+          echo ""
 
     artifacts:
       - build/ios/ipa/*.ipa
