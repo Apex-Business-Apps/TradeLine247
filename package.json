@@ -156,7 +156,7 @@
     "axe-core": "^4.11.0",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.2",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^5.2.0",
