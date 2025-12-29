@@ -80,10 +80,10 @@ workflows:
           set -eo pipefail
           cd ios/App && pod install --repo-update
 
-      - name: Set iOS version/build (1.0.7 + ASC-max+1)
+      - name: Set iOS version/build (1.0.8 + ASC-max+1)
         script: |
-          chmod +x scripts/ci/ios_versioning_107.sh
-          ./scripts/ci/ios_versioning_107.sh
+          chmod +x scripts/ci/ios_versioning_108.sh
+          ./scripts/ci/ios_versioning_108.sh
 
       # Step 7: Configure code signing (NO manual fetch-signing-files per spec)
       - name: Configure code signing
@@ -138,8 +138,8 @@ workflows:
               exp_ver = os.environ.get("APP_VERSION", "")
               exp_bld = os.environ.get("NEXT_BUILD_NUMBER", "")
 
-              if exp_ver != "1.0.7":
-                  print(f"❌ APP_VERSION must be 1.0.7, got {exp_ver!r}")
+              if exp_ver != "1.0.8":
+                  print(f"❌ APP_VERSION must be 1.0.8, got {exp_ver!r}")
                   sys.exit(1)
               if not exp_bld.isdigit():
                   print(f"❌ NEXT_BUILD_NUMBER missing or not integer: {exp_bld!r}")
