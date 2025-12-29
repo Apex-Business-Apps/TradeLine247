@@ -103,55 +103,58 @@ workflows:
 
       - name: Verify IPA version + build (fail-fast preflight)
         script: |
-          set -euo pipefail
-          echo "🎯 Expected version: ${APP_VERSION:-}"
-          echo "🎯 Expected build number: ${NEXT_BUILD_NUMBER:-}"
-          python3 - <<'PY'
-import os, glob, re, zipfile, plistlib, sys
+          #!/usr/bin/env python3
+          import os, glob, re, zipfile, plistlib, sys
 
-ipas = glob.glob("build/ios/ipa/*.ipa")
-if not ipas:
-    print("❌ No IPA found at build/ios/ipa/*.ipa")
-    sys.exit(1)
-ipa = ipas[0]
-print(f"📦 Found IPA: {ipa}")
+          try:
+              print(f"🎯 Expected version: {os.environ.get('APP_VERSION', '')}")
+              print(f"🎯 Expected build number: {os.environ.get('NEXT_BUILD_NUMBER', '')}")
 
-with zipfile.ZipFile(ipa, "r") as z:
-    names = z.namelist()
-    plist_paths = [p for p in names if re.match(r"^Payload/[^/]+\.app/Info\.plist$", p)]
-    if not plist_paths:
-        print("❌ Could not find Info.plist in IPA.")
-        print("🔎 First 200 IPA entries:")
-        for p in names[:200]:
-            print(p)
-        sys.exit(1)
-    plist_path = plist_paths[0]
-    info = plistlib.loads(z.read(plist_path))
+              ipas = glob.glob("build/ios/ipa/*.ipa")
+              if not ipas:
+                  print("❌ No IPA found at build/ios/ipa/*.ipa")
+                  sys.exit(1)
+              ipa = ipas[0]
+              print(f"📦 Found IPA: {ipa}")
 
-ver = str(info.get("CFBundleShortVersionString", ""))
-bld = str(info.get("CFBundleVersion", ""))
-print(f"✅ IPA Info.plist: {plist_path}")
-print(f"✅ IPA Version: {ver}")
-print(f"✅ IPA Build:   {bld}")
+              with zipfile.ZipFile(ipa, "r") as z:
+                  names = z.namelist()
+                  plist_paths = [p for p in names if re.match(r"^Payload/[^/]+\.app/Info\.plist$", p)]
+                  if not plist_paths:
+                      print("❌ Could not find Info.plist in IPA.")
+                      print("🔎 First 200 IPA entries:")
+                      for p in names[:200]:
+                          print(p)
+                      sys.exit(1)
+                  plist_path = plist_paths[0]
+                  info = plistlib.loads(z.read(plist_path))
 
-exp_ver = os.environ.get("APP_VERSION", "")
-exp_bld = os.environ.get("NEXT_BUILD_NUMBER", "")
+              ver = str(info.get("CFBundleShortVersionString", ""))
+              bld = str(info.get("CFBundleVersion", ""))
+              print(f"✅ IPA Info.plist: {plist_path}")
+              print(f"✅ IPA Version: {ver}")
+              print(f"✅ IPA Build:   {bld}")
 
-if exp_ver != "1.0.7":
-    print(f"❌ APP_VERSION must be 1.0.7, got {exp_ver!r}")
-    sys.exit(1)
-if not exp_bld.isdigit():
-    print(f"❌ NEXT_BUILD_NUMBER missing or not integer: {exp_bld!r}")
-    sys.exit(1)
-if ver != exp_ver:
-    print(f"❌ Version mismatch: expected {exp_ver} got {ver}")
-    sys.exit(1)
-if bld != exp_bld:
-    print(f"❌ Build mismatch: expected {exp_bld} got {bld}")
-    sys.exit(1)
+              exp_ver = os.environ.get("APP_VERSION", "")
+              exp_bld = os.environ.get("NEXT_BUILD_NUMBER", "")
 
-print("✅ IPA version/build verified. Safe to publish.")
-PY
+              if exp_ver != "1.0.7":
+                  print(f"❌ APP_VERSION must be 1.0.7, got {exp_ver!r}")
+                  sys.exit(1)
+              if not exp_bld.isdigit():
+                  print(f"❌ NEXT_BUILD_NUMBER missing or not integer: {exp_bld!r}")
+                  sys.exit(1)
+              if ver != exp_ver:
+                  print(f"❌ Version mismatch: expected {exp_ver} got {ver}")
+                  sys.exit(1)
+              if bld != exp_bld:
+                  print(f"❌ Build mismatch: expected {exp_bld} got {bld}")
+                  sys.exit(1)
+
+              print("✅ IPA version/build verified. Safe to publish.")
+          except Exception as e:
+              print(f"❌ Script failed: {e}")
+              sys.exit(1)
 
     artifacts:
       - build/ios/ipa/*.ipa
