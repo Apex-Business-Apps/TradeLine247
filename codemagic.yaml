@@ -122,12 +122,20 @@ workflows:
           TMP="$(mktemp -d)"
           unzip -q "$IPA" -d "$TMP"
 
-          PLIST_IN_IPA="$(find "$TMP/Payload" -maxdepth 4 -name Info.plist | head -n 1)"
-          if [[ -z "$PLIST_IN_IPA" ]]; then
-            echo "❌ Could not find Info.plist in IPA"
-            find "$TMP/Payload" -maxdepth 3 -print || true
+          # Direct path to App's Info.plist (NOT nested storyboard plists)
+          PLIST_IN_IPA="$TMP/Payload/App.app/Info.plist"
+
+          if [[ ! -f "$PLIST_IN_IPA" ]]; then
+            echo "❌ Info.plist not found at: $PLIST_IN_IPA"
+            echo "📂 Contents of Payload:"
+            ls -la "$TMP/Payload/" || true
+            echo "📂 Contents of App.app:"
+            ls -la "$TMP/Payload/App.app/" || true
+            rm -rf "$TMP"
             exit 1
           fi
+
+          echo "✅ IPA Info.plist: $PLIST_IN_IPA"
 
           V=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_IN_IPA")
           B=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_IN_IPA")
