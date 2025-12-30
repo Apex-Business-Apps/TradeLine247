@@ -83,13 +83,22 @@ workflows:
       - name: Verify IPA version + build (fail-fast)
         script: |
           #!/usr/bin/env bash
-          # Minimal IPA verification - matches Build #130 behavior
+          set -e  # Exit on error
 
+          # Minimal IPA verification - matches Build #130 behavior
           IPA_PATH="build/ios/ipa/App.ipa"
           echo "📦 Found IPA: $IPA_PATH"
 
-          # Extract IPA to temp directory
+          # Validate IPA exists
+          if [ ! -f "$IPA_PATH" ]; then
+            echo "❌ IPA not found at $IPA_PATH"
+            exit 1
+          fi
+
+          # Extract IPA to temp directory with cleanup trap
           TEMP_DIR=$(mktemp -d)
+          trap "rm -rf $TEMP_DIR" EXIT
+
           unzip -q "$IPA_PATH" -d "$TEMP_DIR"
 
           # Direct path to app's Info.plist (not nested storyboard plists)
@@ -97,7 +106,8 @@ workflows:
 
           if [ ! -f "$PLIST_PATH" ]; then
             echo "❌ Info.plist not found at expected path"
-            rm -rf "$TEMP_DIR"
+            echo "📂 IPA contents:"
+            ls -la "$TEMP_DIR/Payload/" 2>/dev/null || true
             exit 1
           fi
 
@@ -107,13 +117,15 @@ workflows:
           IPA_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_PATH")
           IPA_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH")
 
+          # Validate we got values
+          if [ -z "$IPA_VERSION" ] || [ -z "$IPA_BUILD" ]; then
+            echo "❌ Failed to read version or build from plist"
+            exit 1
+          fi
+
           echo "✅ IPA Version: $IPA_VERSION"
           echo "✅ IPA Build:   $IPA_BUILD"
-
-          # Cleanup
-          rm -rf "$TEMP_DIR"
-
-          echo "✅ IPA version/build verified. Safe to publish."
+          echo "✅ IPA verification passed. Safe to publish."
 
     artifacts:
       - build/ios/ipa/*.ipa
