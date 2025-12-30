@@ -1,70 +1,57 @@
 #!/bin/bash
-set -e
-
-# ==========================================
-# CONFIGURATION
-# ==========================================
-# Standard Capacitor iOS Info.plist path
-PLIST_PATH="ios/App/App/Info.plist"
+set -euo pipefail
 
 echo "🚀 Starting iOS Versioning & Build Number Update..."
-echo "📍 Target Plist: $PLIST_PATH"
 
-# ==========================================
-# PRE-FLIGHT CHECKS
-# ==========================================
-if [ ! -f "$PLIST_PATH" ]; then
-    echo "❌ CRITICAL ERROR: Info.plist not found at $PLIST_PATH"
-    echo "📂 Current Directory Layout (ios/):"
-    ls -R ios/ | head -n 20
-    exit 1
+PLIST_PATH="ios/App/App/Info.plist"
+: "${EXPECTED_IOS_VERSION:?EXPECTED_IOS_VERSION is not set}"
+if [[ ! -f "$PLIST_PATH" ]]; then
+  echo "❌ Info.plist not found at: $PLIST_PATH"
+  exit 1
 fi
 
-# ==========================================
-# CALCULATE BUILD NUMBER
-# ==========================================
-# Attempt to fetch latest build from TestFlight.
-# We use '|| echo 0' to prevent the script from crashing if the API call fails/times out.
-echo "🔍 Fetching latest build number from App Store Connect..."
-LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" || echo "0")
+# Determine build number
+LATEST_BUILD=""
+if [[ -n "${APP_STORE_ID:-}" && "${APP_STORE_ID}" =~ ^[0-9]+$ ]]; then
+  echo "🔍 Fetching latest TestFlight build (APP_STORE_ID=$APP_STORE_ID)..."
+  set +e
+  LATEST_BUILD="$(app-store-connect get-latest-testflight-build-number "$APP_STORE_ID" 2>/dev/null)"
+  set -e
+fi
 
-if [ "$LATEST_BUILD" == "0" ]; then
-    echo "⚠️  WARNING: Could not fetch latest build number (or it returned 0)."
-    echo "⚙️  Defaulting to safe fallback: 10"
-    NEW_BUILD_NUMBER=10
+if [[ "${LATEST_BUILD}" =~ ^[0-9]+$ ]]; then
+  BUILD_NUMBER="$((LATEST_BUILD + 1))"
+  echo "✅ Latest build: $LATEST_BUILD → using: $BUILD_NUMBER"
 else
-    NEW_BUILD_NUMBER=$(($LATEST_BUILD + 1))
-    echo "✅ Fetched latest build: $LATEST_BUILD. Incrementing to: $NEW_BUILD_NUMBER"
+  BUILD_NUMBER="$(python3 - <<'PY'
+import time
+print(int(time.time()*1000))
+PY
+)"
+  echo "⚠️ ASC lookup unavailable → using ms-epoch build: $BUILD_NUMBER"
 fi
 
-# ==========================================
-# EXECUTE UPDATES (PlistBuddy)
-# ==========================================
-# We use PlistBuddy as it is the native, safe way to edit Plists on macOS.
-# 'Set' assumes the key exists. If keys are missing, we might need 'Add', 
-# but standard Capacitor projects have these keys.
-
-echo "📝 Updating CFBundleShortVersionString to $EXPECTED_IOS_VERSION..."
+echo "📝 Setting version=$EXPECTED_IOS_VERSION build=$BUILD_NUMBER ..."
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $EXPECTED_IOS_VERSION" "$PLIST_PATH"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST_PATH"
 
-echo "📝 Updating CFBundleVersion to $NEW_BUILD_NUMBER..."
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $NEW_BUILD_NUMBER" "$PLIST_PATH"
-
-# ==========================================
-# VERIFICATION & EXPORT
-# ==========================================
-# Read values back to verify success
-FINAL_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_PATH")
-FINAL_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH")
+# Read-back assertions
+ACTUAL_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_PATH")
+ACTUAL_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH")
+if [[ "$ACTUAL_VERSION" != "$EXPECTED_IOS_VERSION" ]]; then
+  echo "❌ Version mismatch: expected=$EXPECTED_IOS_VERSION actual=$ACTUAL_VERSION"
+  exit 1
+fi
+if [[ ! "$ACTUAL_BUILD" =~ ^[0-9]+$ ]]; then
+  echo "❌ Build is not numeric: $ACTUAL_BUILD"
+  exit 1
+fi
 
 echo "✅ SUCCESS: Info.plist updated."
-echo "   Version: $FINAL_VERSION"
-echo "   Build:   $FINAL_BUILD"
+echo "   Version: $ACTUAL_VERSION"
+echo "   Build:   $ACTUAL_BUILD"
 
-# Export variable for subsequent Codemagic steps
-if [ -n "$CM_ENV" ]; then
-    echo "BUILD_NUMBER=$NEW_BUILD_NUMBER" >> $CM_ENV
-    echo "📤 Exported BUILD_NUMBER to Codemagic environment."
-fi
-
-exit 0
+# Export for later steps
+echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$CM_ENV"
+echo "PLIST_PATH=$PLIST_PATH" >> "$CM_ENV"
+echo "📤 Exported BUILD_NUMBER and PLIST_PATH to Codemagic env."
