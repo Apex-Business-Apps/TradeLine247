@@ -82,29 +82,41 @@ workflows:
 
       - name: Verify IPA version + build (fail-fast)
         script: |
-          set -e
-          IPA_PATH="build/ios/ipa/App.ipa"
-          echo "📦 IPA: $IPA_PATH"
-          
-          # Extract Info.plist from IPA (it's a zip)
-          TEMP_DIR=$(mktemp -d)
-          unzip -q "$IPA_PATH" -d "$TEMP_DIR"
-          
-          # Find Info.plist
-          PLIST_PATH=$(find "$TEMP_DIR" -name "Info.plist" -path "*/Payload/*.app/*" | head -1)
-          echo "✅ IPA Info.plist: $PLIST_PATH"
-          
-          # Read version and build
-          IPA_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_PATH")
-          IPA_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_PATH")
-          
-          echo "✅ IPA Version: $IPA_VERSION"
-          echo "✅ IPA Build:   $IPA_BUILD"
-          
-          # Cleanup
-          rm -rf "$TEMP_DIR"
-          
-          echo "✅ IPA version/build verified. Safe to publish."
+          set -euo pipefail
+          source "$CM_ENV"
+
+          IPA="$(ls -1 build/ios/ipa/*.ipa | head -n 1)"
+          echo "📦 IPA: $IPA"
+
+          TMP="$(mktemp -d)"
+          unzip -q "$IPA" -d "$TMP"
+
+          # Direct path to App's Info.plist (NOT nested storyboard plists)
+          PLIST_IN_IPA="$TMP/Payload/App.app/Info.plist"
+
+          if [[ ! -f "$PLIST_IN_IPA" ]]; then
+            echo "❌ Info.plist not found at: $PLIST_IN_IPA"
+            echo "📂 Contents of Payload:"
+            ls -la "$TMP/Payload/" || true
+            echo "📂 Contents of App.app:"
+            ls -la "$TMP/Payload/App.app/" || true
+            rm -rf "$TMP"
+            exit 1
+          fi
+
+          echo "✅ IPA Info.plist: $PLIST_IN_IPA"
+
+          V=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST_IN_IPA")
+          B=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST_IN_IPA")
+
+          echo "✅ IPA Version: $V"
+          echo "✅ IPA Build:   $B"
+
+          [[ "$V" == "$APP_VERSION" ]] || (echo "❌ Version mismatch (expected $APP_VERSION)"; exit 1)
+          [[ "$B" == "$APP_BUILD_NUMBER" ]] || (echo "❌ Build mismatch (expected $APP_BUILD_NUMBER)"; exit 1)
+
+          rm -rf "$TMP"
+          echo "✅ IPA verified. Safe to publish."
 
     artifacts:
       - build/ios/ipa/*.ipa
