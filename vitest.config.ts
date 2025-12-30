@@ -14,7 +14,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     watch: !isCI,
-    reporters: isCI ? ['basic'] : ['default'],
+    reporters: ['default'],  // Vitest 4.x: use 'default' for all environments
     setupFiles: ['src/setupTests.tsx'],
     globals: true,
     css: true,

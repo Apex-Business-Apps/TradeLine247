@@ -36,7 +36,8 @@ for (let i = 0; i < rawArgs.length; i += 1) {
 
 const baseArgs = ['run'];
 if (!hasReporter) {
-  baseArgs.push('--reporter=basic');
+  // Use 'default' reporter - Vitest 4.x changed reporter loading
+  baseArgs.push('--reporter=default');
 }
 
 const finalArgs = [...baseArgs, ...forwarded];
