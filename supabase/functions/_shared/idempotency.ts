@@ -20,7 +20,17 @@ export interface IdempotencyResult {
 }
 
 /**
- * Generate idempotency key from request
+ * Generate cryptographic nonce for idempotency keys
+ * SECURITY: Uses crypto.randomUUID() for unpredictable component
+ */
+function generateNonce(): string {
+  return crypto.randomUUID();
+}
+
+/**
+ * Generate idempotency key from request with cryptographic nonce
+ * SECURITY: Combines deterministic hash with random nonce to prevent replay attacks
+ * Format: {operationType}_{nonce}_{contentHash}
  */
 export async function generateIdempotencyKey(
   operationType: string,
@@ -28,7 +38,8 @@ export async function generateIdempotencyKey(
 ): Promise<string> {
   const data = JSON.stringify({ operationType, args });
   const hash = await sha256Hex(data);
-  return `${operationType}_${hash}`;
+  const nonce = generateNonce();
+  return `${operationType}_${nonce}_${hash}`;
 }
 
 /**

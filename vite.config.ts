@@ -20,14 +20,16 @@ export default defineConfig(({ mode }: ConfigEnv) => ({
             'Content-Security-Policy',
             [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
+              // SECURITY: unsafe-inline needed for styled-components; unsafe-eval REMOVED
+              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https:",
-              "connect-src 'self' https://*.supabase.co https://api.openai.com https://api.twilio.com",
+              "connect-src 'self' https://*.supabase.co https://api.openai.com https://api.twilio.com wss://*.supabase.co",
               "frame-ancestors 'none'",
               "base-uri 'self'",
-              "form-action 'self'"
+              "form-action 'self'",
+              "upgrade-insecure-requests"
             ].join('; ')
           );
           next();

@@ -30,12 +30,37 @@ describe('HTTP security primitives', () => {
     delete process.env.TWILIO_AUTH_TOKEN;
   });
 
-  it('handles CORS preflight', () => {
+  it('handles CORS preflight with origin validation', () => {
+    // Request without origin header - defaults to primary domain
     const res = preflight(new Request('https://example.com', { method: 'OPTIONS' }));
     expect(res).not.toBeNull();
     expect(res?.status).toBe(204);
-    expect(res?.headers.get('Access-Control-Allow-Origin')).toBe('*');
+    // SECURITY: Should NOT be "*" - must be specific allowed origin
+    expect(res?.headers.get('Access-Control-Allow-Origin')).toBe('https://tradeline247.com');
     expect(res?.headers.get('Content-Length')).toBe('0');
+  });
+
+  it('handles CORS preflight with allowed origin', () => {
+    // Request with allowed origin header - returns that origin
+    const res = preflight(new Request('https://example.com', {
+      method: 'OPTIONS',
+      headers: { 'Origin': 'http://localhost:8080' },
+    }));
+    expect(res).not.toBeNull();
+    expect(res?.status).toBe(204);
+    expect(res?.headers.get('Access-Control-Allow-Origin')).toBe('http://localhost:8080');
+  });
+
+  it('rejects unknown CORS origins', () => {
+    // Request with unknown origin - falls back to primary domain
+    const res = preflight(new Request('https://example.com', {
+      method: 'OPTIONS',
+      headers: { 'Origin': 'https://malicious-site.com' },
+    }));
+    expect(res).not.toBeNull();
+    expect(res?.status).toBe(204);
+    // Unknown origins are rejected - falls back to primary domain
+    expect(res?.headers.get('Access-Control-Allow-Origin')).toBe('https://tradeline247.com');
   });
 
   it('merges secure headers with custom sets', () => {
