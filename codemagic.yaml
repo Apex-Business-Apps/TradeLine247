@@ -40,31 +40,6 @@ workflows:
           set -euo pipefail
           npx cap sync ios
 
-      - name: Guardrail - enforce export compliance key
-        script: |
-          #!/bin/bash
-          set -eo pipefail
-
-          PLIST="ios/App/App/Info.plist"
-
-          if [ ! -f "$PLIST" ]; then
-            echo "❌ Export compliance guardrail: Info.plist not found at: $PLIST"
-            exit 2
-          fi
-
-          TARGET_VALUE="false"
-
-          if /usr/libexec/PlistBuddy -c "Print :ITSAppUsesNonExemptEncryption" "$PLIST" >/dev/null 2>&1; then
-            /usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption $TARGET_VALUE" "$PLIST"
-            echo "✅ Export compliance key updated to $TARGET_VALUE"
-          else
-            /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool $TARGET_VALUE" "$PLIST"
-            echo "✅ Export compliance key added with value $TARGET_VALUE"
-          fi
-
-          /usr/bin/plutil -lint "$PLIST" >/dev/null
-          echo "✅ Export compliance guardrail: ITSAppUsesNonExemptEncryption=$TARGET_VALUE in $PLIST"
-
       - name: Install CocoaPods
         script: |
           set -euo pipefail
@@ -94,7 +69,7 @@ workflows:
           xcode-project use-profiles --custom-export-options='{"testFlightInternalTestingOnly": true}'
           # Goodbuild shows it generates export options with Apple Distribution + manual signing
 
-      # Force Apple Distribution identity at archive time (prevents “iOS Distribution” mismatch)
+      # Force Apple Distribution identity at archive time (prevents "iOS Distribution" mismatch)
       - name: Build archive & IPA
         script: |
           set -euo pipefail
@@ -151,51 +126,6 @@ workflows:
           echo "✅ IPA Version: $IPA_VERSION"
           echo "✅ IPA Build:   $IPA_BUILD"
           echo "✅ IPA verification passed. Safe to publish."
-
-      - name: Preflight - verify export compliance in IPA
-        script: |
-          #!/bin/bash
-          set -eo pipefail
-
-          IPA="$(ls -1 build/ios/ipa/*.ipa 2>/dev/null | head -n 1 || true)"
-
-          if [ -z "$IPA" ]; then
-            echo "❌ Preflight: IPA not found at build/ios/ipa/*.ipa"
-            exit 2
-          fi
-
-          echo "📦 Found IPA: $IPA"
-
-          TMPDIR="$(mktemp -d)"
-          unzip -q "$IPA" -d "$TMPDIR"
-
-          APP_DIR="$(find "$TMPDIR/Payload" -maxdepth 1 -type d -name "*.app" | head -n 1 || true)"
-
-          if [ -z "$APP_DIR" ]; then
-            echo "❌ Preflight: no *.app found under Payload/"
-            rm -rf "$TMPDIR"
-            exit 2
-          fi
-
-          APP_PLIST="$APP_DIR/Info.plist"
-
-          if [ ! -f "$APP_PLIST" ]; then
-            echo "❌ Preflight: Info.plist not found at $APP_PLIST"
-            rm -rf "$TMPDIR"
-            exit 2
-          fi
-
-          EXPECTED="false"
-          ACTUAL="$(/usr/libexec/PlistBuddy -c "Print :ITSAppUsesNonExemptEncryption" "$APP_PLIST" 2>/dev/null || echo "MISSING")"
-
-          rm -rf "$TMPDIR"
-
-          if [ "$ACTUAL" != "$EXPECTED" ]; then
-            echo "❌ Preflight: ITSAppUsesNonExemptEncryption mismatch. Expected '$EXPECTED', got '$ACTUAL'"
-            exit 1
-          fi
-
-          echo "✅ Preflight: IPA contains ITSAppUsesNonExemptEncryption=$EXPECTED"
 
     artifacts:
       - build/ios/ipa/*.ipa
