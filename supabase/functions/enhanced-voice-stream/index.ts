@@ -4,12 +4,17 @@
  *
  * Real-time voice streaming with emotional recognition,
  * booking intent detection, and escalation triggers.
+ *
+ * Supports two authentication modes:
+ * 1. Standard Bearer token auth (for authenticated API clients)
+ * 2. Short-lived HMAC stream tokens (for Twilio WebSocket connections)
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { enterpriseMonitor } from "../_shared/enterprise-monitoring.ts";
-import { withSecurity, ExtendedSecurityContext, successResponse, errorResponse } from "../_shared/security-middleware.ts";
+import { withSecurity, ExtendedSecurityContext, successResponse, errorResponse, corsHeaders } from "../_shared/security-middleware.ts";
+import { verifyStreamToken } from "../_shared/stream_token.ts";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -242,7 +247,70 @@ and offer to help resolve their concerns.`;
 }
 
 async function handleVoiceStream(req: Request, ctx: ExtendedSecurityContext): Promise<Response> {
-  const requestData: VoiceStreamRequest = await req.json();
+  // Check for stream token authentication (Twilio WebSocket connections)
+  const urlObj = new URL(req.url);
+  const streamToken = urlObj.searchParams.get('streamToken');
+  const queryCallSid = urlObj.searchParams.get('callSid');
+
+  let tokenAuthOk = false;
+  let tokenCallSid: string | null = null;
+
+  if (streamToken) {
+    const secret = Deno.env.get('VOICE_STREAM_SECRET') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const verified = await verifyStreamToken(secret, streamToken);
+
+    if (!verified.ok) {
+      console.error('Invalid stream token:', verified.reason);
+      await enterpriseMonitor.logSecurityEvent(
+        'auth_failure',
+        {
+          reason: `stream_token_${verified.reason}`,
+          call_sid: queryCallSid,
+        },
+        undefined,
+        'high'
+      );
+      return errorResponse(`Invalid stream token: ${verified.reason}`, 401, ctx.requestId);
+    }
+
+    tokenAuthOk = true;
+    tokenCallSid = verified.callSid;
+
+    // Verify callSid in token matches query param
+    if (queryCallSid && queryCallSid !== tokenCallSid) {
+      console.error('CallSid mismatch:', { queryCallSid, tokenCallSid });
+      return errorResponse('CallSid mismatch', 401, ctx.requestId);
+    }
+
+    console.log('Stream token authenticated for call:', tokenCallSid);
+  }
+
+  // If no token auth and no user auth, reject
+  if (!tokenAuthOk && !ctx.userId) {
+    return errorResponse('Authentication required', 401, ctx.requestId);
+  }
+
+  // Parse request body
+  let requestData: VoiceStreamRequest;
+  try {
+    requestData = await req.json();
+  } catch {
+    // For WebSocket upgrade requests or empty bodies, use query params
+    requestData = {
+      callSid: tokenCallSid || queryCallSid || '',
+      organizationId: tokenAuthOk ? 'hotline' : (ctx.organizationId || ''),
+    };
+  }
+
+  // Use token callSid if available (overrides body)
+  if (tokenCallSid) {
+    requestData.callSid = tokenCallSid;
+  }
+
+  // For token-authenticated requests, set organizationId to 'hotline'
+  if (tokenAuthOk && !requestData.organizationId) {
+    requestData.organizationId = 'hotline';
+  }
 
   if (!requestData.callSid || !requestData.organizationId) {
     return errorResponse('Missing required fields: callSid, organizationId', 400, ctx.requestId);
@@ -323,6 +391,6 @@ async function handleVoiceStream(req: Request, ctx: ExtendedSecurityContext): Pr
 
 serve(withSecurity(handleVoiceStream, {
   endpoint: 'enhanced-voice-stream',
-  requireAuth: true,
+  requireAuth: false, // Auth handled internally (supports both Bearer tokens and stream tokens)
   rateLimit: 1000, // Higher limit for streaming
 }));

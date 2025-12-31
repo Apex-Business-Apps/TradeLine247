@@ -2,6 +2,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateTwilioRequest } from "../_shared/twilioValidator.ts";
 import { buildInternalNumberSet, isInternalCaller, safeDialTarget } from "../_shared/antiLoop.ts";
+import { createStreamToken } from "../_shared/stream_token.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,8 +19,18 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+    // Hotline configuration - assistant-first mode
+    const HOTLINE_DID = Deno.env.get('HOTLINE_DID') || '+15877428885';
+    const HOTLINE_ASSISTANT_ONLY = (Deno.env.get('HOTLINE_ASSISTANT_ONLY') || 'false') === 'true';
+    const VOICE_STREAM_SECRET = Deno.env.get('VOICE_STREAM_SECRET') || supabaseServiceKey;
+    const HOTLINE_ALERT_WEBHOOK = Deno.env.get('HOTLINE_ALERT_WEBHOOK');
+
     if (!FORWARD_TARGET_E164) {
       throw new Error('Missing required environment variables');
+    }
+
+    if (!VOICE_STREAM_SECRET) {
+      throw new Error('VOICE_STREAM_SECRET must be set for secure stream authentication');
     }
 
     // CRITICAL: Enforce E.164 format for bridge target
@@ -37,7 +48,68 @@ Deno.serve(async (req) => {
     const hasRecordingParam = recordingParam !== null;
     const recordingEnabled = recordingParam === 'true';
 
+    // Check for fallback and hotline flags
+    const isFallback = url.searchParams.get('fallback') === 'true';
+    const isHotlineFallback = url.searchParams.get('hotline') === 'true';
+
     console.log('✅ Twilio signature validated successfully');
+
+    // HOTLINE FALLBACK HANDLER: When stream handshake fails, don't dial - notify ops instead
+    if (isFallback && isHotlineFallback) {
+      const CallSid = params['CallSid'] || 'unknown';
+      const From = params['From'] || 'unknown';
+
+      console.error('Hotline stream fallback triggered:', { CallSid, From });
+
+      // Create supabase client for logging
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+      // Log the fallback event
+      await supabase.from('call_timeline').insert({
+        call_sid: CallSid,
+        event: 'hotline_fallback',
+        timestamp: new Date().toISOString(),
+        metadata: {
+          from: From,
+          reason: 'stream_handshake_failed'
+        }
+      }).catch(e => console.error('Failed to log fallback:', e));
+
+      // Insert alert for ops
+      await supabase.from('hotline_alerts').insert({
+        call_sid: CallSid,
+        reason: 'stream_handshake_failed',
+        from_e164: From,
+        created_at: new Date().toISOString()
+      }).catch(e => console.error('Failed to insert hotline alert:', e));
+
+      // Optionally fire webhook to ops
+      if (HOTLINE_ALERT_WEBHOOK) {
+        fetch(HOTLINE_ALERT_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            callSid: CallSid,
+            from: From,
+            reason: 'stream_handshake_failed',
+            timestamp: new Date().toISOString()
+          })
+        }).catch(e => console.error('Failed to send alert webhook:', e));
+      }
+
+      // Return friendly message - NO DIAL for hotline
+      const fallbackTwiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna">We're sorry. We're temporarily unable to connect the assistant. Our team has been notified. Please try calling again in a few minutes, or leave a message after the tone.</Say>
+  <Record maxLength="120" transcribe="true" playBeep="true" />
+  <Say voice="Polly.Joanna">Thank you for your message. Goodbye.</Say>
+  <Hangup/>
+</Response>`;
+
+      return new Response(fallbackTwiml, {
+        headers: { ...corsHeaders, 'Content-Type': 'text/xml' }
+      });
+    }
 
     // Extract parameters
     const CallSid = params['CallSid'];
@@ -79,7 +151,17 @@ Deno.serve(async (req) => {
     const dialTarget = safeDialTarget(FORWARD_TARGET_E164, From, To, internalNumbers);
     const canDial = !!dialTarget;
 
-    console.log('Incoming call:', { CallSid, From, To, AnsweredBy });
+    // Hotline detection - assistant-first mode (never forward, always AI)
+    const isHotline = (To === HOTLINE_DID) || HOTLINE_ASSISTANT_ONLY;
+
+    // Helper to create secure stream URL with short-lived HMAC token
+    async function makeStreamUrl(callSid: string): Promise<string> {
+      const token = await createStreamToken(VOICE_STREAM_SECRET, callSid, 3 * 60 * 1000); // 3m TTL
+      const base = supabaseUrl.replace('https://', '');
+      return `wss://${base}/functions/v1/enhanced-voice-stream?callSid=${callSid}&streamToken=${token}`;
+    }
+
+    console.log('Incoming call:', { CallSid, From, To, AnsweredBy, isHotline });
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
@@ -142,9 +224,20 @@ Deno.serve(async (req) => {
     const statusCallbackUrl = `${supabaseUrl}/functions/v1/voice-status-callback`;
     const dialRecordAttr = recordingEnabled ? "record-from-answer" : "do-not-record";
 
-    if (internalCaller || !canDial) {
+    // HOTLINE ASSISTANT-ONLY: never dial external numbers, always connect to AI
+    if (isHotline) {
+      const streamUrl = await makeStreamUrl(CallSid);
+      twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna">Welcome to the TradeLine demo hotline. Connecting you to our AI receptionist now.</Say>
+  <Connect action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-answer?fallback=true&amp;hotline=true">
+    <Stream url="${streamUrl}" />
+  </Connect>
+  <Say voice="Polly.Joanna">Thank you for calling. Goodbye.</Say>
+</Response>`;
+    } else if (internalCaller || !canDial) {
       // Safe path: never dial humans for internal callers or blocked targets
-      const streamUrl = `wss://${supabaseUrl.replace('https://', '')}/functions/v1/voice-stream?callSid=${CallSid}`;
+      const streamUrl = await makeStreamUrl(CallSid);
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="Polly.Joanna">Admin line active. Connecting you to the AI assistant.</Say>
@@ -156,6 +249,7 @@ Deno.serve(async (req) => {
     } else if ((useLLM || pickupMode === 'immediate') && realtimeEnabled && withinConcurrencyLimit) {
       // Greeting + realtime stream with 3s watchdog fallback
       // PHASE 1A: Ensure recording doesn't loop - use record="record-from-answer" on Dial only (not on Connect/Stream)
+      const streamUrl = await makeStreamUrl(CallSid);
       twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Gather action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-action?recording_enabled=${recordingEnabled}" numDigits="1" timeout="1">
@@ -164,7 +258,7 @@ Deno.serve(async (req) => {
     </Say>
   </Gather>
   <Connect action="https://${supabaseUrl.replace('https://', '')}/functions/v1/voice-answer?fallback=true">
-    <Stream url="wss://${supabaseUrl.replace('https://', '')}/functions/v1/voice-stream?callSid=${CallSid}" />
+    <Stream url="${streamUrl}" />
   </Connect>
   <Say voice="Polly.Joanna">Connecting you to an agent now.</Say>
   <Dial callerId="${To}" record="${dialRecordAttr}" recordingStatusCallback="${recordingCallbackUrl}" statusCallback="${statusCallbackUrl}" statusCallbackEvent="initiated ringing answered completed">
