@@ -20,3 +20,21 @@ vi.mock('react-helmet-async', async () => {
     Helmet: () => null, // Mock Helmet to return nothing in tests
   };
 });
+
+// Mock IntersectionObserver globally for all tests
+const observe = vi.fn();
+const disconnect = vi.fn();
+const unobserve = vi.fn();
+
+class IntersectionObserverMock {
+  observe = observe;
+  disconnect = disconnect;
+  unobserve = unobserve;
+  takeRecords = vi.fn();
+  root = null;
+  rootMargin = '';
+  thresholds = [];
+  constructor() {}
+}
+
+window.IntersectionObserver = IntersectionObserverMock as any;

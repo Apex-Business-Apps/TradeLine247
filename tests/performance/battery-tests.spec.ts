@@ -156,7 +156,7 @@ test.describe('Battery Tests - Performance & Reliability', () => {
 
       // Perform smooth scroll
       window.scrollTo({
-        top: 1000,
+        top: 5000, // Maximized distance to ensure enough events are captured in headless mode
         behavior: 'smooth',
       });
 
