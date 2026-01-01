@@ -165,13 +165,25 @@ export const Header: React.FC = () => {
     <>
       {/* Scroll Sentinel: Positioned at top of page, 10px high. When it leaves viewport, we are scrolled > 10px */}
       <div 
-        data-header-inner
-        className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 items-center gap-4"
+        ref={sentinelRef}
+        className="absolute top-0 left-0 w-full h-[10px] pointer-events-none opacity-0 -z-10"
+        aria-hidden="true"
+      />
+
+      <header
+        id="app-header"
+        data-site-header
+        data-testid="app-header"
+        role="banner"
+        className={cn(
+          'sticky top-0 z-[9999] w-full border-b bg-background transition-all duration-300 isolate',
+          isScrolled ? 'shadow-lg py-2' : 'py-4'
+        )}
+        style={{ isolation: 'isolate' }}
       >
         <div 
-          id="app-header-left"
-          data-slot="left"
-          className="flex items-center gap-3"
+          data-header-inner
+          className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 items-center gap-4"
         >
           {/* Left: Home Button & Badge */}
           <div
@@ -199,18 +211,17 @@ export const Header: React.FC = () => {
             />
           </div>
 
-        {/* Center: Desktop Admin Navigation (Admin Only, NOT on marketing home) */}
-        {isUserAdmin && !isMarketingHome && (
-          <nav
-            data-slot="app-nav"
-            aria-label="Application"
-            className="hidden lg:flex items-center gap-1 ml-4 pl-4 border-l border-border"
-          >
-            <NavigationMenu>
-              <NavigationMenuList className="gap-1">
-                {ADMIN_NAV.map((item) => {
-                  const Icon = item.icon;
-                  return (
+          {/* Center: Desktop Marketing Navigation - Only show for logged-out users */}
+          {!user && (
+            <nav
+              data-slot="center"
+              aria-label="Primary"
+              role="navigation"
+              className="hidden lg:flex items-center gap-1"
+            >
+              <NavigationMenu>
+                <NavigationMenuList className="gap-1">
+                  {MARKETING_NAV.map((item) => (
                     <NavigationMenuItem key={item.name}>
                       <NavigationMenuLink asChild>
                         <Link
