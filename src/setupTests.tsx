@@ -26,15 +26,29 @@ const observe = vi.fn();
 const disconnect = vi.fn();
 const unobserve = vi.fn();
 
-class IntersectionObserverMock {
+class IntersectionObserverMock implements IntersectionObserver {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin: string = '0px';
+  readonly thresholds: ReadonlyArray<number> = [0];
+
   observe = observe;
   disconnect = disconnect;
   unobserve = unobserve;
-  takeRecords = vi.fn();
-  root = null;
-  rootMargin = '';
-  thresholds = [];
-  constructor() {}
+  takeRecords = vi.fn(() => [] as IntersectionObserverEntry[]);
+
+  constructor(
+    _callback: IntersectionObserverCallback,
+    options?: IntersectionObserverInit
+  ) {
+    // Store options to match real IntersectionObserver API
+    if (options) {
+      (this as { root: Element | Document | null }).root = options.root ?? null;
+      (this as { rootMargin: string }).rootMargin = options.rootMargin ?? '0px';
+      (this as { thresholds: ReadonlyArray<number> }).thresholds = Array.isArray(options.threshold)
+        ? options.threshold
+        : [options.threshold ?? 0];
+    }
+  }
 }
 
-window.IntersectionObserver = IntersectionObserverMock as any;
+window.IntersectionObserver = IntersectionObserverMock as unknown as typeof IntersectionObserver;

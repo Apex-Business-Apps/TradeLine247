@@ -1,33 +1,114 @@
-You are Google Jules acting as a senior Codemagic + iOS release engineer.
+workflows:
+  # ────────────────────────────────────────────────────────────────────────────
+  # iOS BUILD FOR APP STORE CONNECT (PRIMARY)
+  # ────────────────────────────────────────────────────────────────────────────
+  ios-capacitor-testflight:
+    name: iOS • Capacitor -> TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 75
+    environment:
+      groups:
+        - ios_config
+        - appstore_credentials
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: $BUNDLE_ID
+      node: 20.11.1
+      npm: 10
+      xcode: latest
+      cocoapods: default
+    cache:
+      cache_paths:
+        - ~/.npm
+        - ~/.cocoapods
+        - ios/Pods
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Quality gates
+        script: npm run lint && npm run typecheck && npm run test:unit
+      - name: Playwright smoke
+        script: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e:smoke
+      - name: Build archive & IPA
+        script: bash scripts/build-ios.sh
+      - name: Upload to TestFlight
+        script: fastlane ios upload
+      - name: Verify artifacts
+        script: bash scripts/verify-codemagic.sh
+    artifacts:
+      - ios/build/export/*.ipa
+      - ios/build/TradeLine247.xcarchive
+      - playwright-report/**/*
+      - dist/**/*
+      - build-artifacts-sha256.txt
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
 
-GOAL:
-Fix the Codemagic build failing at preflight due to missing APP_STORE_CONNECT_KEY_ID and ensure TestFlight publishing works consistently using environment-variable auth.
+  # ────────────────────────────────────────────────────────────────────────────
+  # ANDROID BUILD (OPTIONAL)
+  # ────────────────────────────────────────────────────────────────────────────
+  android-capacitor-release:
+    name: Android • Capacitor bundleRelease
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      groups:
+        - android_signing
+      node: 20.11.1
+      npm: 10
+      java: 17
+    cache:
+      cache_paths:
+        - ~/.npm
+        - ~/.gradle
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Quality gates
+        script: npm run lint && npm run typecheck && npm run test:unit
+      - name: Playwright smoke
+        script: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e:smoke
+      - name: Build Android App Bundle
+        script: bash scripts/build-android.sh
+      - name: Verify artifacts
+        script: bash scripts/verify-codemagic.sh
+    artifacts:
+      - android/app/build/outputs/**/*.aab
+      - playwright-report/**/*
+      - dist/**/*
+      - build-artifacts-sha256.txt
 
-EVIDENCE:
-Build log shows env var exists as APP_STORE_CONNECT_KEY_iD (lowercase i) and preflight fails on APP_STORE_CONNECT_KEY_ID.
-This proves a case-sensitive env-var name mismatch.
-
-CONSTRAINTS:
-- Use Codemagic documented env vars: APP_STORE_CONNECT_PRIVATE_KEY, APP_STORE_CONNECT_KEY_IDENTIFIER, APP_STORE_CONNECT_ISSUER_ID.
-- Must persist normalized env vars across steps using CM_ENV.
-- Keep iOS signing as provisioning profile + certificate references only.
-- Provide full-file replacement codemagic.yaml at repo root.
-
-TASKS:
-1) Replace root codemagic.yaml with the assistant-provided full YAML.
-2) In the preflight step, normalize key id env var:
-   - Prefer APP_STORE_CONNECT_KEY_IDENTIFIER, fallback to APP_STORE_CONNECT_KEY_ID, then APP_STORE_CONNECT_KEY_iD.
-   - Persist normalized name by writing: echo "APP_STORE_CONNECT_KEY_IDENTIFIER=<value>" >> $CM_ENV
-3) Ensure publishing.app_store_connect uses:
-   api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-   key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-   issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-4) Commit with message: "Fix ASC env var normalization + stabilize TestFlight publishing"
-
-ACCEPTANCE CRITERIA:
-- Preflight succeeds even when only APP_STORE_CONNECT_KEY_iD exists.
-- IPA artifact is generated.
-- TestFlight upload succeeds.
-
-ROLLBACK:
-- Revert commit and retag.
+  # ────────────────────────────────────────────────────────────────────────────
+  # WEB TESTS (LINUX) - CI VALIDATION
+  # ────────────────────────────────────────────────────────────────────────────
+  web-tests-only:
+    name: Web Tests & Smoke
+    instance_type: linux
+    max_build_duration: 45
+    environment:
+      node: 20.11.1
+      npm: 10
+    cache:
+      cache_paths:
+        - ~/.npm
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Lint, typecheck, unit tests
+        script: npm run lint && npm run typecheck && npm run test:unit
+      - name: Build web bundle
+        script: npm run build:web
+      - name: Install Playwright browsers
+        script: npm run test:install-browsers
+      - name: Run full Playwright test suite
+        script: npx playwright test --reporter=html
+    artifacts:
+      - playwright-report/**/*
+      - dist/**/*
