@@ -34,20 +34,6 @@ vi.mock('@/stores/userPreferencesStore', () => ({
   }),
 }));
 
-// Mock IntersectionObserver
-const observe = vi.fn();
-const disconnect = vi.fn();
-window.IntersectionObserver = class {
-  observe = observe;
-  disconnect = disconnect;
-  unobserve = vi.fn();
-  takeRecords = vi.fn();
-  root = null;
-  rootMargin = '';
-  thresholds = [];
-  constructor() {}
-} as any;
-
 describe('Header user menu', () => {
   let hourSpy: ReturnType<typeof vi.spyOn>;
 
